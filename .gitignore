@@ -1,0 +1,8 @@
+/.vagrant
+/.idea
+/vagrantfile
+/composer.phar
+/composer.json
+/composer.lock
+/bootstrap.sh
+/start.sh
