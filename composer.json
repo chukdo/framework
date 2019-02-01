@@ -3,12 +3,15 @@
     "type": "framework",
     "version": "1.0.0",
     "description": "Small Framework using AZURE Storage and MONGODB Database",
+    "homepage": "http://git.modelo.fr/jpdomingo/chukdo",
     "keywords": [ "framework", "chukdo"],
     "license": "MIT",
     "authors": [
         {
             "name": "Jean-Pierre Domingo",
-            "email": "jp.domingo@modelo.fr"
+            "email": "jp.domingo@modelo.fr",
+            "homepage": "http://git.modelo.fr/jpdomingo/chukdo",
+            "role": "Author"
         }
     ],
     "require": {
