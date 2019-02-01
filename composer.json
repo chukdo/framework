@@ -1,7 +1,8 @@
 {
-    "name": "chukdo",
+    "name": "chukdo/chukdo",
+    "type": "framework",
     "version": "1.0.0",
-    "description": "Small Framework using AZURE Storage and MongoDb Database",
+    "description": "Small Framework using AZURE Storage and MONGODB Database",
     "keywords": [ "framework", "chukdo"],
     "license": "MIT",
     "authors": [
@@ -20,7 +21,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Chukdo\\": "src/"
+            "Chukdo": "src"
         }
     }
 }
