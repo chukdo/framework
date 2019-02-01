@@ -1,7 +1,7 @@
 {
     "name": "chukdo/chukdo",
     "type": "framework",
-    "version": "1.0.1",
+    "version": "1.0.0",
     "description": "Small Framework using AZURE Storage and MONGODB Database",
     "homepage": "http://git.modelo.fr/jpdomingo/chukdo",
     "keywords": [ "framework", "chukdo"],
