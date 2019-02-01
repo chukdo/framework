@@ -200,11 +200,11 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     /**
      * Place le pointeur de flux à une position
      *
-     * @param   int $offset
-     * @param   int $whence
-     * @return  bool
+     * @param int $offset
+     * @param int $whence
+     * @return bool
      */
-    public function stream_seek(int $offset, int $whence = SEEK_SET): bool
+    public function stream_seek(int $offset, $whence = SEEK_SET): bool
     {
         switch ($whence) {
             case SEEK_SET :

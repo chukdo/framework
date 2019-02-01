@@ -21,7 +21,7 @@ interface StreamWrapper
      * @param int $whence
      * @return bool
      */
-    public function stream_seek(int $offset, int $whence = SEEK_SET): bool;
+    public function stream_seek(int $offset, int $whence): bool;
 
     /**
      * @return bool

@@ -45,17 +45,15 @@ Interface Redis extends \Iterator, \Countable
     /**
      * Retourne les informations sur le serveur Redis
      *
-     * @param 	string 	$key    information que l'on souhaite recuperer
-     * @return 	mixed 	string si $key defini array sinon
+     * @param string|null $key information que l'on souhaite recuperer
+     * @return mixed
      */
-    public function info(string $key = '');
+    public function info(string $key = null);
 
     /**
-     * Appel des commandes redis au travers de la surcharge magique de PHP
-     *
-     * @param 	string	$name de la fonction redis à invoquer
-     * @param 	array 	$args arguments à passer à la fonction
-     * @return	 mixed
+     * @param string $name
+     * @param array $args
+     * @return mixed
      */
     public function __call(string $name, array $args);
 }

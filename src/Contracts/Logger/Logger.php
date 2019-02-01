@@ -11,77 +11,67 @@
  */
 interface Logger
 {
+    /**
+     * @param string $message
+     * @param array $context
+     * @return bool
+     */
+    public function alert(string $message, array $context = []): bool;
 
     /**
-     * Ajoute un enregistrement d'alerte dans le journal
-     *
-     * @param  string  $message
-     * @param  array  $context
-     * @return void
+     * @param string $message
+     * @param array $context
+     * @return bool
      */
-    public function alert(string $message, array $context = []): void;
+    public function critical(string $message, array $context = []): bool;
 
     /**
-     * Ajoute un enregistrement critique dans le journal
-     *
-     * @param  string  $message
-     * @param  array  $context
-     * @return void
+     * @param string $message
+     * @param array $context
+     * @return bool
      */
-    public function critical(string $message, array $context = []): void;
+    public function emergency(string $message, array $context = []): bool;
 
     /**
-     * Ajoute un enregistrement d'erreur dans le journal
-     *
-     * @param  string  $message
-     * @param  array  $context
-     * @return void
+     * @param string $message
+     * @param array $context
+     * @return bool
      */
-    public function error(string $message, array $context = []): void;
+    public function error(string $message, array $context = []): bool;
 
     /**
-     * Ajoute un enregistrement d'avertissement dans le journal
-     *
-     * @param  string  $message
-     * @param  array  $context
-     * @return void
+     * @param string $message
+     * @param array $context
+     * @return bool
      */
-    public function warning(string $message, array $context = []): void;
+    public function warning(string $message, array $context = []): bool;
 
     /**
-     * Ajoute un enregistrement de notice dans le journal
-     *
-     * @param  string  $message
-     * @param  array  $context
-     * @return void
+     * @param string $message
+     * @param array $context
+     * @return bool
      */
-    public function notice(string $message, array $context = []): void;
+    public function notice(string $message, array $context = []): bool;
 
     /**
-     * Ajoute un enregistrement d'information dans le journal
-     *
-     * @param  string  $message
-     * @param  array  $context
-     * @return void
+     * @param string $message
+     * @param array $context
+     * @return bool
      */
-    public function info(string $message, array $context = []): void;
+    public function info(string $message, array $context = []): bool;
 
     /**
-     * Ajoute un enregistrement de debug dans le journal
-     *
-     * @param  string  $message
-     * @param  array  $context
-     * @return void
+     * @param string $message
+     * @param array $context
+     * @return bool
      */
-    public function debug(string $message, array $context = []): void;
+    public function debug(string $message, array $context = []): bool;
 
     /**
-     * Ajoute un enregistrement dans le journal
-     *
-     * @param  string  $level
-     * @param  string  $message
-     * @param  array  $context
-     * @return void
+     * @param string $level
+     * @param string $message
+     * @param array $context
+     * @return bool
      */
-    public function log(string $level, $message, array $context = []): void;
+    public function log(string $level, string $message, array $context = []): bool;
 }

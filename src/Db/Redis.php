@@ -58,22 +58,20 @@ class Redis implements RedisInterface
      * @var string 
      */
 	protected $type = null;	
-	
+
     /**
-     * Constructeur
-     * Initialise l'objet
-     * 
-     * @param 	string 	$dsn de connexion au serveur redis
-     * @param 	int 	$timeout en secondes
-     * @throws  RedisException
+     * Redis constructor.
+     * @param string|null $dsn
+     * @param int|null $timeout
+     * @throws RedisException
      */
-    public function __construct(string $dsn = 'redis://127.0.0.1:6379', int $timeout = 5)
+    public function __construct(string $dsn = null, int $timeout = null)
     {
-        $dsn  = parse_url($dsn);
+        $dsn  = parse_url($dsn ?: 'redis://127.0.0.1:6379');
         $host = $dsn['host'];
         $port = $dsn['port'];
 
-        $this->sock = fsockopen($host, $port, $errno, $errstr, $timeout);
+        $this->sock = fsockopen($host, $port, $errno, $errstr, $timeout ?: 5);
 
         if ($this->sock === null) {
             throw new RedisException("[$errno $errstr]");
@@ -401,10 +399,10 @@ class Redis implements RedisInterface
      * @return array|bool|mixed
      * @throws RedisException
      */
-    public function info($key = '')
+    public function info(string $key = null)
     {
-        $info  =[];
-        $items = explode("\r\n", $this->__call('info',[]));
+        $info   = [];
+        $items  = explode("\r\n", $this->__call('info',[]));
 
         foreach ($items as $item) {
             $item = explode(":", $item);
