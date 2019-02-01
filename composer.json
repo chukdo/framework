@@ -1,0 +1,26 @@
+{
+    "name": "chukdo",
+    "version": "1.0.0",
+    "description": "Small Framework using AZURE Storage and MongoDb Database",
+    "keywords": [ "framework", "chukdo"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jean-Pierre Domingo",
+            "email": "jp.domingo@modelo.fr"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.0",
+        "ext-json": "*",
+        "ext-mongodb": "^1.5.0",
+        "mongodb/mongodb": "~1.4.0",
+        "microsoft/azure-storage-common": "~1.2.0",
+        "microsoft/azure-storage-blob": "~1.2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Chukdo\\": "src/"
+        }
+    }
+}
