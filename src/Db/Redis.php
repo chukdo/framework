@@ -133,7 +133,7 @@ class Redis implements RedisInterface
      */
 	public function count()
 	{
-		$this->write($this->command(array('dbsize')));
+		$this->write($this->command(['dbsize']));
 		
 		return $this->read();
 	}
@@ -169,19 +169,19 @@ class Redis implements RedisInterface
         if (isset($this->stack[0])) {
             $key = $this->stack[0];
 
-            switch ($this->__call("TYPE", array($key))) {
+            switch ($this->__call("TYPE", [$key])) {
                 case 'string' :
                 case 'set' :
                     $current = $this->get($key);
                     break;
                 case 'list' :
-                    $current = $this->__call("LRANGE", array($key, '0', '-1'));
+                    $current = $this->__call("LRANGE", [$key, '0', '-1']);
                     break;
                 case 'zset' :
-                    $current = $this->__call("ZRANGE", array($key, '0', '-1'));
+                    $current = $this->__call("ZRANGE", [$key, '0', '-1']);
                     break;
                 case 'hash' :
-                    $current = $this->__call("HGETALL", array($key));
+                    $current = $this->__call("HGETALL", [$key]);
                     break;
             }
         }
@@ -426,7 +426,7 @@ class Redis implements RedisInterface
      */
     public function exists(string $key)
     {
-        return $this->__call("EXISTS", array($key));
+        return $this->__call("EXISTS", [$key]);
     }
 
     /**
@@ -437,7 +437,7 @@ class Redis implements RedisInterface
      */
     public function set(string $key, $value)
     {
-        return $this->__call("SET", array($key, $value));
+        return $this->__call("SET", [$key, $value]);
     }
 
     /**
@@ -447,7 +447,7 @@ class Redis implements RedisInterface
      */
     public function get(string $key)
     {
-        return $this->__call("GET", array($key));
+        return $this->__call("GET", [$key]);
     }
 
     /**
@@ -457,7 +457,7 @@ class Redis implements RedisInterface
      */
     public function del(string $key)
     {
-        return (bool) $this->__call("DEL", array($key));
+        return (bool) $this->__call("DEL", [$key]);
     }
 
     /**
@@ -483,7 +483,7 @@ class Redis implements RedisInterface
      */
     public function __isset(string $key)
     {
-        return $this->__call("EXISTS", array($key));
+        return $this->__call("EXISTS", [$key]);
     }
 
     /**

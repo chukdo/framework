@@ -41,9 +41,9 @@ class Json extends \ArrayObject
     /**
      * json constructor.
      * @param mixed $data
-     * @param bool $clean
+     * @param bool|null $clean
      */
-    public function __construct($data = null, bool $clean = false)
+    public function __construct($data = null, bool $clean = null)
     {
         parent::__construct([]);
 
@@ -213,10 +213,10 @@ class Json extends \ArrayObject
     /**
      * @param mixed $key
      * @param mixed $value
-     * @param bool $clean
+     * @param bool|null $clean
      * @return Json
      */
-    public function offsetSet($key, $value, bool $clean = false): self
+    public function offsetSet($key, $value, bool $clean = null): self
     {
         if ($clean) {
             if ($value === '' || $value === null) {
@@ -303,10 +303,10 @@ class Json extends \ArrayObject
 
     /**
      * @param iterable $merge
-     * @param bool $overwrite
+     * @param bool|null $overwrite
      * @return Json
      */
-    public function merge(iterable $merge, bool $overwrite = true): self
+    public function merge(iterable $merge, bool $overwrite = null): self
     {
         foreach ($merge as $k => $v) {
             if ($overwrite || !$this->offsetExists($k)) {
@@ -319,10 +319,10 @@ class Json extends \ArrayObject
 
     /**
      * @param iterable $merge
-     * @param bool $overwrite
+     * @param bool|null $overwrite
      * @return Json
      */
-    public function mergeRecursive(iterable $merge, bool $overwrite = true): self
+    public function mergeRecursive(iterable $merge, bool $overwrite = null): self
     {
         foreach ($merge as $k => $v) {
 
@@ -358,15 +358,15 @@ class Json extends \ArrayObject
     /**
      * @param iterable $hydrate
      * @param Json $reference
-     * @param bool $typehint
-     * @param bool $matchOnly
+     * @param bool|null $typehint
+     * @param bool|null $matchOnly
      * @return Json
      */
     public static function hydrator(
         iterable $hydrate,
         Json $reference,
-        bool $typehint = true,
-        bool $matchOnly = false): Json
+        bool $typehint = null,
+        bool $matchOnly = null): Json
     {
         $data = new Json();
 
@@ -426,20 +426,20 @@ class Json extends \ArrayObject
 
     /**
      * @param iterable $populate
-     * @param bool $typehint
+     * @param bool|null $typehint
      * @return Json
      */
-    public function hydrate(iterable $populate, bool $typehint = true): Json
+    public function hydrate(iterable $populate, bool $typehint = null): Json
     {
         return self::hydrator($populate, $this, $typehint, false);
     }
 
     /**
      * @param iterable $populate
-     * @param bool $typehint
+     * @param bool|null $typehint
      * @return Json
      */
-    public function populate(iterable $populate, bool $typehint = true): Json
+    public function populate(iterable $populate, bool $typehint = null): Json
     {
         return self::hydrator($populate, $this, $typehint, true);
     }
@@ -546,10 +546,10 @@ class Json extends \ArrayObject
     /**
      * Retourne l'objet sous forme d'un tableau a 2 dimensions (path => value)
      *
-     * @param mixed $path chemin de depart
+     * @param string|null $path chemin de depart
      * @return array
      */
-    public function toFlatJson($path = false)
+    public function toFlatJson($path = null)
     {
         $mixed = [];
 
@@ -569,10 +569,10 @@ class Json extends \ArrayObject
 
     /**
      * @param string $path
-     * @param bool $assoc
+     * @param bool|null $assoc
      * @return Json|mixed|null
      */
-    public function getPathMatch(string $path, bool $assoc = false)
+    public function getPathMatch(string $path, bool $assoc = null)
     {
         /** Pas de chemin,  retour de l'offset */
         if (strpos($path, '/') === false) {

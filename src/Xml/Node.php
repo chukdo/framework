@@ -339,7 +339,7 @@ class Node implements IteratorAggregate
                 $this->appendNode(new DOMText($value));
             } else {
                 $len1  = strlen($value);
-                $len2  = strlen(str_replace(array('"', '[', ']', '&', '<', '>'), '', $value));
+                $len2  = strlen(str_replace(['"', '[', ']', '&', '<', '>'], '', $value));
 
                 $this->appendNode(
                     $len1 !== $len2 ?

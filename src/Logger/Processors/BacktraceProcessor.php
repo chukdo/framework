@@ -20,7 +20,7 @@ class BacktraceProcessor implements ProcessorInterface
     public function processRecord(array $record): array
     {
         $debug = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-        $record['extra']['backtrace'] = array();
+        $record['extra']['backtrace'] = [];
 
         array_shift($debug);
 

@@ -51,7 +51,7 @@ class Loader
      */
 	public function register(): void
 	{
-		spl_autoload_register(array($this, 'loadClass'));
+		spl_autoload_register([$this, 'loadClass']);
 	}
 	
     /**
@@ -61,7 +61,7 @@ class Loader
      */
 	public function unregister(): void
 	{
-		spl_autoload_unregister(array($this, 'loadClass'));
+		spl_autoload_unregister([$this, 'loadClass']);
 	}
 	
     /**

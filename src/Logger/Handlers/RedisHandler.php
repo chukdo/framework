@@ -3,9 +3,12 @@
 use \Chukdo\Contracts\Db\Redis as RedisInterface;
 
 /**
- * Gestionaire de db nosql redis
+ * Gestionnaire des flux Redis
  *
- * @copyright 	licence MIT, Copyright (C) 2015 Domingo
+ * @package 	Logger
+ * @version 	1.0.0
+ * @copyright 	licence MIT, Copyright (C) 2019 Domingo
+ * @since 		08/01/2019
  * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class RedisHandler extends AbstractHandler
@@ -21,10 +24,9 @@ class RedisHandler extends AbstractHandler
     protected $key;
 
     /**
-     * Constructeur
-     *
-     * @param   \Chukdo\Contracts\Db\Redis  $redis RedisInterface
-     * @param   string  $key cle de stockage dans redis
+     * RedisHandler constructor.
+     * @param RedisInterface $redis
+     * @param string $key
      */
     public function __construct(RedisInterface $redis, $key = 'log')
     {
@@ -46,12 +48,10 @@ class RedisHandler extends AbstractHandler
     }
 
     /**
-     * Ecriture de l'enregistrement
-     *
-     * @param  array    $record
-     * @return bool     true si l'operation reussi false sinon
+     * @param array $record
+     * @return bool
      */
-    public function write(array $record)
+    public function write(array $record): bool
     {
         try {
             $this->redis->rpush($this->key, $record['formatted']);

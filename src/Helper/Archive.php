@@ -91,7 +91,7 @@ final class Archive
         $path     = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
         $ret      = $list ? [] : 0;
         $open     = zip_open($file);       
-        $ziperror = array(
+        $ziperror = [
             ZIPARCHIVE::ER_MULTIDISK => 'Multi-disk zip archives not supported.',
             ZIPARCHIVE::ER_RENAME => 'Renaming temporary file failed.',
             ZIPARCHIVE::ER_CLOSE => 'Closing zip archive failed', 
@@ -115,7 +115,7 @@ final class Archive
             ZIPARCHIVE::ER_INCONS => 'Zip archive inconsistent', 
             ZIPARCHIVE::ER_REMOVE => 'Can\'t remove file',
             ZIPARCHIVE::ER_DELETED => 'Entry has been deleted'
-        );
+        ];
         
         /** Creation repertoire */
         mkdir($path, 0777, true);

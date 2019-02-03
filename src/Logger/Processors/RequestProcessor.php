@@ -22,7 +22,7 @@ class RequestProcessor implements ProcessorInterface
      */
     public function processRecord(array $record): array
     {
-        $browser = Http::getBrowser($this->server('HTTP_USER_AGENT'));
+        $browser = Http::getUserAgent($this->server('HTTP_USER_AGENT'));
 
         $record['extra']['request'] = [
             'uri'       => $this->server('REQUEST_URI'),

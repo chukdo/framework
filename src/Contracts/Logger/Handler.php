@@ -12,34 +12,26 @@
 interface Handler
 {
     /**
-     * Test si l'enregistrement sera géré ou non par le gestionnaire de log
-     *
-     * @param  array  $record
+     * @param array $record
      * @return bool
      */
     public function isHandling(array $record): bool;
 
     /**
-     * Gere un enregistrement
-     *
-     * @param  array  $record
+     * @param array $record
      * @return bool
      */
     public function handle(array $record): bool;
 
     /**
-     * Ajoute un processeur de modification des enregistrements de log
-     *
      * @param Processor $processor
      * @return Handler
      */
-    public function pushProcessor(Processor $processor): self;
+    public function pushProcessor(Processor $processor): Handler;
 
     /**
-     * Defini le formatteur de données.
-     *
      * @param Formatter $formatter
      * @return Handler
      */
-    public function setFormatter(Formatter $formatter): self;
+    public function setFormatter(Formatter $formatter): Handler;
 }

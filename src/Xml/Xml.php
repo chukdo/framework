@@ -171,7 +171,7 @@ class Xml extends Node
     {
         $this->__buffer = $this->saveToString();
 
-        return array('__buffer');
+        return ['__buffer'];
     }
 
     /**

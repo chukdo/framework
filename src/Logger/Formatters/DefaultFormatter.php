@@ -4,47 +4,32 @@ use \Chukdo\Contracts\Logger\Formatter as FormatterInterface;
 use \Chukdo\Json\Json;
 
 /**
- * Formatter de log par defaut (json)
+ * Formatter de log par defaut
  *
- * @copyright 	licence MIT, Copyright (C) 2015 Domingo
+ * @package 	Logger
+ * @version 	1.0.0
+ * @copyright 	licence MIT, Copyright (C) 2019 Domingo
+ * @since 		08/01/2019
  * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class DefaultFormatter implements FormatterInterface
 {
-
     /**
-     * @var bool
-     */
-    protected $pretty;
-
-    /**
-     * Constructeur
-     *
-     * @param   bool    $pretty
-     */
-    public function __construct($pretty = false)
-    {
-        $this->pretty = $pretty;
-    }
-
-    /**
-     * Formatte un enregistrement
-     *
-     * @param  array  $record
+     * @param array $record
      * @return mixed
      */
     public function formatRecord(array $record)
     {
-        $json = new Json(array(
+        $json = new Json([
             'date'      => date('d/m/Y H:i:s', $record['time']),
             'name'      => $record['channel'].'.'.$record['levelname'],
-            'message'   => str_replace(array("\r\n", "\r", "\n"), ' ', $record['message']),
+            'message'   => str_replace(["\r\n", "\r", "\n"], ' ', $record['message']),
             'context'   => $record['context'],
             'extra'     => $record['extra'],
             'time'      => $record['time'],
             'level'     => $record['level']
-        ));
+        ]);
 
-        return $json->stringify($this->pretty);
+        return $json->toJson();
     }
 }

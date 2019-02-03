@@ -4,9 +4,12 @@ use \Chukdo\Helper\File;
 use \Chukdo\Http\Url;
 
 /**
- * Gestionaire de fichier
+ * Gestionnaire des flux fichier
  *
- * @copyright 	licence MIT, Copyright (C) 2014 Domingo
+ * @package 	Logger
+ * @version 	1.0.0
+ * @copyright 	licence MIT, Copyright (C) 2019 Domingo
+ * @since 		08/01/2019
  * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class StreamHandler extends AbstractHandler
@@ -50,12 +53,10 @@ class StreamHandler extends AbstractHandler
     }
 
     /**
-     * Ecriture de l'enregistrement
-     *
-     * @param  array    $record
-     * @return bool     true si l'operation reussi false sinon
+     * @param array $record
+     * @return bool
      */
-    public function write(array $record)
+    public function write(array $record): bool
     {
         $this->handleFile();
         $write = $this->getStream()->fwrite($record['formatted']."\r\n");
@@ -64,22 +65,17 @@ class StreamHandler extends AbstractHandler
     }
 
     /**
-     * defini l'url
-     *
-     * @param   string  $url
-     * @return  void
+     * @param string $url
      */
-    private function setUrl($url)
+    private function setUrl(string $url): void
     {
         $this->url = new Url($url);
     }
 
     /**
-     * Retourne l'objet url
-     *
-     * @return object   Chukdo\Http\Url
+     * @return Url
      */
-    private function getUrl()
+    private function getUrl(): Url
     {
         return $this->url;
     }

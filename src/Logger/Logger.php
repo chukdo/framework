@@ -44,7 +44,7 @@ class Logger implements LoggerInterface
      *
      * @var array $levels
      */
-    public static $levels = array(
+    public static $levels = [
         100 => 'DEBUG',
         200 => 'INFO',
         250 => 'NOTICE',
@@ -53,7 +53,7 @@ class Logger implements LoggerInterface
         500 => 'CRITICAL',
         550 => 'ALERT',
         600 => 'EMERGENCY',
-    );
+    ];
 
     /**
      * @var string
