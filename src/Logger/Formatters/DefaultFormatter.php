@@ -24,7 +24,6 @@ class DefaultFormatter implements FormatterInterface
             'date'      => date('d/m/Y H:i:s', $record['time']),
             'name'      => $record['channel'].'.'.$record['levelname'],
             'message'   => str_replace(["\r\n", "\r", "\n"], ' ', $record['message']),
-            'context'   => $record['context'],
             'extra'     => $record['extra'],
             'time'      => $record['time'],
             'level'     => $record['level']

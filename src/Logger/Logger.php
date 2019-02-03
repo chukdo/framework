@@ -45,14 +45,14 @@ class Logger implements LoggerInterface
      * @var array $levels
      */
     public static $levels = [
-        100 => 'DEBUG',
-        200 => 'INFO',
-        250 => 'NOTICE',
-        300 => 'WARNING',
-        400 => 'ERROR',
-        500 => 'CRITICAL',
-        550 => 'ALERT',
-        600 => 'EMERGENCY',
+        100 => 'Debug',
+        200 => 'Info',
+        250 => 'Notice',
+        300 => 'Warning',
+        400 => 'Error',
+        500 => 'Critical',
+        550 => 'Alert',
+        600 => 'Emergency',
     ];
 
     /**
@@ -107,8 +107,26 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * Retourne le nom de l'instance de log
-     *
+     * @param int $level
+     * @return string
+     */
+    public static function getLevel(int $level): string
+    {
+        return self::$levels[$level];
+    }
+
+    /**
+     * @param string $name
+     * @return Logger
+     */
+    public function setName(string $name): self
+    {
+        $this->name = ucfirst(strtolower($name));
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getName()
@@ -122,7 +140,7 @@ class Logger implements LoggerInterface
      * @param   HandlerInterface $handler
      * @return  $this
      */
-    public function pushHandler(HandlerInterface $handler)
+    public function pushHandler(HandlerInterface $handler): self
     {
         array_push($this->handlers, $handler);
 
@@ -135,7 +153,7 @@ class Logger implements LoggerInterface
      * @param   ProcessorInterface $processor
      * @return  $this
      */
-    public function pushProcessor(ProcessorInterface $processor)
+    public function pushProcessor(ProcessorInterface $processor): self
     {
         array_push($this->processors, $processor);
 
@@ -231,13 +249,13 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * @param string $level
+     * @param int $level
      * @param string $message
      * @param array $context
      * @return bool
      * @throws LoggerException
      */
-    public function log(string $level, string $message, array $context = []): bool
+    public function log(int $level, string $message, array $context = []): bool
     {
         if (empty($this->handlers)) {
             throw new LoggerException('You tried to log record from an empty handler stack.');
@@ -248,17 +266,34 @@ class Logger implements LoggerInterface
         }
 
         $record = [
-            'message'   => $message,
-            'context'   => $context,
+            'message'   => $this->interpolate($message, $context),
             'level'     => $level,
-            'levelname' => ucfirst(strtolower(self::$levels[$level])),
-            'channel'   => ucfirst(strtolower($this->name)),
+            'levelname' => $this->getLevel($level),
+            'channel'   => $this->getName(),
             'time'      => time(),
             'extra'     => [],
             'formatted' => null
         ];
 
         return $this->handleRecord($this->processRecord($record));
+    }
+
+    /**
+     * @param string $message
+     * @param array $context
+     * @return string
+     */
+    public function interpolate(string $message, array $context = []): string
+    {
+        $replace = [];
+
+        foreach ($context as $key => $val) {
+            if (!is_array($val) && (!is_object($val) || method_exists($val, '__toString'))) {
+                $replace['{' . $key . '}'] = $val;
+            }
+        }
+
+        return strtr($message, $replace);
     }
 
     /**

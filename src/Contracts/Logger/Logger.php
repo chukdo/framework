@@ -68,10 +68,10 @@ interface Logger
     public function debug(string $message, array $context = []): bool;
 
     /**
-     * @param string $level
+     * @param int $level
      * @param string $message
      * @param array $context
      * @return bool
      */
-    public function log(string $level, string $message, array $context = []): bool;
+    public function log(int $level, string $message, array $context = []): bool;
 }

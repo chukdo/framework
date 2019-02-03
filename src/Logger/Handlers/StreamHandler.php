@@ -53,13 +53,13 @@ class StreamHandler extends AbstractHandler
     }
 
     /**
-     * @param array $record
+     * @param string $record
      * @return bool
      */
-    public function write(array $record): bool
+    public function write(string $record): bool
     {
         $this->handleFile();
-        $write = $this->getStream()->fwrite($record['formatted']."\r\n");
+        $write = $this->getStream()->fwrite($record."\r\n");
 
         return $write > 0 ? true : false;
     }

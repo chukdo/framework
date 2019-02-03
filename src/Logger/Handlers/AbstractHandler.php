@@ -41,10 +41,10 @@ abstract class AbstractHandler implements HandlerInterface
     }
 
     /**
-     * @param array $record
+     * @param string $record
      * @return bool
      */
-    abstract protected function write(array $record): bool;
+    abstract protected function write(string $record): bool;
 
     /**
      * @param $levels
@@ -76,9 +76,7 @@ abstract class AbstractHandler implements HandlerInterface
                 $this->setFormatter(new DefaultFormatter());
             }
 
-            $record['formatted'] = $this->formatter->formatRecord($record);
-
-            return $this->write($record);
+            return $this->write($this->formatter->formatRecord($record));
         }
 
         return false;
