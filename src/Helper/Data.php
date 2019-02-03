@@ -1,5 +1,7 @@
 <?php namespace Chukdo\Helper;
 
+Use \Chukdo\Json\Json;
+
 /**
  * Classe Data
  * Fonctionnalités de filtre sur les données
@@ -18,15 +20,56 @@ final class data
      */
     private function __construct() {}
 
+
     /**
-     * @param int $duration
+     * Verifie si une chaine de caractere contient une autre chaine de caractere
+     *
+     * @param 	string  $haystack La chaîne dans laquelle on doit chercher
+     * @param 	string	$needle valeur recherché
+     * @return 	bool
+     */
+    public static function contain(string $haystack, string $needle): bool
+    {
+        return strpos($haystack, $needle) === false ? false : true;
+    }
+
+    /**
+     * Verifie si une chaine de caractere ne contient pas une autre chaine de caractere
+     *
+     * @param 	string 	$haystack La chaîne dans laquelle on doit chercher
+     * @param 	string	$needle valeur recherché
+     * @return 	bool
+     */
+    public static function notContain(string $haystack, string $needle): bool
+    {
+        return !self::contain($haystack, $needle);
+    }
+
+    /**
+     * Retourne un caractere d'une chaine en fonction de sa position
+     *
+     * @param 	string 	$string
+     * @param 	int 	$index
+     * @return 	string
+     */
+    public static function charAt(string $string, int $index): string
+    {
+        if ($index < strlen($string)) {
+            return substr($string, $index, 1);
+        } else{
+            return -1;
+        }
+    }
+
+    /**
+     * @param int|null $duration
      * @return string
      */
-    public static function csrfTokenEncode(int $duration = 60): string
+    public static function csrfTokenEncode(int $duration = null): string
     {
         return self::encrypt(json_encode([
             'time'      => time(),
-            'duration'  => (int) $duration
+            'duration'  => (int) $duration ?: 60
         ]), '[A"[6cnTDT{J[6s\'');
     }
 
@@ -55,11 +98,11 @@ final class data
     /**
      * @param string $pattern
      * @param string $value
-     * @return array_object
+     * @return Json
      */
-    public static function matchAll(string $pattern, string $value)
+    public static function matchAll(string $pattern, string $value): Json
     {
-        $match   = new array_object();
+        $match   = new Json();
         $matches = [];
         preg_match_all($pattern, $value, $matches, PREG_SET_ORDER);
 
@@ -79,7 +122,7 @@ final class data
     /**
      * @param string $pattern
      * @param string $value
-     * @return array_object|string|null
+     * @return Json|string|null
      */
     public static function match(string $pattern, string $value)
     {
@@ -92,7 +135,7 @@ final class data
             case 2  : return $match[1];
             default :
                 array_shift($match);
-                return new array_object($match);
+                return new Json($match);
         }
     }
 
@@ -108,17 +151,19 @@ final class data
     }
 
     /**
-     * @param int $time
+     * @param int|null $time
      * @return string
      */
-    public static function time(int $time = 0): string
+    public static function time(int $time = null): string
     {
         if ($time < 0.1) {
             return round($time * 1000, 3).' Micro-secondes';
-        } elseif ($time < 1) {
+        } else if ($time < 1) {
             return round($time * 1000, 3).' Milli-secondes';
-        } else {
+        } else if ($time) {
             return round($time, 3).' Secondes';
+        } else {
+            return '0';
         }
     }
 
@@ -126,42 +171,44 @@ final class data
      * @param int $mem
      * @return string
      */
-    public static function memory(int $mem = 0): string
+    public static function memory(int $mem = null): string
     {
         if ($mem < 1024) {
             return $mem.' Octets';
-        } elseif ($mem < 1048576) {
+        } else if ($mem < 1048576) {
             return round($mem/1024, 2).' Kilo-octets';
-        } else {
+        } else if ($mem) {
             return round($mem/1048576, 2).' Mega-octets';
+        } else {
+            return '0';
         }
     }
 
     /**
-     * @param string $prefix
+     * @param string|null $prefix
      * @return string
      */
-    public static function uid(string $prefix = ''): string
+    public static function uid(string $prefix = null): string
     {
         return $prefix.md5(uniqid(rand(), true));
     }
 
     /**
-     * @param int $length
+     * @param int|null $length
      * @return string
      */
-    public static function password(int $length = 8): string
+    public static function password(int $length = null): string
     {
         $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?";
-        $password = substr( str_shuffle( $chars ), 0, $length );
+        $password = substr( str_shuffle( $chars ), 0, $length ?: 8);
         return $password;
     }
 
     /**
-     * @param $length
+     * @param int $length
      * @param bool $readable
      * @return string
-     * @throws Exception
+     * @throws \Exception
      */
     public static function generateCode(int $length, bool $readable = true): string
     {
@@ -183,7 +230,7 @@ final class data
      * @param string $salt
      * @return string
      */
-    public static function encrypt(string $data, string $salt = 'saltgedao'): string
+    public static function encrypt(string $data, string $salt): string
     {
         $encrypted  = openssl_encrypt($data, 'bf-ecb', $salt, true);
         $result     = base64_encode($encrypted);
@@ -196,7 +243,7 @@ final class data
      * @param string $salt
      * @return string
      */
-    public static function decrypt(string $data, string $salt = 'saltgedao'): string
+    public static function decrypt(string $data, string $salt): string
     {
         $data       = base64_decode($data);
         $decrypted  = openssl_decrypt($data, 'bf-ecb', $salt, true);
@@ -233,9 +280,9 @@ final class data
      * @param string $replacement
      * @return string
      */
-    public static function stripTag(string $value, string $tag = '', string $replacement = ' '): string
+    public static function stripTag(string $value, string $tag = null, string $replacement = null): string
     {
-        return self::replace('/<\/?\s*'.$tag.'[^>]*>/', $replacement, $value);
+        return self::replace('/<\/?\s*'.$tag.'[^>]*>/', $replacement ?: ' ', $value);
     }
 
     /**

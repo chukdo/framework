@@ -76,10 +76,10 @@ final class Image
      *
      * @param resource $image (imagecreatetruecolor)
      * @param int $format type d'image (IMAGETYPE_GIF | IMAGETYPE_JPEG | IMAGETYPE_PNG)
-     * @param int $quality (0 à 100)
+     * @param int|null $quality (0 à 100)
      * @return string
      */
-    public static function getImage(resource $image, int $format, int $quality = 85): string
+    public static function getImage($image, int $format, int $quality = null): string
     {
         ob_start();
 
@@ -88,13 +88,13 @@ final class Image
                 imagegif($image);
                 break;
             case 'image/jpeg' :
-                imagejpeg($image, null, $quality);
+                imagejpeg($image, null, $quality ?: 85);
                 break;
             case 'image/png' :
-                $quality = 9 - abs(floor(($quality - 1) / 10));
+                $quality = 9 - abs(floor((($quality ?: 85) - 1) / 10));
                 imagealphablending($image, false);
                 imagesavealpha($image, true);
-                imagepng($image, null, $quality);
+                imagepng($image, null, $quality ?: 85);
                 break;
         }
 
@@ -109,10 +109,10 @@ final class Image
      *
      * @param array $image [w, h, t, i] (self::loadImage*)
      * @param int $format type d'image (IMAGETYPE_GIF | IMAGETYPE_JPEG | IMAGETYPE_PNG)
-     * @param int $quality (0 à 100)
+     * @param int|null $quality (0 à 100)
      * @return string si l'operation reussi false sinon
      */
-    public static function convert(array $image, int $format, int $quality = 92): ?string
+    public static function convert(array $image, int $format, int $quality = null): ?string
     {
         if ($image) {
             $w   = $image['w'];
@@ -122,7 +122,7 @@ final class Image
 
             if ($src && $dst) {
                 imagecopy($dst, $src, 0, 0, 0, 0, $w, $h);
-                $r = self::getImage($dst, $format, $quality);
+                $r = self::getImage($dst, $format, $quality ?: 92);
                 imagedestroy($src);
                 imagedestroy($dst);
 
@@ -167,10 +167,10 @@ final class Image
      *
      * @param array $image [w, h, t, i] (self::loadImage*)
      * @param int $dw largeur
-     * @param int $dh hauteur
+     * @param int|null $dh hauteur
      * @return string|null
      */
-    public static function resize(array $image, int $dw = 0, int $dh = 0): ?string
+    public static function resize(array $image, int $dw = 0, int $dh = null): ?string
     {
         $sw		= $image['w'];
         $sh		= $image['h'];
@@ -239,10 +239,10 @@ final class Image
      * @param int $dw destination largeur
      * @param int $dh destination hauteur
      * @param int $sw source largeur
-     * @param int $sh source hauteur
+     * @param int|null $sh source hauteur
      * @return string si l'operation reussi false si le resize n'est pas nécessaire
      */
-    public static function resampleImage(array $image, int $sx, int $sy, int $dw, int $dh, int $sw = 0, int $sh = 0): ?string
+    public static function resampleImage(array $image, int $sx, int $sy, int $dw, int $dh, int $sw = 0, int $sh = null): ?string
     {
         $type	= $image['t'];
         $src    = $image['i'];

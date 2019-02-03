@@ -43,11 +43,11 @@ final class Html
      *
      * @param string $buffer
      * @param string $tag
-     * @return array_object
+     * @return Json
      */
 	public static function parseTag(string $buffer, string $tag): Json
 	{
-		$parse = new array_object([], true);
+		$parse = new Json([], true);
 		
 		foreach (helper_data::match('/(<\s*'.$tag.'((?:\s+\w+(?:\s*=\s*(?:".*?"|\'.*?\'|[^\'">\s]+))?)+\s*|\s*)\/?>)/', $buffer, true) as $match) {
 			$attributes	= [];

@@ -75,13 +75,13 @@ class Service implements ArrayAccess
 		return false;
 	}
 
-	/**
-	 * Enregistre une closure en tant service partagé (singleton)
-	 *
-	 * @param	string					$name
-	 * @param	Closure|string|array	$closure
-	 * @return	bool
-	 */
+    /**
+     * Enregistre une closure en tant service partagé (singleton)
+     *
+     * @param string $name
+     * @param $closure
+     * @return bool
+     */
 	public function singleton(string $name, $closure): bool
 	{
         if (is_string($closure) || $closure instanceof \Closure  || is_array($closure)) {

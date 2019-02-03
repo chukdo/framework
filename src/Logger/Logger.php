@@ -267,7 +267,7 @@ class Logger implements LoggerInterface
      * @param  array  $record
      * @return array
      */
-    public function processRecord(array $record)
+    public function processRecord(array $record): array
     {
         foreach ($this->processors as $processor) {
             $record = $processor->processRecord($record);
@@ -282,7 +282,7 @@ class Logger implements LoggerInterface
      * @param  array    $record
      * @return bool     true si un gestionnaire à traiter l'enregistrement false sinon
      */
-    public function handleRecord(array $record)
+    public function handleRecord(array $record): bool
     {
         $handle = 0;
 

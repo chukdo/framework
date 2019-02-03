@@ -46,15 +46,15 @@ final class Convert
 
     /**
      * @param string $name
-     * @param string $prefix
+     * @param string|null $prefix
      * @return string
      */
-    public static function toQName(string $name, $prefix = 'error'): string
+    public static function toQName(string $name, $prefix = null): string
     {
         $qname = str_replace(' ', '_', Data::allText($name));
 
         if (!preg_match('/^[a-z]/', $qname)) {
-            $qname = $prefix;
+            $qname = $prefix ?: 'error';
         }
 
         return $qname;
@@ -62,17 +62,17 @@ final class Convert
 
     /**
      * @param string $name
-     * @param string $prefix
-     * @param string $suffix
+     * @param string|null $prefix
+     * @param string|null $suffix
      * @return string
      */
-    public static function toFileName(string $name, string $prefix = '', string $suffix = ''): string
+    public static function toFileName(string $name, string $prefix = null, string $suffix = null): string
     {
         if (strlen($name) > 0) {
             return preg_replace(
                 '/_{2,}/',
                 '_',
-                $prefix.str_replace(
+                $prefix . str_replace(
                     ' ',
                     '_',
                     Data::allText($name)
@@ -125,10 +125,10 @@ final class Convert
 
     /**
      * @param string $value
-     * @param string $escape
+     * @param string|null $escape
      * @return string
      */
-    public static function toStringJS(string $value, string $escape = ''): string
+    public static function toStringJS(string $value, string $escape = null): string
     {
         $value = preg_replace(['/\n/', '/\r/'], ['\\n', ''], $value);
 
@@ -141,18 +141,19 @@ final class Convert
 
     /**
      * @param string $value
-     * @param string $format
-     * @return DateTime
+     * @param string|null $format
+     * @return \DateTime
+     * @throws \Exception
      */
-    public static function toDate(string $value, string $format = 'd/m/y'): DateTime
+    public static function toDate(string $value, string $format = null): \DateTime
     {
-        $date = DateTime::createFromFormat($format, $value);
+        $date = \DateTime::createFromFormat($format ?: 'd/m/y', $value);
 
         if ($date instanceof \DateTime) {
             return $date;
         }
 
-        return new DateTime();
+        return new \DateTime();
     }
 
     /**
@@ -240,7 +241,7 @@ final class Convert
      * @throws \Chukdo\Xml\NodeException
      * @throws \Chukdo\Xml\XmlException
      */
-    public static function toXml($value)
+    public static function toXml($value): \Chukdo\Xml\Xml
     {
 		if ($value instanceof \Chukdo\Xml\Xml) {
 			return $value;
@@ -258,10 +259,10 @@ final class Convert
 
     /**
      * @param $value
-     * @param string $title
+     * @param string|null $title
      * @return string
      */
-    public static function toPrint($value, string $title = ''): string
+    public static function toPrint($value, string $title = null): string
     {
         ob_start();
         if ($title) {
@@ -276,10 +277,10 @@ final class Convert
 
     /**
      * @param $value
-     * @param string $title
+     * @param string|null $title
      * @return string
      */
-    public static function toHtml($value, $title = ''): string
+    public static function toHtml($value, $title = null ): string
     {
         /** Title */
         $title = is_string($title) ? htmlentities(self::toUtf8($title), ENT_NOQUOTES, 'UTF-8') : null;

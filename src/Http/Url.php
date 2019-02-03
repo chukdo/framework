@@ -28,12 +28,11 @@ class Url
     ];
 
     /**
-     * Constructeur
-     *
-     * @param   string  $url
-     * @param   array   $meta
+     * Url constructor.
+     * @param string|null $url
+     * @param array $meta
      */
-    public function __construct(string $url = '', array $meta = [])
+    public function __construct(string $url = null, array $meta = [])
     {
         if ($url) {
             $this->parseUrl($url);
