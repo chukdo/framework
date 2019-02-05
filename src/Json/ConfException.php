@@ -1,7 +1,5 @@
 <?php namespace Chukdo\Json;
 
-use Chukdo\Bootstrap\AppException;
-
 /**
  * Gestion des exceptions
  *
@@ -11,7 +9,7 @@ use Chukdo\Bootstrap\AppException;
  * @since 		08/01/2019
  * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class ConfException extends AppException
+class ConfException extends JsonException
 {
 
 }
