@@ -33,7 +33,7 @@ final class Http
         ];
 
         $is = function($contain, $name = false) use ($ua, &$browser) {
-            if (Str::contain($ua, $contain)) {
+            if (Data::contain($ua, $contain)) {
                 $browser['browser'] = $name ?: $contain;
                 $browser['version'] = Data::match('/'.$contain.'[\/\s](\d+)/', $ua);
                 return true;

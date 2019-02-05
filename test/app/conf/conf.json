@@ -1,0 +1,77 @@
+{
+    "db": {
+        "mongo": {
+            "server": "mongodb:\/\/127.0.0.1:27017\/?replicaSet=rs0&readPreference=primaryPreferred"
+        },
+        "elastic": {
+            "host": "localhost:9200"
+        }
+    },
+    "log": {
+        "driver": "log_file",
+        "dsn": "\/storage\/www\/modelo\/__log\/",
+        "db": "0",
+        "app": "0",
+        "ws": "1",
+        "api": "1",
+        "webhook": "1"
+    },
+    "view": {
+        "cache": "0"
+    },
+    "storage": {
+        "azure": {
+            "endpoint": "DefaultEndpointsProtocol=https;AccountName=asmodelostandard;AccountKey=1q4NUZB8xCbK3O8ah1YvT08XREN0\/SK1ZpmCnPqDKRhzMn7QAH3kQnKhOW2WtglgiyRscmi6jM+hjhdJ7J5OpQ==",
+            "files": "files-dev",
+            "esign": "esign-dev",
+            "db": "db-dev"
+        }
+    },
+    "app": {
+        "allow": {
+            "iframe": {
+                "origin": "*"
+            }
+        }
+    },
+    "sms": {
+        "sid": "AC567e327659f9f7ba5dd47811df78fb8c",
+        "token": "f0d6275468e642a5fcb06c3bc7fd1d30",
+        "phone": "+33644644424"
+    },
+    "registre": {
+        "sms": "+33644644002"
+    },
+    "lre": {
+        "token": "6179f2f305374ae502a2b5f546c394e72b7fbfe0",
+        "dsn": "https:\/\/test.ar24.fr\/api\/",
+        "cgu": "https:\/\/www.ar24.fr\/cgu\/"
+    },
+    "esign": {
+        "environnement": "demo",
+        "login": "lionel.cazaumayou@gmail.com",
+        "password": "#9Terinfo!ys",
+        "apikey": "6fWkSImHfYgyAatPXjEGVpgDiIswT6CZYol8HLRc",
+        "mail": "sign@modelo.fr",
+        "urltoken": {
+            "iframe": "https:\/\/demo.yousign.fr\/public\/ext\/cosignature\/",
+            "public": "https:\/\/demo.yousign.fr\/public\/cosignature\/"
+        },
+        "template": {
+            "presentiel": {
+                "desktop": "75939f804064075298c5fa3bfc19b558",
+                "mobile": "f5e92e1a6280aff0e204a913a52cace3"
+            },
+            "distanciel": {
+                "desktop": "197da1f28e831d38eb29b8fb002ba239",
+                "mobile": "b17fa9c5d649b064229be353fbd187cd"
+            }
+        }
+    },
+    "vosfactures": {
+        "api": {
+            "url": "https:\/\/editions-modelo.vosfactures.fr\/",
+            "token": "1OG96X6RtJdnhlDM4Q\/editions-modelo"
+        }
+    }
+}

@@ -19,6 +19,7 @@
         "ext-json": "*",
         "ext-mongodb": "^1.5.0",
         "mongodb/mongodb": "~1.4.0",
+        "sentry/sentry": "^1.8",
         "microsoft/azure-storage-common": "~1.2.0",
         "microsoft/azure-storage-blob": "~1.2.0"
     },

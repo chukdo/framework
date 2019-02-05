@@ -3,7 +3,7 @@
 use \Chukdo\Contracts\Db\Redis as RedisInterface;
 
 /**
- * Gestionnaire des flux Redis
+ * Gestionnaire de log pour Redis
  *
  * @package 	Logger
  * @version 	1.0.0
@@ -26,12 +26,12 @@ class RedisHandler extends AbstractHandler
     /**
      * RedisHandler constructor.
      * @param RedisInterface $redis
-     * @param string $key
+     * @param string|null $key
      */
-    public function __construct(RedisInterface $redis, $key = 'log')
+    public function __construct(RedisInterface $redis, string $key = null)
     {
         $this->redis = $redis;
-        $this->key   = $key;
+        $this->key   = $key ?: 'log';
 
         parent::__construct();
     }
@@ -44,7 +44,7 @@ class RedisHandler extends AbstractHandler
     public function __destruct()
     {
         $this->redis->__destruct();
-        $this->redis = '';
+        $this->redis = null;
     }
 
     /**

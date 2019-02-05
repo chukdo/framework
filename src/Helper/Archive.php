@@ -84,7 +84,7 @@ final class Archive
      * @param bool $list
      * @param bool $root
      * @return array|int
-     * @throws exception
+     * @throws ArchiveException
      */
     public static function unzipFile($file, $path, $list = false, $root = false)
     {

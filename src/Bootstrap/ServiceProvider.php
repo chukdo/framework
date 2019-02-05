@@ -23,28 +23,22 @@ class ServiceProviderException extends \Exception {}
 abstract class ServiceProvider {
 
     /**
-     * The application instance.
-     *
-     * @var \Chukdo\Bootstrap\App
+     * @var App
      */
     protected $app;
 
     /**
-     * Create a new service provider instance.
-     *
-     * @param  \Chukdo\Bootstrap\App  $app
+     * ServiceProvider constructor.
+     * @param App $app
      */
-    public function __construct(\Chukdo\Bootstrap\App $app)
+    public function __construct(App $app)
     {
         $this->app = $app;
     }
 
     /**
-     * Crée un alias de classe
-     *
-     * @param   string  $name nom de la classe
-     * @param   string  $alias alias de la classe
-     * @return void
+     * @param string $name
+     * @param string $alias
      */
     public function setClassAlias(string $name, string $alias): void
     {
@@ -52,9 +46,7 @@ abstract class ServiceProvider {
     }
 
     /**
-     * Register bindings in the container.
-     *
-     * @return void
+     * @return mixed
      */
-    abstract public function register();
+    abstract public function register(): void;
 }

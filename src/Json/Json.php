@@ -663,11 +663,12 @@ class Json extends \ArrayObject
     }
 
     /**
+     * @param bool $prettyfy
      * @return string
      */
-    public function toJson(): string
+    public function toJson($prettyfy = false): string
     {
-        return json_encode($this->getArrayCopy(), JSON_PRETTY_PRINT);
+        return json_encode($this->getArrayCopy(), $prettyfy ? JSON_PRETTY_PRINT : null);
     }
 
     /**

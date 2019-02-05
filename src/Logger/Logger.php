@@ -1,20 +1,9 @@
 <?php namespace Chukdo\Logger;
 
-use \Chukdo\Contracts\Logger\Logger as LoggerInterface;
-use \Chukdo\Contracts\Logger\Handler as HandlerInterface;
-use \Chukdo\Contracts\Logger\Processor as ProcessorInterface;
-use \Chukdo\Contracts\Logger\Formatter as FormatterInterface;
-
-/**
- * Gestion des exceptions
- *
- * @package 	Contracts
- * @version 	1.0.0
- * @copyright 	licence MIT, Copyright (C) 2019 Domingo
- * @since 		08/01/2019
- * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
- */
-class LoggerException extends \Exception {}
+Use \Chukdo\Contracts\Logger\Logger as LoggerInterface;
+Use \Chukdo\Contracts\Logger\Handler as HandlerInterface;
+Use \Chukdo\Contracts\Logger\Processor as ProcessorInterface;
+Use \Chukdo\Contracts\Logger\Formatter as FormatterInterface;
 
 /**
  * Gestion des logs
@@ -99,9 +88,9 @@ class Logger implements LoggerInterface
     /**
      * Retourne la liste des niveaux de la RFC 5424
      *
-     * @return string
+     * @return array
      */
-    public static function getLevels(): string
+    public static function getLevels(): array
     {
         return self::$levels;
     }
