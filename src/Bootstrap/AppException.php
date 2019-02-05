@@ -1,4 +1,4 @@
-<?php
+<?php namespace Chukdo\Bootstrap;
 
 /**
  * Gestion des exceptions

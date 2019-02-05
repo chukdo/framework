@@ -1,5 +1,4 @@
-<?php
-
+<?php namespace Chukdo\Bootstrap;
 /**
  * Gestion des exceptions
  *
@@ -9,7 +8,7 @@
  * @since 		08/01/2019
  * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class LoaderException extends \RuntimeException
+class LoaderException extends AppException
 {
 
 }
