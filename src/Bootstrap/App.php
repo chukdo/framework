@@ -2,7 +2,6 @@
 
 Use \Closure;
 Use \Chukdo\Helper\Convert;
-Use \Chukdo\Bootstrap\AppException;
 
 /**
  * Initialisation de l'application
@@ -54,6 +53,14 @@ class App extends Service
     public static function printc($data)
     {
         echo Convert::toPrint($data);
+    }
+
+    /**
+     * @return bool
+     */
+    public function runningInConsole(): bool
+    {
+        return php_sapi_name() == "cli";
     }
 
     /**

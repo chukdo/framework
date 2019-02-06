@@ -28,7 +28,10 @@ $loader->register();
 /** Declaration des facades */
 Use \Chukdo\Facades\Facade;
 
-Facade::setFacadeApplication(new \Chukdo\Bootstrap\App());
+$app = new \Chukdo\Bootstrap\App(); //basic gestion exception
+//$app->registerExceptionHandler(testingMode, logger);
+
+Facade::setFacadeApplication($app);
 Facade::setClassAlias('\Chukdo\Facades\Facade', 'Facade');
 Facade::setClassAlias('\Chukdo\Facades\App', 'App');
 Facade::setClassAlias('\Chukdo\Facades\Event', 'Event');
