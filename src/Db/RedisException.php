@@ -1,4 +1,4 @@
-<?php namespace Chukdo\Json;
+<?php namespace Chukdo\Db;
 
 Use Chukdo\Bootstrap\AppException;
 
@@ -11,7 +11,7 @@ Use Chukdo\Bootstrap\AppException;
  * @since 		08/01/2019
  * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class JsonException extends AppException
+class RedisException extends AppException
 {
 
 }

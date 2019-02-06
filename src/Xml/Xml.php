@@ -4,17 +4,6 @@ use \DOMDocument;
 use \Throwable;
 
 /**
- * Gestion des exceptions
- *
- * @package 	Exception
- * @version 	1.0.0
- * @copyright 	licence MIT, Copyright (C) 2019 Domingo
- * @since 		08/01/2019
- * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
- */
-class XmlException extends \Exception {}
-
-/**
  * Classe XML DOCUMENT, etend les fonctionnalites XML de PHP5 
  * pour la creation rapide de document XML compatible DOM
  *

@@ -17,6 +17,9 @@
     "require": {
         "php": ">=7.2.0",
         "ext-json": "*",
+        "ext-zip": "*",
+        "ext-dom": "*",
+        "ext-simplexml": "*",
         "ext-mongodb": "^1.5.0",
         "mongodb/mongodb": "~1.4.0",
         "sentry/sentry": "^1.8",

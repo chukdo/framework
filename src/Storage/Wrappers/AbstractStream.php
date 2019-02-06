@@ -1,20 +1,8 @@
 <?php namespace Chukdo\Storage\Wrappers;
 
-
 Use \Chukdo\Contracts\Storage\StreamWrapper as StreamWrapperInterface;
 Use \Chukdo\Contracts\Storage\Stream as StreamInterface;
 Use \Chukdo\Http\Url;
-
-/**
- * Gestion des exceptions
- *
- * @package 	Exception
- * @version 	1.0.0
- * @copyright 	licence MIT, Copyright (C) 2019 Domingo
- * @since 		08/01/2019
- * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
- */
-class StreamException extends \Exception {}
 
 /**
  * Abstraction de la classe PHP StreamWrapper (File First Vision)

@@ -1,6 +1,6 @@
-<?php namespace Chukdo\Json;
+<?php namespace Chukdo\Xml;
 
-Use Chukdo\Bootstrap\AppException;
+use Chukdo\Bootstrap\AppException;
 
 /**
  * Gestion des exceptions
@@ -11,7 +11,7 @@ Use Chukdo\Bootstrap\AppException;
  * @since 		08/01/2019
  * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class JsonException extends AppException
+class XmlException extends AppException
 {
 
 }

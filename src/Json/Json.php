@@ -20,13 +20,6 @@ use \Chukdo\Helper\Convert;
 class Json extends \ArrayObject
 {
     /**
-     * Defini si l'objet est défini ou non
-     *
-     * @var bool
-     */
-    protected $undefined = true;
-
-    /**
      * json constructor.
      * @param mixed $data
      * @param bool|null $clean
@@ -34,8 +27,6 @@ class Json extends \ArrayObject
     public function __construct($data = null, bool $clean = null)
     {
         parent::__construct([]);
-
-        $this->undefined = true;
 
         if (Test::isArray($data)) {
             foreach ($data as $k => $v) {
@@ -46,14 +37,6 @@ class Json extends \ArrayObject
                 $this->offsetSet($k, $v, $clean);
             }
         }
-    }
-
-    /**
-     * @return bool
-     */
-    public function isUndefined(): bool
-    {
-        return $this->isEmpty() && $this->undefined;
     }
 
     /**
@@ -178,8 +161,6 @@ class Json extends \ArrayObject
             parent::append($value);
         }
 
-        $this->undefined = true;
-
         return $this;
     }
 
@@ -217,8 +198,6 @@ class Json extends \ArrayObject
         } else {
             parent::offsetSet($key, $value);
         }
-
-        $this->undefined = false;
 
         return $this;
     }

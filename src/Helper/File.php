@@ -1,17 +1,6 @@
 <?php
 
 /**
- * Gestion des exceptions
- *
- * @package 	Exception
- * @version 	1.0.0
- * @copyright 	licence MIT, Copyright (C) 2019 Domingo
- * @since 		08/01/2019
- * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
- */
-class FileException extends \Exception {}
-
-/**
  * Gestion des Fichiers
  *
  * @package 	Helper
@@ -108,19 +97,19 @@ final class File
                     if ($size > $maxSize) {
                         fclose($fpw);
                         fclose($fpr);
-                        throw new FileException('Le fichier est trop lourd, il dépasse les '.helper_data::memory($maxSize, true));
+                        throw new \Chukdo\Bootstrap\AppException('Le fichier est trop lourd, il dépasse les '.helper_data::memory($maxSize, true));
                     }
                 }
             } else {
                 fclose($fpw);
                 fclose($fpr);
-                throw new FileException('Impossible de télécharger le fichier, l\'adresse '.$url.' n\'est pas valide');
+                throw new \Chukdo\Bootstrap\AppException('Impossible de télécharger le fichier, l\'adresse '.$url.' n\'est pas valide');
             }
 
             fclose($fpw);
             fclose($fpr);
         } else {
-            throw new FileException('Impossible de sauvegarder le fichier téléchargé à l\'adresse '.$url);
+            throw new \Chukdo\Bootstrap\AppException('Impossible de sauvegarder le fichier téléchargé à l\'adresse '.$url);
         }
 
         return $file;
@@ -159,7 +148,7 @@ final class File
             if ($error == 0) {
 
                 /** Fichier téléchargé */
-                $file = $filePath . helper_data::uid('upload_');
+                $file = $filePath . \Chukdo\Helper\data::uid('upload_');
 
                 if (move_uploaded_file($tmp, $file)) {
                     chmod($file, 0777);
@@ -196,7 +185,7 @@ final class File
 
             /** Gestion des erreurs */
             if ($err != '') {
-                throw new FileException($err);
+                throw new \Chukdo\Bootstrap\AppException($err);
             }
         }
 

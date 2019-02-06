@@ -1,7 +1,6 @@
 <?php namespace Chukdo\Xml;
 
 Use \Chukdo\Helper\Test;
-
 Use IteratorAggregate;
 Use Traversable;
 Use Exception;
@@ -14,17 +13,6 @@ Use DOMNode;
 Use DOMText;
 Use DOMXPath;
 Use SimpleXMLElement;
-
-/**
- * Gestion des exceptions
- *
- * @package 	Exception
- * @version 	1.0.0
- * @copyright 	licence MIT, Copyright (C) 2019 Domingo
- * @since 		08/01/2019
- * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
- */
-class NodeException extends Exception {}
 
 /**
  * Classe XML NODE, etend les fonctionnalites XML de PHP7
