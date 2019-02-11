@@ -5,7 +5,7 @@ set_error_handler('triggerError');
 set_exception_handler('triggerException');
 register_shutdown_function('triggerErrorShutdown');
 
-function triggerError($e, $message, $file = __FILE__, $line = __LINE__) { echo("<pre>ERROR: $message on file $file at line $line</pre>");echo \Chukdo\Helper\Convert::toHtml(debug_backtrace());exit;}
+function triggerError($e, $message, $file = __FILE__, $line = __LINE__) { echo("<pre>ERROR: $message on file $file at line $line</pre>");echo \Chukdo\Helper\Convert::toHtml((new \Chukdo\Json\Json(debug_backtrace()))->toFlatJson());exit;}
 function triggerErrorShutdown() { if ($error = error_get_last()) { triggerError($error['type'],$error['message'], $error['file'], $error['line']);}}
 function triggerException($e) { triggerError($e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine());}
 
@@ -46,9 +46,67 @@ App::env(App::getConf('env'));
 App::channel('orpi');
 App::register('\App\Providers\ExceptionLoggerServiceProvider');
 
-ExceptionLogger::emergency('trop cool enfin ca marche... OK');
+ExceptionLogger::debug('trop cool enfin ca marche... OK');
+echo '<pre>';
+$console = new \Chukdo\Console\Console();
+$console
+    ->setHeaders(array('Language', 70 => 'Year'))
+    ->setIndent(4)
+    ->display();
 
+$console
+    ->addRow()
+    ->addColumn('PHP')
+    ->addColumn('1994QZSDFGHHJGFDSQSDFGHHJGFDS')
+    ->addRow()
+    ->addColumn('C++')
+    ->addColumn(1983)
+    ->addRow()
+    ->addColumn('C')
+    ->addColumn(1970)
+    ->flush();
+
+$console
+    ->addRow()
+    ->addColumn('PHP')
+    ->addColumn('1994')
+    ->addRow()
+    ->addColumn('C++')
+    ->addColumn(1983)
+    ->addRow()
+    ->addColumn('C')
+    ->addColumn(1970)
+    ->setIndent(4)
+    ->display();
+
+$console = new \Chukdo\Console\Console();
+
+$console
+    ->setHeaders(array('Language', 60 => 'Year'))
+    ->addRow(array('PHP', 1994))
+    ->addRow(array('C++', 1983))
+    ->addRow(array('C', 1970))
+    ->setPadding(8)
+    ->showAllBorders()
+    ->display();
+
+$console = new \Chukdo\Console\Console();
+
+$console
+    //->setHeaders(array('Language', 'Year'))
+    ->addRow('PHP')
+    ->addRow('C++')
+    ->addRow('C - CF')
+    ->hideBorder()
+    ->display();
+echo '</pre>';
+exit;
 echo \Chukdo\Helper\Convert::toHtml(App::getConf('env'));
+
+// console
+// http_reponse
+
+// exception handler
 
 exit;
 

@@ -17,22 +17,22 @@ final class Http
     private function __construct() {}
 
     /**
-     * @param string $ua
+     * @param string|null $ua
      * @return array
      */
-    public static function getUserAgent(string $ua): array
+    public static function getUserAgent(string $ua = null): array
     {
-        $ua = strtolower($ua);
-
         $browser = [
             'platform'  => null,
             'browser'   => null,
             'mobile'    => null,
             'version'   => null,
-            'bot'       => Data::match('/baiduspider|googlebot|yandexbot|bingbot|lynx|wget|curl/', $ua)
+            'bot'       => null
         ];
 
-        $is = function($contain, $name = false) use ($ua, &$browser) {
+        $ua             = strtolower($ua);
+        $browser['bot'] = Data::match('/baiduspider|googlebot|yandexbot|bingbot|lynx|wget|curl/', $ua);
+        $is             = function($contain, $name = false) use ($ua, &$browser) {
             if (Data::contain($ua, $contain)) {
                 $browser['browser'] = $name ?: $contain;
                 $browser['version'] = Data::match('/'.$contain.'[\/\s](\d+)/', $ua);

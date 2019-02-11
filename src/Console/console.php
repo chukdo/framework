@@ -1,100 +1,129 @@
 <?php namespace Chukdo\Console;
 
-/**
- * This file is part of the PHPLucidFrame library.
- * The class makes you easy to build console style tables
- *
- * @package     PHPLucidFrame\Console
- * @since       PHPLucidFrame v 1.12.0
- * @copyright   Copyright (c), PHPLucidFrame.
- * @author      Sithu K. <cithukyaw@gmail.com>
- * @link        http://phplucidframe.github.io
- * @license     http://www.opensource.org/licenses/mit-license.php MIT License
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE
- */
-
-namespace LucidFrame\Console;
-
-class ConsoleTable
+class Console
 {
-    const HEADER_INDEX = -1;
-    const HR = 'HR';
+    /**
+     * @var array
+     */
+    private $data = [];
 
-    /** @var array Array of table data */
-    protected $data = array();
-    /** @var boolean Border shown or not */
-    protected $border = true;
-    /** @var boolean All borders shown or not */
-    protected $allBorders = false;
-    /** @var integer Table padding */
-    protected $padding = 1;
-    /** @var integer Table left margin */
-    protected $indent = 0;
-    /** @var integer */
+    /**
+     * @var bool
+     */
+    private $border = true;
+
+    /**
+     * @var bool
+     */
+    private $allBorders = false;
+
+    /**
+     * @var int
+     */
+    private $padding = 1;
+
+    /**
+     * @var int
+     */
+    private $indent = 0;
+
+    /**
+     * @var int
+     */
     private $rowIndex = -1;
-    /** @var array */
-    private $columnWidths = array();
 
     /**
-     * Adds a column to the table header
-     * @param  mixed  Header cell content
-     * @return object LucidFrame\Console\ConsoleTable
+     * @var array
      */
-    public function addHeader($content = '')
+    private $columnWidths = [];
+
+    /**
+     * @var array
+     */
+    private $foregroundColors = [
+        'white' => '1;37',
+        'black' => '0;30',
+        'red'   => '0;31',
+        'green' => '0;32',
+        'yellow'=> '1;33',
+        'blue'  => '0;34',
+        'grey'  => '0;37'
+    ];
+
+    /**
+     * @var array
+     */
+    private $backgroundColors = [
+        'white' => '',
+        'black' => '40',
+        'red'   => '41',
+        'green' => '42',
+        'yellow'=> '43',
+        'blue'  => '44',
+        'grey'  => '47'
+    ];
+
+    /**
+     * Console constructor.
+     */
+    public function __construct()
     {
-        $this->data[self::HEADER_INDEX][] = $content;
+        $this->data         = [];
+        $this->columnWidths = [];
+        $this->rowIndex     = -1;
+        $this->border       = true;
+        $this->allBorders   = false;
+        $this->padding      = 1;
+        $this->indent       = 0;
+    }
+
+    /**
+     * @param string $header
+     * @param int|null $strPad
+     * @return Console
+     */
+    public function addHeader(string $header, int $strPad = null): self
+    {
+        $this->data[-1][] = $strPad > strlen($header) ? str_pad($header, $strPad) : $header;
 
         return $this;
     }
 
     /**
-     * Set headers for the columns in one-line
-     * @param  array  Array of header cell content
-     * @return object LucidFrame\Console\ConsoleTable
+     * @param array $headers
+     * @return Console
      */
-    public function setHeaders(array $content)
+    public function setHeaders(array $headers): self
     {
-        $this->data[self::HEADER_INDEX] = $content;
-
-        return $this;
-    }
-
-    /**
-     * Get the row of header
-     */
-    public function getHeaders()
-    {
-        return isset($this->data[self::HEADER_INDEX]) ? $this->data[self::HEADER_INDEX] : null;
-    }
-
-    /**
-     * Adds a row to the table
-     * @param  array  $data The row data to add
-     * @return object LucidFrame\Console\ConsoleTable
-     */
-    public function addRow(array $data = null)
-    {
-        $this->rowIndex++;
-
-        if (is_array($data)) {
-            foreach ($data as $col => $content) {
-                $this->data[$this->rowIndex][$col] = $content;
-            }
+        foreach ($headers as $size => $header) {
+            $this->addHeader($header, $size);
         }
 
         return $this;
     }
 
     /**
-     * Adds a column to the table
-     * @param  mixed    $content The data of the column
-     * @param  integer  $col     The column index to populate
-     * @param  integer  $row     If starting row is not zero, specify it here
-     * @return object LucidFrame\Console\ConsoleTable
+     * @param array|null $data
+     * @return Console
      */
-    public function addColumn($content, $col = null, $row = null)
+    public function addRow($data = null): self
+    {
+        $this->rowIndex++;
+
+        foreach ((array) $data as $col => $content) {
+            $this->data[$this->rowIndex][$col] = $content;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param $content
+     * @param null $col
+     * @param null $row
+     * @return Console
+     */
+    public function addColumn($content, $col = null, $row = null): self
     {
         $row = $row === null ? $this->rowIndex : $row;
         if ($col === null) {
@@ -107,10 +136,9 @@ class ConsoleTable
     }
 
     /**
-     * Show table border
-     * @return object LucidFrame\Console\ConsoleTable
+     * @return Console
      */
-    public function showBorder()
+    public function showBorder(): self
     {
         $this->border = true;
 
@@ -118,10 +146,9 @@ class ConsoleTable
     }
 
     /**
-     * Hide table border
-     * @return object LucidFrame\Console\ConsoleTable
+     * @return Console
      */
-    public function hideBorder()
+    public function hideBorder(): self
     {
         $this->border = false;
 
@@ -129,10 +156,9 @@ class ConsoleTable
     }
 
     /**
-     * Show all table borders
-     * @return object LucidFrame\Console\ConsoleTable
+     * @return Console
      */
-    public function showAllBorders()
+    public function showAllBorders(): self
     {
         $this->showBorder();
         $this->allBorders = true;
@@ -141,11 +167,10 @@ class ConsoleTable
     }
 
     /**
-     * Set padding for each cell
-     * @param  integer $value The integer value, defaults to 1
-     * @return object LucidFrame\Console\ConsoleTable
+     * @param int $value
+     * @return Console
      */
-    public function setPadding($value = 1)
+    public function setPadding(int $value = 1): self
     {
         $this->padding = $value;
 
@@ -153,11 +178,10 @@ class ConsoleTable
     }
 
     /**
-     * Set left indentation for the table
-     * @param  integer $value The integer value, defaults to 1
-     * @return object LucidFrame\Console\ConsoleTable
+     * @param int $value
+     * @return Console
      */
-    public function setIndent($value = 0)
+    public function setIndent(int $value = 0): self
     {
         $this->indent = $value;
 
@@ -165,39 +189,65 @@ class ConsoleTable
     }
 
     /**
-     * Add horizontal border line
-     * @return object LucidFrame\Console\ConsoleTable
+     * @return Console
      */
-    public function addBorderLine()
+    public function addBorderLine(): self
     {
         $this->rowIndex++;
-        $this->data[$this->rowIndex] = self::HR;
+        $this->data[$this->rowIndex] = 'HR';
 
         return $this;
     }
 
     /**
-     * Print the table
-     * @return void
+     * @return Console
      */
-    public function display()
+    public function display(): self
     {
         echo $this->getTable();
+
+        return $this;
     }
 
     /**
-     * Get the printable table content
+     * @return Console
+     */
+    public function flush(): self
+    {
+        $this->display();
+        $this->data         = [];
+        $this->rowIndex     = -1;
+
+        return $this;
+    }
+
+    /**
+     * @return Console
+     */
+    public function flushAll(): self
+    {
+        $this->display();
+        $this->__construct();
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
-    public function getTable()
+    public function getTable(): string
     {
-        $this->calculateColumnWidth();
+        $this->computeColumnWidths();
 
-        $output = $this->border ? $this->getBorderLine() : '';
+        $endBorder  = false;
+        $output     = $this->border ? $this->getBorder() : '';
+
         foreach ($this->data as $y => $row) {
-            if ($row === self::HR) {
+            if ($row === 'HR') {
                 if (!$this->allBorders) {
-                    $output .= $this->getBorderLine();
+                    $output   .= $this->getBorder();
+                    $endBorder = true;
+
                     unset($this->data[$y]);
                 }
 
@@ -205,48 +255,46 @@ class ConsoleTable
             }
 
             foreach ($row as $x => $cell) {
-                $output .= $this->getCellOutput($x, $row);
+                $output   .= $this->getCell($x, $row);
+                $endBorder = false;
             }
             $output .= PHP_EOL;
 
-            if ($y === self::HEADER_INDEX) {
-                $output .= $this->getBorderLine();
+            if ($y === -1) {
+                $output   .= $this->getBorder();
+                $endBorder = true;
             } else {
                 if ($this->allBorders) {
-                    $output .= $this->getBorderLine();
+                    $output   .= $this->getBorder();
+                    $endBorder = true;
                 }
             }
         }
 
-        if (!$this->allBorders) {
-            $output .= $this->border ? $this->getBorderLine() : '';
-        }
-
-        if (PHP_SAPI !== 'cli') {
-            $output = '<pre>'.$output.'</pre>';
+        if (!$this->allBorders && !$endBorder) {
+            $output .= $this->border ? $this->getBorder() : '';
         }
 
         return $output;
     }
 
     /**
-     * Get the printable border line
      * @return string
      */
-    private function getBorderLine()
+    private function getBorder(): string
     {
         $output = '';
 
         if (isset($this->data[0])) {
             $columnCount = count($this->data[0]);
-        } elseif (isset($this->data[self::HEADER_INDEX])) {
-            $columnCount = count($this->data[self::HEADER_INDEX]);
+        } elseif (isset($this->data[-1])) {
+            $columnCount = count($this->data[-1]);
         } else {
             return $output;
         }
 
         for ($col = 0; $col < $columnCount; $col++) {
-            $output .= $this->getCellOutput($col);
+            $output .= $this->getCell($col);
         }
 
         if ($this->border) {
@@ -258,16 +306,14 @@ class ConsoleTable
     }
 
     /**
-     * Get the printable cell content
-     * @param integer $index The column index
-     * @param array   $row   The table row
+     * @param int $index
+     * @param array|null $row
      * @return string
      */
-    private function getCellOutput($index, $row = null)
+    private function getCell(int $index, array $row = null): string
     {
         $cell       = $row ? $row[$index] : '-';
         $width      = $this->columnWidths[$index];
-        $pad        = $row ? $width - strlen($cell) : $width;
         $padding    = str_repeat($row ? ' ' : '-', $this->padding);
 
         $output = '';
@@ -280,13 +326,14 @@ class ConsoleTable
             $output .= $row ? '|' : '+';
         }
 
-        $output .= $padding; # left padding
-        $cell    = trim(preg_replace('/\s+/', ' ', $cell)); # remove line breaks
+        $output .= $padding;
+        $cell    = trim(preg_replace('/\s+/', ' ', $cell));
         $content = preg_replace('#\x1b[[][^A-Za-z]*[A-Za-z]#', '', $cell);
         $delta   = strlen($cell) - strlen($content);
-        $output .= str_pad($cell, $width + $delta, $row ? ' ' : '-'); # cell content
-        $output .= $padding; # right padding
-        if ($row && $index == count($row)-1 && $this->border) {
+        $output .= str_pad($cell, $width + $delta, $row ? ' ' : '-');
+        $output .= $padding;
+
+        if ($row && $index == count($row) - 1 && $this->border) {
             $output .= $row ? '|' : '+';
         }
 
@@ -294,21 +341,20 @@ class ConsoleTable
     }
 
     /**
-     * Calculate maximum width of each column
      * @return array
      */
-    private function calculateColumnWidth()
+    private function computeColumnWidths(): array
     {
         foreach ($this->data as $y => $row) {
             if (is_array($row)) {
                 foreach ($row as $x => $col) {
                     $content = preg_replace('#\x1b[[][^A-Za-z]*[A-Za-z]#', '', $col);
+
                     if (!isset($this->columnWidths[$x])) {
                         $this->columnWidths[$x] = strlen($content);
-                    } else {
-                        if (strlen($content) > $this->columnWidths[$x]) {
-                            $this->columnWidths[$x] = strlen($content);
-                        }
+
+                    } else if (strlen($content) > $this->columnWidths[$x]) {
+                        $this->columnWidths[$x] = strlen($content);
                     }
                 }
             }
