@@ -5,7 +5,7 @@ set_error_handler('triggerError');
 set_exception_handler('triggerException');
 register_shutdown_function('triggerErrorShutdown');
 
-function triggerError($e, $message, $file = __FILE__, $line = __LINE__) { echo("<pre>ERROR: $message on file $file at line $line</pre>");app::printr(debug_backtrace());exit;}
+function triggerError($e, $message, $file = __FILE__, $line = __LINE__) { echo("<pre>ERROR: $message on file $file at line $line</pre>");echo \Chukdo\Helper\Convert::toHtml(debug_backtrace());exit;}
 function triggerErrorShutdown() { if ($error = error_get_last()) { triggerError($error['type'],$error['message'], $error['file'], $error['line']);}}
 function triggerException($e) { triggerError($e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine());}
 
@@ -25,11 +25,10 @@ $loader->registerNameSpace('\Chukdo', CHUKDO_PATH);
 $loader->registerNameSpace('\App', APP_PATH);
 $loader->register();
 
+$app = new \Chukdo\Bootstrap\App();
+
 /** Declaration des facades */
 Use \Chukdo\Facades\Facade;
-
-$app = new \Chukdo\Bootstrap\App(); //basic gestion exception
-//$app->registerExceptionHandler(testingMode, logger);
 
 Facade::setFacadeApplication($app);
 Facade::setClassAlias('\Chukdo\Facades\Facade', 'Facade');
@@ -41,6 +40,17 @@ Facade::setClassAlias('\Chukdo\Helper\Stream', 'Stream');
 
 /** Configuration */
 Conf::loadConf(CONF_PATH.'conf.json');
+Conf::loadConf(CONF_PATH.'conf_prod.json');
+
+App::env(App::getConf('env'));
+App::channel('orpi');
+App::register('\App\Providers\ExceptionLoggerServiceProvider');
+
+ExceptionLogger::emergency('trop cool enfin ca marche... OK');
+
+echo \Chukdo\Helper\Convert::toHtml(App::getConf('env'));
+
+exit;
 
 /** Service locator */
 App::setAlias('\Chukdo\Storage\ServiceLocator', 'ServiceLocator');
@@ -50,30 +60,8 @@ App::instance('ServiceLocator', \Chukdo\Storage\ServiceLocator::getInstance());
 Stream::register('azure', '\Chukdo\Storage\Wrappers\AzureStream');
 ServiceLocator::setService('azure',
     function () {
-        return MicrosoftAzure\Storage\Blob\BlobRestProxy::createBlobService(Conf::get('/storage/azure/endpoint'));
+        return MicrosoftAzure\Storage\Blob\BlobRestProxy::createBlobService(Conf::get('storage/azure/endpoint'));
     }
 );
 
-Stream::register('redis', '\Chukdo\Storage\Wrappers\RedisStream');
-ServiceLocator::setService('redis',
-    function () {
-        return new \Chukdo\Db\Redis();
-    }
-);
-
-App::register('\App\Providers\queueServiceProvider');
-Queue::set('tttt', 'xcvxcvxvxcvxcv');
-App::printr(Queue::get('tttt'));
-App::printr(Conf::get('/storage/azure/endpoint'));
-
-$fileHandler = new \Chukdo\Logger\Handlers\FileHandler('/storage/www/chukdo/test/app/log/debug.log');
-$fileHandler->setLevels([500, 600]);
-/** Gestionnaire de log */
-$logger = new \Chukdo\Logger\Logger('debug', [
-    $fileHandler
-], [
-    new \Chukdo\Logger\Processors\RequestProcessor()
-]);
-
-//$logger->debug('toto il est beau');
-$logger->emergency('toto il est moche');
+echo \Chukdo\Helper\Convert::toHtml(Conf::get('storage/azure/endpoint'));

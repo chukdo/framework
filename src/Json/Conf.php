@@ -19,10 +19,20 @@ class Conf extends Json
     {
         if (file_exists($file)) {
             $load = new Json(file_get_contents($file));
-            $this->merge($load->toFlatJson());
+            $this->merge($load->toFlatJson(), true);
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * @param string $key
+     * @param null $default
+     * @return string
+     */
+    public function get(string $key, $default = null): string
+    {
+        return parent::get('/' . trim($key, '/'));
     }
 }

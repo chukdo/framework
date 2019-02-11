@@ -50,6 +50,13 @@ class Service implements ArrayAccess
 	protected $instances = [];
 
     /**
+     * Tableau de configuration
+     *
+     * @var array
+     */
+    protected $conf = [];
+
+    /**
      * Service constructor.
      */
     public function __construct() {}
@@ -67,7 +74,7 @@ class Service implements ArrayAccess
      */
 	public function bind(string $name, $closure): bool
 	{
-		if (is_string($closure) || $closure instanceof \Closure  || is_array($closure)) {
+		if (is_string($closure) || $closure instanceof \Closure || is_array($closure)) {
 			$this->bindings[$name] = $closure;
 			return true;
 		}
@@ -84,7 +91,7 @@ class Service implements ArrayAccess
      */
 	public function singleton(string $name, $closure): bool
 	{
-        if (is_string($closure) || $closure instanceof \Closure  || is_array($closure)) {
+        if (is_string($closure) || $closure instanceof \Closure || is_array($closure)) {
             $this->singletons[$name] = $closure;
             return true;
         }
@@ -108,6 +115,31 @@ class Service implements ArrayAccess
 		
 		return false;
 	}
+
+    /**
+     * @param array $conf
+     * @return bool
+     */
+	public function conf(array $conf): bool
+    {
+        $this->conf = $conf;
+        return true;
+    }
+
+    /**
+     * @param string $key
+     * @return string|null
+     */
+    public function getConf(string $key): ?string
+    {
+        $key = '/' . trim($key, '/');
+
+        if (isset($this->conf[$key])) {
+            return $this->conf[$key];
+        }
+
+        return null;
+    }
 
     /**
      * Retourne une instance lié
@@ -204,13 +236,38 @@ class Service implements ArrayAccess
 	private function resolveService(string $class, array $args = [])
 	{
 		foreach ($args as $key => $arg) {
-			if (substr($arg, 0, 1) == '@') {
-				$args[$key] = $this->getClosure(substr($arg, 1));
-			}
+		    if (is_array($arg)) {
+		        foreach ($arg as $k => $v) {
+                    $args[$key][$k] = $this->resolveServiceArg($v);
+                }
+            } else {
+                $args[$key] = $this->resolveServiceArg($arg);
+            }
 		}
 
 		return $this->resolveClass($class, $args);
 	}
+
+    /**
+     * @param string $arg
+     * @return mixed|object|string
+     * @throws ServiceException
+     * @throws \ReflectionException
+     */
+	private function resolveServiceArg(string $arg)
+    {
+        $firstPart  = substr($arg, 0, 1);
+        $lastPart   = substr($arg, 1);
+
+        if ($firstPart == '@') {
+            return $this->getClosure($lastPart);
+
+        } else if ($firstPart == '#') {
+            return $this->getConf($lastPart);
+        }
+
+        return $arg;
+    }
 
     /**
      * @param string $class

@@ -4,6 +4,15 @@ Use \Throwable;
 Use \Exception;
 Use \ErrorException;
 
+/**
+ * Gestion des exception
+ *
+ * @package 	Contracts
+ * @version 	1.0.0
+ * @copyright 	licence MIT, Copyright (C) 2019 Domingo
+ * @since 		08/01/2019
+ * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
+ */
 class HandleExceptions
 {
     /**
@@ -41,25 +50,22 @@ class HandleExceptions
 
     /**
      * @param Throwable $e
+     * @throws ServiceException
+     * @throws \ReflectionException
      */
     public function handleException(Throwable $e)
     {
+        $exceptionHandler = $this->getExceptionHandler();
+
         try {
-            $e->report();
+            $exceptionHandler->report($e);
         } catch (Exception $e) {}
 
         if ($this->app->runningInConsole()) {
-            $this->renderForConsole($e);
+            $exceptionHandler->renderForConsole($e);
         } else {
-            $this->renderHttpResponse($e);
+            $exceptionHandler->render($e);
         }
-
-        if (!headers_sent()) {
-            header("HTTP/1.1 500 Internal Server Error");
-            header("Content-Type: text/html; charset=utf-8");
-        }
-
-        die('<h1>ERROR 500 Internal Server Error</h1><h4>Exception: '.$e->getMessage().' in '.$e->getFile().'('.$e->getLine().')</h4>');
     }
 
     /**
@@ -93,9 +99,9 @@ class HandleExceptions
     }
 
     /**
-     * Get an instance of the exception handler.
-     *
-     * @return \Illuminate\Contracts\Debug\ExceptionHandler
+     * @return mixed|object|null
+     * @throws ServiceException
+     * @throws \ReflectionException
      */
     protected function getExceptionHandler()
     {

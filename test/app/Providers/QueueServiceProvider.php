@@ -2,7 +2,7 @@
 
 use \Chukdo\Bootstrap\ServiceProvider;
 
-class queueServiceProvider extends ServiceProvider {
+class QueueServiceProvider extends ServiceProvider {
 
     /**
      * @return void

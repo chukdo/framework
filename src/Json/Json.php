@@ -633,9 +633,14 @@ class Json extends \ArrayObject
      * @param bool $prettyfy
      * @return string
      */
-    public function toJson($prettyfy = false): string
+    public function toJson(bool $prettyfy = false): string
     {
-        return json_encode($this->getArrayCopy(), $prettyfy ? JSON_PRETTY_PRINT : null);
+        return json_encode(
+            $this->getArrayCopy(),
+            $prettyfy ?
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES :
+                JSON_UNESCAPED_SLASHES
+        );
     }
 
     /**

@@ -4,7 +4,7 @@ use \Chukdo\Logger\Logger;
 use \Chukdo\Contracts\Logger\Handler as HandlerInterface;
 use \Chukdo\Contracts\Logger\Processor as ProcessorInterface;
 use \Chukdo\Contracts\Logger\Formatter as FormatterInterface;
-use \Chukdo\Logger\Formatters\DefaultFormatter;
+use \Chukdo\Logger\Formatters\JsonStringFormatter;
 
 /**
  * Abstract class
@@ -41,10 +41,10 @@ abstract class AbstractHandler implements HandlerInterface
     }
 
     /**
-     * @param string $record
+     * @param $record
      * @return bool
      */
-    abstract protected function write(string $record): bool;
+    abstract protected function write($record): bool;
 
     /**
      * @param $levels
@@ -73,7 +73,7 @@ abstract class AbstractHandler implements HandlerInterface
             $record = $this->processRecord($record);
 
             if (!$this->formatter) {
-                $this->setFormatter(new DefaultFormatter());
+                $this->setFormatter(new JsonStringFormatter());
             }
 
             return $this->write($this->formatter->formatRecord($record));

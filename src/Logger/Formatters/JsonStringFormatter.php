@@ -12,7 +12,7 @@ use \Chukdo\Json\Json;
  * @since 		08/01/2019
  * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class DefaultFormatter implements FormatterInterface
+class JsonStringFormatter implements FormatterInterface
 {
     /**
      * @param array $record

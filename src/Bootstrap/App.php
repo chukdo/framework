@@ -27,7 +27,17 @@ class App extends Service
 	 * @var array
 	 */
 	protected static $aliases = [];
-	
+
+    /**
+     * @var string
+     */
+	protected $env = '';
+
+    /**
+     * @var string
+     */
+	protected $channel = '';
+
     /**
      * Constructeur
      * Initialise l'objet
@@ -40,27 +50,48 @@ class App extends Service
     }
 
     /**
-     * @param $data
-     */
-    public static function printr($data)
-    {
-        echo Convert::toHtml($data);
-    }
-
-    /**
-     * @param $data
-     */
-    public static function printc($data)
-    {
-        echo Convert::toPrint($data);
-    }
-
-    /**
      * @return bool
      */
     public function runningInConsole(): bool
     {
         return php_sapi_name() == "cli";
+    }
+
+    /**
+     * @param string|null $env
+     * @return string
+     */
+    public function env(string $env = null): string
+    {
+        if ($env != null) {
+            $this->env = $env;
+        }
+
+        return $this->env;
+    }
+
+    /**
+     * @param string|null $channel
+     * @return string
+     */
+    public function channel(string $channel = null): string
+    {
+        if ($channel != null) {
+            $this->channel = $channel;
+        }
+
+        return $this->channel;
+    }
+
+    /**
+     * @param string $key
+     * @return string|null
+     * @throws ServiceException
+     * @throws \ReflectionException
+     */
+    public function getConf(string $key): ?string
+    {
+        return $this->make('Conf')::get($key);
     }
 
     /**

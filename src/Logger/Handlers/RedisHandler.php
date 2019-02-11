@@ -51,7 +51,7 @@ class RedisHandler extends AbstractHandler
      * @param string $record
      * @return bool
      */
-    public function write(string $record): bool
+    public function write($record): bool
     {
         try {
             $this->redis->rpush($this->key, $record);

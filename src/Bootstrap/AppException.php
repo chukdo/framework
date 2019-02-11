@@ -11,13 +11,5 @@
  */
 class AppException extends \RuntimeException
 {
-    /**
-     *
-     */
-    public function report()
-    {
-        // log file
-        // log sentry
-        // comment
-    }
+
 }

@@ -41,7 +41,7 @@ class FileHandler extends AbstractHandler
      * @param string $record
      * @return bool
      */
-    public function write(string $record): bool
+    public function write($record): bool
     {
         $fp = fopen($this->file, 'a');
         $r  = fwrite($fp, $record."\n");

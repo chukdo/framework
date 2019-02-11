@@ -1,6 +1,7 @@
 <?php namespace Chukdo\Logger\Handlers;
 
 Use Elasticsearch\ClientBuilder;
+Use \Chukdo\Logger\Formatters\NullFormatter;
 
 /**
  * Gestionnaire des logs pour fichier
@@ -24,22 +25,17 @@ class ElasticHandler extends AbstractHandler
     private $dsn = '';
 
     /**
-     * @var string
-     */
-    private $index = '';
-
-    /**
      * ElasticHandler constructor.
      * @param string $dsn
-     * @param string $index
      */
-    public function __construct(string $dsn, string $index)
+    public function __construct(string $dsn)
     {
         $this->dsn      = $dsn;
-        $this->index    = $index;
         $this->elastic  = ClientBuilder::create()
             ->setHosts(explode(',', $dsn))
             ->build();
+
+        $this->setFormatter(new NullFormatter());
 
         parent::__construct();
     }
@@ -54,31 +50,32 @@ class ElasticHandler extends AbstractHandler
     }
 
     /**
-     * @param string $record
+     * @param array $record
      * @return bool
      */
-    public function write(string $record): bool
+    public function write($record): bool
     {
-        $this->init();
-        $this->elastic->index([
-            'index' => $this->index,
-            'type'  => 'log',
+        $this->init($record['channel']);
+        $write = $this->elastic->index([
+            'index' => $record['channel'],
+            'type'  => 'search',
             'id'    => uniqid('', true),
-            'body'  => [
-                'date'  => time(),
-                'data'  => $record
-            ]
+            'body'  => $record
         ]);
+
+        return !isset($write['error']);
     }
 
     /**
-     *
+     * @param string $channel
      */
-    protected function init(): void
+    protected function init(string $channel): void
     {
-        if (!$this->elastic->indices()->exists([$this->index])) {
+        if (!$this->elastic->indices()->exists([
+            'index' => $channel
+        ])) {
             $this->elastic->indices()->create([
-                'index' => $this->index,
+                'index' => $channel,
                 'body'  => [
                     'mappings' => [
                         'search' => [
@@ -86,9 +83,6 @@ class ElasticHandler extends AbstractHandler
                                 'date' => [
                                     'type' => 'date',
                                     'format' => 'epoch_second',
-                                ],
-                                'data' => [
-                                    'type' => 'text'
                                 ]
                             ]
                         ]

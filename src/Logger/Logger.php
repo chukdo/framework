@@ -259,7 +259,7 @@ class Logger implements LoggerInterface
             'level'     => $level,
             'levelname' => $this->getLevel($level),
             'channel'   => $this->getName(),
-            'time'      => time(),
+            'date'      => time(),
             'extra'     => [],
             'formatted' => null
         ];
