@@ -35,6 +35,7 @@ Facade::setClassAlias('\Chukdo\Facades\Facade', 'Facade');
 Facade::setClassAlias('\Chukdo\Facades\App', 'App');
 Facade::setClassAlias('\Chukdo\Facades\Event', 'Event');
 Facade::setClassAlias('\Chukdo\Facades\Conf', 'Conf');
+Facade::setClassAlias('\Chukdo\Facades\Console', 'Console');
 Facade::setClassAlias('\Chukdo\Facades\ServiceLocator', 'ServiceLocator');
 Facade::setClassAlias('\Chukdo\Helper\Stream', 'Stream');
 
@@ -48,26 +49,22 @@ App::register('\App\Providers\ExceptionLoggerServiceProvider');
 
 ExceptionLogger::debug('trop cool enfin ca marche... OK');
 echo '<pre>';
-$console = new \Chukdo\Console\Console();
-$console
-    ->setHeaders(array('Language', 70 => 'Year'))
+Console::setHeaders(array('Language', 70 => 'Year'))
     ->setIndent(4)
     ->display();
 
-$console
-    ->addRow()
+Console::addRow()
     ->addColumn('PHP')
-    ->addColumn('1994QZSDFGHHJGFDSQSDFGHHJGFDS')
+    ->addColumn(Console::background('1994QZSDFGHHJGFDSQSDFGHHJGFDS', 'red'))
     ->addRow()
     ->addColumn('C++')
-    ->addColumn(1983)
+    ->addColumn(Console::color(1983, 'blue'))
     ->addRow()
     ->addColumn('C')
     ->addColumn(1970)
     ->flush();
 
-$console
-    ->addRow()
+Console::addRow()
     ->addColumn('PHP')
     ->addColumn('1994')
     ->addRow()
@@ -77,28 +74,21 @@ $console
     ->addColumn('C')
     ->addColumn(1970)
     ->setIndent(4)
-    ->display();
+    ->flushAll();
 
-$console = new \Chukdo\Console\Console();
-
-$console
-    ->setHeaders(array('Language', 60 => 'Year'))
+Console::setHeaders(array('Language', 10 => 'Year'))
     ->addRow(array('PHP', 1994))
     ->addRow(array('C++', 1983))
     ->addRow(array('C', 1970))
     ->setPadding(8)
     ->showAllBorders()
-    ->display();
+    ->flushAll();
 
-$console = new \Chukdo\Console\Console();
-
-$console
-    //->setHeaders(array('Language', 'Year'))
-    ->addRow('PHP')
+Console::addRow('PHP')
     ->addRow('C++')
     ->addRow('C - CF')
     ->hideBorder()
-    ->display();
+    ->flush();
 echo '</pre>';
 exit;
 echo \Chukdo\Helper\Convert::toHtml(App::getConf('env'));

@@ -78,6 +78,26 @@ class Console
     }
 
     /**
+     * @param string $data
+     * @param string|null $foregroundColor
+     * @return string
+     */
+    public function color(string $data, string $foregroundColor = null): string
+    {
+        return "\033[" . $this->foregroundColors[$foregroundColor] . "m" . $data . "\033[0m";
+    }
+
+    /**
+     * @param string $data
+     * @param string|null $backgroundColor
+     * @return string
+     */
+    public function background(string $data, string $backgroundColor = null): string
+    {
+        return "\033[" . $this->backgroundColors[$backgroundColor] . "m" . $data . "\033[0m";
+    }
+
+    /**
      * @param string $header
      * @param int|null $strPad
      * @return Console
