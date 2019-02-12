@@ -1,7 +1,6 @@
 <?php namespace Chukdo\Bootstrap;
 
 Use \Closure;
-Use \Chukdo\Helper\Convert;
 
 /**
  * Initialisation de l'application
@@ -47,6 +46,14 @@ class App extends Service
     public function __construct()
     {
 		$this->instance('\Chukdo\Bootstrap\App', $this);
+    }
+
+    /**
+     *
+     */
+    public function registerHandleExceptions()
+    {
+        new HandleExceptions($this);
     }
 
     /**

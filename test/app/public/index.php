@@ -1,5 +1,6 @@
 <?php
 
+/**
 error_reporting(E_ALL);
 set_error_handler('triggerError');
 set_exception_handler('triggerException');
@@ -8,6 +9,7 @@ register_shutdown_function('triggerErrorShutdown');
 function triggerError($e, $message, $file = __FILE__, $line = __LINE__) { echo("<pre>ERROR: $message on file $file at line $line</pre>");echo \Chukdo\Helper\Convert::toHtml((new \Chukdo\Json\Json(debug_backtrace()))->toFlatJson());exit;}
 function triggerErrorShutdown() { if ($error = error_get_last()) { triggerError($error['type'],$error['message'], $error['file'], $error['line']);}}
 function triggerException($e) { triggerError($e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine());}
+*/
 
 /** Definition des chemins */
 DEFINE('CONF_PATH', '/storage/www/chukdo/test/app/conf/');
@@ -43,10 +45,16 @@ Facade::setClassAlias('\Chukdo\Helper\Stream', 'Stream');
 Conf::loadConf(CONF_PATH.'conf.json');
 Conf::loadConf(CONF_PATH.'conf_prod.json');
 
+/** App */
 App::env(App::getConf('env'));
 App::channel('orpi');
+App::register('\App\Providers\LoggerHandlerServiceProvider');
 App::register('\App\Providers\ExceptionLoggerServiceProvider');
+App::registerHandleExceptions();
+ExceptionLogger::emergency('allo ?');
+throw new Exception('ho dommage !!! borddel');
 
+exit;
 ExceptionLogger::debug('trop cool enfin ca marche... OK');
 echo '<pre>';
 Console::setHeaders(array('Language', 70 => 'Year'))

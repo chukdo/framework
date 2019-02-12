@@ -40,7 +40,7 @@ class Service implements ArrayAccess
      *
      * @var array
      */
-    protected $singletons = [];
+    public $singletons = [];
 
 	/**
 	 * Tableau des instances
@@ -62,6 +62,15 @@ class Service implements ArrayAccess
     public function __construct() {}
 
     /**
+     * @param string $name
+     * @return string
+     */
+    protected function formatNameSpace(string $name): string
+    {
+        return trim($name, '\\');
+    }
+
+    /**
      * Enregistre une closure en tant service
      * La closure peut être une string qui s'auto reference dans service
      * Une closure qui sera retourné lors de l'appel
@@ -75,7 +84,7 @@ class Service implements ArrayAccess
 	public function bind(string $name, $closure): bool
 	{
 		if (is_string($closure) || $closure instanceof \Closure || is_array($closure)) {
-			$this->bindings[$name] = $closure;
+			$this->bindings[$this->formatNameSpace($name)] = $closure;
 			return true;
 		}
 			
@@ -92,7 +101,7 @@ class Service implements ArrayAccess
 	public function singleton(string $name, $closure): bool
 	{
         if (is_string($closure) || $closure instanceof \Closure || is_array($closure)) {
-            $this->singletons[$name] = $closure;
+            $this->singletons[$this->formatNameSpace($name)] = $closure;
             return true;
         }
 
@@ -109,7 +118,7 @@ class Service implements ArrayAccess
 	public function instance(string $name, $instance): bool
 	{
 		if (is_object($instance)) {
-			$this->instances[$name] = $instance;
+			$this->instances[$this->formatNameSpace($name)] = $instance;
 			return true;
 		}
 		
@@ -149,6 +158,8 @@ class Service implements ArrayAccess
      */
     public function getInstance(string $name)
     {
+        $name = $this->formatNameSpace($name);
+
         return isset($this->instances[$name]) ?
             $this->instances[$name] :
             null;
@@ -162,6 +173,8 @@ class Service implements ArrayAccess
      */
     public function getSingleton(string $name)
     {
+        $name = $this->formatNameSpace($name);
+
         return isset($this->singletons[$name]) ?
             $this->singletons[$name] :
             null;
@@ -175,6 +188,8 @@ class Service implements ArrayAccess
      */
     public function getBind(string $name)
     {
+        $name = $this->formatNameSpace($name);
+
         return isset($this->bindings[$name]) ?
             $this->bindings[$name] :
             null;
@@ -260,7 +275,7 @@ class Service implements ArrayAccess
         $lastPart   = substr($arg, 1);
 
         if ($firstPart == '@') {
-            return $this->getClosure($lastPart);
+            return $this->make($lastPart);
 
         } else if ($firstPart == '#') {
             return $this->getConf($lastPart);
@@ -325,11 +340,11 @@ class Service implements ArrayAccess
 	{
 		$name	= $parameter->getName(); 
 		$class 	= $parameter->getClass();
-		
+
 		/** Le parametre est un objet on cherche à le resoudre  */
 		if ($cname = $parameter->getClass()) {
-			return $this->getClosure($cname->name);
-		
+			return $this->make($cname->name);
+
 		/** Le parametre a une valeur par defaut que l'on injecte */
 		} elseif ($parameter->isDefaultValueAvailable()) {
 			return $parameter->getDefaultValue();

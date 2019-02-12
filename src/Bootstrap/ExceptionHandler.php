@@ -15,26 +15,85 @@ Use \Chukdo\Contracts\Exception\Handler;
 Class ExceptionHandler Implements Handler
 {
     /**
+     * @var App $app
+     */
+    protected $app;
+
+    /**
+     * ExceptionHandler constructor.
+     * @param App $app
+     */
+    public function __construct(App $app)
+    {
+        $this->app = $app;
+    }
+
+    /**
      * @param Exception $e
+     * @throws ServiceException
+     * @throws \ReflectionException
      */
     public function report(Exception $e): void
     {
-        // app make logger
+        $this
+            ->app
+            ->make('ExceptionLogger')
+            ->emergency('#'. $e->getCode() . ' ' . $e->getMessage() . ' ' . $e->getFile() . '(' . $e->getLine() . ')');
     }
 
     /**
      * @param Exception $e
+     * @throws ServiceException
+     * @throws \ReflectionException
      */
     public function render(Exception $e): void
     {
-        // app make http
+        //$this->app->make('Response');
+        var_dump($e->getMessage());
+        var_dump($e->getTraceAsString());
+        // conf ENV oupsss!!
     }
 
     /**
      * @param Exception $e
+     * @throws ServiceException
+     * @throws \ReflectionException
      */
     public function renderForConsole(Exception $e): void
     {
-        // app make console
+        $console = $this->app->make('Console');
+
+        $console
+            ->addHeader($console->background('Exception', 'red'))
+            ->flushAll();
+
+        $console->setHeaders([
+            'Code',
+            'Message',
+            'File',
+            'Line',
+        ])->addRow([
+            $e->getCode(),
+            $e->getMessage(),
+            $e->getFile(),
+            $e->getLine()
+        ])->flushAll();
+
+        $console->setHeaders([
+            'Call',
+            'File',
+            'Line'
+        ]);
+
+        foreach ($e->getTrace() as $trace) {
+            $console->addRow([
+                ($trace['class'] ? $trace['class'] . $trace['type'] : '') . $trace['function'] . '()',
+                $trace['file'],
+                $trace['line']
+            ]);
+        }
+
+        $console->flushAll();
+
     }
 }

@@ -21,9 +21,10 @@ class HandleExceptions
     protected $app;
 
     /**
+     * HandleExceptions constructor.
      * @param App $app
      */
-    public function bootstrap(App $app): void
+    public function __construct(App $app)
     {
         $this->app = $app;
 
@@ -57,9 +58,7 @@ class HandleExceptions
     {
         $exceptionHandler = $this->getExceptionHandler();
 
-        try {
-            $exceptionHandler->report($e);
-        } catch (Exception $e) {}
+        $exceptionHandler->report($e);
 
         if ($this->app->runningInConsole()) {
             $exceptionHandler->renderForConsole($e);
@@ -69,7 +68,8 @@ class HandleExceptions
     }
 
     /**
-     *
+     * @throws ServiceException
+     * @throws \ReflectionException
      */
     public function handleShutdown(): void
     {
@@ -105,6 +105,6 @@ class HandleExceptions
      */
     protected function getExceptionHandler()
     {
-        return $this->app->make(ExceptionHandler::class);
+        return $this->app->make('\Chukdo\Bootstrap\ExceptionHandler');
     }
 }

@@ -13,6 +13,6 @@ class ExceptionLogger extends Facade
 {
 	public static function name(): string
 	{
-		return '\Chukdo\Logger\Logger';
+		return 'ExceptionLogger';
 	}
 }
