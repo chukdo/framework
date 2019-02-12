@@ -56,6 +56,7 @@ class ElasticHandler extends AbstractHandler
     public function write($record): bool
     {
         $this->init($record['channel']);
+
         $write = $this->elastic->index([
             'index' => $record['channel'],
             'type'  => 'search',

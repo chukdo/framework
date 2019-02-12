@@ -51,11 +51,20 @@ App::channel('orpi');
 App::register('\App\Providers\LoggerHandlerServiceProvider');
 App::register('\App\Providers\ExceptionLoggerServiceProvider');
 App::registerHandleExceptions();
-ExceptionLogger::emergency('allo ?');
-throw new Exception('ho dommage !!! borddel');
+
+var_dump(App::listBindings());
+var_dump(App::listSingletons());
+var_dump(App::listInstances());
+
+Console::setHeaders(array('Language', 70 => 'Year'))
+    ->setIndent(4)
+    ->display();
+
+//ExceptionLogger::emergency('allo ?');
+throw new Exception('au lit les enfants');
 
 exit;
-ExceptionLogger::debug('trop cool enfin ca marche... OK');
+ExceptionLogger::debug('bah c\'est bon');
 echo '<pre>';
 Console::setHeaders(array('Language', 70 => 'Year'))
     ->setIndent(4)

@@ -61,7 +61,7 @@ Class ExceptionHandler Implements Handler
      */
     public function renderForConsole(Exception $e): void
     {
-        $console = $this->app->make('Console');
+        $console = $this->app->make('\Chukdo\Console\Console');
 
         $console
             ->addHeader($console->background('Exception', 'red'))

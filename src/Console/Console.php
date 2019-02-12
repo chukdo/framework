@@ -63,11 +63,14 @@ class Console
         'grey'  => '47'
     ];
 
+    protected $uid;
+
     /**
      * Console constructor.
      */
     public function __construct()
     {
+        $this->uid = uniqid('');
         $this->data         = [];
         $this->columnWidths = [];
         $this->rowIndex     = -1;
@@ -104,7 +107,7 @@ class Console
      */
     public function addHeader(string $header, int $strPad = null): self
     {
-        $this->data[-1][] = $strPad > strlen($header) ? str_pad($header, $strPad) : $header;
+        $this->data[-1][] = $this->uid . ($strPad > strlen($header) ? str_pad($header, $strPad) : $header);
 
         return $this;
     }
@@ -247,7 +250,13 @@ class Console
     public function flushAll(): self
     {
         $this->display();
-        $this->__construct();
+        $this->data         = [];
+        $this->columnWidths = [];
+        $this->rowIndex     = -1;
+        $this->border       = true;
+        $this->allBorders   = false;
+        $this->padding      = 1;
+        $this->indent       = 0;
 
         return $this;
     }

@@ -40,7 +40,7 @@ class Service implements ArrayAccess
      *
      * @var array
      */
-    public $singletons = [];
+    protected $singletons = [];
 
 	/**
 	 * Tableau des instances
@@ -68,6 +68,30 @@ class Service implements ArrayAccess
     protected function formatNameSpace(string $name): string
     {
         return trim($name, '\\');
+    }
+
+    /**
+     * @return array
+     */
+    public function listBindings(): array
+    {
+        return array_keys($this->bindings);
+    }
+
+    /**
+     * @return array
+     */
+    public function listSingletons(): array
+    {
+        return array_keys($this->singletons);
+    }
+
+    /**
+     * @return array
+     */
+    public function listInstances(): array
+    {
+        return array_keys($this->instances);
     }
 
     /**
