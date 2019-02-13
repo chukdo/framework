@@ -218,7 +218,7 @@ class Json extends \ArrayObject
 
     /**
      * @param mixed $key
-     * @return mixed|void|null
+     * @return mixed|null
      */
     public function offsetUnset($key)
     {
@@ -227,6 +227,7 @@ class Json extends \ArrayObject
             parent::offsetUnset($key);
             return $offset;
         }
+
         return null;
     }
 
@@ -521,7 +522,7 @@ class Json extends \ArrayObject
         $mixed = [];
 
         foreach ($this as $k => $v) {
-            $k = ($path ? $path : '').'/'.ltrim($k, '/');
+            $k = trim(($path ? $path : '') . '.' . $k, '.');
 
             if ($v instanceof Json) {
                 $mixed = array_merge($mixed, $v->toFlatJson($k));
@@ -560,7 +561,7 @@ class Json extends \ArrayObject
 
         /** recherche de valeurs multiples */
         $path   = trim($path, '/');
-        $match  = '/^\/'.str_replace(['*', '/'], ['.*?', '\/'], $path).'$/';
+        $match  = '/^\/'.str_replace(['*', '.'], ['.*?', '\.'], $path).'$/';
         $values = new Json();
 
         foreach (Data::match($match, array_keys($data)) as  $value) {
@@ -581,7 +582,7 @@ class Json extends \ArrayObject
     public function getPath(string $path)
     {
         /** Pas de chemin,  retour de l'offset */
-        if (strpos($path, '/') === false) {
+        if (strpos($path, '.') === false) {
             return $this->offsetGet($path);
         }
 
@@ -603,7 +604,7 @@ class Json extends \ArrayObject
      */
     public function setPath(string $path, $value): self
     {
-        $path = explode('/', trim($path, '/'));
+        $path = explode('.', trim($path, '.'));
         $end  = array_pop($path);
         $key  = $this;
 

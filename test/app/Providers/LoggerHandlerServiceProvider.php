@@ -12,7 +12,7 @@ class LoggerHandlerServiceProvider extends ServiceProvider {
         $this->app->singleton('LoggerHandler', [
             'class' => '\Chukdo\Logger\Handlers\ElasticHandler',
             'args' => [
-                '#db/elastic/host'
+                '#db.elastic.host'
             ]
         ]);
     }

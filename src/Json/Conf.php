@@ -25,14 +25,4 @@ class Conf extends Json
 
         return false;
     }
-
-    /**
-     * @param string $key
-     * @param null $default
-     * @return string
-     */
-    public function get(string $key, $default = null): string
-    {
-        return parent::get('/' . trim($key, '/'));
-    }
 }

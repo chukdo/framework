@@ -56,9 +56,15 @@ class HandleExceptions
      */
     public function handleException(Throwable $e)
     {
+        if (!$e instanceof Exception) {
+            $e = new AppException($e->getMessage(), $e->getCode(), $e);
+        }
+
         $exceptionHandler = $this->getExceptionHandler();
 
-        $exceptionHandler->report($e);
+        try {
+            $exceptionHandler->report($e);
+        } catch (Exception $e) {}
 
         if ($this->app->runningInConsole()) {
             $exceptionHandler->renderForConsole($e);

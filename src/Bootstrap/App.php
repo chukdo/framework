@@ -123,16 +123,21 @@ class App extends Service
 
     /**
      * @param string $name
+     * @param bool $bindInstance
      * @return mixed|object|null
      * @throws ServiceException
      * @throws \ReflectionException
      */
-	public function make(string $name)
+	public function make(string $name, bool $bindInstance = false)
 	{
         $alias      = $this->getAlias($name);
         $bindObject = parent::make($alias);
 
         $this->resolve($alias, $bindObject);
+
+        if ($bindInstance == true) {
+            $this->instance($name, $bindObject);
+        }
 
         return $bindObject;
 	}

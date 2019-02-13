@@ -25,7 +25,8 @@
         "microsoft/azure-storage-common": "~1.2.0",
         "microsoft/azure-storage-blob": "~1.2.0",
         "guzzlehttp/guzzle": "~6.0",
-        "elasticsearch/elasticsearch": "~6.0"
+        "elasticsearch/elasticsearch": "~6.0",
+        "digitalnature/php-ref": "^1.2"
     },
     "autoload": {
         "psr-4": {

@@ -48,7 +48,7 @@ Class ExceptionHandler Implements Handler
      */
     public function render(Exception $e): void
     {
-        //$this->app->make('Response');
+        //$this->app->make('Response'); \Chukdo\Http\Response
         var_dump($e->getMessage());
         var_dump($e->getTraceAsString());
         // conf ENV oupsss!!
@@ -64,26 +64,18 @@ Class ExceptionHandler Implements Handler
         $console = $this->app->make('\Chukdo\Console\Console');
 
         $console
-            ->addHeader($console->background('Exception', 'red'))
-            ->flushAll();
-
-        $console->setHeaders([
-            'Code',
-            'Message',
-            'File',
-            'Line',
-        ])->addRow([
-            $e->getCode(),
-            $e->getMessage(),
-            $e->getFile(),
-            $e->getLine()
-        ])->flushAll();
-
-        $console->setHeaders([
-            'Call',
-            'File',
-            'Line'
-        ]);
+            ->addRow($console->background(' ----------- EXCEPTION ----------- ', 'red'))
+            ->hideBorder()
+            ->flush()
+            ->addHeader($console->color('Code', 'green'))
+            ->addHeader($console->color('Message', 'green'))
+            ->addHeader($console->color('File', 'green'))
+            ->addHeader($console->color('Line', 'green'))
+            ->addRow([$e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine()])
+            ->flush()
+            ->addHeader($console->color('Call', 'green'))
+            ->addHeader($console->color('File', 'green'))
+            ->addHeader($console->color('Line', 'green'));
 
         foreach ($e->getTrace() as $trace) {
             $console->addRow([
@@ -93,7 +85,7 @@ Class ExceptionHandler Implements Handler
             ]);
         }
 
-        $console->flushAll();
+        $console->flush();
 
     }
 }

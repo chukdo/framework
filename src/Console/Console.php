@@ -1,5 +1,14 @@
 <?php namespace Chukdo\Console;
 
+/**
+ * Console pour cli
+ *
+ * @package 	Console
+ * @version 	1.0.0
+ * @copyright 	licence MIT, Copyright (C) 2019 Domingo
+ * @since 		08/01/2019
+ * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
+ */
 class Console
 {
     /**
@@ -63,14 +72,11 @@ class Console
         'grey'  => '47'
     ];
 
-    protected $uid;
-
     /**
      * Console constructor.
      */
     public function __construct()
     {
-        $this->uid = uniqid('');
         $this->data         = [];
         $this->columnWidths = [];
         $this->rowIndex     = -1;
@@ -78,6 +84,12 @@ class Console
         $this->allBorders   = false;
         $this->padding      = 1;
         $this->indent       = 0;
+    }
+
+    public function loadArray($array)
+    {
+        // array to json
+        // json flat add each k => v
     }
 
     /**
@@ -107,7 +119,7 @@ class Console
      */
     public function addHeader(string $header, int $strPad = null): self
     {
-        $this->data[-1][] = $this->uid . ($strPad > strlen($header) ? str_pad($header, $strPad) : $header);
+        $this->data[-1][] = $strPad > strlen($header) ? str_pad($header, $strPad) : $header;
 
         return $this;
     }
@@ -229,15 +241,6 @@ class Console
     {
         echo $this->getTable();
 
-        return $this;
-    }
-
-    /**
-     * @return Console
-     */
-    public function flush(): self
-    {
-        $this->display();
         $this->data         = [];
         $this->rowIndex     = -1;
 
@@ -247,7 +250,7 @@ class Console
     /**
      * @return Console
      */
-    public function flushAll(): self
+    public function flush(): self
     {
         $this->display();
         $this->data         = [];

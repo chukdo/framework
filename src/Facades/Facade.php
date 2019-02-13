@@ -66,7 +66,7 @@ class Facade
 	public static function getInstance(string $name)
 	{
 		if (!isset(static::$facades[$name])) {
-			static::$facades[$name] = static::$app->make($name);
+			static::$facades[$name] = static::$app->make($name, true);
 		}	
 			
 		return static::$facades[$name];

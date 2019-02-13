@@ -1,16 +1,5 @@
 <?php
 
-/**
-error_reporting(E_ALL);
-set_error_handler('triggerError');
-set_exception_handler('triggerException');
-register_shutdown_function('triggerErrorShutdown');
-
-function triggerError($e, $message, $file = __FILE__, $line = __LINE__) { echo("<pre>ERROR: $message on file $file at line $line</pre>");echo \Chukdo\Helper\Convert::toHtml((new \Chukdo\Json\Json(debug_backtrace()))->toFlatJson());exit;}
-function triggerErrorShutdown() { if ($error = error_get_last()) { triggerError($error['type'],$error['message'], $error['file'], $error['line']);}}
-function triggerException($e) { triggerError($e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine());}
-*/
-
 /** Definition des chemins */
 DEFINE('CONF_PATH', '/storage/www/chukdo/test/app/conf/');
 DEFINE('APP_PATH', '/storage/www/chukdo/test/app/');
@@ -52,62 +41,16 @@ App::register('\App\Providers\LoggerHandlerServiceProvider');
 App::register('\App\Providers\ExceptionLoggerServiceProvider');
 App::registerHandleExceptions();
 
-var_dump(App::listBindings());
-var_dump(App::listSingletons());
-var_dump(App::listInstances());
+//r($app);
 
+echo '<pre>';
 Console::setHeaders(array('Language', 70 => 'Year'))
+    ->addRow(["toto titi est gros minet", ''])
     ->setIndent(4)
-    ->display();
+    ->flush();
 
 //ExceptionLogger::emergency('allo ?');
 throw new Exception('au lit les enfants');
-
-exit;
-ExceptionLogger::debug('bah c\'est bon');
-echo '<pre>';
-Console::setHeaders(array('Language', 70 => 'Year'))
-    ->setIndent(4)
-    ->display();
-
-Console::addRow()
-    ->addColumn('PHP')
-    ->addColumn(Console::background('1994QZSDFGHHJGFDSQSDFGHHJGFDS', 'red'))
-    ->addRow()
-    ->addColumn('C++')
-    ->addColumn(Console::color(1983, 'blue'))
-    ->addRow()
-    ->addColumn('C')
-    ->addColumn(1970)
-    ->flush();
-
-Console::addRow()
-    ->addColumn('PHP')
-    ->addColumn('1994')
-    ->addRow()
-    ->addColumn('C++')
-    ->addColumn(1983)
-    ->addRow()
-    ->addColumn('C')
-    ->addColumn(1970)
-    ->setIndent(4)
-    ->flushAll();
-
-Console::setHeaders(array('Language', 10 => 'Year'))
-    ->addRow(array('PHP', 1994))
-    ->addRow(array('C++', 1983))
-    ->addRow(array('C', 1970))
-    ->setPadding(8)
-    ->showAllBorders()
-    ->flushAll();
-
-Console::addRow('PHP')
-    ->addRow('C++')
-    ->addRow('C - CF')
-    ->hideBorder()
-    ->flush();
-echo '</pre>';
-exit;
 echo \Chukdo\Helper\Convert::toHtml(App::getConf('env'));
 
 // console
