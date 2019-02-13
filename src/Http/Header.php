@@ -162,9 +162,9 @@ class Header
 
     /**
      * @param string $name
-     * @return string
+     * @return string|null
      */
-    public function getHeader(string $name): string
+    public function getHeader(string $name): ?string
     {
         return $this->header->offsetGet($this->normalize($name));
     }

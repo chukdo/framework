@@ -42,20 +42,6 @@ App::register(\App\Providers\LoggerHandlerServiceProvider::class);
 App::register(\App\Providers\ExceptionLoggerServiceProvider::class);
 App::registerHandleExceptions();
 
-//$r = new \Chukdo\Http\Response();
-
-//Response::json(['A' => 'bvc'])->send()->end();
-
-//ExceptionLogger::emergency('allo ?');
-throw new Exception('au lit les enfants');
-
-// console
-// http_reponse
-
-// exception handler
-
-exit;
-
 /** Service locator */
 App::setAlias(\Chukdo\Storage\ServiceLocator::class, 'ServiceLocator');
 App::instance('ServiceLocator', \Chukdo\Storage\ServiceLocator::getInstance());
@@ -64,8 +50,18 @@ App::instance('ServiceLocator', \Chukdo\Storage\ServiceLocator::getInstance());
 Stream::register('azure', \Chukdo\Storage\Wrappers\AzureStream::class);
 ServiceLocator::setService('azure',
     function () {
-        return MicrosoftAzure\Storage\Blob\BlobRestProxy::createBlobService(Conf::get('storage/azure/endpoint'));
+        return MicrosoftAzure\Storage\Blob\BlobRestProxy::createBlobService(Conf::get('storage.azure.endpoint'));
     }
 );
 
-echo \Chukdo\Helper\Convert::toHtml(Conf::get('storage/azure/endpoint'));
+Response::file('azure://files-dev/566170fe8bc5d2cf3d000000/5948da9a28b8b.pdf', 'test.pdf', 'application/pdf')->send()->end();
+//file_get_contents()
+//var_dump();
+
+//Response::json(['A' => 'bvc'])->send()->end();
+
+
+//throw new Exception('au lit les enfants');
+
+
+exit;

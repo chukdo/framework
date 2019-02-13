@@ -10,18 +10,15 @@
  * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 final class Stream
-{  
+{
     /**
-     * Constructeur privé, empeche l'intanciation de la classe statique
+     * Stream constructor.
      */
     private function __construct() {}
 
     /**
-     * Enregistre un gestionnaire d'URL
-     *
-     * @param 	string  $name Le nom du gestionnaire à enregistrer.
-     * @param 	string	$class La classe qui implémente le gestionnaire
-     * @return 	void
+     * @param string $name
+     * @param string $class
      */
     public static function register(string $name, string $class): void
     {
@@ -32,10 +29,8 @@ final class Stream
     }
 
     /**
-     * Retourne si un gestionnaire d'URL existe
-     *
-     * @param 	string  $name Le nom du gestionnaire à trouver.
-     * @return 	bool
+     * @param string $name
+     * @return bool
      */
     public static function exists(string $name): bool
     {

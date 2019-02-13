@@ -4,7 +4,7 @@ Use \Chukdo\Storage\ServiceLocator;
 Use \MicrosoftAzure\Storage\Blob\BlobRestProxy;
 
 /**
- * Redis streamWrapper
+ * Azure streamWrapper
  *
  * @copyright 	licence MIT, Copyright (C) 2015 Domingo
  * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
@@ -15,6 +15,9 @@ class AzureStream extends AbstractStream
      * @var object StreamInterface
      */
     protected $stream;
+
+    private $streamContent = null;
+    private $streamLenght = 0;
 
     /**
      * @return BlobRestProxy
@@ -60,9 +63,12 @@ class AzureStream extends AbstractStream
      */
     public function streamGet()
     {
-        ob_start();
-        fpassthru($this->getStream()->getBlob($this->getHost(), $this->getPath())->getContentStream());
-        return ob_get_clean();
+        if ($this->streamContent == null) {
+            $this->streamContent    = stream_get_contents($this->getStream()->getBlob($this->getHost(), $this->getPath())->getContentStream());
+            $this->streamLenght     = strlen($this->streamContent);
+        }
+
+        return $this->streamContent;
     }
 
     /**
@@ -75,7 +81,15 @@ class AzureStream extends AbstractStream
      */
     public function streamGetRange(int $offset, int $length): ?string
     {
-        throw new StreamException('[streamGetRange] not implemented');
+        if ($this->streamContent == null) {
+            $this->streamGet();
+        }
+
+        if ($offset >= $this->streamLenght) {
+            return null;
+        } else {
+            return substr($this->streamContent, $offset, $length);
+        }
     }
 
     /**
@@ -137,10 +151,14 @@ class AzureStream extends AbstractStream
      */
     public function streamSize(): int
     {
-        return (int) $this->getStream()
+        if ($this->streamLenght == 0) {
+            $this->streamLenght = (int) $this->getStream()
                 ->getBlob($this->getHost(), $this->getPath())
                 ->getProperties()
                 ->getContentLength();
+        }
+
+        return $this->streamLenght;
     }
 
     /**
@@ -151,7 +169,8 @@ class AzureStream extends AbstractStream
      */
     public function streamDelete(): bool
     {
-        return (bool) $this->getStream()->deleteBlob($this->getHost(), $this->getPath());
+        $this->getStream()->deleteBlob($this->getHost(), $this->getPath());
+        return true;
     }
 
     /**
@@ -216,7 +235,7 @@ class AzureStream extends AbstractStream
 
             if ($path) {
                 if (strpos($name, $path) === 0) {
-                    $list[] = trim(str_replace($path, '', $name), '/');
+                    $list[] = trim(substr($name, strlen($path)), '/');
                 }
             } else {
                 $list[] = $name;

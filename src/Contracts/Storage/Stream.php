@@ -21,8 +21,8 @@ Interface Stream
     /**
      * Ajoute du contenu au debut du fichier (et le ramene à 0 s'il existe avant)
      *
-     * @param   string  $content
-     * @return 	bool
+     * @param string $content
+     * @return bool
      */
     public function streamSet(string $content): bool;
 

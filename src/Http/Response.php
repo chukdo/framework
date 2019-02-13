@@ -182,16 +182,15 @@ class Response
     /**
      *
      */
-    public function end(): void
+    public function end()
     {
         exit;
     }
 
-
     /**
-     * Envoi la reponse HTTP à la sortie standard
+     * @return Response
      */
-    public function send()
+    public function send(): self
     {
         $hasContent = $this->content != null;
         $hasFile    = $this->file != null;
@@ -205,6 +204,8 @@ class Response
         } else {
             $this->sendHeaderResponse();
         }
+
+        return $this;
     }
 
     /**
@@ -213,7 +214,7 @@ class Response
     protected function sendHeaderResponse(): self
     {
         if (headers_sent()) {
-            return;
+            return $this;
         }
 
         header_remove();
@@ -259,6 +260,8 @@ class Response
             $this->sendHeaderResponse();
             echo $data;
         }
+
+        return $this;
     }
 
     /**
@@ -272,7 +275,7 @@ class Response
             $f = fopen($this->file, 'rb');
 
             while (!feof($f)) {
-                $c = fread($f, 4096);
+                $c = fread($f, 131072);
                 $l = dechex(strlen($c));
 
                 echo "$l\r\n$c\r\n";
@@ -287,5 +290,7 @@ class Response
             $this->sendHeaderResponse();
             readfile($this->file);
         }
+
+        return $this;
     }
 }
