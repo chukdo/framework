@@ -23,23 +23,17 @@ class Url
         'dir'       => '',
         'file'      => '',
         'input'     => [],
-        'fragment'  => '',
-        'meta'      => []
+        'fragment'  => ''
     ];
 
     /**
      * Url constructor.
      * @param string|null $url
-     * @param array $meta
      */
-    public function __construct(string $url = null, array $meta = [])
+    public function __construct(string $url = null)
     {
         if ($url) {
             $this->parseUrl($url);
-        }
-
-        foreach ($meta as $key => $value) {
-            $this->setMeta($key, $value);
         }
     }
 
@@ -216,29 +210,6 @@ class Url
     {
         return isset($this->url['input'][$key]) ?
             $this->url['input'][$key] :
-            '';
-    }
-
-    /**
-     * @param string $key
-     * @param string $value
-     * @return Url
-     */
-    public function setMeta(string $key, string $value): Url
-    {
-        $this->url['meta'][$key] = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param string $key
-     * @return string
-     */
-    public function getMeta(string $key): string
-    {
-        return isset($this->url['meta'][$key]) ?
-            $this->url['meta'][$key] :
             '';
     }
 
