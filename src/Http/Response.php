@@ -2,6 +2,7 @@
 
 Use \Chukdo\Json\Json;
 Use \Chukdo\Xml\Xml;
+Use \Chukdo\Helper\Http;
 
 /**
  * Gestion des entetes HTTP
@@ -101,10 +102,9 @@ class Response
     public function download(string $file, string $name = null, string $type = null): self
     {
         $name = $name ?: basename($file);
-        $type = $type ?: 'application/octet-stream';
+        $type = $type ?: Http::mimeContentType($name);
 
-        $this->file     = $file;
-        $this->stream   = null;
+        $this->file = $file;
         $this->header
             ->setHeader('Content-Disposition', 'attachment; filename="'.$name.'"')
             ->setHeader('Content-Type', $type);
@@ -121,10 +121,9 @@ class Response
     public function file(string $file, string $name = null, string $type = null): self
     {
         $name = $name ?: basename($file);
-        $type = $type ?: 'application/octet-stream';
+        $type = $type ?: Http::mimeContentType($name);
 
-        $this->file     = $file;
-        $this->stream   = null;
+        $this->file = $file;
         $this->header
             ->setHeader('Content-Disposition', 'inline; filename="'.$name.'"')
             ->setHeader('Content-Type', $type);

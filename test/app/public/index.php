@@ -54,7 +54,7 @@ ServiceLocator::setService('azure',
     }
 );
 
-Response::file('azure://files-dev/566170fe8bc5d2cf3d000000/5948da9a28b8b.pdf', 'test.pdf', 'application/pdf')->send()->end();
+Response::file('azure://files-dev/566170fe8bc5d2cf3d000000/5948da9a28b8b.pdf', 'test.pdf')->send()->end();
 //file_get_contents()
 //var_dump();
 
