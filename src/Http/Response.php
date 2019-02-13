@@ -27,17 +27,17 @@ class Response
     /**
      * @param string
      */
-    protected $content;
+    protected $content = null;
 
     /**
      * @param string $file
      */
-    protected $file;
+    protected $file = null;
 
     /**
      * @param Closure $stream
      */
-    protected $stream;
+    protected $stream = null;
 
     /**
      * Response constructor.
@@ -45,9 +45,6 @@ class Response
     public function __construct()
     {
         $this->header   = new Header();
-        $this->data     = new Json();
-        $this->files    = new Json();
-
         $this->header
             ->setStatus(200)
             ->setDate(time())
@@ -112,7 +109,8 @@ class Response
     {
         $type = $type ?: 'application/octet-stream';
 
-        $this->stream = $closure;
+        $this->file     = null;
+        $this->stream   = $closure;
         $this->header
             ->setHeader('Content-Disposition', 'attachment; filename="'.$name.'"')
             ->setHeader('Content-Type', $type);
@@ -131,7 +129,8 @@ class Response
         $name = $name ?: basename($file);
         $type = $type ?: 'application/octet-stream';
 
-        $this->file = $file;
+        $this->file     = $file;
+        $this->stream   = null;
         $this->header
             ->setHeader('Content-Disposition', 'attachment; filename="'.$name.'"')
             ->setHeader('Content-Type', $type);
@@ -150,7 +149,8 @@ class Response
         $name = $name ?: basename($file);
         $type = $type ?: 'application/octet-stream';
 
-        $this->file = $file;
+        $this->file     = $file;
+        $this->stream   = null;
         $this->header
             ->setHeader('Content-Disposition', 'inline; filename="'.$name.'"')
             ->setHeader('Content-Type', $type);
@@ -219,24 +219,28 @@ class Response
      */
     public function send()
     {
-        $count = $this->data->count() + $this->files->count();
+        $hasContent = $this->content != null;
+        $hasFile    = $this->file != null;
+        $hasStream  = $this->stream != null;
 
-        switch($count) {
-            case 0  :
-                $this->sendHeaderResponse(true);
-                break;
-            case 1  :
-                $this->sendSimpleResponse(true);
-                break;
-            default :
-                $this->sendMultipartResponse(true);
+        if ($hasContent) {
+            $this->sendContentResponse();
+
+        } else if ($hasFile) {
+            $this->sendDownloadResponse();
+
+        } else if ($hasStream) {
+            $this->sendStreamResponse();
+
+        } else {
+            $this->sendHeaderResponse();
         }
     }
 
     /**
      * @return Response
      */
-    public function sendHeaderResponse(): self
+    protected function sendHeaderResponse(): self
     {
         if (headers_sent()) {
             return;
@@ -249,6 +253,78 @@ class Response
         }
 
         return $this;
+    }
+
+    /**
+     * @return Response
+     */
+    protected function sendContentResponse(): self
+    {
+        $data            = $this->content;
+        $contentEncoding = $this->header->getHeader('content-encoding');
+
+        /** Content-Encoding */
+        if ($contentEncoding) {
+
+            /** Compression GZIP || ZLIB */
+            switch ($contentEncoding) {
+                case 'gzip'    : $data = gzencode($this->content); break;
+                case 'deflate' : $data = gzdeflate($this->content); break;
+            }
+        }
+
+        if ($this->header->getHeader('transfer-encoding') == 'chunked') {
+            $this->sendHeaderResponse();
+
+            foreach (str_split($data, 4096) as $c) {
+                $l = dechex(strlen($c));
+
+                echo "$l\r\n$c\r\n";
+            }
+
+            echo "0\r\n";
+
+        } else {
+            $this->header->setHeader('content-length', strlen($data));
+            $this->sendHeaderResponse();
+            echo $data;
+        }
+    }
+
+    /**
+     * @return Response
+     */
+    protected function sendDownloadResponse(): self
+    {
+        if ($this->header->getHeader('Transfer-encoding') == 'chunked') {
+            $this->sendHeaderResponse();
+
+            $f = fopen($this->file, 'rb');
+
+            while (!feof($f)) {
+                $c = fread($f, 4096);
+                $l = dechex(strlen($c));
+
+                echo "$l\r\n$c\r\n";
+            }
+
+            fclose($f);
+
+            echo "0\r\n";
+
+        } else {
+            $this->header->setHeader('content-length', filesize($this->file));
+            $this->sendHeaderResponse();
+            readfile($this->file);
+        }
+    }
+
+    /**
+     * @return Response
+     */
+    protected function sendStreamResponse(): self
+    {
+
     }
 
     /**
