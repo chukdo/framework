@@ -22,13 +22,14 @@ $app = new \Chukdo\Bootstrap\App();
 Use \Chukdo\Facades\Facade;
 
 Facade::setFacadeApplication($app);
-Facade::setClassAlias('\Chukdo\Facades\Facade', 'Facade');
-Facade::setClassAlias('\Chukdo\Facades\App', 'App');
-Facade::setClassAlias('\Chukdo\Facades\Event', 'Event');
-Facade::setClassAlias('\Chukdo\Facades\Conf', 'Conf');
-Facade::setClassAlias('\Chukdo\Facades\Console', 'Console');
-Facade::setClassAlias('\Chukdo\Facades\ServiceLocator', 'ServiceLocator');
-Facade::setClassAlias('\Chukdo\Helper\Stream', 'Stream');
+Facade::setClassAlias(\Chukdo\Facades\Facade::class, 'Facade');
+Facade::setClassAlias(\Chukdo\Facades\App::class, 'App');
+Facade::setClassAlias(\Chukdo\Facades\Event::class, 'Event');
+Facade::setClassAlias(\Chukdo\Facades\Response::class, 'Response');
+Facade::setClassAlias(\Chukdo\Facades\Conf::class, 'Conf');
+Facade::setClassAlias(\Chukdo\Facades\Console::class, 'Console');
+Facade::setClassAlias(\Chukdo\Facades\ServiceLocator::class, 'ServiceLocator');
+Facade::setClassAlias(\Chukdo\Helper\Stream::class, 'Stream');
 
 /** Configuration */
 Conf::loadConf(CONF_PATH.'conf.json');
@@ -37,21 +38,16 @@ Conf::loadConf(CONF_PATH.'conf_prod.json');
 /** App */
 App::env(App::getConf('env'));
 App::channel('orpi');
-App::register('\App\Providers\LoggerHandlerServiceProvider');
-App::register('\App\Providers\ExceptionLoggerServiceProvider');
+App::register(\App\Providers\LoggerHandlerServiceProvider::class);
+App::register(\App\Providers\ExceptionLoggerServiceProvider::class);
 App::registerHandleExceptions();
 
-//r($app);
+//$r = new \Chukdo\Http\Response();
 
-echo '<pre>';
-Console::setHeaders(array('Language', 70 => 'Year'))
-    ->addRow(["toto titi est gros minet", ''])
-    ->setIndent(4)
-    ->flush();
+//Response::json(['A' => 'bvc'])->send()->end();
 
 //ExceptionLogger::emergency('allo ?');
 throw new Exception('au lit les enfants');
-echo \Chukdo\Helper\Convert::toHtml(App::getConf('env'));
 
 // console
 // http_reponse
@@ -61,11 +57,11 @@ echo \Chukdo\Helper\Convert::toHtml(App::getConf('env'));
 exit;
 
 /** Service locator */
-App::setAlias('\Chukdo\Storage\ServiceLocator', 'ServiceLocator');
+App::setAlias(\Chukdo\Storage\ServiceLocator::class, 'ServiceLocator');
 App::instance('ServiceLocator', \Chukdo\Storage\ServiceLocator::getInstance());
 
 /** Declaration de flux */
-Stream::register('azure', '\Chukdo\Storage\Wrappers\AzureStream');
+Stream::register('azure', \Chukdo\Storage\Wrappers\AzureStream::class);
 ServiceLocator::setService('azure',
     function () {
         return MicrosoftAzure\Storage\Blob\BlobRestProxy::createBlobService(Conf::get('storage/azure/endpoint'));

@@ -13,6 +13,6 @@ class Event extends Facade
 {
 	public static function name(): string
 	{
-		return '\Chukdo\Event\Event';
+		return \Chukdo\Event\Event::class;
 	}
 }

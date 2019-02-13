@@ -13,6 +13,6 @@ class ServiceLocator extends Facade
 {
 	public static function name(): string
 	{
-		return '\Chukdo\Storage\ServiceLocator';
+		return \Chukdo\Storage\ServiceLocator::class;
 	}
 }

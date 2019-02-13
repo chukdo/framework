@@ -10,7 +10,7 @@ class ExceptionLoggerServiceProvider extends ServiceProvider {
     public function register(): void
     {
         $this->app->singleton('ExceptionLogger', [
-            'class' => '\Chukdo\Logger\Logger',
+            'class' => \Chukdo\Logger\Logger::class,
             'args'  => [
                 'exception_' . $this->app->channel() . '_' . $this->app->env(),
                 [
@@ -22,6 +22,6 @@ class ExceptionLoggerServiceProvider extends ServiceProvider {
             ]
         ]);
 
-        $this->setClassAlias('\Chukdo\Facades\ExceptionLogger', 'ExceptionLogger');
+        $this->setClassAlias(\Chukdo\Facades\ExceptionLogger::class, 'ExceptionLogger');
     }
 }

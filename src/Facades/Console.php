@@ -13,6 +13,6 @@ class Console extends Facade
 {
 	public static function name(): string
 	{
-		return '\Chukdo\Console\Console';
+		return \Chukdo\Console\Console::class;
 	}
 }

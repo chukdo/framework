@@ -1,9 +1,7 @@
 <?php namespace Chukdo\Http;
 
-Use \Closure;
 Use \Chukdo\Json\Json;
 Use \Chukdo\Xml\Xml;
-Use \Chukdo\Helper\Data;
 
 /**
  * Gestion des entetes HTTP
@@ -33,11 +31,6 @@ class Response
      * @param string $file
      */
     protected $file = null;
-
-    /**
-     * @param Closure $stream
-     */
-    protected $stream = null;
 
     /**
      * Response constructor.
@@ -95,25 +88,6 @@ class Response
     public function cookies(iterable $cookies): self
     {
         $this->header->setCookies($cookies);
-
-        return $this;
-    }
-
-    /**
-     * @param Closure $closure
-     * @param string $name
-     * @param string|null $type
-     * @return Response
-     */
-    public function stream(Closure $closure, string $name, string $type = null): self
-    {
-        $type = $type ?: 'application/octet-stream';
-
-        $this->file     = null;
-        $this->stream   = $closure;
-        $this->header
-            ->setHeader('Content-Disposition', 'attachment; filename="'.$name.'"')
-            ->setHeader('Content-Type', $type);
 
         return $this;
     }
@@ -221,16 +195,12 @@ class Response
     {
         $hasContent = $this->content != null;
         $hasFile    = $this->file != null;
-        $hasStream  = $this->stream != null;
 
         if ($hasContent) {
             $this->sendContentResponse();
 
         } else if ($hasFile) {
             $this->sendDownloadResponse();
-
-        } else if ($hasStream) {
-            $this->sendStreamResponse();
 
         } else {
             $this->sendHeaderResponse();
@@ -317,163 +287,5 @@ class Response
             $this->sendHeaderResponse();
             readfile($this->file);
         }
-    }
-
-    /**
-     * @return Response
-     */
-    protected function sendStreamResponse(): self
-    {
-
-    }
-
-    /**
-     * @return $this
-     */
-    public function sendSimpleResponse()
-    {
-        if ($this->data->count()) {
-            $this->sendSimpleResponseData($this->data->getIndex(0));
-
-        } else if ($this->files->count()) {
-            foreach ($this->files as $name => $file) {
-                $this->sendSimpleResponseFile($file, $name);
-                break;
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param $file
-     * @param $name
-     * @param $header
-     * @throws Exception
-     */
-    public function sendSimpleResponseFile($file, $name, $header)
-    {
-        $this->unsetContentEncoding();
-
-        /** Définition du Content-Type si non défini */
-        if (!$this->getContentType()) {
-            $this->setContentType(helper_file::getFileContentType($file));
-        }
-
-        /** Download */
-        $this->setContentDisposition($this->disposition.'; filename="'.$name.'"');
-
-        /** Transfert-Encoding > chunked !! */
-        if ($this->getTransferEncoding() == 'chunked') {
-            $this->sendHeaderResponse($header);
-
-            $f = fopen($file, 'rb');
-
-            while (!feof($f)) {
-                $c = fread($f, 4096);
-                $l = dechex(strlen($c));
-
-                echo "$l\r\n$c\r\n";
-            }
-
-            fclose($f);
-
-            echo "0\r\n";
-
-            /** Envoi simple sans Content-Encoding ni Transfert-Encoding spécifique */
-        } else {
-            $scheme = parse_url($file, PHP_URL_SCHEME);
-
-            if ($scheme == null) {
-                $this->setContentLength(filesize($file));
-            }
-
-            $this->sendHeaderResponse($header);
-            readfile($file);
-        }
-    }
-
-    /**
-     * @param $data
-     * @param $header
-     * @throws Exception
-     */
-    public function sendSimpleResponseData($data, $header)
-    {
-        $content = $this->getContentEncoding();
-
-        /** Définition du Content-Type si non défini */
-        if (!$this->getContentType()) {
-            $this->setContentType(helper_data::getDataContentType($data));
-        }
-
-        /** Content-Encoding */
-        if ($content) {
-
-            /** Compression GZIP || ZLIB */
-            switch ($content) {
-                case 'gzip'    : $data = gzencode($data); break;
-                case 'deflate' : $data = gzdeflate($data); break;
-            }
-        }
-
-        /** Transfert-Encoding > chunked !! */
-        if ($this->getTransferEncoding() == 'chunked') {
-            $this->sendHeaderResponse($header);
-
-            foreach (str_split($data, 4096) as $c) {
-                $l = dechex(strlen($c));
-
-                echo "$l\r\n$c\r\n";
-            }
-
-            echo "0\r\n";
-
-            /** Envoi simple sans Content-Encoding ni Transfert-Encoding spécifique */
-        } else {
-            $this->setContentLength(strlen($data));
-            $this->sendHeaderResponse($header);
-            echo $data;
-        }
-    }
-
-    /**
-     * Envoi la reponse HTTP ne contenant plusieurs données et / ou fichiers
-     *
-     * @param bool $header envoi les entetes via la fonction 'header()' ou à la sortie standard
-     * @throws Exception
-     */
-    public function sendMultipartResponse($header)
-    {
-        $bound = md5(uniqid('', true));
-
-        /** Definition des entetes */
-        $this->header->unsetContentEncoding();
-        $this->header->setContentType('multipart/related; boundary='.$bound);
-
-        /** Envoi des entetes */
-        $this->sendHeaderResponse($header);
-
-        /** Envoi du multipart Data */
-        foreach ($this->data as $value) {
-            $type = Data::getDataContentType($value);
-
-            echo "--$bound\r\nContent-Type: $type\r\n\r\n$value\r\n";
-        }
-
-        /** Envoi du multipart Fichiers */
-        foreach ($this->files as $name => $file) {
-            $type = File::getFileContentType($file);
-
-            echo "--$bound\r\n"
-                ."Content-Disposition: inline; filename=\"$name\"\r\n"
-                ."Content-Type: $type\r\n\r\n";
-
-            readfile($file);
-
-            echo "\r\n";
-        }
-
-        echo "--$bound--";
     }
 }
