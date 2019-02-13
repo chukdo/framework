@@ -1,5 +1,6 @@
 <?php namespace Chukdo\Http;
 
+Use \Closure;
 Use \Chukdo\Json\Json;
 Use \Chukdo\Xml\Xml;
 Use \Chukdo\Helper\Data;
@@ -29,9 +30,14 @@ class Response
     protected $content;
 
     /**
-     * @param array_object $file
+     * @param string $file
      */
     protected $file;
+
+    /**
+     * @param Closure $stream
+     */
+    protected $stream;
 
     /**
      * Response constructor.
@@ -96,18 +102,59 @@ class Response
         return $this;
     }
 
-    public function streamDownload($callback, $name, $type): self
+    /**
+     * @param Closure $closure
+     * @param string $name
+     * @param string|null $type
+     * @return Response
+     */
+    public function stream(Closure $closure, string $name, string $type = null): self
     {
+        $type = $type ?: 'application/octet-stream';
+
+        $this->stream = $closure;
+        $this->header
+            ->setHeader('Content-Disposition', 'attachment; filename="'.$name.'"')
+            ->setHeader('Content-Type', $type);
+
         return $this;
     }
 
-    public function download($file, $name, $type): self
+    /**
+     * @param string $file
+     * @param string|null $name
+     * @param string|null $type
+     * @return Response
+     */
+    public function download(string $file, string $name = null, string $type = null): self
     {
+        $name = $name ?: basename($file);
+        $type = $type ?: 'application/octet-stream';
+
+        $this->file = $file;
+        $this->header
+            ->setHeader('Content-Disposition', 'attachment; filename="'.$name.'"')
+            ->setHeader('Content-Type', $type);
+
         return $this;
     }
 
-    public function file($file, $name, $type): self
+    /**
+     * @param string $file
+     * @param string|null $name
+     * @param string|null $type
+     * @return Response
+     */
+    public function file(string $file, string $name = null, string $type = null): self
     {
+        $name = $name ?: basename($file);
+        $type = $type ?: 'application/octet-stream';
+
+        $this->file = $file;
+        $this->header
+            ->setHeader('Content-Disposition', 'inline; filename="'.$name.'"')
+            ->setHeader('Content-Type', $type);
+
         return $this;
     }
 
@@ -140,64 +187,32 @@ class Response
     {
         $this->header->setHeader('Content-Type', 'text/xml');
 
-        $this->content((new Xml())->import($content)->toXmlString($html), true);
+        $this->content((new Xml())->import($content)->toXmlString($html, true));
 
         return $this;
     }
 
     /**
-     * Ajoute un fichier
-     *
-     * @param string $file chemin du fichier
-     * @param mixed $name nom si le fichier est a télécharger (active le télechargement de la donnée)
-     * @return object this
-     */
-    public function setFile($file, $name = false)
-    {
-        if (!$name) {
-            $name = basename($file);
-        }
-
-        $this->files->offsetSet($name, $file);
-
-        return $this;
-    }
-
-    /**
-     * Ajoute une donnée
-     *
-     * @param string $value donnée
-     * @return object this
-     */
-    public function setData($value)
-    {
-        $this->data->append($value);
-
-        return $this;
-    }
-
-    /**
-     * Recupere les données
-     *
-     * @return array_object
-     */
-    public function getData()
-    {
-        return $this->data;
-    }
-
-    /**
-     * Redirige vers une nouvelle page avec un nouveau status
-     *
-     * @param $url
+     * @param string $url
      * @param int $code
-     * @throws Exception
+     * @return Response
      */
-    public function redirect($url, $code = 307)
+    public function redirect(string $url, int $code = 307): self
     {
         $this->header->setLocation($url, $code);
         $this->send();
+
+        return $this;
     }
+
+    /**
+     *
+     */
+    public function end(): void
+    {
+        exit;
+    }
+
 
     /**
      * Envoi la reponse HTTP à la sortie standard
