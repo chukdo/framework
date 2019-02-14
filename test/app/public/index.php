@@ -33,7 +33,7 @@ Facade::setClassAlias(\Chukdo\Helper\Stream::class, 'Stream');
 
 /** Configuration */
 Conf::loadConf(CONF_PATH.'conf.json');
-Conf::loadConf(CONF_PATH.'conf_prod.json');
+//Conf::loadConf(CONF_PATH.'conf_prod.json');
 
 /** App */
 App::env(App::getConf('env'));
@@ -54,14 +54,14 @@ ServiceLocator::setService('azure',
     }
 );
 
-Response::file('azure://files-dev/566170fe8bc5d2cf3d000000/5948da9a28b8b.pdf', 'test.pdf')->send()->end();
+//Response::file('azure://files-dev/566170fe8bc5d2cf3d000000/5948da9a28b8b.pdf')->send()->end();
 //file_get_contents()
 //var_dump();
 
-//Response::json(['A' => 'bvc'])->send()->end();
+Response::json(['A' => 'bvc'])->send();
 
 
-//throw new Exception('au lit les enfants');
+throw new Exception('au lit les enfants');
 
 
 exit;

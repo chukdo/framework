@@ -48,6 +48,17 @@ class Response
     }
 
     /**
+     * @param int $status
+     * @return Response
+     */
+    public function status(int $status): self
+    {
+        $this->header->setStatus($status);
+
+        return $this;
+    }
+
+    /**
      * @param string $name
      * @param string $header
      * @return Response

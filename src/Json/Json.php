@@ -658,6 +658,25 @@ class Json extends \ArrayObject
     }
 
     /**
+     * @param string|null $title
+     * @return string
+     */
+    public function toHtml(string $title = null): string
+    {
+        $html = '<table border="1" cellpadding="5" cellspacing="0">';
+
+        if ($title) {
+            $html .= '<thead bgcolor="#ddd"><tr><th colspan="2">' . $title . '</th></tr></thead>';
+        }
+
+        foreach ($this as $k => $v) {
+            $html .= '<tr><td>' . $k . '</td><td>' . ($v instanceof Json ? $v->toHtml() : $v) . '</td></tr>';
+        }
+
+        return $html . '</table>';
+    }
+
+    /**
      * @param string $key
      * @return bool
      */

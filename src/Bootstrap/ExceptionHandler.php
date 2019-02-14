@@ -1,6 +1,9 @@
 <?php namespace Chukdo\Bootstrap;
 
 Use \Exception;
+Use \Chukdo\Helper\Data;
+Use \Chukdo\Helper\Http;
+Use \Chukdo\Json\Json;
 Use \Chukdo\Contracts\Exception\Handler;
 
 /**
@@ -48,10 +51,55 @@ Class ExceptionHandler Implements Handler
      */
     public function render(Exception $e): void
     {
-        //$this->app->make('Response'); \Chukdo\Http\Response
-        var_dump($e->getMessage());
-        var_dump($e->getTraceAsString());
-        // conf ENV oupsss!!
+        $response   = $this->app->make('\Chukdo\Http\Response');
+        $ext        = Data::extension($_SERVER['SCRIPT_URL']);
+        $env        = $this->app->env();
+        $message    = new Json();
+        $backTrace  = new Json();
+
+        /** Dev mode */
+        if ($env == 0) {
+            foreach ($e->getTrace() as $trace) {
+                $backTrace->append([
+                    'Call' => ($trace['class'] ? $trace['class'] . $trace['type'] : '') . $trace['function'] . '()',
+                    'File' => $trace['file'],
+                    'Line' => $trace['line']
+                ]);
+            }
+
+            $message
+                ->set('Code', $e->getCode())
+                ->set('Message', $e->getMessage())
+                ->set('File', $e->getFile())
+                ->set('Line', $e->getLine())
+                ->set('Trace', $backTrace);
+
+        /** Whooops */
+        } else {
+            $message->set('Message', 'Error happened');
+        }
+
+        switch($ext) {
+            case 'xml' :
+                $content        = $message->toXml()->toXmlString();
+                $contentType    = Http::mimeContentType('xml');
+                break;
+            case 'json' :
+                $content        = $message->toJson(true);
+                $contentType    = Http::mimeContentType('json');
+                break;
+            case 'html' :
+            default :
+                $content        = $message->toHtml('Exception');
+                $contentType    = Http::mimeContentType('html');
+        }
+
+        $response
+            ->status(500)
+            ->header('Content-Type', $contentType)
+            ->content($content)
+            ->send()
+            ->end();
     }
 
     /**

@@ -20,6 +20,21 @@ final class data
      */
     private function __construct() {}
 
+    /**
+     * @param string $name
+     * @return string
+     */
+    public static function extension(string $name): string
+    {
+        $name   = strtolower($name);
+        $pos    = strrpos($name, '.');
+
+        if ($pos !== false) {
+            return substr($name, strrpos($name, '.') + 1);
+        }
+
+        return $name;
+    }
 
     /**
      * Verifie si une chaine de caractere contient une autre chaine de caractere

@@ -59,7 +59,7 @@ final class Http
             'pptx'  => 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
         ];
 
-        $ext = strtolower(substr($name, strrpos($name, '.') + 1));
+        $ext = Data::extension($name);
 
         if (array_key_exists($ext, $mimeTypes)) {
             return $mimeTypes[$ext];
