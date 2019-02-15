@@ -290,23 +290,21 @@ class Response
      */
     protected function sendContentResponse(): self
     {
-        $data            = $this->content;
-        $contentEncoding = $this->header->getHeader('content-encoding');
+        $content = $this->content;
 
-        /** Content-Encoding */
-        if ($contentEncoding) {
+        if (Http::acceptDeflateEncoding()) {
+            $this->header->setHeader('Content-Encoding', 'deflate');
+            $content = gzdeflate($this->content);
 
-            /** Compression GZIP || ZLIB */
-            switch ($contentEncoding) {
-                case 'gzip'    : $data = gzencode($this->content); break;
-                case 'deflate' : $data = gzdeflate($this->content); break;
-            }
+        } else if (Http::acceptGzipEncoding()) {
+            $this->header->setHeader('Content-Encoding', 'gzip');
+            $content = gzencode($this->content);
         }
 
-        if ($this->header->getHeader('transfer-encoding') == 'chunked') {
+        if ($this->header->getHeader('Transfer-Encoding') == 'chunked') {
             $this->sendHeaderResponse();
 
-            foreach (str_split($data, 4096) as $c) {
+            foreach (str_split($content, 4096) as $c) {
                 $l = dechex(strlen($c));
 
                 echo "$l\r\n$c\r\n";
@@ -315,9 +313,9 @@ class Response
             echo "0\r\n";
 
         } else {
-            $this->header->setHeader('content-length', strlen($data));
+            $this->header->setHeader('Content-Length', strlen($content));
             $this->sendHeaderResponse();
-            echo $data;
+            echo $content;
         }
 
         return $this;
@@ -328,7 +326,7 @@ class Response
      */
     protected function sendDownloadResponse(): self
     {
-        if ($this->header->getHeader('Transfer-encoding') == 'chunked') {
+        if ($this->header->getHeader('Transfer-Encoding') == 'chunked') {
             $this->sendHeaderResponse();
 
             $f = fopen($this->file, 'rb');
@@ -345,7 +343,7 @@ class Response
             echo "0\r\n";
 
         } else {
-            $this->header->setHeader('content-length', filesize($this->file));
+            $this->header->setHeader('Content-Length', filesize($this->file));
             $this->sendHeaderResponse();
             readfile($this->file);
         }

@@ -61,7 +61,7 @@ ServiceLocator::setService('azure',
 //file_get_contents()
 //var_dump();
 
-//Response::content('<h1>Coucou !</h1>')->send()->end();
+Response::content('<h1>Coucou !</h1>')->send()->end();
 
 Class test2 {
     public function render()

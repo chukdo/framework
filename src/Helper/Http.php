@@ -1,5 +1,7 @@
 <?php namespace Chukdo\Helper;
 
+use Chukdo\Http\Url;
+
 /**
  * Gestion des messages HTTP
  *
@@ -67,6 +69,38 @@ final class Http
         } else {
             return 'application/octet-stream';
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public static function acceptDeflateEncoding(): bool
+    {
+        if (isset($_SERVER['HTTP_ACCEPT_ENCODING'])) {
+            return strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'deflate') !== false;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function acceptGzipEncoding(): bool
+    {
+        if (isset($_SERVER['HTTP_ACCEPT_ENCODING'])) {
+            return strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return Url
+     */
+    public static function getUrl(): Url
+    {
+        return new Url($_SERVER['URI']);
     }
 
     /**
