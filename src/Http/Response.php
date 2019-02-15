@@ -34,6 +34,11 @@ class Response
     protected $file = null;
 
     /**
+     * @param bool $deleteFileAfterSend
+     */
+    protected $deleteFileAfterSend = false;
+
+    /**
      * Response constructor.
      */
     public function __construct()
@@ -142,9 +147,39 @@ class Response
         return $this;
     }
 
-    public function content($content): self
+    /**
+     * @param string $content
+     * @return Response
+     */
+    public function content(string $content): self
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    /**
+     * @param string $content
+     * @return Response
+     */
+    public function html(string $content): self
+    {
+        $this->header->setHeader('Content-Type', 'text/html; charset=utf-8');
+
+        $this->content($content);
+
+        return $this;
+    }
+
+    /**
+     * @param $content
+     * @return Response
+     */
+    public function text($content): self
+    {
+        $this->header->setHeader('Content-Type', 'text/plain; charset=utf-8');
+
+        $this->content((new Json($content))->toJson());
 
         return $this;
     }
@@ -155,7 +190,7 @@ class Response
      */
     public function json($content): self
     {
-        $this->header->setHeader('Content-Type', 'application/json');
+        $this->header->setHeader('Content-Type', 'application/json; charset=utf-8');
 
         $this->content((new Json($content))->toJson());
 
@@ -169,7 +204,7 @@ class Response
      */
     public function xml($content, bool $html = false): self
     {
-        $this->header->setHeader('Content-Type', 'text/xml');
+        $this->header->setHeader('Content-Type', 'text/xml; charset=utf-8');
 
         $this->content((new Xml())->import($content)->toXmlString($html, true));
 
@@ -200,6 +235,16 @@ class Response
     /**
      * @return Response
      */
+    public function deleteFileAfterSend(): self
+    {
+        $this->deleteFileAfterSend = true;
+
+        return $this;
+    }
+
+    /**
+     * @return Response
+     */
     public function send(): self
     {
         $hasContent = $this->content != null;
@@ -213,6 +258,10 @@ class Response
 
         } else {
             $this->sendHeaderResponse();
+        }
+
+        if ($this->deleteFileAfterSend) {
+            unlink($this->file);
         }
 
         return $this;

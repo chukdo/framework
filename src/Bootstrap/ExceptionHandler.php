@@ -3,7 +3,7 @@
 Use \Exception;
 Use \Chukdo\Helper\Data;
 Use \Chukdo\Helper\Http;
-Use \Chukdo\Json\Json;
+Use \Chukdo\Json\JsonException;
 Use \Chukdo\Contracts\Exception\Handler;
 
 /**
@@ -52,34 +52,16 @@ Class ExceptionHandler Implements Handler
     public function render(Exception $e): void
     {
         $response   = $this->app->make('\Chukdo\Http\Response');
-        $ext        = Data::extension($_SERVER['SCRIPT_URL']);
-        $env        = $this->app->env();
-        $message    = new Json();
-        $backTrace  = new Json();
+        $message    = new JsonException();
+
+        $message->set('Message', 'Error happened');
 
         /** Dev mode */
-        if ($env == 0) {
-            foreach ($e->getTrace() as $trace) {
-                $backTrace->append([
-                    'Call' => ($trace['class'] ? $trace['class'] . $trace['type'] : '') . $trace['function'] . '()',
-                    'File' => $trace['file'],
-                    'Line' => $trace['line']
-                ]);
-            }
-
-            $message
-                ->set('Code', $e->getCode())
-                ->set('Message', $e->getMessage())
-                ->set('File', $e->getFile())
-                ->set('Line', $e->getLine())
-                ->set('Trace', $backTrace);
-
-        /** Whooops */
-        } else {
-            $message->set('Message', 'Error happened');
+        if ($this->app->env() == 0) {
+            $message->loadException($e);
         }
 
-        switch($ext) {
+        switch(Data::extension($_SERVER['SCRIPT_URL'])) {
             case 'xml' :
                 $content        = $message->toXml()->toXmlString();
                 $contentType    = Http::mimeContentType('xml');
@@ -90,13 +72,13 @@ Class ExceptionHandler Implements Handler
                 break;
             case 'html' :
             default :
-                $content        = $message->toHtml('Exception');
+                $content        = $message->toHtml(get_class($e), 500);
                 $contentType    = Http::mimeContentType('html');
         }
 
         $response
             ->status(500)
-            ->header('Content-Type', $contentType)
+            ->header('Content-Type', $contentType. '; charset=utf-8')
             ->content($content)
             ->send()
             ->end();
@@ -104,36 +86,11 @@ Class ExceptionHandler Implements Handler
 
     /**
      * @param Exception $e
-     * @throws ServiceException
-     * @throws \ReflectionException
      */
     public function renderForConsole(Exception $e): void
     {
-        $console = $this->app->make('\Chukdo\Console\Console');
-
-        $console
-            ->addRow($console->background(' ----------- EXCEPTION ----------- ', 'red'))
-            ->hideBorder()
-            ->flush()
-            ->addHeader($console->color('Code', 'green'))
-            ->addHeader($console->color('Message', 'green'))
-            ->addHeader($console->color('File', 'green'))
-            ->addHeader($console->color('Line', 'green'))
-            ->addRow([$e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine()])
-            ->flush()
-            ->addHeader($console->color('Call', 'green'))
-            ->addHeader($console->color('File', 'green'))
-            ->addHeader($console->color('Line', 'green'));
-
-        foreach ($e->getTrace() as $trace) {
-            $console->addRow([
-                ($trace['class'] ? $trace['class'] . $trace['type'] : '') . $trace['function'] . '()',
-                $trace['file'],
-                $trace['line']
-            ]);
-        }
-
-        $console->flush();
-
+        $message = new JsonException();
+        $message->loadException($e)->toConsole(get_class($e));
+        exit;
     }
 }

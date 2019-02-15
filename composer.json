@@ -27,7 +27,8 @@
         "microsoft/azure-storage-blob": "~1.2.0",
         "guzzlehttp/guzzle": "~6.0",
         "elasticsearch/elasticsearch": "~6.0",
-        "digitalnature/php-ref": "^1.2"
+        "digitalnature/php-ref": "^1.2",
+        "wp-cli/php-cli-tools": "^0.11.11"
     },
     "autoload": {
         "psr-4": {

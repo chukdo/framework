@@ -27,15 +27,15 @@ Facade::setClassAlias(\Chukdo\Facades\App::class, 'App');
 Facade::setClassAlias(\Chukdo\Facades\Event::class, 'Event');
 Facade::setClassAlias(\Chukdo\Facades\Response::class, 'Response');
 Facade::setClassAlias(\Chukdo\Facades\Conf::class, 'Conf');
-Facade::setClassAlias(\Chukdo\Facades\Console::class, 'Console');
 Facade::setClassAlias(\Chukdo\Facades\ServiceLocator::class, 'ServiceLocator');
 Facade::setClassAlias(\Chukdo\Helper\Stream::class, 'Stream');
 
 /** Configuration */
 Conf::loadConf(CONF_PATH.'conf.json');
-//Conf::loadConf(CONF_PATH.'conf_prod.json');
+Conf::loadConf(CONF_PATH.'conf_prod.json');
 
 /** App */
+
 App::env(App::getConf('env'));
 App::channel('orpi');
 App::register(\App\Providers\LoggerHandlerServiceProvider::class);
@@ -54,14 +54,33 @@ ServiceLocator::setService('azure',
     }
 );
 
+//ExceptionLogger::emergency('coucou les loulous');
 //Response::file('azure://files-dev/566170fe8bc5d2cf3d000000/5948da9a28b8b.pdf')->send()->end();
+
+
 //file_get_contents()
 //var_dump();
 
-Response::json(['A' => 'bvc'])->send();
+//Response::content('<h1>Coucou !</h1>')->send()->end();
 
+Class test2 {
+    public function render()
+    {
+        throw new \Chukdo\Bootstrap\AppException('au lit les én$#@fants');
+    }
+}
 
-throw new Exception('au lit les enfants');
+Class test {
+    public function test()
+    {
+        $t2 = new test2();
+        $t2->render();
+    }
+}
+
+$test = new test();
+$test->test();
+
 
 
 exit;

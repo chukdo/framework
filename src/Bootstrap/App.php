@@ -98,7 +98,7 @@ class App extends Service
      */
     public function getConf(string $key): ?string
     {
-        return $this->make('Conf')::get($key);
+        return $this->make('\Chukdo\Json\JsonConf')->get($key);
     }
 
     /**

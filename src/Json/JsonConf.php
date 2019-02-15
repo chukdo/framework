@@ -9,7 +9,7 @@
  * @since 		08/01/2019
  * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class Conf extends Json
+class JsonConf extends Json
 {
     /**
      * @param string $file
@@ -19,7 +19,7 @@ class Conf extends Json
     {
         if (file_exists($file)) {
             $load = new Json(file_get_contents($file));
-            $this->merge($load->toFlatJson(), true);
+            $this->merge($load->toFlatten(), true);
             return true;
         }
 

@@ -512,30 +512,6 @@ class Json extends \ArrayObject
     }
 
     /**
-     * Retourne l'objet sous forme d'un tableau a 2 dimensions (path => value)
-     *
-     * @param string|null $path chemin de depart
-     * @return array
-     */
-    public function toFlatJson($path = null)
-    {
-        $mixed = [];
-
-        foreach ($this as $k => $v) {
-            $k = trim(($path ? $path : '') . '.' . $k, '.');
-
-            if ($v instanceof Json) {
-                $mixed = array_merge($mixed, $v->toFlatJson($k));
-            } else {
-                $mixed[$k] = $v;
-            }
-        }
-
-        return $mixed;
-    }
-
-
-    /**
      * @param string $path
      * @param bool|null $assoc
      * @return Json|mixed|null
@@ -548,7 +524,7 @@ class Json extends \ArrayObject
         }
 
         /** Mise à plat des données */
-        $data = $this->toFlatJson();
+        $data = $this->toFlatten();
 
         /** recherche une seule valeur */
         if (strpos($path, '*') === false) {
@@ -587,7 +563,7 @@ class Json extends \ArrayObject
         }
 
         /** Mise à plat des données */
-        $data = $this->toFlatJson();
+        $data = $this->toFlatten();
 
         /** recherche une seule valeur */
         if (isset($data[$path])) {
@@ -620,6 +596,29 @@ class Json extends \ArrayObject
         $key->offsetSet($end, $value);
 
         return $this;
+    }
+
+    /**
+     * Retourne l'objet sous forme d'un tableau a 2 dimensions (path => value)
+     *
+     * @param string|null $path chemin de depart
+     * @return array
+     */
+    public function toFlatten($path = null)
+    {
+        $mixed = [];
+
+        foreach ($this as $k => $v) {
+            $k = trim(($path ? $path : '') . '.' . $k, '.');
+
+            if ($v instanceof Json) {
+                $mixed = array_merge($mixed, $v->toFlatten($k));
+            } else {
+                $mixed[$k] = $v;
+            }
+        }
+
+        return $mixed;
     }
 
     /**
@@ -659,21 +658,42 @@ class Json extends \ArrayObject
 
     /**
      * @param string|null $title
+     * @param string|null $color
      * @return string
      */
-    public function toHtml(string $title = null): string
+    public function toHtml(string $title = null, string $color = null): string
     {
-        $html = '<table border="1" cellpadding="5" cellspacing="0">';
+        $html = "<table id=\"JsonTableRender\" style=\"border-spacing:0;border-collapse:collapse;font-family:Helvetica;\">";
 
         if ($title) {
-            $html .= '<thead bgcolor="#ddd"><tr><th colspan="2">' . $title . '</th></tr></thead>';
+            $color = $color ?: '#499cef';
+            $html .= "<thead style=\"color: #fff;background: $color;\">"
+                . "<tr>"
+                . "<th colspan=\"2\" style=\"padding:10px;\">$title</th>"
+                . "</tr>"
+                . "</thead>";
         }
 
         foreach ($this as $k => $v) {
-            $html .= '<tr><td>' . $k . '</td><td>' . ($v instanceof Json ? $v->toHtml() : $v) . '</td></tr>';
+            $v     = $v instanceof Json ? $v->toHtml() : $v;
+            $html .= "<tr>"
+                . "<td style=\"background:#eee;padding:8px;border:1px solid #eee;\">$k</td>"
+                . "<td  style=\"padding:8px;border:1px solid #eee;\">$v</td>"
+                . "</tr>";
         }
 
         return $html . '</table>';
+    }
+
+    /**
+     *
+     */
+    public function toConsole(): void
+    {
+        $tree = new \cli\Tree;
+        $tree->setData($this->toArray());
+        $tree->setRenderer(new \cli\tree\Ascii);
+        $tree->display();
     }
 
     /**
@@ -710,17 +730,5 @@ class Json extends \ArrayObject
     public function __unset(string $key): bool
     {
         return (bool) $this->offsetUnset($key);
-    }
-
-    /**
-     * Delegation de methode
-     *
-     * @param $name
-     * @param array $params
-     * @throws JsonException
-     */
-    public function __call(string $name, array $params = [])
-    {
-        throw new JsonException("La methode $name n'existe pas");
     }
 }
