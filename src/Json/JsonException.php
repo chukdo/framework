@@ -28,10 +28,11 @@ class JsonException extends Json
         $backTrace = [];
 
         foreach ($e->getTrace() as $trace) {
+            $trace       = new Json($trace);
             $backTrace[] = [
-                'Call' => ($trace['class'] ? $trace['class'] . $trace['type'] : '') . $trace['function'] . '()',
-                'File' => $trace['file'],
-                'Line' => $trace['line']
+                'Call' => $trace->offsetGet('class') . $trace->offsetGet('type') . $trace->offsetGet('function') . '()',
+                'File' => $trace->offsetGet('file'),
+                'Line' => $trace->offsetGet('line')
             ];
         }
 
@@ -50,7 +51,7 @@ class JsonException extends Json
      * @param string|null $color
      * @return string
      */
-    public function toHtml(string $title = null, string $color = null): string
+    public function toHtml(string $title = null, string $color = null): string //todo à revoir le rendu
     {
         $code       = $color ?: '500';
         $title      = $title ?: 'Error';

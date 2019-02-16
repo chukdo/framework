@@ -15,12 +15,6 @@ Use \Chukdo\Json\Json;
 final class data
 {
     /**
-     * Constructeur privé, empeche l'intanciation de la classe statique
-     * @return void
-     */
-    private function __construct() {}
-
-    /**
      * @param string $name
      * @return string
      */

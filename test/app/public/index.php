@@ -32,7 +32,7 @@ Facade::setClassAlias(\Chukdo\Helper\Stream::class, 'Stream');
 
 /** Configuration */
 Conf::loadConf(CONF_PATH.'conf.json');
-Conf::loadConf(CONF_PATH.'conf_prod.json');
+//Conf::loadConf(CONF_PATH.'conf_prod.json');
 
 /** App */
 
@@ -54,14 +54,17 @@ ServiceLocator::setService('azure',
     }
 );
 
+$json = new \Chukdo\Json\Json([
+    'a' => '08/01/75',
+    'q' => 'qsdfghjklm'
+]);
+r($json->is('date', 'a', 'd/m/Y'));
+
 //ExceptionLogger::emergency('coucou les loulous');
 //Response::file('azure://files-dev/566170fe8bc5d2cf3d000000/5948da9a28b8b.pdf')->send()->end();
 
 
-//file_get_contents()
-//var_dump();
-
-Response::content('<h1>Coucou !</h1>')->send()->end();
+Response::json($json)->send()->end();
 
 Class test2 {
     public function render()

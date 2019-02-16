@@ -17,9 +17,7 @@ Use \Chukdo\Helper\Http;
 class Response
 {
     /**
-     * Données
-     *
-     * @param Header $data
+     * @param Header $header
      */
     protected $header;
 

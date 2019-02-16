@@ -4,9 +4,9 @@ use Chukdo\Xml\Xml;
 use Closure;
 use ArrayObject;
 
-use \Chukdo\Helper\Test;
+use \Chukdo\Helper\Is;
 use \Chukdo\Helper\Data;
-use \Chukdo\Helper\Convert;
+use \Chukdo\Helper\To;
 
 /**
  * Manipulation des données
@@ -28,11 +28,11 @@ class Json extends \ArrayObject
     {
         parent::__construct([]);
 
-        if (Test::isArray($data)) {
+        if (Is::arr($data)) {
             foreach ($data as $k => $v) {
                 $this->offsetSet($k, $v, $clean);
             }
-        } else if (Test::isJson($data)) {
+        } else if (Is::json($data)) {
             foreach (json_decode($data, true) as $k => $v) {
                 $this->offsetSet($k, $v, $clean);
             }
@@ -155,7 +155,7 @@ class Json extends \ArrayObject
      */
     public function append($value): self
     {
-        if (Test::isArray($value)) {
+        if (Is::arr($value)) {
             parent::append(new Json($value));
         } else {
             parent::append($value);
@@ -193,7 +193,7 @@ class Json extends \ArrayObject
             }
         }
 
-        if (Test::isArray($value)) {
+        if (Is::arr($value)) {
             parent::offsetSet($key, new Json($value, $clean));
         } else {
             parent::offsetSet($key, $value);
@@ -368,7 +368,7 @@ class Json extends \ArrayObject
 
                         /** Typage */
                         if ($typehint == true) {
-                            $hydrateValue = Convert::toType(gettype($refValue), $hydrateValue);
+                            $hydrateValue = To::type(gettype($refValue), $hydrateValue);
                         }
 
                         $data->offsetSet($hydrateKey, $hydrateValue);
@@ -596,6 +596,30 @@ class Json extends \ArrayObject
         $key->offsetSet($end, $value);
 
         return $this;
+    }
+
+    /**
+     * @param mixed ...$param
+     * @return mixed
+     */
+    public function to(...$param)
+    {
+        $function = array_shift($param);
+        $param[0] = $this->offsetGet($param[0]);
+
+        return call_user_func_array(['\Chukdo\Helper\To', $function], $param);
+    }
+
+    /**
+     * @param mixed ...$param
+     * @return mixed
+     */
+    public function is(...$param)
+    {
+        $function = array_shift($param);
+        $param[0] = $this->offsetGet($param[0]);
+
+        return call_user_func_array(['\Chukdo\Helper\Is', $function], $param);
     }
 
     /**

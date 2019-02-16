@@ -1,6 +1,6 @@
 <?php namespace Chukdo\Xml;
 
-Use \Chukdo\Helper\Test;
+Use \Chukdo\Helper\Is;
 Use IteratorAggregate;
 Use Traversable;
 Use Exception;
@@ -804,7 +804,7 @@ class Node implements IteratorAggregate
             $this->appendNode($this->doc()->importNode($node, true));
 
 		/** importation d'un tableau */
-        } elseif (Test::isArray($import)) {
+        } elseif (Is::arr($import)) {
         	foreach($import as $k => $v) {
 
         		/** Index */
@@ -823,7 +823,7 @@ class Node implements IteratorAggregate
         		}        		
 
                 /** gestion de la recursivité */
-				if (Test::isTraversable($v)) {
+				if (Is::traversable($v)) {
                     $node->import($v);
                 } else {
                     $node->setValue($v);
@@ -1072,7 +1072,7 @@ class Node implements IteratorAggregate
 			$name  = $child->name() == $default ? $k : $child->name();
 			$value = $child->childs()->count() == 0 ? $child->value() : $this->toArray($default, $child);
 
-            if (!Test::isEmpty($value)) {
+            if (!Is::empty($value)) {
                 if (isset($array[$name])) {
                     if (is_array($array[$name])) {
                         if (key($array[$name]) === 0) {

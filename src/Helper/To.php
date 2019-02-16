@@ -1,7 +1,7 @@
 <?php namespace Chukdo\Helper;
 
 /**
- * Classe Convert
+ * Classe To
  * Fonctionnalités de converstion des données
  *
  * @package		helper
@@ -10,20 +10,14 @@
  * @since 		08/01/2019
  * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-final class Convert
+final class To
 {
-    /**
-     * Constructeur privé, empeche l'intanciation de la classe statique
-     * @return void
-     */
-    private function __construct() {}
-
     /**
      * @param string $type
      * @param $value
      * @return array|bool|float|int|string
      */
-    public static function toType(string $type, $value)
+    public static function type(string $type, $value)
     {
         switch ($type) {
             case 'boolean' :
@@ -49,7 +43,7 @@ final class Convert
      * @param string|null $prefix
      * @return string
      */
-    public static function toQName(string $name, $prefix = null): string
+    public static function qualifiedName(string $name, $prefix = null): string
     {
         $qname = str_replace(' ', '_', Data::allText($name));
 
@@ -66,7 +60,7 @@ final class Convert
      * @param string|null $suffix
      * @return string
      */
-    public static function toFileName(string $name, string $prefix = null, string $suffix = null): string
+    public static function fileName(string $name, string $prefix = null, string $suffix = null): string
     {
         if (strlen($name) > 0) {
             return preg_replace(
@@ -87,7 +81,7 @@ final class Convert
      * @param string $value
      * @return string
      */
-    public static function toUtf8(string $value): string
+    public static function utf8(string $value): string
     {
         $value = (string) $value;
 
@@ -103,18 +97,18 @@ final class Convert
      * @param $value
      * @return int
      */
-    public static function toInt($value): int
+    public static function int($value): int
     {
-        return (int) self::toScalar($value);
+        return (int) self::scalar($value);
     }
 
     /**
      * @param $value
      * @return float
      */
-    public static function toFloat($value): float
+    public static function float($value): float
     {
-        $value = str_replace(' ', '', self::toScalar($value));
+        $value = str_replace(' ', '', self::scalar($value));
 
         if (strpos($value, '.') !== false && strpos($value, ',') !== false) {
             $value = str_replace('.', '', $value);
@@ -125,29 +119,13 @@ final class Convert
 
     /**
      * @param string $value
-     * @param string|null $escape
-     * @return string
-     */
-    public static function toStringJS(string $value, string $escape = null): string
-    {
-        $value = preg_replace(['/\n/', '/\r/'], ['\\n', ''], $value);
-
-        if ($escape != '') {
-            $value = str_replace($escape, '\\'.$escape, $value);
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param string $value
      * @param string|null $format
      * @return \DateTime
      * @throws \Exception
      */
-    public static function toDate(string $value, string $format = null): \DateTime
+    public static function date(string $value, string $format = null): \DateTime
     {
-        $date = \DateTime::createFromFormat($format ?: 'd/m/y', $value);
+        $date = \DateTime::createFromFormat($format ?: 'd/m/Y', $value);
 
         if ($date instanceof \DateTime) {
             return $date;
@@ -160,19 +138,19 @@ final class Convert
      * @param $value
      * @return mixed
      */
-    public static function toScalar($value)
+    public static function scalar($value)
     {
         $scalar = '';
 
-    	if (Test::isScalar($value)) {
+    	if (Is::scalar($value)) {
         	$scalar = $value;
 
-        } elseif (Test::isObject($value, '__toString')) {
+        } elseif (Is::object($value, '__toString')) {
         	$scalar = $value->__toString();
 
-        } elseif (Test::isTraversable($value)) {
+        } elseif (Is::traversable($value)) {
         	foreach($value as $v) {
-        		$scalar .= self::toScalar($v).' ';
+        		$scalar .= self::scalar($v).' ';
         	}
         } else {
         	$scalar = (string) $value;
@@ -185,7 +163,7 @@ final class Convert
      * @param $value
      * @return array
      */
-    public static function toArray($value): array
+    public static function arr($value): array
     {
         $array = [];
 
@@ -197,17 +175,17 @@ final class Convert
             $array = [];
 
         /** La valeur est un entier ou une chaine de caractere */
-        } elseif (Test::isScalar($value)) {
+        } elseif (Is::scalar($value)) {
             $array = [$value];
 
         /** La valeur est un object avec une fonction de transformation */
-        } elseif (Test::isObject($value, 'toArray')) {
+        } elseif (Is::object($value, 'toArray')) {
             $array = $value->toArray();
 
         /** La valeur est un tableau ou est travsersable */
-        } elseif (Test::isTraversable($value)) {
+        } elseif (Is::traversable($value)) {
             foreach ($value as $k => $v) {
-                $array[$k] = is_scalar($v) ? $v : self::toArray($v);
+                $array[$k] = is_scalar($v) ? $v : self::arr($v);
             }
 
         /** retourne un tableau vide */
@@ -222,16 +200,16 @@ final class Convert
      * @param $value
      * @return string
      */
-    public static function toJson($value): string
+    public static function json($value): string
     {
 		if (is_scalar($value)) {
 			return $value;
 
-		} elseif (Test::isObject($value, 'toJson')) {
+		} elseif (Is::object($value, 'toJson')) {
 			return $value->toJson();
 
 		} else {
-    		return json_encode(self::toArray($value), JSON_PRETTY_PRINT);
+    		return json_encode(self::arr($value), JSON_PRETTY_PRINT);
 		}
     }
 
@@ -241,12 +219,12 @@ final class Convert
      * @throws \Chukdo\Xml\NodeException
      * @throws \Chukdo\Xml\XmlException
      */
-    public static function toXml($value): \Chukdo\Xml\Xml
+    public static function xml($value): \Chukdo\Xml\Xml
     {
 		if ($value instanceof \Chukdo\Xml\Xml) {
 			return $value;
 
-		} elseif (Test::isObject($value, 'toXml')) {
+		} elseif (Is::object($value, 'toXml')) {
 			return $value->toXml();
 
 		} else {
