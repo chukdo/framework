@@ -25,6 +25,7 @@ Facade::setFacadeApplication($app);
 Facade::setClassAlias(\Chukdo\Facades\Facade::class, 'Facade');
 Facade::setClassAlias(\Chukdo\Facades\App::class, 'App');
 Facade::setClassAlias(\Chukdo\Facades\Event::class, 'Event');
+Facade::setClassAlias(\Chukdo\Facades\Request::class, 'Request');
 Facade::setClassAlias(\Chukdo\Facades\Response::class, 'Response');
 Facade::setClassAlias(\Chukdo\Facades\Conf::class, 'Conf');
 Facade::setClassAlias(\Chukdo\Facades\ServiceLocator::class, 'ServiceLocator');
@@ -33,6 +34,7 @@ Facade::setClassAlias(\Chukdo\Helper\Stream::class, 'Stream');
 /** Configuration */
 Conf::loadConf(CONF_PATH.'conf.json');
 //Conf::loadConf(CONF_PATH.'conf_prod.json');
+
 
 /** App */
 
@@ -53,6 +55,8 @@ ServiceLocator::setService('azure',
         return MicrosoftAzure\Storage\Blob\BlobRestProxy::createBlobService(Conf::get('storage.azure.endpoint'));
     }
 );
+var_dump($_SERVER);exit;
+r(new \Chukdo\Http\Url());
 
 $json = new \Chukdo\Json\Json([
     'a' => '08/01/75',

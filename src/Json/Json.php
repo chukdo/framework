@@ -5,7 +5,7 @@ use Closure;
 use ArrayObject;
 
 use \Chukdo\Helper\Is;
-use \Chukdo\Helper\Data;
+use \Chukdo\Helper\Str;
 use \Chukdo\Helper\To;
 
 /**
@@ -270,6 +270,40 @@ class Json extends \ArrayObject
     }
 
     /**
+     * @param mixed ...$offsets
+     * @return Json
+     */
+    public function only(...$offsets): Json
+    {
+        $only = new Json();
+
+        foreach ($offsets as $offsetList) {
+            foreach ((array) $offsetList as $offset) {
+                $only->offsetSet($offset, $this->offsetGet($offset));
+            }
+        }
+
+        return $only;
+    }
+
+    /**
+     * @param mixed ...$offsets
+     * @return Json
+     */
+    public function except(...$offsets): Json
+    {
+        $except = new Json($this->getArrayCopy());
+
+        foreach ($offsets as $offsetList) {
+            foreach ((array) $offsetList as $offset) {
+                $except->offsetUnset($offset);
+            }
+        }
+
+        return $except;
+    }
+
+    /**
      * @param iterable $merge
      * @param bool|null $overwrite
      * @return Json
@@ -516,7 +550,7 @@ class Json extends \ArrayObject
      * @param bool|null $assoc
      * @return Json|mixed|null
      */
-    public function getPathMatch(string $path, bool $assoc = null)
+    public function get2DMatch(string $path, bool $assoc = null)
     {
         /** Pas de chemin,  retour de l'offset */
         if (strpos($path, '/') === false) {
@@ -524,7 +558,7 @@ class Json extends \ArrayObject
         }
 
         /** Mise à plat des données */
-        $data = $this->toFlatten();
+        $data = $this->to2D();
 
         /** recherche une seule valeur */
         if (strpos($path, '*') === false) {
@@ -540,7 +574,7 @@ class Json extends \ArrayObject
         $match  = '/^\/'.str_replace(['*', '.'], ['.*?', '\.'], $path).'$/';
         $values = new Json();
 
-        foreach (Data::match($match, array_keys($data)) as  $value) {
+        foreach (Str::match($match, array_keys($data)) as $value) {
             if ($assoc == true) {
                 $values->offsetSet($value, $data[$value]);
             } else {
@@ -555,7 +589,7 @@ class Json extends \ArrayObject
      * @param string $path
      * @return mixed|null
      */
-    public function getPath(string $path)
+    public function get2D(string $path)
     {
         /** Pas de chemin,  retour de l'offset */
         if (strpos($path, '.') === false) {
@@ -563,7 +597,7 @@ class Json extends \ArrayObject
         }
 
         /** Mise à plat des données */
-        $data = $this->toFlatten();
+        $data = $this->to2D();
 
         /** recherche une seule valeur */
         if (isset($data[$path])) {
@@ -578,7 +612,7 @@ class Json extends \ArrayObject
      * @param $value
      * @return Json
      */
-    public function setPath(string $path, $value): self
+    public function set2D(string $path, $value): self
     {
         $path = explode('.', trim($path, '.'));
         $end  = array_pop($path);
@@ -628,7 +662,7 @@ class Json extends \ArrayObject
      * @param string|null $path chemin de depart
      * @return array
      */
-    public function toFlatten($path = null)
+    public function to2D($path = null)
     {
         $mixed = [];
 
@@ -636,7 +670,7 @@ class Json extends \ArrayObject
             $k = trim(($path ? $path : '') . '.' . $k, '.');
 
             if ($v instanceof Json) {
-                $mixed = array_merge($mixed, $v->toFlatten($k));
+                $mixed = array_merge($mixed, $v->to2D($k));
             } else {
                 $mixed[$k] = $v;
             }

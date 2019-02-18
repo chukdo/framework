@@ -22,13 +22,13 @@ class RequestProcessor implements ProcessorInterface
      */
     public function processRecord(array $record): array
     {
-        $browser = Http::getUserAgent($this->server('HTTP_USER_AGENT'));
+        $browser = Http::getUserAgent(Http::server('HTTP_USER_AGENT'));
 
         $record['extra']['request'] = [
-            'uri'       => $this->server('REQUEST_URI') ?: implode(' ', $_SERVER['argv']),
-            'remote'    => $this->server('REMOTE_ADDR'),
-            'referer'   => $this->server('HTT_REFERER'),
-            'method'    => $this->server('REQUEST_METHOD'),
+            'uri'       => Http::server('REQUEST_URI') ?: implode(' ', Http::server('argv')),
+            'remote'    => Http::server('REMOTE_ADDR'),
+            'referer'   => Http::server('HTTP_REFERER'),
+            'method'    => Http::server('REQUEST_METHOD'),
             'useragent' => [
                 'platform'  => $browser['platform'] ?: 'Cli',
                 'browser'   => $browser['browser'],
@@ -38,16 +38,5 @@ class RequestProcessor implements ProcessorInterface
         ];
 
         return $record;
-    }
-
-    /**
-     * Retourne une information de la variable $_SERVER
-     *
-     * @param  string   $name
-     * @return string
-     */
-    private function server($name)
-    {
-        return isset($_SERVER[$name]) ? $_SERVER[$name] : null;
     }
 }

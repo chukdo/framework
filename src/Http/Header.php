@@ -1,7 +1,7 @@
 <?php namespace Chukdo\Http;
 
 Use \Chukdo\Json\Json;
-Use \Chukdo\Helper\Data;
+Use \Chukdo\Helper\Str;
 
 /**
  * Gestion des entetes HTTP
@@ -109,7 +109,7 @@ class Header
      */
     public function getStatus(): ?int
     {
-        return Data::match('/([0-9]{3})/', $this->getHttp());
+        return Str::match('/([0-9]{3})/', $this->getHttp());
     }
 
     /**
@@ -253,7 +253,7 @@ class Header
     public function getCookie(string $name): ?Json
     {
         if ($cookie = $this->cookie->offsetGet($name)) {
-            return Data::match(
+            return Str::match(
                 '/([^=]+)=([^;]+)(?:; expires=([^;]+))?(?:; path=([^;]+))?(?:; domain=([^;]+))?/i',
                 $cookie
             );
@@ -338,7 +338,7 @@ class Header
             if ($value == 'must-revalidate') {
                 $cache->offsetSet('revalidate', true);
 
-            } elseif (($age = Data::match('/max-age=([0-9]+)/', $value)) !== false) {
+            } elseif (($age = Str::match('/max-age=([0-9]+)/', $value)) !== false) {
                 $cache->offsetSet('max', $age);
 
             } else {
@@ -369,7 +369,7 @@ class Header
     public function getAuthorization(): ?string
     {
         if (($auth = $this->getHeader('WWW-Authenticate')) !== false) {
-            return Data::match('/Basic realm="([^"]+)"/', $auth);
+            return Str::match('/Basic realm="([^"]+)"/', $auth);
         }
 
         return null;
@@ -543,7 +543,7 @@ class Header
     public function __call($name, $params = [])
     {
         $value  = array_shift($params);
-        $match  = new Json(Data::match('/^(set|get|unset)([a-z]+)/i', strtolower($name)));
+        $match  = new Json(Str::match('/^(set|get|unset)([a-z]+)/i', strtolower($name)));
         $action = $match->get(0);
         $header = $match->get(1);
 

@@ -1,7 +1,7 @@
 <?php namespace Chukdo\Bootstrap;
 
 Use \Exception;
-Use \Chukdo\Helper\Data;
+Use \Chukdo\Helper\Str;
 Use \Chukdo\Helper\Http;
 Use \Chukdo\Json\JsonException;
 Use \Chukdo\Contracts\Exception\Handler;
@@ -61,7 +61,7 @@ Class ExceptionHandler Implements Handler
             $message->loadException($e);
         }
 
-        switch(Data::extension($_SERVER['SCRIPT_URL'])) {
+        switch(Str::extension($_SERVER['SCRIPT_URL'])) {
             case 'xml' :
                 $content        = $message->toXml()->toXmlString();
                 $contentType    = Http::mimeContentType('xml');

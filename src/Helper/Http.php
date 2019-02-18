@@ -61,7 +61,7 @@ final class Http
             'pptx'  => 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
         ];
 
-        $ext = Data::extension($name);
+        $ext = Str::extension($name);
 
         if (array_key_exists($ext, $mimeTypes)) {
             return $mimeTypes[$ext];
@@ -69,38 +69,6 @@ final class Http
         } else {
             return 'application/octet-stream';
         }
-    }
-
-    /**
-     * @return bool
-     */
-    public static function acceptDeflateEncoding(): bool
-    {
-        if (isset($_SERVER['HTTP_ACCEPT_ENCODING'])) {
-            return strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'deflate') !== false;
-        }
-
-        return false;
-    }
-
-    /**
-     * @return bool
-     */
-    public static function acceptGzipEncoding(): bool
-    {
-        if (isset($_SERVER['HTTP_ACCEPT_ENCODING'])) {
-            return strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false;
-        }
-
-        return false;
-    }
-
-    /**
-     * @return Url
-     */
-    public static function getUrl(): Url
-    {
-        return new Url($_SERVER['URI']);
     }
 
     /**
@@ -118,11 +86,11 @@ final class Http
         ];
 
         $ua             = strtolower($ua);
-        $browser['bot'] = Data::match('/baiduspider|googlebot|yandexbot|bingbot|lynx|wget|curl/', $ua);
+        $browser['bot'] = Str::match('/baiduspider|googlebot|yandexbot|bingbot|lynx|wget|curl/', $ua);
         $is             = function($contain, $name = false) use ($ua, &$browser) {
-            if (Data::contain($ua, $contain)) {
+            if (Str::contain($ua, $contain)) {
                 $browser['browser'] = $name ?: $contain;
-                $browser['version'] = Data::match('/'.$contain.'[\/\s](\d+)/', $ua);
+                $browser['version'] = Str::match('/'.$contain.'[\/\s](\d+)/', $ua);
                 return true;
             }
 
@@ -149,21 +117,41 @@ final class Http
         }
 
         /** Platform */
-        if (Data::contain($ua, 'windows')) {
+        if (Str::contain($ua, 'windows')) {
             $browser['platform'] = 'windows';
-        } else if (Data::contain($ua, 'linux')) {
+        } else if (Str::contain($ua, 'linux')) {
             $browser['platform'] = 'linux';
-        } else if (Data::contain($ua, 'mac')) {
+        } else if (Str::contain($ua, 'mac')) {
             $browser['platform'] = 'osx';
         }
 
         /** Mobile */
-        if (Data::contain($ua, 'ipad') || Data::contain($ua, 'iphone')) {
+        if (Str::contain($ua, 'ipad') || Str::contain($ua, 'iphone')) {
             $browser['mobile'] = 'ios';
-        } else if (Data::contain($ua, 'android')) {
+        } else if (Str::contain($ua, 'android')) {
             $browser['mobile'] = 'android';
         }
 
         return $browser;
+    }
+
+    /**
+     * @param $name
+     * @param string|null $default
+     * @return string|null
+     */
+    public static function server($name, string $default = null): ?string
+    {
+        return isset($_SERVER[$name]) ? $_SERVER[$name] : $default;
+    }
+
+    /**
+     * @param $name
+     * @param string|null $default
+     * @return string|null
+     */
+    public static function request($name, string $default = null): ?string
+    {
+        return isset($_REQUEST[$name]) ? $_REQUEST[$name] : $default;
     }
 }

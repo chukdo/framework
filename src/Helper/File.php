@@ -148,7 +148,7 @@ final class File
             if ($error == 0) {
 
                 /** Fichier téléchargé */
-                $file = $filePath . \Chukdo\Helper\data::uid('upload_');
+                $file = $filePath . \Chukdo\Helper\Str::uid('upload_');
 
                 if (move_uploaded_file($tmp, $file)) {
                     chmod($file, 0777);

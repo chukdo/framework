@@ -290,11 +290,11 @@ class Response
     {
         $content = $this->content;
 
-        if (Http::acceptDeflateEncoding()) {
+        if (strpos(Http::server('HTTP_ACCEPT_ENCODING'), 'deflate') !== false) {
             $this->header->setHeader('Content-Encoding', 'deflate');
             $content = gzdeflate($this->content);
 
-        } else if (Http::acceptGzipEncoding()) {
+        } else if (strpos(Http::server('HTTP_ACCEPT_ENCODING'), 'gzip') !== false) {
             $this->header->setHeader('Content-Encoding', 'gzip');
             $content = gzencode($this->content);
         }

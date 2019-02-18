@@ -45,7 +45,7 @@ final class To
      */
     public static function qualifiedName(string $name, $prefix = null): string
     {
-        $qname = str_replace(' ', '_', Data::allText($name));
+        $qname = str_replace(' ', '_', Str::allText($name));
 
         if (!preg_match('/^[a-z]/', $qname)) {
             $qname = $prefix ?: 'error';
@@ -69,7 +69,7 @@ final class To
                 $prefix . str_replace(
                     ' ',
                     '_',
-                    Data::allText($name)
+                    Str::allText($name)
                 ).$suffix
             );
         }
