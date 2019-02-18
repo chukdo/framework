@@ -126,6 +126,16 @@ final class Str
     }
 
     /**
+     * @param string $value
+     * @param string $delimiter
+     * @return array
+     */
+    public static function split(string $value, string $delimiter): array
+    {
+        return explode($delimiter, $value);
+    }
+
+    /**
      * @param int|null $time
      * @return string
      */

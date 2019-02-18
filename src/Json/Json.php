@@ -22,19 +22,18 @@ class Json extends \ArrayObject
     /**
      * json constructor.
      * @param mixed $data
-     * @param bool|null $clean
      */
-    public function __construct($data = null, bool $clean = null)
+    public function __construct($data = null)
     {
         parent::__construct([]);
 
         if (Is::arr($data)) {
             foreach ($data as $k => $v) {
-                $this->offsetSet($k, $v, $clean);
+                $this->offsetSet($k, $v);
             }
         } else if (Is::json($data)) {
             foreach (json_decode($data, true) as $k => $v) {
-                $this->offsetSet($k, $v, $clean);
+                $this->offsetSet($k, $v);
             }
         }
     }
@@ -115,7 +114,7 @@ class Json extends \ArrayObject
      * @param null $default
      * @return int|mixed|string|null
      */
-    public function getIndexKey(int $index = 0, $default = null)
+    public function getKeyIndex(int $index = 0, $default = null)
     {
         if ($this->count() > 0) {
             foreach($this as $key => $value) {
@@ -182,19 +181,12 @@ class Json extends \ArrayObject
     /**
      * @param mixed $key
      * @param mixed $value
-     * @param bool|null $clean
      * @return Json
      */
-    public function offsetSet($key, $value, bool $clean = null): self
+    public function offsetSet($key, $value): self
     {
-        if ($clean) {
-            if ($value === '' || $value === null) {
-                return $this;
-            }
-        }
-
         if (Is::arr($value)) {
-            parent::offsetSet($key, new Json($value, $clean));
+            parent::offsetSet($key, new Json($value));
         } else {
             parent::offsetSet($key, $value);
         }
@@ -247,60 +239,6 @@ class Json extends \ArrayObject
         }
 
         return $array;
-    }
-
-    /**
-     * @param string $key
-     * @param $value
-     * @return Json
-     */
-    public function set(string $key, $value): self
-    {
-        return $this->offsetSet($key, $value);
-    }
-
-    /**
-     * @param string $key
-     * @param bool $default
-     * @return mixed
-     */
-    public function get(string $key, $default = null)
-    {
-        return $this->offsetGet($key, $default);
-    }
-
-    /**
-     * @param mixed ...$offsets
-     * @return Json
-     */
-    public function only(...$offsets): Json
-    {
-        $only = new Json();
-
-        foreach ($offsets as $offsetList) {
-            foreach ((array) $offsetList as $offset) {
-                $only->offsetSet($offset, $this->offsetGet($offset));
-            }
-        }
-
-        return $only;
-    }
-
-    /**
-     * @param mixed ...$offsets
-     * @return Json
-     */
-    public function except(...$offsets): Json
-    {
-        $except = new Json($this->getArrayCopy());
-
-        foreach ($offsets as $offsetList) {
-            foreach ((array) $offsetList as $offset) {
-                $except->offsetUnset($offset);
-            }
-        }
-
-        return $except;
     }
 
     /**
@@ -384,7 +322,7 @@ class Json extends \ArrayObject
                             $data->offsetSet($hydrateKey, array_values((array) $hydrateValue));
 
                             /** Tableau avec un element de structure */
-                        } else if ($refValue->count() === 1 && $refValue->getIndexKey(0) === 0) {
+                        } else if ($refValue->count() === 1 && $refValue->getKeyIndex(0) === 0) {
                             $refValueClone  = reset($refValue->getArrayCopy());
                             $refValueClones = new Json();
 
@@ -394,7 +332,7 @@ class Json extends \ArrayObject
 
                             $data->offsetSet($hydrateKey, self::hydrator($hydrateValue, $refValueClones, $typehint, $matchOnly));
 
-                            /** Objet */
+                        /** Objet */
                         } else {
                             $data->offsetSet($hydrateKey, self::hydrator($hydrateValue, $refValue, $typehint, $matchOnly));
                         }
@@ -447,18 +385,6 @@ class Json extends \ArrayObject
     }
 
     /**
-     * Supprime les doublons de l'objet
-     *
-     * @return Json
-     */
-    public function unique(): self
-    {
-        $this->reset(array_unique($this->getArrayCopy()));
-
-        return $this;
-    }
-
-    /**
      * Applique une fonction aux resultats
      *
      * @param Closure $closure
@@ -493,36 +419,6 @@ class Json extends \ArrayObject
     }
 
     /**
-     * Supprime en recursif tous les champs vides
-     *
-     * @return Json
-     */
-    public function removeEmpty(): self
-    {
-        $toremove = [];
-
-        foreach ($this as $k => $v) {
-            if ($v instanceof Json) {
-                $v->removeEmpty();
-
-                if ($v->count() == 0) {
-                    $toremove[] = $k;
-                }
-            } else {
-                if ($v === '' || $v === null) {
-                    $toremove[] = $k;
-                }
-            }
-        }
-
-        foreach ($toremove as $remove) {
-            $this->offsetUnset($remove);
-        }
-
-        return $this;
-    }
-
-    /**
      * Appel d'une methode callback
      *
      * @param $callback
@@ -546,39 +442,94 @@ class Json extends \ArrayObject
     }
 
     /**
+     * @param mixed ...$offsets
+     * @return Json
+     */
+    public function only(...$offsets): Json
+    {
+        $only = new Json();
+
+        foreach ($offsets as $offsetList) {
+            foreach ((array) $offsetList as $offset) {
+                $only->set($offset, $this->get($offset));
+            }
+        }
+
+        return $only;
+    }
+
+    /**
+     * @param mixed ...$offsets
+     * @return Json
+     */
+    public function except(...$offsets): Json
+    {
+        $except = new Json($this->getArrayCopy());
+
+        foreach ($offsets as $offsetList) {
+            foreach ((array) $offsetList as $offset) {
+                $except->unset($offset);
+            }
+        }
+
+        return $except;
+    }
+
+    /**
      * @param string $path
-     * @param bool|null $assoc
+     * @return bool
+     */
+    public function filled(string $path): bool
+    {
+        $value = $this->get($path);
+
+        if ($value != null && $value != '') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $path
+     * @return bool
+     */
+    public function exists(string $path): bool
+    {
+        $value = $this->get($path);
+
+        if ($value !== null) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $path
+     * @param null $default
      * @return Json|mixed|null
      */
-    public function get2DMatch(string $path, bool $assoc = null)
+    public function get(string $path, $default = null)
     {
-        /** Pas de chemin,  retour de l'offset */
-        if (strpos($path, '/') === false) {
-            return $this->offsetGet($path);
+        $dot        = Str::contain($path, '.');
+        $wildcard   = Str::contain($path, '*');
+
+        /** Pas de chemin, retourne offsetGet */
+        if (!$dot && !$wildcard) {
+            return $this->offsetGet($path, $default);
         }
 
         /** Mise à plat des données */
-        $data = $this->to2D();
-
-        /** recherche une seule valeur */
-        if (strpos($path, '*') === false) {
-            if (isset($data[$path])) {
-                return $data[$path];
-            }
-
-            return null;
-        }
+        $simpleArray = $this->toSimpleArray();
 
         /** recherche de valeurs multiples */
-        $path   = trim($path, '/');
-        $match  = '/^\/'.str_replace(['*', '.'], ['.*?', '\.'], $path).'$/';
-        $values = new Json();
+        $pattern    = '/^'.str_replace(['.', '*'], ['\.', '.*?'], $path).'/';
+        $values     = new Json();
 
-        foreach (Str::match($match, array_keys($data)) as $value) {
-            if ($assoc == true) {
-                $values->offsetSet($value, $data[$value]);
-            } else {
-                $values->append($data[$value]);
+        foreach ($simpleArray as $key => $v) {
+            if (Str::match($pattern, $key)) {
+                $values->set($key, $simpleArray[$key]);
             }
         }
 
@@ -587,24 +538,28 @@ class Json extends \ArrayObject
 
     /**
      * @param string $path
-     * @return mixed|null
+     * @return Json
      */
-    public function get2D(string $path)
+    public function unset(string $path): self
     {
-        /** Pas de chemin,  retour de l'offset */
-        if (strpos($path, '.') === false) {
-            return $this->offsetGet($path);
+        $dot        = Str::contain($path, '.');
+        $wildcard   = Str::contain($path, '*');
+
+        /** Pas de chemin, retourne offsetGet */
+        if (!$dot && !$wildcard) {
+            $this->offsetUnset($path);
+            return true;
         }
 
-        /** Mise à plat des données */
-        $data = $this->to2D();
+        $json = $this->get($path);
 
-        /** recherche une seule valeur */
-        if (isset($data[$path])) {
-            return $data[$path];
+        foreach ($json as $key => $value) {
+            // split key
+                // loop
+                    // à la fin offsetUnset
         }
 
-        return null;
+        return $this;
     }
 
     /**
@@ -612,9 +567,9 @@ class Json extends \ArrayObject
      * @param $value
      * @return Json
      */
-    public function set2D(string $path, $value): self
+    public function set(string $path, $value): self
     {
-        $path = explode('.', trim($path, '.'));
+        $path = Str::split($path, '.');
         $end  = array_pop($path);
         $key  = $this;
 
@@ -633,44 +588,20 @@ class Json extends \ArrayObject
     }
 
     /**
-     * @param mixed ...$param
-     * @return mixed
-     */
-    public function to(...$param)
-    {
-        $function = array_shift($param);
-        $param[0] = $this->offsetGet($param[0]);
-
-        return call_user_func_array(['\Chukdo\Helper\To', $function], $param);
-    }
-
-    /**
-     * @param mixed ...$param
-     * @return mixed
-     */
-    public function is(...$param)
-    {
-        $function = array_shift($param);
-        $param[0] = $this->offsetGet($param[0]);
-
-        return call_user_func_array(['\Chukdo\Helper\Is', $function], $param);
-    }
-
-    /**
      * Retourne l'objet sous forme d'un tableau a 2 dimensions (path => value)
      *
-     * @param string|null $path chemin de depart
+     * @param string|null $path chemin de depart null par défaut
      * @return array
      */
-    public function to2D($path = null)
+    public function toSimpleArray(string $path = null): array
     {
         $mixed = [];
 
         foreach ($this as $k => $v) {
-            $k = trim(($path ? $path : '') . '.' . $k, '.');
+            $k = trim($path . '.' . $k, '.');
 
             if ($v instanceof Json) {
-                $mixed = array_merge($mixed, $v->to2D($k));
+                $mixed = array_merge($mixed, $v->toSimpleArray($k));
             } else {
                 $mixed[$k] = $v;
             }
@@ -752,6 +683,30 @@ class Json extends \ArrayObject
         $tree->setData($this->toArray());
         $tree->setRenderer(new \cli\tree\Ascii);
         $tree->display();
+    }
+
+    /**
+     * @param mixed ...$param
+     * @return mixed
+     */
+    public function to(...$param)
+    {
+        $function = array_shift($param);
+        $param[0] = $this->get($param[0]);
+
+        return call_user_func_array(['\Chukdo\Helper\To', $function], $param);
+    }
+
+    /**
+     * @param mixed ...$param
+     * @return mixed
+     */
+    public function is(...$param)
+    {
+        $function = array_shift($param);
+        $param[0] = $this->get($param[0]);
+
+        return call_user_func_array(['\Chukdo\Helper\Is', $function], $param);
     }
 
     /**

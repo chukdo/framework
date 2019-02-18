@@ -3,6 +3,7 @@
 use Chukdo\Helper\Str;
 Use \Chukdo\Json\Json;
 Use \Chukdo\Helper\Http;
+use Chukdo\Storage\FileUploaded;
 
 /**
  * Gestion de requete HTTP entrante
@@ -46,8 +47,8 @@ class Request
         $this->inputs   = new Json($_REQUEST, true);
         $this->method   = Http::request('httpverb') ?: Http::server('REQUEST_METHOD');
 
-        $this->header->setHeader('Content-Type', Http::server('CONTENT_TYPE'));
-        $this->header->setHeader('Content-Length', Http::server('CONTENT_TYPE'));
+        $this->header->setHeader('Content-Type', Http::server('CONTENT_TYPE', ''));
+        $this->header->setHeader('Content-Length', Http::server('CONTENT_LENGTH', ''));
 
         foreach ($_SERVER as $key => $value) {
             if ($name = Str::match('/^HTTP_(.*)/', $key)) {
@@ -79,6 +80,17 @@ class Request
     }
 
     /**
+     * @param string $name
+     * @param string|null $allowedMimeTypes
+     * @param int|null $maxFileSize
+     * @return FileUploaded
+     */
+    public function file(string $name, string $allowedMimeTypes = null, int $maxFileSize = null): FileUploaded
+    {
+        return new FileUploaded($name, $allowedMimeTypes, $maxFileSize = null);
+    }
+
+    /**
      * @return Json
      */
     public function inputs(): Json
@@ -92,16 +104,16 @@ class Request
      */
     public function input(string $name)
     {
-        return $this->inputs->get2D($name);
+        return $this->inputs->get($name);
     }
 
     /**
      * @param string $name
      * @return bool
      */
-    public function has(string $name): bool
+    public function exists(string $name): bool
     {
-        return isset($_REQUEST[$name]);
+        return $this->inputs->exists($name);
     }
 
     /**
@@ -110,7 +122,7 @@ class Request
      */
     public function filled(string $name): bool
     {
-        return $this->inputs->offsetExists($name);
+        return $this->inputs->filled($name);
     }
 
     /**

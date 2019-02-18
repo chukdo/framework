@@ -103,4 +103,25 @@ final class Crypto
 
         return $decrypted;
     }
+
+    /**
+     * Hash un fichier et retourne son chemin de stockage
+     *
+     * @param string $name nom du fichier
+     * @param int $hashlevel nombre de sous repertoire pour le stockage du fichier
+     * @return string chemin complet du fichier à stocker
+     */
+    public static function hash(string $name, int $hashlevel = 2): string
+    {
+        $file = crc32($name);
+        $path = '';
+        $hash = str_split(hash('crc32', $file), 2);
+
+        /** Hashlevel */
+        for ($i = 0; $i < $hashlevel; $i++) {
+            $path .= $hash[$i].'/';
+        }
+
+        return $path.$file;
+    }
 }

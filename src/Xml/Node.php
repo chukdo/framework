@@ -67,7 +67,7 @@ class Node implements IteratorAggregate
     	    return $doc;
     	}
 
-        throw new NodeException('Le document xml n\'est pas défini');
+        throw new NodeException('Xml document not defined');
     }
 
     /**
@@ -80,7 +80,7 @@ class Node implements IteratorAggregate
             return $this->__node;
         }
 
-        throw new NodeException('Le noeud xml n\'est pas défini');
+        throw new NodeException('Xml node not defined');
     }
 
     /**
@@ -1124,7 +1124,7 @@ class Node implements IteratorAggregate
      */
     public function __get(string $name)
     {
-        throw new NodeException("La methode $name n'existe pas");
+        throw new NodeException("Method $name does not exist");
     }
 
     /**
@@ -1134,7 +1134,7 @@ class Node implements IteratorAggregate
      */
     public function __set(string $name, $value)
     {
-        throw new NodeException("La methode $name n'existe pas");
+        throw new NodeException("Method $name does not exist");
     }
 
     /**
@@ -1145,6 +1145,6 @@ class Node implements IteratorAggregate
      */
     public function __call(string $name, $params = [])
     {
-        throw new NodeException("La methode $name n'existe pas");
+        throw new NodeException("Method $name does not exist");
     }
 }

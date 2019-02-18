@@ -19,7 +19,7 @@ class JsonConf extends Json
     {
         if (file_exists($file)) {
             $load = new Json(file_get_contents($file));
-            $this->merge($load->to2D(), true);
+            $this->merge($load->toSimpleArray(), true);
             return true;
         }
 

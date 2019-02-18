@@ -1,5 +1,16 @@
 <?php
 
+/** Bootsrap ERROR */
+error_reporting(E_ALL);
+set_error_handler('triggerError');
+set_exception_handler('triggerException');
+register_shutdown_function('triggerErrorShutdown');
+
+function dd($data) {echo('<pre>');var_dump($data);exit;}
+function triggerException($e) {dd($e);}
+function triggerError($code, $message, $file = __FILE__, $line = __LINE__, $context) {throw new ErrorException($message,$code, 1, $file, $line, $context);}
+function triggerErrorShutdown() { if ($error = error_get_last()) { triggerError($error['type'],$error['message'], $error['file'], $error['line'], null);}}
+
 /** Definition des chemins */
 DEFINE('CONF_PATH', '/storage/www/chukdo/test/app/conf/');
 DEFINE('APP_PATH', '/storage/www/chukdo/test/app/');
@@ -37,7 +48,6 @@ Conf::loadConf(CONF_PATH.'conf.json');
 
 
 /** App */
-
 App::env(App::getConf('env'));
 App::channel('orpi');
 App::register(\App\Providers\LoggerHandlerServiceProvider::class);
@@ -55,39 +65,15 @@ ServiceLocator::setService('azure',
         return MicrosoftAzure\Storage\Blob\BlobRestProxy::createBlobService(Conf::get('storage.azure.endpoint'));
     }
 );
-var_dump($_SERVER);exit;
-r(new \Chukdo\Http\Url());
+
+dd(Request::input('a.avion.c*'));
 
 $json = new \Chukdo\Json\Json([
     'a' => '08/01/75',
     'q' => 'qsdfghjklm'
 ]);
-r($json->is('date', 'a', 'd/m/Y'));
+
 
 //ExceptionLogger::emergency('coucou les loulous');
 //Response::file('azure://files-dev/566170fe8bc5d2cf3d000000/5948da9a28b8b.pdf')->send()->end();
-
-
 Response::json($json)->send()->end();
-
-Class test2 {
-    public function render()
-    {
-        throw new \Chukdo\Bootstrap\AppException('au lit les én$#@fants');
-    }
-}
-
-Class test {
-    public function test()
-    {
-        $t2 = new test2();
-        $t2->render();
-    }
-}
-
-$test = new test();
-$test->test();
-
-
-
-exit;
