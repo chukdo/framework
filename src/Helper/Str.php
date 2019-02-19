@@ -136,6 +136,16 @@ final class Str
     }
 
     /**
+     * @param array $value
+     * @param string $glue
+     * @return string
+     */
+    public static function join(array $value, string $glue): string
+    {
+        return implode($glue, $value);
+    }
+
+    /**
      * @param int|null $time
      * @return string
      */

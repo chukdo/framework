@@ -1,6 +1,7 @@
 <?php namespace Chukdo\Json;
 
 use Chukdo\Xml\Xml;
+use function cli\choose;
 use Closure;
 use ArrayObject;
 
@@ -512,28 +513,19 @@ class Json extends \ArrayObject
      */
     public function get(string $path, $default = null)
     {
-        $dot        = Str::contain($path, '.');
-        $wildcard   = Str::contain($path, '*');
-
-        /** Pas de chemin, retourne offsetGet */
-        if (!$dot && !$wildcard) {
+        if (!Str::contain($path, '.')) {
             return $this->offsetGet($path, $default);
         }
 
-        /** Mise à plat des données */
-        $simpleArray = $this->toSimpleArray();
+        $arr  = new Arr(Str::split($path, '.'));
+        $get  = $this->offsetGet($arr->getFirstAndRemove());
 
-        /** recherche de valeurs multiples */
-        $pattern    = '/^'.str_replace(['.', '*'], ['\.', '.*?'], $path).'/';
-        $values     = new Json();
+        if ($get instanceof Json) {
+            return $get->get($arr->join('.'));
 
-        foreach ($simpleArray as $key => $v) {
-            if (Str::match($pattern, $key)) {
-                $values->set($key, $simpleArray[$key]);
-            }
+        } else {
+            return null;
         }
-
-        return $values;
     }
 
     /**
@@ -545,19 +537,18 @@ class Json extends \ArrayObject
         $dot        = Str::contain($path, '.');
         $wildcard   = Str::contain($path, '*');
 
-        /** Pas de chemin, retourne offsetGet */
+        /** Pas de chemin > offsetGet */
         if (!$dot && !$wildcard) {
             $this->offsetUnset($path);
             return true;
         }
 
-        $json = $this->get($path);
+        $items      = Str::split($path, '.');
+        $firstItem  = array_shift($items);
+        $otherItems = Str::join($items, '.' );
 
-        foreach ($json as $key => $value) {
-            // split key
-                // loop
-                    // à la fin offsetUnset
-        }
+        $json = $this->get($firstItem);
+        $json->unset($otherItems);
 
         return $this;
     }
@@ -569,20 +560,27 @@ class Json extends \ArrayObject
      */
     public function set(string $path, $value): self
     {
+        $dot = Str::contain($path, '.');
+
+        /** Pas de chemin > offsetSet */
+        if (!$dot) {
+            return $this->offsetSet($path, $value);
+        }
+
         $path = Str::split($path, '.');
         $end  = array_pop($path);
-        $key  = $this;
+        $json = $this;
 
         foreach ($path as $name) {
-            if (($get = $key->offsetGet($name)) instanceof Json) {
-                $key = $get;
+            if (($get = $json->offsetGet($name)) instanceof Json) {
+                $json = $get;
             } else {
-                $key->offsetSet($name, []);
-                $key = $key->offsetGet($name);
+                $json->offsetSet($name, []);
+                $json = $json->offsetGet($name);
             }
         }
 
-        $key->offsetSet($end, $value);
+        $json->offsetSet($end, $value);
 
         return $this;
     }

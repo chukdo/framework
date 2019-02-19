@@ -66,14 +66,22 @@ ServiceLocator::setService('azure',
     }
 );
 
-dd(Request::input('a.avion.c*'));
-
 $json = new \Chukdo\Json\Json([
-    'a' => '08/01/75',
-    'q' => 'qsdfghjklm'
+    'a' => [
+        'b' => [
+            'c' => 'okc',
+            'd' => 'okd'
+        ],
+        'c' => [
+            'd' => 'oke',
+            'f' => 'okf'
+        ]
+    ],
+    'b' => 'qsdfghjklm'
 ]);
 
-
+dd($json->get('a.*.d'));
+exit;
 //ExceptionLogger::emergency('coucou les loulous');
 //Response::file('azure://files-dev/566170fe8bc5d2cf3d000000/5948da9a28b8b.pdf')->send()->end();
 Response::json($json)->send()->end();
