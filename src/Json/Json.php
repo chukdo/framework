@@ -1,7 +1,6 @@
 <?php namespace Chukdo\Json;
 
 use Chukdo\Xml\Xml;
-use function cli\choose;
 use Closure;
 use ArrayObject;
 
@@ -37,6 +36,14 @@ class Json extends \ArrayObject
                 $this->offsetSet($k, $v);
             }
         }
+    }
+
+    /**
+     * @return Json
+     */
+    public function clone(): Json
+    {
+        return new Json($this->getArrayCopy());
     }
 
     /**
@@ -180,6 +187,20 @@ class Json extends \ArrayObject
     }
 
     /**
+     * @param $key
+     * @param mixed $value
+     * @return mixed
+     */
+    public function offsetGetOrSet($key, $value = null)
+    {
+        if ($this->offsetExists($key)) {
+            return parent::offsetGet($key);
+        } else {
+            return $this->offsetSet($key, $value ?: [])->offsetGet($key);
+        }
+    }
+
+    /**
      * @param mixed $key
      * @param mixed $value
      * @return Json
@@ -294,95 +315,6 @@ class Json extends \ArrayObject
         }
 
         return $this;
-    }
-
-    /**
-     * @param iterable $hydrate
-     * @param Json $reference
-     * @param bool|null $typehint
-     * @param bool|null $matchOnly
-     * @return Json
-     */
-    public static function hydrator(
-        iterable $hydrate,
-        Json $reference,
-        bool $typehint = null,
-        bool $matchOnly = null): Json
-    {
-        $data = new Json();
-
-        foreach ($reference as $refKey => $refValue) {
-            $match = false;
-
-            foreach ($hydrate as $hydrateKey => $hydrateValue) {
-                if ($refKey == $hydrateKey) {
-                    if ($refValue instanceof Json) {
-
-                        /** Tableau vide */
-                        if ($refValue->isEmpty()) {
-                            $data->offsetSet($hydrateKey, array_values((array) $hydrateValue));
-
-                            /** Tableau avec un element de structure */
-                        } else if ($refValue->count() === 1 && $refValue->getKeyIndex(0) === 0) {
-                            $refValueClone  = reset($refValue->getArrayCopy());
-                            $refValueClones = new Json();
-
-                            foreach ($hydrateValue as $v) {
-                                $refValueClones->append($refValueClone);
-                            }
-
-                            $data->offsetSet($hydrateKey, self::hydrator($hydrateValue, $refValueClones, $typehint, $matchOnly));
-
-                        /** Objet */
-                        } else {
-                            $data->offsetSet($hydrateKey, self::hydrator($hydrateValue, $refValue, $typehint, $matchOnly));
-                        }
-                    } else {
-
-                        /** Typage */
-                        if ($typehint == true) {
-                            $hydrateValue = To::type(gettype($refValue), $hydrateValue);
-                        }
-
-                        $data->offsetSet($hydrateKey, $hydrateValue);
-                    }
-
-                    $match = true;
-                    break;
-                }
-            }
-
-            /** Hydrate or populate */
-            if (!$match && !$matchOnly) {
-                $data->offsetSet($refKey,
-                    $refValue instanceof Json ?
-                        $refValue->getArrayCopy() :
-                        $refValue
-                );
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     * @param iterable $populate
-     * @param bool|null $typehint
-     * @return Json
-     */
-    public function hydrate(iterable $populate, bool $typehint = null): Json
-    {
-        return self::hydrator($populate, $this, $typehint, false);
-    }
-
-    /**
-     * @param iterable $populate
-     * @param bool|null $typehint
-     * @return Json
-     */
-    public function populate(iterable $populate, bool $typehint = null): Json
-    {
-        return self::hydrator($populate, $this, $typehint, true);
     }
 
     /**
@@ -508,49 +440,79 @@ class Json extends \ArrayObject
 
     /**
      * @param string $path
+     * @return Json
+     */
+    public function wildcard(string $path): Json
+    {
+        $path       = rtrim($path, '.*');
+        $arr        = new Arr(Str::split($path, '.'));
+        $firstPath  = $arr->getFirstAndRemove();
+        $emptyPath  = $arr->empty();
+        $endPath    = $arr->join('.');
+        $json       = new Json();
+        $get        = $this->offsetGet($firstPath);
+
+        if ($firstPath == '*') {
+            foreach ($this as $key => $value) {
+                if ($value instanceof Json) {
+                    if (($get = $value->wildcard($endPath))->count()) {
+                        $json->offsetSet($key, $get);
+                    }
+                }
+            }
+        } else if ($get instanceof Json && !$emptyPath) {
+            $json->offsetSet($firstPath, $get->wildcard($endPath));
+
+        } else if ($get && $emptyPath) {
+            $json->offsetSet($firstPath, $get);
+        }
+
+        return $json;
+    }
+
+    /**
+     * @param string $path
      * @param null $default
      * @return Json|mixed|null
      */
     public function get(string $path, $default = null)
     {
-        if (!Str::contain($path, '.')) {
+        if (Str::notContain($path, '.')) {
             return $this->offsetGet($path, $default);
         }
 
-        $arr  = new Arr(Str::split($path, '.'));
-        $get  = $this->offsetGet($arr->getFirstAndRemove());
+        $arr        = new Arr(Str::split($path, '.'));
+        $firstPath  = $arr->getFirstAndRemove();
+        $endPath    = $arr->join('.');
+        $get        = $this->offsetGet($firstPath);
 
         if ($get instanceof Json) {
-            return $get->get($arr->join('.'));
-
-        } else {
-            return null;
+            return $get->get($endPath);
         }
+
+        return $default;
     }
 
     /**
      * @param string $path
-     * @return Json
+     * @return mixed|null
      */
-    public function unset(string $path): self
+    public function unset(string $path)
     {
-        $dot        = Str::contain($path, '.');
-        $wildcard   = Str::contain($path, '*');
-
-        /** Pas de chemin > offsetGet */
-        if (!$dot && !$wildcard) {
-            $this->offsetUnset($path);
-            return true;
+        if (Str::notContain($path, '.')) {
+            return $this->offsetUnset($path);
         }
 
-        $items      = Str::split($path, '.');
-        $firstItem  = array_shift($items);
-        $otherItems = Str::join($items, '.' );
+        $arr        = new Arr(Str::split($path, '.'));
+        $firstPath  = $arr->getFirstAndRemove();
+        $endPath    = $arr->join('.');
+        $get        = $this->offsetGet($firstPath);
 
-        $json = $this->get($firstItem);
-        $json->unset($otherItems);
+        if ($get instanceof Json) {
+            return $get->unset($endPath);
+        }
 
-        return $this;
+        return null;
     }
 
     /**
@@ -560,29 +522,15 @@ class Json extends \ArrayObject
      */
     public function set(string $path, $value): self
     {
-        $dot = Str::contain($path, '.');
-
-        /** Pas de chemin > offsetSet */
-        if (!$dot) {
+        if (Str::notContain($path, '.')) {
             return $this->offsetSet($path, $value);
         }
 
-        $path = Str::split($path, '.');
-        $end  = array_pop($path);
-        $json = $this;
+        $arr        = new Arr(Str::split($path, '.'));
+        $firstPath  = $arr->getFirstAndRemove();
+        $endPath    = $arr->join('.');
 
-        foreach ($path as $name) {
-            if (($get = $json->offsetGet($name)) instanceof Json) {
-                $json = $get;
-            } else {
-                $json->offsetSet($name, []);
-                $json = $json->offsetGet($name);
-            }
-        }
-
-        $json->offsetSet($end, $value);
-
-        return $this;
+        return $this->offsetGetOrSet($firstPath)->set($endPath, $value);
     }
 
     /**

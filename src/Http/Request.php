@@ -109,6 +109,15 @@ class Request
 
     /**
      * @param string $name
+     * @return mixed|null
+     */
+    public function wildcard(string $name)
+    {
+        return $this->inputs->wildcard($name);
+    }
+
+    /**
+     * @param string $name
      * @return bool
      */
     public function exists(string $name): bool

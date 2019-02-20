@@ -128,11 +128,19 @@ final class Str
     /**
      * @param string $value
      * @param string $delimiter
+     * @param int|null $pad
+     * @param null $padValue
      * @return array
      */
-    public static function split(string $value, string $delimiter): array
+    public static function split(string $value, string $delimiter, int $pad = null, $padValue = null): array
     {
-        return explode($delimiter, $value);
+        $split = explode($delimiter, $value);
+
+        if ($pad) {
+            $split = array_pad($split, $pad, $padValue);
+        }
+
+        return $split;
     }
 
     /**

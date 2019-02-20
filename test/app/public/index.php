@@ -70,17 +70,46 @@ $json = new \Chukdo\Json\Json([
     'a' => [
         'b' => [
             'c' => 'okc',
-            'd' => 'okd'
+            'd' => [
+                'r' => 'i',
+                't' => 'u'
+            ]
         ],
         'c' => [
             'd' => 'oke',
             'f' => 'okf'
+        ],
+        'g' => [
+            'h' => [
+                'r' => 'ttttit'
+            ]
+        ],
+        'e' => [
+            'r' => 'toto',
+            'd' => [
+                'r' => 'ezrte'
+            ]
         ]
     ],
     'b' => 'qsdfghjklm'
 ]);
+$json->set('a.f.t.r.t.y.u.i.o.p', 'coucou');
 
-dd($json->get('a.*.d'));
+dd($json->wildcard('a.*'));
+
+/**
+[a =>
+    [
+        b => [
+            d => okd
+        ],
+        c => [
+            d => oke
+        ]
+    ]
+]
+*/
+
 exit;
 //ExceptionLogger::emergency('coucou les loulous');
 //Response::file('azure://files-dev/566170fe8bc5d2cf3d000000/5948da9a28b8b.pdf')->send()->end();

@@ -79,6 +79,14 @@ class Arr implements \Iterator
     }
 
     /**
+     * @return bool
+     */
+    public function empty(): bool
+    {
+        return count($this->arr) === 0;
+    }
+
+    /**
      * @param string $glue
      * @return string
      */
