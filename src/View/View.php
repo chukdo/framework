@@ -3,6 +3,7 @@
 Use \Closure;
 Use \Chukdo\Helper\Str;
 Use \Chukdo\Http\Response;
+Use \Chukdo\Contracts\View\Functions;
 
 /**
  * Moteur de template
@@ -169,6 +170,14 @@ class View
         } else {
             return null;
         }
+    }
+
+    /**
+     * @param Functions $functions
+     */
+    public function loadFunction(Functions $functions): void
+    {
+        $functions->register($this);
     }
 
     /**
