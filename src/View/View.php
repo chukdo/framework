@@ -2,7 +2,6 @@
 
 Use \Closure;
 Use \Chukdo\Helper\Str;
-Use \Chukdo\Json\Json;
 Use \Chukdo\Http\Response;
 
 /**
@@ -54,12 +53,13 @@ class View
     public function __construct(string $folder = null, Response $response = null)
     {
         $this->setDefaultFolder($folder);
+        $this->setResponseHandler($response);
     }
 
     /**
-     * @param Response $response
+     * @param Response|null $response
      */
-    public function setResponseHandler(Response $response)
+    public function setResponseHandler(Response $response = null)
     {
         $this->response = $response;
     }
