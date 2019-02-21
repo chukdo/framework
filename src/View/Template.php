@@ -59,7 +59,7 @@ class Template
      */
     public function e(string $key, string $functions = null): void
     {
-        $e = isset(${$key}) ? ${$key} : $this->j($key);
+        $e = isset($GLOBALS[$key]) ? $GLOBALS[$key] : $this->j($key);
 
         echo $e;
     }

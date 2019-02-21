@@ -656,6 +656,14 @@ class Json extends \ArrayObject
     }
 
     /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->toJson(true);
+    }
+
+    /**
      * @param string $key
      * @return bool
      */

@@ -79,8 +79,8 @@ $json = new \Chukdo\Json\Json([
     ]
 ]);
 
-$view = new Chukdo\View\View(TPL_PATH, $json);
-$view->render('info');
+$view = new Chukdo\View\View(TPL_PATH);
+$view->render('info', $json);
 
 //ExceptionLogger::emergency('coucou les loulous');
 //Response::file('azure://files-dev/566170fe8bc5d2cf3d000000/5948da9a28b8b.pdf')->send()->end();
