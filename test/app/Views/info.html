@@ -2,14 +2,14 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title><?=$this->e('title')?></title>
+    <title><?=$this->j('title')?></title>
 </head>
 <body>
-    <h1><?=$this->e('title')?></h1>
+    <h1><?=$this->j('title', 'strtolower|ucfirst')?></h1>
     <ul>
     <?php foreach($this->j('articles.auto') as $auto): ?>
         <li>
-            <?=$this->e('auto')?><?php if ($auto == 'audi'): ?> <b>Voiture de luxe trouvé</b><?php endif; ?>
+            <?=$this->v($auto, 'ucfirst')?><?php if ($this->v($auto) == 'audi'): ?> <b>Voiture de luxe trouvé</b><?php endif; ?>
         </li>
     <?php endforeach; ?>
     </ul>

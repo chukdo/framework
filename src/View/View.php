@@ -70,6 +70,50 @@ class View
     }
 
     /**
+     * @param string $template
+     * @return bool
+     */
+    public function exists(string $template): bool
+    {
+        return $this->path($template)['exists'];
+    }
+
+    /**
+     * @param string $template
+     * @return array|null
+     */
+    public function path(string $template): ?array
+    {
+        list ($folder, $name) = Str::split($template, '::', 2);
+
+        $r = [
+            'folder'    => null,
+            'name'      => null,
+            'file'      => null,
+            'exists'    => false
+        ];
+
+        if ($name) {
+            $r['folder']    = $folder;
+            $r['name']      = $name;
+
+            if (isset($this->folders[$folder])) {
+                $r['file']      = $this->folders[$folder] . '/' . $name . '.html';
+                $r['exists']    = file_exists($r['file']);
+            }
+        } else {
+            $r['name'] = $folder;
+
+            if ($this->defaultFolder) {
+                $r['file']      = $this->defaultFolder . '/' . $folder . '.html';
+                $r['exists']    = file_exists($r['file']);
+            }
+        }
+
+        return $r;
+    }
+
+    /**
      * @param iterable $data
      * @param array|string|null $templates
      * @return View
@@ -131,23 +175,18 @@ class View
      */
     public function make(string $template, iterable $data = null): Template
     {
-        list ($folder, $name) = Str::split($template, '::', 2);
+        $path = $this->path($template);
 
-        $file = $name ?
-            $this->folders[$folder] . '/' . $name . '.html' :
-            $this->defaultFolder . '/' . $folder . '.html';
-
-        $data = new Json($data);
-        $data->mergeRecursive($name ?
-            $this->getData($folder) :
-            $this->getData()
-        );
-
-        if (file_exists($file)) {
-            return new Template($file, $data, $this->getRegisteredFunctions());
+        if (!$path['exists']) {
+            throw new ViewException(sprintf('Template file [%s] does not exist', $template));
         }
 
-        throw new ViewException(sprintf('Template file [%s] does not exist', $file));
+        $data = new Json($data);
+        $data
+            ->mergeRecursive($this->getData())
+            ->mergeRecursive($this->getData($template));
+
+        return new Template($path['file'], $data, $this->getRegisteredFunctions());
     }
 
     /**

@@ -264,15 +264,17 @@ class Json extends \ArrayObject
     }
 
     /**
-     * @param iterable $merge
+     * @param iterable|null $merge
      * @param bool|null $overwrite
      * @return Json
      */
-    public function merge(iterable $merge, bool $overwrite = null): self
+    public function merge(iterable $merge = null, bool $overwrite = null): self
     {
-        foreach ($merge as $k => $v) {
-            if ($overwrite || !$this->offsetExists($k)) {
-                $this->offsetSet($k, $v);
+        if ($merge) {
+            foreach ($merge as $k => $v) {
+                if ($overwrite || !$this->offsetExists($k)) {
+                    $this->offsetSet($k, $v);
+                }
             }
         }
 
@@ -280,22 +282,24 @@ class Json extends \ArrayObject
     }
 
     /**
-     * @param iterable $merge
+     * @param iterable|null $merge
      * @param bool|null $overwrite
      * @return Json
      */
-    public function mergeRecursive(iterable $merge, bool $overwrite = null): self
+    public function mergeRecursive(iterable $merge = null, bool $overwrite = null): self
     {
-        foreach ($merge as $k => $v) {
+        if ($merge) {
+            foreach ($merge as $k => $v) {
 
-            /** Les deux sont iterables on boucle en recursif */
-            if (is_iterable($v) && $this->offsetGet($k) instanceof Json) {
-                $this->offsetGet($k)->mergeRecursive($v, $overwrite);
-                continue;
-            }
+                /** Les deux sont iterables on boucle en recursif */
+                if (is_iterable($v) && $this->offsetGet($k) instanceof Json) {
+                    $this->offsetGet($k)->mergeRecursive($v, $overwrite);
+                    continue;
+                }
 
-            if ($overwrite || !$this->offsetExists($k)) {
-                $this->offsetSet($k, $v);
+                if ($overwrite || !$this->offsetExists($k)) {
+                    $this->offsetSet($k, $v);
+                }
             }
         }
 

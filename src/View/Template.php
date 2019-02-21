@@ -1,7 +1,7 @@
 <?php namespace Chukdo\View;
 
-use \Closure;
 use Chukdo\Json\Json;
+use Chukdo\Helper\Str;
 
 /**
  * Moteur de template
@@ -54,32 +54,68 @@ class Template
     }
 
     /**
+     * @param $data
+     * @param string|null $functions
+     * @return mixed
+     */
+    public function v($data, string $functions = null)
+    {
+        if($functions) {
+            foreach (Str::split($functions, '|') as $function) {
+                $data = $this->$function($data);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * @param string $key
      * @param string|null $functions
-     */
-    public function e(string $key, string $functions = null): void
-    {
-        $e = isset($GLOBALS[$key]) ? $GLOBALS[$key] : $this->j($key);
-
-        echo $e;
-    }
-
-    /**
-     * @param string $key
      * @return Json|mixed|null
      */
-    public function j(string $key)
+    public function j(string $key, string $functions = null)
     {
-        return $this->data->get($key);
+        return $this->v($this->data->get($key), $functions);
     }
 
     /**
      * @param string $key
-     * @return Json
+     * @param string|null $functions
+     * @return mixed
      */
-    public function w(string $key)
+    public function w(string $key, string $functions = null)
     {
-        return $this->data->wildcard($key);
+        return $this->v($this->data->wildcard($key), $functions);
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        ob_start();
+        include($this->file);
+        return ob_get_clean();
+    }
+
+    /**
+     * @param string $name
+     * @param array|null $arguments
+     * @return mixed
+     */
+    public function __call(string $name, array $arguments)
+    {
+        $data = reset($arguments);
+
+        if (isset($this->functions[$name])) {
+            return $this->functions[$name]($data);
+
+        } else if (is_callable($name)) {
+            return $name($data);
+        }
+
+        throw new ViewException(sprintf('Method [%s] is not a template registered function', $name));
     }
 
     /**
@@ -87,11 +123,7 @@ class Template
      */
     public function render()
     {
-        ob_start();
-        include($this->file);
-        $render = ob_get_clean();
-
         // $response   = $this->app->make('\Chukdo\Http\Response')
-        echo $render;
+        echo $this->__toString();
     }
 }

@@ -1,15 +1,6 @@
 <?php
 
-/** Bootsrap ERROR */
-error_reporting(E_ALL);
-set_error_handler('triggerError');
-set_exception_handler('triggerException');
-register_shutdown_function('triggerErrorShutdown');
-
 function dd($data) {echo("Dump and Die\n" . (php_sapi_name() == 'cli' ? '' : '<pre>'));var_dump($data);exit;}
-function triggerException($e) {dd($e);}
-function triggerError($code, $message, $file = __FILE__, $line = __LINE__, $context) {throw new ErrorException($message, $code, 1, $file, $line, $context instanceof Throwable ? $context : null);}
-function triggerErrorShutdown() { if ($error = error_get_last()) { triggerError($error['type'],$error['message'], $error['file'], $error['line'], null);}}
 
 /** Definition des chemins */
 DEFINE('CONF_PATH', '/storage/www/chukdo/test/app/Conf/');
