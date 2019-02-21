@@ -48,36 +48,12 @@ class JsonException extends Json
 
     /**
      * @param string|null $title
-     * @param string|null $color
+     * @param string|null $code
      * @return string
      */
-    public function toHtml(string $title = null, string $color = null): string //todo à revoir le rendu
+    public function toHtml(string $title = null, string $code = null): string
     {
-        $code       = $color ?: '500';
-        $title      = $title ?: 'Error';
-        $message    = $this->get('Message');
-        $file       = $this->get('File');
-        $line       = $this->get('Line');
-        $backTrace  = '';
-
-        foreach ((array) $this->get('Trace') as $trace) {
-            $backTrace .= '<li>'
-                . $trace->get('File') . '('
-                . $trace->get('Line') . ') #'
-                . $trace->get('Call') . '</li>';
-        }
-
-        return "<style>"
-            . "h1, h2, h3, h5 {padding:0;margin:0;}"
-            . "#die {text-align: center;text-transform:uppercase;color: #444;}"
-            . "#die h1 {font-size:200px;}"
-            . "#die h2 {font-size:60px;}"
-            . "#die h3 {font-size:30px;}"
-            . "#die li {display:block;}"
-            . "</style>"
-            . "<div id=\"die\">"
-            . "<h1>$code</h1><h2>$title</h2><h3>$message</h3><h5>$file($line)</h5><ul>$backTrace</ul>"
-            . "</div>";
+        return parent::toHtml(($title ?: 'Error') . ' (' . ($code ?: '500') . ')', 'red');
     }
 
     /**
