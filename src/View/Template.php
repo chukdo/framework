@@ -53,8 +53,44 @@ class Template
         return $this;
     }
 
+    /**
+     * @param string $key
+     * @param string|null $functions
+     */
+    public function e(string $key, string $functions = null): void
+    {
+        $e = isset(${$key}) ? ${$key} : $this->j($key);
+
+        echo $e;
+    }
+
+    /**
+     * @param string $key
+     * @return Json|mixed|null
+     */
+    public function j(string $key)
+    {
+        return $this->data->get($key);
+    }
+
+    /**
+     * @param string $key
+     * @return Json
+     */
+    public function w(string $key)
+    {
+        return $this->data->wildcard($key);
+    }
+
+    /**
+     *
+     */
     public function render()
     {
-        
+        ob_start();
+        include $this->file;
+        $render = ob_get_clean();
+
+        echo $render;
     }
 }

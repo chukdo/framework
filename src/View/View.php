@@ -147,7 +147,7 @@ class View
             return new Template($file, $data, $this->getRegisteredFunctions());
         }
 
-        throw new ViewException();
+        throw new ViewException(sprintf('Template file [%s] does not exist', $file));
     }
 
     /**

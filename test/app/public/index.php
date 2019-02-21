@@ -6,14 +6,15 @@ set_error_handler('triggerError');
 set_exception_handler('triggerException');
 register_shutdown_function('triggerErrorShutdown');
 
-function dd($data) {echo('<pre>');var_dump($data);exit;}
+function dd($data) {echo("Dump and Die\n" . (php_sapi_name() == 'cli' ? '' : '<pre>'));var_dump($data);exit;}
 function triggerException($e) {dd($e);}
-function triggerError($code, $message, $file = __FILE__, $line = __LINE__, $context) {throw new ErrorException($message,$code, 1, $file, $line, $context);}
+function triggerError($code, $message, $file = __FILE__, $line = __LINE__, $context) {throw new ErrorException($message, $code, 1, $file, $line, $context instanceof Throwable ? $context : null);}
 function triggerErrorShutdown() { if ($error = error_get_last()) { triggerError($error['type'],$error['message'], $error['file'], $error['line'], null);}}
 
 /** Definition des chemins */
-DEFINE('CONF_PATH', '/storage/www/chukdo/test/app/conf/');
+DEFINE('CONF_PATH', '/storage/www/chukdo/test/app/Conf/');
 DEFINE('APP_PATH', '/storage/www/chukdo/test/app/');
+DEFINE('TPL_PATH', APP_PATH . 'Views/');
 DEFINE('CHUKDO_PATH', '/storage/www/chukdo/src/');
 DEFINE('VENDOR_PATH', '/storage/www/chukdo/vendor/');
 
@@ -43,7 +44,7 @@ Facade::setClassAlias(\Chukdo\Facades\ServiceLocator::class, 'ServiceLocator');
 Facade::setClassAlias(\Chukdo\Helper\Stream::class, 'Stream');
 
 /** Configuration */
-Conf::loadConf(CONF_PATH.'conf.json');
+Conf::loadConf(CONF_PATH.'Conf.json');
 //Conf::loadConf(CONF_PATH.'conf_prod.json');
 
 
@@ -67,50 +68,20 @@ ServiceLocator::setService('azure',
 );
 
 $json = new \Chukdo\Json\Json([
-    'a' => [
-        'b' => [
-            'c' => 'okc',
-            'd' => [
-                'r' => 'i',
-                't' => 'u'
-            ]
-        ],
-        'c' => [
-            'd' => 'oke',
-            'f' => 'okf'
-        ],
-        'g' => [
-            'h' => [
-                'r' => 'ttttit'
-            ]
-        ],
-        'e' => [
-            'r' => 'toto',
-            'd' => [
-                'r' => 'ezrte'
-            ]
-        ]
-    ],
-    'b' => 'qsdfghjklm'
-]);
-$json->set('a.f.t.r.t.y.u.i.o.p', 'coucou');
-
-dd($json->wildcard('a.*'));
-
-/**
-[a =>
-    [
-        b => [
-            d => okd
-        ],
-        c => [
-            d => oke
+    'title' => 'Liste des voitures',
+    'articles' => [
+        'auto' => [
+            'bmw',
+            'audi',
+            'mercedes',
+            'peugeot'
         ]
     ]
-]
-*/
+]);
 
-exit;
+$view = new Chukdo\View\View(TPL_PATH, $json);
+$view->render('info');
+
 //ExceptionLogger::emergency('coucou les loulous');
 //Response::file('azure://files-dev/566170fe8bc5d2cf3d000000/5948da9a28b8b.pdf')->send()->end();
-Response::json($json)->send()->end();
+//Response::json($json)->send()->end();

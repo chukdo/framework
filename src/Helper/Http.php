@@ -1,7 +1,5 @@
 <?php namespace Chukdo\Helper;
 
-use Chukdo\Http\Url;
-
 /**
  * Gestion des messages HTTP
  *
@@ -133,6 +131,14 @@ final class Http
         }
 
         return $browser;
+    }
+
+    /**
+     * @return array
+     */
+    public static function argv(): array
+    {
+        return isset($_SERVER['argv']) ? $_SERVER['argv'] : [];
     }
 
     /**
