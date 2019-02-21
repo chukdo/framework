@@ -88,9 +88,10 @@ class Template
     public function render()
     {
         ob_start();
-        include $this->file;
+        include($this->file);
         $render = ob_get_clean();
 
+        // $response   = $this->app->make('\Chukdo\Http\Response')
         echo $render;
     }
 }

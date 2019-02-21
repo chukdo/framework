@@ -3,6 +3,7 @@
 Use \Chukdo\Json\Json;
 Use \Chukdo\Xml\Xml;
 Use \Chukdo\Helper\Http;
+Use \Chukdo\Helper\Str;
 
 /**
  * Gestion des entetes HTTP
@@ -290,11 +291,11 @@ class Response
     {
         $content = $this->content;
 
-        if (strpos(Http::server('HTTP_ACCEPT_ENCODING'), 'deflate') !== false) {
+        if (Str::contain(Http::server('HTTP_ACCEPT_ENCODING'), 'deflate')) {
             $this->header->setHeader('Content-Encoding', 'deflate');
             $content = gzdeflate($this->content);
 
-        } else if (strpos(Http::server('HTTP_ACCEPT_ENCODING'), 'gzip') !== false) {
+        } else if (Str::contain(Http::server('HTTP_ACCEPT_ENCODING'), 'gzip')) {
             $this->header->setHeader('Content-Encoding', 'gzip');
             $content = gzencode($this->content);
         }
@@ -313,6 +314,7 @@ class Response
         } else {
             $this->header->setHeader('Content-Length', strlen($content));
             $this->sendHeaderResponse();
+
             echo $content;
         }
 

@@ -61,7 +61,7 @@ Class ExceptionHandler Implements Handler
             $message->loadException($e);
         }
 
-        switch(Str::extension($_SERVER['SCRIPT_URL'])) {
+        switch(Str::extension(Http::server('SCRIPT_URL'))) {
             case 'xml' :
                 $content        = $message->toXml()->toXmlString();
                 $contentType    = Http::mimeContentType('xml');
@@ -75,6 +75,9 @@ Class ExceptionHandler Implements Handler
                 $content        = $message->toHtml(get_class($e), 500);
                 $contentType    = Http::mimeContentType('html');
         }
+
+        /** Important: purge des ob_start avant l'envoi d'une réponse */
+        ob_end_clean();
 
         $response
             ->status(500)
