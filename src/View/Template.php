@@ -22,32 +22,46 @@ class Template
     /**
      * @var Json
      */
-    protected $data;
+    protected $data = null;
 
     /**
-     * @var array
+     * @var View
      */
-    protected $functions = [];
+    protected $view;
 
     /**
      * Template constructor.
-     * @param string $file
+     * @param string $template
      * @param Json $data
-     * @param array $functions
+     * @param View $view
      */
-    public function __construct(string $file, Json $data, array $functions)
+    public function __construct(string $template, Json $data, View $view)
     {
-        $this->file         = $file;
-        $this->data         = $data;
-        $this->functions    = $functions;
+        $path = $view->path($template);
+
+        if (!$path['exists']) {
+            throw new ViewException(sprintf('Template file [%s] does not exist', $template));
+        }
+
+        $this
+            ->data($view->getData())
+            ->data($view->getData($template))
+            ->data($data);
+
+        $this->file = $path['file'];
+        $this->view = $view;
     }
 
     /**
-     * @param iterable $data
+     * @param iterable|null $data
      * @return Template
      */
-    public function data(Iterable $data): self
+    public function data(Iterable $data = null): self
     {
+        if (!$this->data) {
+            $this->data = new Json();
+        }
+
         $this->data->mergeRecursive($data, true);
 
         return $this;
@@ -108,14 +122,11 @@ class Template
     {
         $data = reset($arguments);
 
-        if (isset($this->functions[$name])) {
-            return $this->functions[$name]($data);
-
-        } else if (is_callable($name)) {
+        if (is_callable($name)) {
             return $name($data);
         }
 
-        throw new ViewException(sprintf('Method [%s] is not a template registered function', $name));
+        return $this->view->getRegisteredFunction($name)($data);
     }
 
     /**
@@ -123,7 +134,13 @@ class Template
      */
     public function render()
     {
-        // $response   = $this->app->make('\Chukdo\Http\Response')
-        echo $this->__toString();
+        if ($responseHandler = $this->view->getResponseHandler()) {
+            $responseHandler
+                ->header('Content-Type', 'text/html; charset=utf-8')
+                ->content($this->__toString())
+                ->send();
+        } else {
+            echo $this->__toString();
+        }
     }
 }

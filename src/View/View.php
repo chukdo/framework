@@ -2,7 +2,8 @@
 
 Use \Closure;
 Use \Chukdo\Helper\Str;
-Use Chukdo\Json\Json;
+Use \Chukdo\Json\Json;
+Use \Chukdo\Http\Response;
 
 /**
  * Moteur de template
@@ -15,6 +16,11 @@ Use Chukdo\Json\Json;
  */
 class View
 {
+    /**
+     * @var Response
+     */
+    protected $response;
+
     /**
      * @var array
      */
@@ -42,17 +48,34 @@ class View
 
     /**
      * View constructor.
-     * @param string $folder
+     * @param string|null $folder
+     * @param Response $response
      */
-    public function __construct(string $folder = null)
+    public function __construct(string $folder = null, Response $response = null)
     {
         $this->setDefaultFolder($folder);
     }
 
     /**
+     * @param Response $response
+     */
+    public function setResponseHandler(Response $response)
+    {
+        $this->response = $response;
+    }
+
+    /**
+     * @return Response|null
+     */
+    public function getResponseHandler(): ?Response
+    {
+        return $this->response;
+    }
+
+    /**
      * @param string|null $folder
      */
-    protected function setDefaultFolder(string $folder = null): void
+    public function setDefaultFolder(string $folder = null): void
     {
         $this->defaultFolder = rtrim($folder, '/');
     }
@@ -135,7 +158,7 @@ class View
      * @param string|null $template
      * @return iterable|null
      */
-    protected function getData(string $template = null): ?iterable
+    public function getData(string $template = null): ?iterable
     {
         if ($template == null) {
             return $this->sharedData;
@@ -163,9 +186,31 @@ class View
     /**
      * @return array
      */
-    protected function getRegisteredFunctions(): array
+    public function getRegisteredFunctions(): array
     {
         return $this->functions;
+    }
+
+    /**
+     * @param string $function
+     * @return bool
+     */
+    public function isRegisteredFunction(string $function): bool
+    {
+        return isset($this->functions[$function]);
+    }
+
+    /**
+     * @param string $function
+     * @return bool
+     */
+    public function getRegisteredFunction(string $function)
+    {
+        if ($this->isRegisteredFunction($function)) {
+            return $this->functions[$function];
+        }
+
+        throw new ViewException(sprintf('Method [%s] is not a template registered function', $function));
     }
 
     /**
@@ -175,18 +220,7 @@ class View
      */
     public function make(string $template, iterable $data = null): Template
     {
-        $path = $this->path($template);
-
-        if (!$path['exists']) {
-            throw new ViewException(sprintf('Template file [%s] does not exist', $template));
-        }
-
-        $data = new Json($data);
-        $data
-            ->mergeRecursive($this->getData())
-            ->mergeRecursive($this->getData($template));
-
-        return new Template($path['file'], $data, $this->getRegisteredFunctions());
+        return new Template($template, $data, $this);
     }
 
     /**
