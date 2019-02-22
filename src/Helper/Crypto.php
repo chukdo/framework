@@ -54,6 +54,7 @@ final class Crypto
     {
         $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?";
         $password = substr( str_shuffle( $chars ), 0, $length ?: 8);
+
         return $password;
     }
 
