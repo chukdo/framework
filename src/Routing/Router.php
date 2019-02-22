@@ -1,7 +1,10 @@
 <?php namespace Chukdo\Routing;
 
+Use \Closure;
+Use \Chukdo\Bootstrap\App;
+
 /**
- * Gestion des froutes
+ * Gestion des Routes
  *
  * @package		Routing
  * @version 	1.0.0
@@ -11,5 +14,47 @@
  */
 class Router
 {
+    /**
+     * @var App $app
+     */
+    protected $app;
 
+    /**
+     * Router constructor.
+     * @param App $app
+     */
+    public function __construct(App $app)
+    {
+        $this->app = $app;
+    }
+
+    public function get(string $uri, Closure $callback): Route
+    {
+
+    }
+
+    public function post(string $uri, Closure $callback): Route
+    {
+
+    }
+
+    public function put(string $uri, Closure $callback): Route
+    {
+
+    }
+
+    public function delete(string $uri, Closure $callback): Route
+    {
+
+    }
+
+    public function any(string $uri, Closure $callback): Route
+    {
+
+    }
+
+    public function console(string $uri, Closure $callback): Route
+    {
+
+    }
 }

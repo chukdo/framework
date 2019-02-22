@@ -1,7 +1,7 @@
 <?php namespace Chukdo\Facades;
 
 /**
- * Initialisation d'une facade Json
+ * Initialisation d'une facade View
  *
  * @package 	bootstrap
  * @version 	1.0.0
@@ -9,10 +9,10 @@
  * @since 		08/01/2019
  * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class ServiceLocator extends Facade
+class View extends Facade
 {
 	public static function name(): string
 	{
-		return \Chukdo\Storage\ServiceLocator::class;
+		return \Chukdo\View\View::class;
 	}
 }
