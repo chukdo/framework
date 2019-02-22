@@ -70,15 +70,13 @@ final class Archive
     /**
      * @param $file
      * @param $path
-     * @param bool $list
      * @param bool $root
-     * @return array|int
-     * @throws ArchiveException
+     * @return array
      */
-    public static function unzipFile($file, $path, $list = false, $root = false)
+    public static function unzipFile($file, $path, $root = false): array
     {
-        $path     = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
-        $ret      = $list ? [] : 0;
+        $path     = rtrim($path, '/') . '/';
+        $ret      = [];
         $open     = zip_open($file);       
         $ziperror = [
             ZIPARCHIVE::ER_MULTIDISK => 'Multi-disk zip archives not supported.',
@@ -152,12 +150,8 @@ final class Archive
                     
                     fclose($fp);
                     @chmod($file, 0777);
-                    
-                    if ($list) {
-                        $ret[] = $file;
-                    } else {
-                        $ret++;
-                    }
+
+                    $ret[] = $file;
                 
                 /** Error */
                 } else {

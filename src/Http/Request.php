@@ -87,7 +87,7 @@ class Request
      */
     public function file(string $name, string $allowedMimeTypes = null, int $maxFileSize = null): FileUploaded
     {
-        return new FileUploaded($name, $allowedMimeTypes, $maxFileSize = null);
+        return new FileUploaded($name, $allowedMimeTypes, $maxFileSize);
     }
 
     /**
