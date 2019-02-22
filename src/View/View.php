@@ -211,13 +211,12 @@ class View
 
     /**
      * @param string $function
-     * @param $data
-     * @return mixed
+     * @return Closure
      */
-    public function callRegisteredFunction(string $function, $data)
+    public function callRegisteredFunction(string $function): Closure
     {
         if ($this->isRegisteredFunction($function)) {
-            return $this->functions[$function]($data);
+            return $this->functions[$function];
         }
 
         throw new ViewException(sprintf('Method [%s] is not a template registered function', $function));

@@ -121,13 +121,11 @@ class Template
      */
     public function __call(string $name, array $arguments)
     {
-        $data = reset($arguments);
-
         if (is_callable($name)) {
-            return $name($data);
+            return call_user_func_array($name, $arguments);
         }
 
-        return $this->view->callRegisteredFunction($name, $data);
+        return call_user_func_array($this->view->callRegisteredFunction($name), $arguments);
     }
 
     /**

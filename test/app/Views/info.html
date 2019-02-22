@@ -9,7 +9,7 @@
     <ul>
     <?php foreach($this->j('articles.auto') as $auto): ?>
         <li>
-            <?=$this->v($auto, 'ucfirst')?><?php if ($this->v($this->contain($auto, 'audi'))): ?> <b>Voiture de luxe trouvé</b><?php endif; ?>
+            <?=$this->v($auto, 'removeSpecialChars|ucfirst')?><?php if ($this->v($this->contain($auto, 'audi'))): ?> <b>Voiture de luxe trouvé</b><?php endif; ?>
         </li>
     <?php endforeach; ?>
     </ul>

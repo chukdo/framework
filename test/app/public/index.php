@@ -64,7 +64,7 @@ $json = new \Chukdo\Json\Json([
         'auto' => [
             'bmw',
             'audi',
-            'mercedes',
+            'mercédes',
             'peugeot'
         ]
     ]

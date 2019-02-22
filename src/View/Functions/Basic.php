@@ -37,4 +37,15 @@ class Basic implements FunctionsInterface
     {
         return Str::contain($data, $search);
     }
+
+    /**
+     * @param string $data
+     * @return string
+     */
+    public function removeSpecialChars(string $data): string
+    {
+        return Str::removeSpecialChars($data);
+    }
+
+
 }

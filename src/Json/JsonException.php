@@ -42,7 +42,7 @@ class JsonException extends Json
         $this
             ->set('Message', $e->getMessage())
             ->set('Code', $e->getCode())
-            ->set('Call', '<b>' . htmlentities($spl->current()) . '</b>')
+            ->set('Call', $spl->current())
             ->set('File', $e->getFile())
             ->set('Line', $e->getLine())
             ->set('Trace', $backTrace);
@@ -57,7 +57,10 @@ class JsonException extends Json
      */
     public function toHtml(string $title = null, string $code = null): string
     {
-        return parent::toHtml(($title ?: 'Error') . ' (' . ($code ?: '500') . ')', 'red');
+        $json = new Json($this->getArrayCopy());
+        $json->Call = '<b>' . htmlentities($json->Call) . '</b>';
+
+        return $json->toHtml(($title ?: 'Error') . ' (' . ($code ?: '500') . ')', 'red');
     }
 
     /**
