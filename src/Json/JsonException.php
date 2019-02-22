@@ -1,8 +1,7 @@
 <?php namespace Chukdo\Json;
 
 Use \Throwable;
-Use \Exception;
-Use \Chukdo\Bootstrap\AppException;
+Use \SplFileObject;
 
 /**
  * Intégration d'une exception dans Json
@@ -21,24 +20,29 @@ class JsonException extends Json
      */
     public function loadException(Throwable $e): self
     {
-        if (!$e instanceof Exception) {
-            $e = new AppException($e->getMessage(), $e->getCode(), $e);
-        }
-
         $backTrace = [];
 
+        if ($previous = $e->getPrevious()) {
+            $e = $previous;
+        }
+
         foreach ($e->getTrace() as $trace) {
-            $trace       = new Json($trace);
+            $trace  = new Json($trace);
+
             $backTrace[] = [
-                'Call' => $trace->offsetGet('class') . $trace->offsetGet('type') . $trace->offsetGet('function') . '()',
-                'File' => $trace->offsetGet('file'),
-                'Line' => $trace->offsetGet('line')
+                'Call'  => $trace->offsetGet('class') . $trace->offsetGet('type') . $trace->offsetGet('function') . '()',
+                'File'  => $trace->offsetGet('file'),
+                'Line'  => $trace->offsetGet('line')
             ];
         }
 
+        $spl = new SplFileObject($e->getFile());
+        $spl->seek($e->getLine() - 1);
+
         $this
-            ->set('Code', $e->getCode())
             ->set('Message', $e->getMessage())
+            ->set('Code', $e->getCode())
+            ->set('Call', '<b>' . htmlentities($spl->current()) . '</b>')
             ->set('File', $e->getFile())
             ->set('Line', $e->getLine())
             ->set('Trace', $backTrace);

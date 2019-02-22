@@ -2,7 +2,8 @@
 
 use Chukdo\Json\Json;
 use Chukdo\Helper\Str;
-
+use Chukdo\Helper\Is;
+use Chukdo\Helper\To;
 /**
  * Moteur de template
  *
@@ -126,7 +127,7 @@ class Template
             return $name($data);
         }
 
-        return $this->view->getRegisteredFunction($name)($data);
+        return $this->view->callRegisteredFunction($name, $data);
     }
 
     /**

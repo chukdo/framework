@@ -73,6 +73,7 @@ $json = new \Chukdo\Json\Json([
 Response::header('X-jpd', 'coucou');
 //App::make('\Chukdo\Http\Response')->json($json)->send()->end();
 $view = new Chukdo\View\View(TPL_PATH, App::make('\Chukdo\Http\Response'));
+$view->loadFunction(new \Chukdo\View\Functions\Basic());
 $view->render('info', $json);
 
 //ExceptionLogger::emergency('coucou les loulous');
