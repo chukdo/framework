@@ -4,6 +4,7 @@ Use \Closure;
 Use \Chukdo\Contracts\View\Functions as FunctionsInterface;
 Use \Chukdo\View\View;
 Use \Chukdo\Helper\Str;
+use mysql_xdevapi\Exception;
 
 /**
  * Fonctions basic pour le moteur de vue
@@ -26,6 +27,8 @@ class Basic implements FunctionsInterface
                 $view->registerFunction($method, Closure::fromCallable([$this, $method]));
             }
         }
+
+        throw new \Exception('pas de bol');
     }
 
     /**

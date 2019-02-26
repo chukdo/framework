@@ -602,13 +602,13 @@ class Json extends \ArrayObject
      */
     public function toHtml(string $title = null, string $color = null): string
     {
-        $html = "<table id=\"JsonTableRender\" style=\"border-spacing:0;border-collapse:collapse;font-family:Helvetica;\">";
+        $html = "<table id=\"JsonTableRender\" style=\"border-spacing:0;border-collapse:collapse;font-family:Helvetica;width:100%;\">";
 
         if ($title) {
             $color = $color ?: '#499cef';
             $html .= "<thead style=\"color: #fff;background: $color;\">"
                 . "<tr>"
-                . "<th colspan=\"2\" style=\"padding:10px;\">$title</th>"
+                . "<th colspan=\"2\" style=\"padding:20px;font-size:30px;\">$title</th>"
                 . "</tr>"
                 . "</thead>";
         }
