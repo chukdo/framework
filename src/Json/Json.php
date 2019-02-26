@@ -598,11 +598,12 @@ class Json extends \ArrayObject
     /**
      * @param string|null $title
      * @param string|null $color
+     * @param string|null $widthFirstCol
      * @return string
      */
-    public function toHtml(string $title = null, string $color = null): string
+    public function toHtml(string $title = null, string $color = null, string $widthFirstCol = null): string
     {
-        $html = "<table id=\"JsonTableRender\" style=\"border-spacing:0;border-collapse:collapse;font-family:Helvetica;width:100%;\">";
+        $html = "<table id=\"JsonTableRender\" style=\"border-spacing:0;border-collapse:collapse;font-family:Helvetica;width:100%;word-break:break-word;\">";
 
         if ($title) {
             $color = $color ?: '#499cef';
@@ -614,10 +615,10 @@ class Json extends \ArrayObject
         }
 
         foreach ($this as $k => $v) {
-            $v     = $v instanceof Json ? $v->toHtml() : $v;
+            $v     = $v instanceof Json ? $v->toHtml(null, null, $widthFirstCol) : $v;
             $html .= "<tr>"
-                . "<td style=\"background:#eee;padding:8px;border:1px solid #eee;\">$k</td>"
-                . "<td  style=\"padding:8px;border:1px solid #eee;\">$v</td>"
+                . "<td style=\"background:#eee;padding:6px;border:1px solid #eee;width:$widthFirstCol;\">$k</td>"
+                . "<td  style=\"padding:6px;border:1px solid #eee;\">$v</td>"
                 . "</tr>";
         }
 

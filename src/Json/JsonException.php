@@ -40,7 +40,7 @@ class JsonException extends Json
         }
 
         $this
-            ->set('Message', $e->getMessage())
+            ->set('Error', $e->getMessage())
             ->set('Code', $e->getCode())
             ->set('File', $e->getFile())
             ->set('Line', $e->getLine())
@@ -77,11 +77,12 @@ class JsonException extends Json
     /**
      * @param string|null $title
      * @param string|null $code
+     * @param string|null $widthFirstCol
      * @return string
      */
-    public function toHtml(string $title = null, string $code = null): string
+    public function toHtml(string $title = null, string $code = null, string $widthFirstCol = null): string
     {
-        return parent::toHtml(($title ?: 'Error') . ' (' . ($code ?: '500') . ')', 'red');
+        return parent::toHtml(($title ?: 'Error') . ' (' . ($code ?: '500') . ')', 'red', '45px');
     }
 
     /**

@@ -27,8 +27,6 @@ class Basic implements FunctionsInterface
                 $view->registerFunction($method, Closure::fromCallable([$this, $method]));
             }
         }
-
-        throw new \Exception('pas de bol');
     }
 
     /**

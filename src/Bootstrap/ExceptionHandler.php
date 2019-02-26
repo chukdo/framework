@@ -54,7 +54,7 @@ Class ExceptionHandler Implements Handler
         $response   = $this->app->make('\Chukdo\Http\Response');
         $message    = new JsonException();
 
-        $message->set('Message', 'Error happened');
+        $message->set('Error', 'Error happened');
 
         /** Dev mode */
         if ($this->app->env() == 0) {
