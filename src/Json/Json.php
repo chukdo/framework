@@ -6,7 +6,6 @@ use ArrayObject;
 
 use \Chukdo\Helper\Is;
 use \Chukdo\Helper\Str;
-use \Chukdo\Helper\To;
 
 /**
  * Manipulation des données
@@ -36,6 +35,14 @@ class Json extends \ArrayObject
                 $this->offsetSet($k, $v);
             }
         }
+    }
+
+    /**
+     * @return $this
+     */
+    public function self()
+    {
+        return $this;
     }
 
     /**

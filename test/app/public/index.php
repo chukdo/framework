@@ -29,6 +29,7 @@ Facade::setClassAlias(\Chukdo\Facades\Facade::class, 'Facade');
 Facade::setClassAlias(\Chukdo\Facades\App::class, 'App');
 Facade::setClassAlias(\Chukdo\Facades\Conf::class, 'Conf');
 Facade::setClassAlias(\Chukdo\Facades\Event::class, 'Event');
+Facade::setClassAlias(\Chukdo\Facades\Input::class, 'Input');
 Facade::setClassAlias(\Chukdo\Facades\Request::class, 'Request');
 Facade::setClassAlias(\Chukdo\Facades\Response::class, 'Response');
 Facade::setClassAlias(\Chukdo\Facades\View::class, 'View');

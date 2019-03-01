@@ -1,9 +1,10 @@
 <?php namespace Chukdo\Http;
 
-use Chukdo\Helper\Str;
-Use \Chukdo\Json\Json;
+use \Chukdo\Bootstrap\App;
+use \Chukdo\Helper\Str;
 Use \Chukdo\Helper\Http;
-use Chukdo\Storage\FileUploaded;
+use \Chukdo\Json\Json;
+use \Chukdo\Json\JsonInput;
 
 /**
  * Gestion de requete HTTP entrante
@@ -18,33 +19,36 @@ use Chukdo\Storage\FileUploaded;
 class Request
 {
     /**
-     * @param Header $header
-     */
-    protected $header;
-
-    /**
-     * @param Url $url
-     */
-    protected $url;
-
-    /**
-     * @param Json $inputs
+     * @param JsonInput
      */
     protected $inputs;
 
     /**
-     * @param String $method
+     * @param Header
+     */
+    protected $header;
+
+    /**
+     * @param Url
+     */
+    protected $url;
+
+    /**
+     * @param String
      */
     protected $method;
 
     /**
-     * Response constructor.
+     * Request constructor.
+     * @param App $app
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
-    public function __construct()
+    public function __construct(App $app)
     {
+        $this->inputs   = $app->make('\Chukdo\Json\JsonInput');
         $this->header   = new Header();
         $this->url      = new Url(Http::server('SCRIPT_URI'));
-        $this->inputs   = new Json($_REQUEST, true);
         $this->method   = Http::request('httpverb') ?: Http::server('REQUEST_METHOD');
 
         $this->header->setHeader('Content-Type', Http::server('CONTENT_TYPE', ''));
@@ -64,36 +68,9 @@ class Request
     }
 
     /**
-     * @return Header
+     * @return JsonInput
      */
-    public function header(): Header
-    {
-        return $this->header;
-    }
-
-    /**
-     * @return Url
-     */
-    public function url(): Url
-    {
-        return $this->url;
-    }
-
-    /**
-     * @param string $name
-     * @param string|null $allowedMimeTypes
-     * @param int|null $maxFileSize
-     * @return FileUploaded
-     */
-    public function file(string $name, string $allowedMimeTypes = null, int $maxFileSize = null): FileUploaded
-    {
-        return new FileUploaded($name, $allowedMimeTypes, $maxFileSize);
-    }
-
-    /**
-     * @return Json
-     */
-    public function inputs(): Json
+    public function inputs(): JsonInput
     {
         return $this->inputs;
     }
@@ -105,33 +82,6 @@ class Request
     public function input(string $name)
     {
         return $this->inputs->get($name);
-    }
-
-    /**
-     * @param string $name
-     * @return mixed|null
-     */
-    public function wildcard(string $name)
-    {
-        return $this->inputs->wildcard($name);
-    }
-
-    /**
-     * @param string $name
-     * @return bool
-     */
-    public function exists(string $name): bool
-    {
-        return $this->inputs->exists($name);
-    }
-
-    /**
-     * @param string $name
-     * @return bool
-     */
-    public function filled(string $name): bool
-    {
-        return $this->inputs->filled($name);
     }
 
     /**
@@ -150,6 +100,49 @@ class Request
     public function except(...$offsets): Json
     {
         return $this->inputs->except($offsets);
+    }
+
+    /**
+     * @param string $path
+     * @return bool
+     */
+    public function filled(string $path): bool
+    {
+        return $this->inputs->filled($path);
+    }
+
+    /**
+     * @param string $path
+     * @return bool
+     */
+    public function exists(string $path): bool
+    {
+        return $this->inputs->exists($path);
+    }
+
+    /**
+     * @param string $path
+     * @return Json
+     */
+    public function wildcard(string $path): Json
+    {
+        return $this->inputs->wildcard($path);
+    }
+
+    /**
+     * @return Header
+     */
+    public function header(): Header
+    {
+        return $this->header;
+    }
+
+    /**
+     * @return Url
+     */
+    public function url(): Url
+    {
+        return $this->url;
     }
 
     /**

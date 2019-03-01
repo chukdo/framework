@@ -4,7 +4,6 @@ Use \Closure;
 Use \Chukdo\Contracts\View\Functions as FunctionsInterface;
 Use \Chukdo\View\View;
 Use \Chukdo\Helper\Str;
-use mysql_xdevapi\Exception;
 
 /**
  * Fonctions basic pour le moteur de vue
