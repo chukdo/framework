@@ -1,6 +1,6 @@
 <?php namespace Chukdo\Logger\Handlers;
 
-use \Chukdo\Contracts\Db\Redis as RedisInterface;
+use Chukdo\Contracts\Db\Redis as RedisInterface;
 
 /**
  * Gestionnaire de log pour Redis

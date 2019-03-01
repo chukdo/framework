@@ -1,7 +1,7 @@
 <?php namespace Chukdo\Logger\Handlers;
 
 Use Elasticsearch\ClientBuilder;
-Use \Chukdo\Logger\Formatters\NullFormatter;
+use Chukdo\Logger\Formatters\NullFormatter;
 
 /**
  * Gestionnaire des logs pour fichier

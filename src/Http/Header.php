@@ -1,7 +1,7 @@
 <?php namespace Chukdo\Http;
 
-Use \Chukdo\Json\Json;
-Use \Chukdo\Helper\Str;
+use Chukdo\Json\Json;
+use Chukdo\Helper\Str;
 
 /**
  * Gestion des entetes HTTP

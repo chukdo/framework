@@ -1,6 +1,6 @@
 <?php namespace Chukdo\Xml;
 
-Use \Chukdo\Helper\Is;
+use Chukdo\Helper\Is;
 Use IteratorAggregate;
 Use Traversable;
 Use Exception;

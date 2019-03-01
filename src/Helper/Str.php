@@ -1,6 +1,6 @@
 <?php namespace Chukdo\Helper;
 
-Use \Chukdo\Json\Json;
+use Chukdo\Json\Json;
 
 /**
  * Classe Str

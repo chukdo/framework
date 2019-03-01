@@ -1,10 +1,10 @@
 <?php namespace Chukdo\Logger\Handlers;
 
-use \Chukdo\Logger\Logger;
-use \Chukdo\Contracts\Logger\Handler as HandlerInterface;
-use \Chukdo\Contracts\Logger\Processor as ProcessorInterface;
-use \Chukdo\Contracts\Logger\Formatter as FormatterInterface;
-use \Chukdo\Logger\Formatters\JsonStringFormatter;
+use Chukdo\Logger\Logger;
+use Chukdo\Contracts\Logger\Handler as HandlerInterface;
+use Chukdo\Contracts\Logger\Processor as ProcessorInterface;
+use Chukdo\Contracts\Logger\Formatter as FormatterInterface;
+use Chukdo\Logger\Formatters\JsonStringFormatter;
 
 /**
  * Abstract class

@@ -1,9 +1,9 @@
 <?php namespace App\Providers;
 
-Use \Chukdo\Bootstrap\ServiceProvider;
-Use \Chukdo\Storage\ServiceLocator;
-Use \Chukdo\Storage\Wrappers\AzureStream;
-Use \Chukdo\Helper\Stream;
+use Chukdo\Bootstrap\ServiceProvider;
+use Chukdo\Storage\ServiceLocator;
+use Chukdo\Storage\Wrappers\AzureStream;
+use Chukdo\Helper\Stream;
 Use MicrosoftAzure\Storage\Blob\BlobRestProxy;
 
 class ServiceLocatorServiceProvider extends ServiceProvider {

@@ -4,8 +4,8 @@ use Chukdo\Xml\Xml;
 use Closure;
 use ArrayObject;
 
-use \Chukdo\Helper\Is;
-use \Chukdo\Helper\Str;
+use Chukdo\Helper\Is;
+use Chukdo\Helper\Str;
 
 /**
  * Manipulation des données

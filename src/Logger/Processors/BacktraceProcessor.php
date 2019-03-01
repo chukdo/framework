@@ -1,6 +1,6 @@
 <?php namespace Chukdo\Logger\Processors;
 
-use \Chukdo\Contracts\Logger\Processor as ProcessorInterface;
+use Chukdo\Contracts\Logger\Processor as ProcessorInterface;
 
 /**
  * Ajoute le debug_backtrace au log

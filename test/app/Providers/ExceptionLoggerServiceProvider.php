@@ -1,6 +1,6 @@
 <?php namespace App\Providers;
 
-Use \Chukdo\Bootstrap\ServiceProvider;
+use Chukdo\Bootstrap\ServiceProvider;
 
 class ExceptionLoggerServiceProvider extends ServiceProvider {
 

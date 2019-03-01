@@ -1,6 +1,6 @@
 <?php namespace Chukdo\Storage;
 
-Use \Chukdo\Helper\Str;
+use Chukdo\Helper\Str;
 
 /**
  * Gestion des fichiers uploadés

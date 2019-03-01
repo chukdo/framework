@@ -1,8 +1,8 @@
 <?php namespace Chukdo\Routing;
 
 Use \Closure;
-Use \Chukdo\Bootstrap\App;
-Use \Chukdo\Http\Request;
+use Chukdo\Bootstrap\App;
+use Chukdo\Http\Request;
 
 /**
  * Gestion des Routes
@@ -44,7 +44,7 @@ class Router
     public function __construct(App $app)
     {
         $this->app      = $app;
-        $this->request  = $app->make('\Chukdo\Http\Request');
+        $this->request  = $app->make('Chukdo\Http\Request');
     }
 
     /**

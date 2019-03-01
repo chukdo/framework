@@ -1,6 +1,6 @@
 <?php namespace Chukdo\Storage\Wrappers;
 
-Use \Chukdo\Storage\ServiceLocator;
+use Chukdo\Storage\ServiceLocator;
 Use \MicrosoftAzure\Storage\Blob\BlobRestProxy;
 
 /**

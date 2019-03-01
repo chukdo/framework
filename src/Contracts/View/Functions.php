@@ -1,6 +1,6 @@
 <?php namespace Chukdo\Contracts\View;
 
-Use \Chukdo\View\View;
+use Chukdo\View\View;
 
 /**
  * Interface d'enregistrement des functions pour le moteur de vue

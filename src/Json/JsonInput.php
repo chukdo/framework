@@ -1,7 +1,7 @@
 <?php namespace Chukdo\Json;
 
-Use \Chukdo\Validation\Validator;
-
+use Chukdo\Storage\FileUploaded;
+use Chukdo\Validation\Validator;
 
 /**
  * Gestion des inputs
@@ -40,14 +40,5 @@ class JsonInput extends Json
     public function file(string $name, string $allowedMimeTypes = null, int $maxFileSize = null): FileUploaded
     {
         return new FileUploaded($name, $allowedMimeTypes, $maxFileSize);
-    }
-
-    /**
-     * @param string $name
-     * @return mixed|null
-     */
-    public function input(string $name)
-    {
-        return $this->get($name);
     }
 }

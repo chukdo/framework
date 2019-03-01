@@ -1,6 +1,6 @@
 <?php namespace App\Providers;
 
-use \Chukdo\Bootstrap\ServiceProvider;
+use Chukdo\Bootstrap\ServiceProvider;
 
 class QueueServiceProvider extends ServiceProvider {
 

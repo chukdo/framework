@@ -1,8 +1,8 @@
 <?php namespace Chukdo\Storage\Wrappers;
 
-Use \Chukdo\Contracts\Storage\StreamWrapper as StreamWrapperInterface;
-Use \Chukdo\Contracts\Storage\Stream as StreamInterface;
-Use \Chukdo\Http\Url;
+use Chukdo\Contracts\Storage\StreamWrapper as StreamWrapperInterface;
+use Chukdo\Contracts\Storage\Stream as StreamInterface;
+use Chukdo\Http\Url;
 
 /**
  * Abstraction de la classe PHP StreamWrapper (File First Vision)

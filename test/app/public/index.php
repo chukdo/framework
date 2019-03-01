@@ -22,7 +22,7 @@ $loader->register();
 $app = new \Chukdo\Bootstrap\App();
 
 /** Declaration des facades */
-Use \Chukdo\Facades\Facade;
+use Chukdo\Facades\Facade;
 
 Facade::setFacadeApplication($app);
 Facade::setClassAlias(\Chukdo\Facades\Facade::class, 'Facade');

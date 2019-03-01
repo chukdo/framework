@@ -1,10 +1,12 @@
 <?php namespace Chukdo\Http;
 
-use \Chukdo\Bootstrap\App;
-use \Chukdo\Helper\Str;
-Use \Chukdo\Helper\Http;
-use \Chukdo\Json\Json;
-use \Chukdo\Json\JsonInput;
+use Chukdo\Bootstrap\App;
+use Chukdo\Helper\Str;
+use Chukdo\Helper\Http;
+use Chukdo\Json\Json;
+use Chukdo\Json\JsonInput;
+use Chukdo\Validation\Validator;
+use Chukdo\Storage\FileUploaded;
 
 /**
  * Gestion de requete HTTP entrante
@@ -46,7 +48,7 @@ class Request
      */
     public function __construct(App $app)
     {
-        $this->inputs   = $app->make('\Chukdo\Json\JsonInput');
+        $this->inputs   = $app->make('Chukdo\Json\JsonInput');
         $this->header   = new Header();
         $this->url      = new Url(Http::server('SCRIPT_URI'));
         $this->method   = Http::request('httpverb') ?: Http::server('REQUEST_METHOD');
@@ -65,6 +67,26 @@ class Request
                 }
             }
         }
+    }
+
+    /**
+     * @param iterable $rules
+     * @return Validator
+     */
+    public function validate(Iterable $rules): Validator
+    {
+        return $this->inputs->validate($rules);
+    }
+
+    /**
+     * @param string $name
+     * @param string|null $allowedMimeTypes
+     * @param int|null $maxFileSize
+     * @return FileUploaded
+     */
+    public function file(string $name, string $allowedMimeTypes = null, int $maxFileSize = null): FileUploaded
+    {
+        return $this->inputs->file($name, $allowedMimeTypes, $maxFileSize);
     }
 
     /**

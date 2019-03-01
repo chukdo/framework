@@ -112,6 +112,6 @@ class HandleExceptions
      */
     protected function getExceptionHandler()
     {
-        return $this->app->make('\Chukdo\Bootstrap\ExceptionHandler');
+        return $this->app->make('Chukdo\Bootstrap\ExceptionHandler');
     }
 }

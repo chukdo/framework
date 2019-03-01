@@ -1,6 +1,6 @@
 <?php namespace Chukdo\Db;
 
-use \Chukdo\Contracts\Db\Redis as RedisInterface;
+use Chukdo\Contracts\Db\Redis as RedisInterface;
 
 /**
  * Gestion de la base de donnée NOSQL Redis basé sur son protocole unifié

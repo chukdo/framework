@@ -1,7 +1,7 @@
 <?php namespace Chukdo\Storage\Wrappers;
 
-Use \Chukdo\Contracts\Db\Redis as RedisInterface;
-Use \Chukdo\Storage\ServiceLocator;
+use Chukdo\Contracts\Db\Redis as RedisInterface;
+use Chukdo\Storage\ServiceLocator;
 
 /**
  * Redis streamWrapper

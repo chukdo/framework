@@ -1,7 +1,7 @@
 <?php namespace Chukdo\Logger\Formatters;
 
-use \Chukdo\Contracts\Logger\Formatter as FormatterInterface;
-use \Chukdo\Json\Json;
+use Chukdo\Contracts\Logger\Formatter as FormatterInterface;
+use Chukdo\Json\Json;
 
 /**
  * Formatter de log par defaut

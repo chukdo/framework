@@ -1,9 +1,9 @@
 <?php namespace Chukdo\Logger;
 
-Use \Chukdo\Contracts\Logger\Logger as LoggerInterface;
-Use \Chukdo\Contracts\Logger\Handler as HandlerInterface;
-Use \Chukdo\Contracts\Logger\Processor as ProcessorInterface;
-Use \Chukdo\Contracts\Logger\Formatter as FormatterInterface;
+use Chukdo\Contracts\Logger\Logger as LoggerInterface;
+use Chukdo\Contracts\Logger\Handler as HandlerInterface;
+use Chukdo\Contracts\Logger\Processor as ProcessorInterface;
+use Chukdo\Contracts\Logger\Formatter as FormatterInterface;
 
 /**
  * Gestion des logs

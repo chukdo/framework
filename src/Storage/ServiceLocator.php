@@ -1,7 +1,7 @@
 <?php namespace Chukdo\Storage;
 
 Use \Closure;
-Use \Chukdo\Support\Singleton;
+use Chukdo\Support\Singleton;
 
 /**
  * Annuaire de ressource pour les flux de données

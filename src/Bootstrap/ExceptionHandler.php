@@ -1,10 +1,10 @@
 <?php namespace Chukdo\Bootstrap;
 
 Use \Exception;
-Use \Chukdo\Helper\Str;
-Use \Chukdo\Helper\Http;
-Use \Chukdo\Json\JsonException;
-Use \Chukdo\Contracts\Exception\Handler;
+use Chukdo\Helper\Str;
+use Chukdo\Helper\Http;
+use Chukdo\Json\JsonException;
+use Chukdo\Contracts\Exception\Handler;
 
 /**
  * Gestionnaire par défauts des exceptions
@@ -51,7 +51,7 @@ Class ExceptionHandler Implements Handler
      */
     public function render(Exception $e): void
     {
-        $response   = $this->app->make('\Chukdo\Http\Response');
+        $response   = $this->app->make('Chukdo\Http\Response');
         $message    = new JsonException();
 
         $message->set('Error', 'Error happened');

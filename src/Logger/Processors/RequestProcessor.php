@@ -1,7 +1,7 @@
 <?php namespace Chukdo\Logger\Processors;
 
-use \Chukdo\Contracts\Logger\Processor as ProcessorInterface;
-use \Chukdo\Helper\Http;
+use Chukdo\Contracts\Logger\Processor as ProcessorInterface;
+use Chukdo\Helper\Http;
 
 /**
  * Ajoute la request HTTP au log

@@ -1,9 +1,9 @@
 <?php namespace Chukdo\View\Functions;
 
 Use \Closure;
-Use \Chukdo\Contracts\View\Functions as FunctionsInterface;
-Use \Chukdo\View\View;
-Use \Chukdo\Helper\Str;
+use Chukdo\Contracts\View\Functions as FunctionsInterface;
+use Chukdo\View\View;
+use Chukdo\Helper\Str;
 
 /**
  * Fonctions basic pour le moteur de vue

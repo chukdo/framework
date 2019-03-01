@@ -1,9 +1,9 @@
 <?php namespace Chukdo\View;
 
 Use \Closure;
-Use \Chukdo\Helper\Str;
-Use \Chukdo\Http\Response;
-Use \Chukdo\Contracts\View\Functions;
+use Chukdo\Helper\Str;
+use Chukdo\Http\Response;
+use Chukdo\Contracts\View\Functions;
 
 /**
  * Moteur de template

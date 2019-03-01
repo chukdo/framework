@@ -1,6 +1,6 @@
 <?php namespace Chukdo\Facades;
 
-Use \Chukdo\Bootstrap\App;
+use Chukdo\Bootstrap\App;
 
 /**
  * Initialisation d'une facade

@@ -1,6 +1,6 @@
 <?php namespace Chukdo\Event;
 
-Use Chukdo\Bootstrap\AppException;
+use Chukdo\Bootstrap\AppException;
 
 /**
  * Gestion des exceptions
