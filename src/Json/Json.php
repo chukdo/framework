@@ -40,7 +40,7 @@ class Json extends \ArrayObject
     /**
      * @return $this
      */
-    public function self()
+    public function all()
     {
         return $this;
     }

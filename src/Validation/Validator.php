@@ -26,13 +26,42 @@ class Validator
     protected $rules = [];
 
     /**
+     * @var array
+     */
+    protected $messages = [
+        'required'  => 'Le champs' // gestion des langues ?
+    ];
+
+    /**
      * Validator constructor.
      * @param JsonInput $inputs
      * @param array $rules
+     * @param array $messages
      */
-    public function __construct(JsonInput $inputs, array $rules)
+    public function __construct(JsonInput $inputs, array $rules, array $messages = [])
     {
         $this->inputs   = $inputs;
         $this->rules    = $rules;
+        $this->messages = array_merge($this->messages, $messages);
+    }
+
+    public function validate()
+    {
+
+    }
+
+    public function validated()
+    {
+
+    }
+
+    public function fails()
+    {
+
+    }
+
+    public function errors()
+    {
+        // sous la forme d'un json
     }
 }
