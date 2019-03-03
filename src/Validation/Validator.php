@@ -28,9 +28,7 @@ class Validator
     /**
      * @var array
      */
-    protected $messages = [
-        'required'  => 'Le champs' // gestion des langues ?
-    ];
+    protected $messages = [];
 
     /**
      * Validator constructor.
@@ -42,12 +40,39 @@ class Validator
     {
         $this->inputs   = $inputs;
         $this->rules    = $rules;
-        $this->messages = array_merge($this->messages, $messages);
+        $this->messages = $messages;
+    }
+
+    /**
+     * @return array
+     */
+    public function rules(): array
+    {
+        return $this->rules;
+    }
+
+    /**
+     * @return array
+     */
+    public function messages(): array
+    {
+        return $this->messages;
+    }
+
+    public function register()
+    {
+        // objet
+        // getRules()
     }
 
     public function validate()
     {
-
+        /**
+        each $rules as $path => $rule
+         * explode(| $rule)
+         * input->wildcard($path)
+         * check call function issu d'un tableau de fonction registreed
+        */
     }
 
     public function validated()

@@ -1,7 +1,9 @@
 <?php namespace Chukdo\Json;
 
+use Chukdo\Storage\Storage;
+
 /**
- * Gestion des fichiers de configuration
+ * Gestion des fichiers de langues
  *
  * @package     Json
  * @version 	1.0.0
@@ -9,20 +11,23 @@
  * @since 		08/01/2019
  * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class JsonConf extends Json
+class JsonLang extends Json
 {
     /**
-     * @param string $file
+     * @param string $dir
      * @return bool
      */
-    public function load(string $file): bool
+    public function load(string $dir): bool
     {
-        if (file_exists($file)) {
+        $r      = false;
+        $files  = (new Storage())->files($dir, '/\.json$/');
+
+        foreach ($files as $file) {
             $load = new Json(file_get_contents($file));
             $this->merge($load->toSimpleArray(), true);
-            return true;
+            $r = true;
         }
 
-        return false;
+        return $r;
     }
 }

@@ -3,6 +3,7 @@
 function dd($data) {echo("Dump and Die\n" . (php_sapi_name() == 'cli' ? '' : '<pre>'));var_dump($data);exit;}
 
 /** Definition des chemins */
+DEFINE('LANG_PATH', '/storage/www/chukdo/test/app/Lang/fr/');
 DEFINE('CONF_PATH', '/storage/www/chukdo/test/app/Conf/');
 DEFINE('APP_PATH', '/storage/www/chukdo/test/app/');
 DEFINE('TPL_PATH', APP_PATH . 'Views/');
@@ -27,7 +28,9 @@ use Chukdo\Facades\Facade;
 Facade::setFacadeApplication($app);
 Facade::setClassAlias(\Chukdo\Facades\Facade::class, 'Facade');
 Facade::setClassAlias(\Chukdo\Facades\App::class, 'App');
+Facade::setClassAlias(\Chukdo\Facades\Storage::class, 'Storage');
 Facade::setClassAlias(\Chukdo\Facades\Conf::class, 'Conf');
+Facade::setClassAlias(\Chukdo\Facades\Lang::class, 'Lang');
 Facade::setClassAlias(\Chukdo\Facades\Event::class, 'Event');
 Facade::setClassAlias(\Chukdo\Facades\Input::class, 'Input');
 Facade::setClassAlias(\Chukdo\Facades\Request::class, 'Request');
@@ -36,8 +39,9 @@ Facade::setClassAlias(\Chukdo\Facades\View::class, 'View');
 Facade::setClassAlias(\Chukdo\Facades\Router::class, 'Router');
 
 /** Configuration */
-Conf::loadConf(CONF_PATH.'Conf.json');
-//Conf::loadConf(CONF_PATH.'conf_prod.json');
+Lang::load(LANG_PATH);
+Conf::load(CONF_PATH.'Conf.json');
+//Conf::load(CONF_PATH.'conf_prod.json');
 
 /** App */
 App::env(App::getConf('env'));

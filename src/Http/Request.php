@@ -69,6 +69,10 @@ class Request
         }
     }
 
+    // function rules()
+    // function messages()
+    // function filters()
+
     /**
      * @param iterable $rules
      * @return Validator
