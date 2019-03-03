@@ -1,7 +1,7 @@
 <?php namespace Chukdo\Validation;
 
-use Chukdo\Http\Input;
 use Chukdo\Json\JsonInput;
+use Chukdo\Json\JsonLang;
 
 /**
  * Validation de données
@@ -34,9 +34,9 @@ class Validator
      * Validator constructor.
      * @param JsonInput $inputs
      * @param array $rules
-     * @param array $messages
+     * @param JsonLang $messages
      */
-    public function __construct(JsonInput $inputs, array $rules, array $messages = [])
+    public function __construct(JsonInput $inputs, array $rules, JsonLang $messages)
     {
         $this->inputs   = $inputs;
         $this->rules    = $rules;

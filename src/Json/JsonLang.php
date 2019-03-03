@@ -1,6 +1,7 @@
 <?php namespace Chukdo\Json;
 
 use Chukdo\Storage\Storage;
+use Chukdo\Helper\Is;
 
 /**
  * Gestion des fichiers de langues
@@ -19,15 +20,25 @@ class JsonLang extends Json
      */
     public function load(string $dir): bool
     {
-        $r      = false;
-        $files  = (new Storage())->files($dir, '/\.json$/');
+        $storage    = new Storage();
+        $files      = $storage->files($dir, '/\.json$/');
 
-        foreach ($files as $file) {
-            $load = new Json(file_get_contents($file));
-            $this->merge($load->toSimpleArray(), true);
-            $r = true;
+        if (count($files) == 0) {
+            return false;
         }
 
-        return $r;
+        foreach ($files as $file) {
+            $json = $storage->get($file);
+
+            if (Is::json($json)) {
+                foreach (json_decode($json, true) as $k => $v) {
+                    $this->offsetSet($k, $v);
+                }
+            } else {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

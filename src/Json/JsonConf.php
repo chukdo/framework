@@ -1,5 +1,7 @@
 <?php namespace Chukdo\Json;
 
+use Chukdo\Storage\Storage;
+
 /**
  * Gestion des fichiers de configuration
  *
@@ -17,8 +19,10 @@ class JsonConf extends Json
      */
     public function load(string $file): bool
     {
-        if (file_exists($file)) {
-            $load = new Json(file_get_contents($file));
+        $storage = new Storage();
+
+        if ($storage->exists($file)) {
+            $load = new Json($storage->get($file));
             $this->merge($load->toSimpleArray(), true);
             return true;
         }

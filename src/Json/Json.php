@@ -215,7 +215,7 @@ class Json extends \ArrayObject
     public function offsetSet($key, $value): self
     {
         if (Is::arr($value)) {
-            parent::offsetSet($key, new Json($value));
+            parent::offsetSet($key, new self($value));
         } else {
             parent::offsetSet($key, $value);
         }
@@ -389,9 +389,9 @@ class Json extends \ArrayObject
      * @param mixed ...$offsets
      * @return Json
      */
-    public function only(...$offsets): Json
+    public function only(...$offsets): self
     {
-        $only = new Json();
+        $only = new self();
 
         foreach ($offsets as $offsetList) {
             foreach ((array) $offsetList as $offset) {
@@ -406,9 +406,9 @@ class Json extends \ArrayObject
      * @param mixed ...$offsets
      * @return Json
      */
-    public function except(...$offsets): Json
+    public function except(...$offsets): self
     {
-        $except = new Json($this->getArrayCopy());
+        $except = new self($this->getArrayCopy());
 
         foreach ($offsets as $offsetList) {
             foreach ((array) $offsetList as $offset) {
@@ -453,14 +453,14 @@ class Json extends \ArrayObject
      * @param string $path
      * @return Json
      */
-    public function wildcard(string $path): Json
+    public function wildcard(string $path): self
     {
         $path       = rtrim($path, '.*');
         $arr        = new Arr(Str::split($path, '.'));
         $firstPath  = $arr->getFirstAndRemove();
         $emptyPath  = $arr->empty();
         $endPath    = $arr->join('.');
-        $json       = new Json();
+        $json       = new self();
         $get        = $this->offsetGet($firstPath);
 
         if ($firstPath == '*') {

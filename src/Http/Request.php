@@ -21,6 +21,11 @@ use Chukdo\Storage\FileUploaded;
 class Request
 {
     /**
+     * @var App
+     */
+    protected $app;
+
+    /**
      * @param JsonInput
      */
     protected $inputs;
@@ -48,6 +53,7 @@ class Request
      */
     public function __construct(App $app)
     {
+        $this->app      = $app;
         $this->inputs   = $app->make('Chukdo\Json\JsonInput');
         $this->header   = new Header();
         $this->url      = new Url(Http::server('SCRIPT_URI'));
@@ -76,10 +82,12 @@ class Request
     /**
      * @param iterable $rules
      * @return Validator
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
     public function validate(Iterable $rules): Validator
     {
-        return $this->inputs->validate($rules);
+        return $this->inputs->validate($rules, $this->app->make('Chukdo\Json\JsonLang'));
     }
 
     /**

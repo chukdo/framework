@@ -24,11 +24,12 @@ class JsonInput extends Json
 
     /**
      * @param iterable $rules
+     * @param JsonLang $messages
      * @return Validator
      */
-    public function validate(Iterable $rules): Validator
+    public function validate(Iterable $rules, JsonLang $messages): Validator
     {
-        return new Validator($this, (array) $rules);
+        return new Validator($this, (array) $rules, $messages);
     }
 
     /**

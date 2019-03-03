@@ -1,3 +1,5 @@
 {
-  "info": "Chukdo v1"
+  "validation" : {
+    "required" : "Le champs est requis"
+  }
 }

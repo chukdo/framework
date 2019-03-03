@@ -100,62 +100,62 @@ class Storage
     }
 
     /**
-     * @param string $path
+     * @param string $file
      * @return bool
      */
-    public function exists(string $path): bool
+    public function exists(string $file): bool
     {
-        return file_exists($path);
+        return file_exists($file);
     }
 
     /**
-     * @param string $path
+     * @param string $file
      * @return int
      */
-    public function size(string $path): int
+    public function size(string $file): int
     {
-        return filesize($path);
+        return filesize($file);
     }
 
     /**
-     * @param string $path
+     * @param string $file
      * @param string $content
      * @return bool
      */
-    public function put(string $path, string $content): bool
+    public function put(string $file, string $content): bool
     {
-        return (bool) file_put_contents($path, $content);
+        return (bool) file_put_contents($file, $content);
     }
 
     /**
-     * @param string $path
+     * @param string $file
      * @return string
      */
-    public function get(string $path): string
+    public function get(string $file): string
     {
-        return file_get_contents($path);
+        return file_get_contents($file);
     }
 
     /**
-     * @param string $oldPath
-     * @param string $newPath
+     * @param string $oldFile
+     * @param string $newFile
      * @return bool
      */
-    public function copy(string $oldPath, string $newPath): bool
+    public function copy(string $oldFile, string $newFile): bool
     {
-        return $this->put($newPath, $this->get($oldPath));
+        return $this->put($newFile, $this->get($oldFile));
     }
 
     /**
-     * @param string $oldPath
-     * @param string $newPath
+     * @param string $oldFile
+     * @param string $newFile
      * @return bool
      */
-    public function move(string $oldPath, string $newPath): bool
+    public function move(string $oldFile, string $newFile): bool
     {
-        $r  = $this->put($newPath, $this->get($oldPath));
+        $r  = $this->put($newFile, $this->get($oldFile));
 
-        $this->delete($oldPath);
+        $this->delete($oldFile);
 
         return $r;
     }
