@@ -49,7 +49,7 @@ class View
     /**
      * View constructor.
      * @param string|null $folder
-     * @param Response $response
+     * @param Response|null $response
      */
     public function __construct(string $folder = null, Response $response = null)
     {
