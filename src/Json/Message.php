@@ -4,77 +4,50 @@
  * Gestion des messages
  *
  * @package     Json
- * @version 	1.0.0
- * @copyright 	licence MIT, Copyright (C) 2019 Domingo
- * @since 		08/01/2019
+ * @version    1.0.0
+ * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @since        08/01/2019
  * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Message extends Json
 {
     /**
+     * @var
+     */
+    protected $name;
+
+    /**
      * Message constructor.
+     *
+     * @param string $name
      */
-    public function __construct()
+    public function __construct( string $name )
     {
-        parent::__construct([
-            'result'    => '',
-            'messages'  => []
-        ]);
+        $this->name = $name;
+
+        parent::__construct( [] );
     }
 
     /**
-     * @param string $message
-     * @return Message
+     * @param string|null $title
+     * @param string|null $color
+     * @param string|null $widthFirstCol
+     *
+     * @return string
      */
-    public function notice(string $message): self
+    public function toHtml( string $title = null, string $color = null, string $widthFirstCol = null ): string
     {
-        $this
-            ->offsetSet('result', 'notice')
-            ->offsetGet('messages')
-            ->append($message);
-
-        return $this;
+        return parent::toHtml( $this->name );
     }
 
     /**
-     * @param string $message
-     * @return Message
+     * @return array
      */
-    public function success(string $message): self
+    public function toArray(): array
     {
-        $this
-            ->offsetSet('result', 'success')
-            ->offsetGet('messages')
-            ->append($message);
-
-        return $this;
-    }
-
-    /**
-     * @param string $message
-     * @return Message
-     */
-    public function warning(string $message): self
-    {
-        $this
-            ->offsetSet('result', 'warning')
-            ->offsetGet('messages')
-            ->append($message);
-
-        return $this;
-    }
-
-    /**
-     * @param string $message
-     * @return Message
-     */
-    public function error(string $message): self
-    {
-        $this
-            ->offsetSet('result', 'error')
-            ->offsetGet('messages')
-            ->append($message);
-
-        return $this;
+        return [
+            'result' => $this->name,
+            'messages' => $this->getArrayCopy()
+        ];
     }
 }

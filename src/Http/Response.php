@@ -9,12 +9,11 @@ use Chukdo\Helper\Str;
  * Gestion des entetes HTTP
  *
  * @package     http
- * @version 	1.0.0
- * @copyright 	licence MIT, Copyright (C) 2019 Domingo
- * @since 		08/01/2019
+ * @version    1.0.0
+ * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @since        08/01/2019
  * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-
 class Response
 {
     /**
@@ -42,22 +41,23 @@ class Response
      */
     public function __construct()
     {
-        $this->header   = new Header();
+        $this->header = new Header();
         $this->header
-            ->setStatus(200)
-            ->setDate(time())
-            ->setServer('Apache')
-            ->setConnection('close')
-            ->setCacheControl(false, false, 'no-store, no-cache, must-revalidate');
+            ->setStatus( 200 )
+            ->setDate( time() )
+            ->setServer( 'Apache' )
+            ->setConnection( 'close' )
+            ->setCacheControl( false, false, 'no-store, no-cache, must-revalidate' );
     }
 
     /**
      * @param int $status
+     *
      * @return Response
      */
-    public function status(int $status): self
+    public function status( int $status ): self
     {
-        $this->header->setStatus($status);
+        $this->header->setStatus( $status );
 
         return $this;
     }
@@ -65,22 +65,24 @@ class Response
     /**
      * @param string $name
      * @param string $header
+     *
      * @return Response
      */
-    public function header(string $name, string $header): self
+    public function header( string $name, string $header ): self
     {
-        $this->header->setHeader($name, $header);
+        $this->header->setHeader( $name, $header );
 
         return $this;
     }
 
     /**
      * @param iterable $headers
+     *
      * @return Response
      */
-    public function headers(iterable $headers): self
+    public function headers( iterable $headers ): self
     {
-        $this->header->setHeaders($headers);
+        $this->header->setHeaders( $headers );
 
         return $this;
     }
@@ -88,22 +90,24 @@ class Response
     /**
      * @param string $name
      * @param string $cookie
+     *
      * @return Response
      */
-    public function cookie(string $name, string $cookie): self
+    public function cookie( string $name, string $cookie ): self
     {
-        $this->header->setCookie($name, $cookie);
+        $this->header->setCookie( $name, $cookie );
 
         return $this;
     }
 
     /**
      * @param iterable $cookies
+     *
      * @return Response
      */
-    public function cookies(iterable $cookies): self
+    public function cookies( iterable $cookies ): self
     {
-        $this->header->setCookies($cookies);
+        $this->header->setCookies( $cookies );
 
         return $this;
     }
@@ -112,17 +116,18 @@ class Response
      * @param string $file
      * @param string|null $name
      * @param string|null $type
+     *
      * @return Response
      */
-    public function download(string $file, string $name = null, string $type = null): self
+    public function download( string $file, string $name = null, string $type = null ): self
     {
-        $name = $name ?: basename($file);
-        $type = $type ?: Http::mimeContentType($name);
+        $name = $name ?: basename( $file );
+        $type = $type ?: Http::mimeContentType( $name );
 
         $this->file = $file;
         $this->header
-            ->setHeader('Content-Disposition', 'attachment; filename="'.$name.'"')
-            ->setHeader('Content-Type', $type);
+            ->setHeader( 'Content-Disposition', 'attachment; filename="' . $name . '"' )
+            ->setHeader( 'Content-Type', $type );
 
         return $this;
     }
@@ -131,26 +136,28 @@ class Response
      * @param string $file
      * @param string|null $name
      * @param string|null $type
+     *
      * @return Response
      */
-    public function file(string $file, string $name = null, string $type = null): self
+    public function file( string $file, string $name = null, string $type = null ): self
     {
-        $name = $name ?: basename($file);
-        $type = $type ?: Http::mimeContentType($name);
+        $name = $name ?: basename( $file );
+        $type = $type ?: Http::mimeContentType( $name );
 
         $this->file = $file;
         $this->header
-            ->setHeader('Content-Disposition', 'inline; filename="'.$name.'"')
-            ->setHeader('Content-Type', $type);
+            ->setHeader( 'Content-Disposition', 'inline; filename="' . $name . '"' )
+            ->setHeader( 'Content-Type', $type );
 
         return $this;
     }
 
     /**
      * @param string $content
+     *
      * @return Response
      */
-    public function content(string $content): self
+    public function content( string $content ): self
     {
         $this->content = $content;
 
@@ -159,39 +166,42 @@ class Response
 
     /**
      * @param string $content
+     *
      * @return Response
      */
-    public function html(string $content): self
+    public function html( string $content ): self
     {
-        $this->header->setHeader('Content-Type', 'text/html; charset=utf-8');
+        $this->header->setHeader( 'Content-Type', 'text/html; charset=utf-8' );
 
-        $this->content($content);
+        $this->content( $content );
 
         return $this;
     }
 
     /**
      * @param $content
+     *
      * @return Response
      */
-    public function text($content): self
+    public function text( $content ): self
     {
-        $this->header->setHeader('Content-Type', 'text/plain; charset=utf-8');
+        $this->header->setHeader( 'Content-Type', 'text/plain; charset=utf-8' );
 
-        $this->content((new Json($content))->toJson());
+        $this->content( ( new Json( $content ) )->toJson() );
 
         return $this;
     }
 
     /**
      * @param $content
+     *
      * @return Response
      */
-    public function json($content): self
+    public function json( $content ): self
     {
-        $this->header->setHeader('Content-Type', 'application/json; charset=utf-8');
+        $this->header->setHeader( 'Content-Type', 'application/json; charset=utf-8' );
 
-        $this->content((new Json($content))->toJson());
+        $this->content( ( new Json( $content ) )->toJson() );
 
         return $this;
     }
@@ -199,13 +209,14 @@ class Response
     /**
      * @param $content
      * @param bool $html
+     *
      * @return Response
      */
-    public function xml($content, bool $html = false): self
+    public function xml( $content, bool $html = false ): self
     {
-        $this->header->setHeader('Content-Type', 'text/xml; charset=utf-8');
+        $this->header->setHeader( 'Content-Type', 'text/xml; charset=utf-8' );
 
-        $this->content((new Xml())->import($content)->toXmlString($html, true));
+        $this->content( ( new Xml() )->import( $content )->toXmlString( $html, true ) );
 
         return $this;
     }
@@ -213,11 +224,12 @@ class Response
     /**
      * @param string $url
      * @param int $code
+     *
      * @return Response
      */
-    public function redirect(string $url, int $code = 307): self
+    public function redirect( string $url, int $code = 307 ): self
     {
-        $this->header->setLocation($url, $code);
+        $this->header->setLocation( $url, $code );
         $this->send();
 
         return $this;
@@ -247,20 +259,20 @@ class Response
     public function send(): self
     {
         $hasContent = $this->content != null;
-        $hasFile    = $this->file != null;
+        $hasFile = $this->file != null;
 
-        if ($hasContent) {
+        if ( $hasContent ) {
             $this->sendContentResponse();
 
-        } else if ($hasFile) {
+        } else if ( $hasFile ) {
             $this->sendDownloadResponse();
 
         } else {
             $this->sendHeaderResponse();
         }
 
-        if ($this->deleteFileAfterSend) {
-            unlink($this->file);
+        if ( $this->deleteFileAfterSend ) {
+            unlink( $this->file );
         }
 
         return $this;
@@ -271,14 +283,14 @@ class Response
      */
     protected function sendHeaderResponse(): self
     {
-        if (headers_sent()) {
+        if ( headers_sent() ) {
             return $this;
         }
 
         header_remove();
 
-        foreach (explode("\n", $this->header->send()) as $header) {
-            header($header, true);
+        foreach ( explode( "\n", $this->header->send() ) as $header ) {
+            header( $header, true );
         }
 
         return $this;
@@ -291,20 +303,20 @@ class Response
     {
         $content = $this->content;
 
-        if (Str::contain(Http::server('HTTP_ACCEPT_ENCODING'), 'deflate')) {
-            $this->header->setHeader('Content-Encoding', 'deflate');
-            $content = gzdeflate($this->content);
+        if ( Str::contain( Http::server( 'HTTP_ACCEPT_ENCODING' ), 'deflate' ) ) {
+            $this->header->setHeader( 'Content-Encoding', 'deflate' );
+            $content = gzdeflate( $this->content );
 
-        } else if (Str::contain(Http::server('HTTP_ACCEPT_ENCODING'), 'gzip')) {
-            $this->header->setHeader('Content-Encoding', 'gzip');
-            $content = gzencode($this->content);
+        } else if ( Str::contain( Http::server( 'HTTP_ACCEPT_ENCODING' ), 'gzip' ) ) {
+            $this->header->setHeader( 'Content-Encoding', 'gzip' );
+            $content = gzencode( $this->content );
         }
 
-        if ($this->header->getHeader('Transfer-Encoding') == 'chunked') {
+        if ( $this->header->getHeader( 'Transfer-Encoding' ) == 'chunked' ) {
             $this->sendHeaderResponse();
 
-            foreach (str_split($content, 4096) as $c) {
-                $l = dechex(strlen($c));
+            foreach ( str_split( $content, 4096 ) as $c ) {
+                $l = dechex( strlen( $c ) );
 
                 echo "$l\r\n$c\r\n";
             }
@@ -312,7 +324,7 @@ class Response
             echo "0\r\n";
 
         } else {
-            $this->header->setHeader('Content-Length', strlen($content));
+            $this->header->setHeader( 'Content-Length', strlen( $content ) );
             $this->sendHeaderResponse();
 
             echo $content;
@@ -326,26 +338,26 @@ class Response
      */
     protected function sendDownloadResponse(): self
     {
-        if ($this->header->getHeader('Transfer-Encoding') == 'chunked') {
+        if ( $this->header->getHeader( 'Transfer-Encoding' ) == 'chunked' ) {
             $this->sendHeaderResponse();
 
-            $f = fopen($this->file, 'rb');
+            $f = fopen( $this->file, 'rb' );
 
-            while (!feof($f)) {
-                $c = fread($f, 131072);
-                $l = dechex(strlen($c));
+            while ( !feof( $f ) ) {
+                $c = fread( $f, 131072 );
+                $l = dechex( strlen( $c ) );
 
                 echo "$l\r\n$c\r\n";
             }
 
-            fclose($f);
+            fclose( $f );
 
             echo "0\r\n";
 
         } else {
-            $this->header->setHeader('Content-Length', filesize($this->file));
+            $this->header->setHeader( 'Content-Length', filesize( $this->file ) );
             $this->sendHeaderResponse();
-            readfile($this->file);
+            readfile( $this->file );
         }
 
         return $this;

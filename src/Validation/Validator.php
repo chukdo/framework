@@ -2,19 +2,18 @@
 
 use Chukdo\Json\Input;
 use Chukdo\Json\Lang;
-use Chukdo\Json\Message;
 use Chukdo\Contracts\Validation\Validate as ValidateInterface;
+use Chukdo\Json\Message;
 
 /**
  * Validation de données
  *
  * @package     Validation
- * @version 	1.0.0
- * @copyright 	licence MIT, Copyright (C) 2019 Domingo
- * @since 		08/01/2019
+ * @version    1.0.0
+ * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @since        08/01/2019
  * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-
 class Validator
 {
     /**
@@ -38,21 +37,37 @@ class Validator
     protected $validate;
 
     /**
+     * @var Lang
+     */
+    protected $messages;
+
+    /**
      * @var Message
      */
-    protected $message;
+    protected $error;
 
     /**
      * Validator constructor.
+     *
      * @param Input $inputs
      * @param array $rules
      * @param Lang $messages
      */
-    public function __construct(Input $inputs, array $rules, Lang $messages)
+    public function __construct( Input $inputs, array $rules, Lang $messages )
     {
+        $this->inputs = $inputs;
+        $this->messages = $messages;
         $this->validate = new Validate();
-        $this->rules    = new Rules($inputs, $rules, $messages, $this->validate);
-        $this->message  = new Message();
+        $this->rules = new Rules( $rules );
+        $this->error = new Message( 'error' );
+    }
+
+    /**
+     * @return Input
+     */
+    public function inputs(): Input
+    {
+        return $this->inputs;
     }
 
     /**
@@ -64,31 +79,46 @@ class Validator
     }
 
     /**
-     * @return Message
+     * @return Lang
      */
-    public function messages(): Message
+    public function messages(): Lang
     {
-        return $this->message;
+        return $this->messages;
     }
 
     /**
      * @param ValidateInterface $validate
+     *
      * @return Validator
      */
-    public function register(ValidateInterface $validate): self
+    public function register( ValidateInterface $validate ): self
     {
-        $this->validate->register($validate);
+        $this->validate->register( $validate );
 
         return $this;
     }
 
-    public function validate()
+    /**
+     * @return bool
+     */
+    public function validate(): bool
     {
-        foreach ($this->rules() as $rule) {
-            if (!$rule->validate()) {
-                $this->message->error($rule->getMessage());
+        $r = true;
+
+        foreach ( $this->rules() as $rule ) {
+            if ( !$this->validate->validate( $rule, $this->inputs(), $this->messages() ) ) {
+                $r .= false;
             }
         }
+
+        // error $this->messages()->get($rule->namespace()) || $this->messages()->get($rule->name()) || throw exception(message no exist)
+        // validate => passe error
+        // rule.name() => correspondance en erreur dans this->inputs !!!
+
+        //$this->error->offsetSet($rule->name(), $this->messages()->get());
+        // $rule->rule() == int / required account.price / account.mail => champ account[mail] to.*.email => to[0][email] et to[1][email]
+
+        return $r;
     }
 
     /**
@@ -96,7 +126,7 @@ class Validator
      */
     public function validated(): bool
     {
-        if ($this->validated === null) {
+        if ( $this->validated === null ) {
             $this->validate();
         }
 
@@ -116,6 +146,6 @@ class Validator
      */
     public function errors(): Message
     {
-        return $this->message->offsetGet('messages');
+        return $this->error;
     }
 }

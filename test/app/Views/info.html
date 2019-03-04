@@ -5,13 +5,14 @@
     <title><?=$this->j('title')?></title>
 </head>
 <body>
-    <h1><?=$this->j('title', 'strtoupper')?></h1>
-    <ul>
+<h1><?=$this->j('title', 'strtoupper')?></h1>
+<ul>
     <?php foreach($this->j('articles.auto') as $auto): ?>
-        <li>
-            <?=$this->v($auto, 'removeSpecialChars|ucfirst')?><?php if ($this->v($this->contain($auto, 'audi'))): ?> <b>Voiture de luxe trouvé</b><?php endif; ?>
-        </li>
+    <li>
+        <?=$this->v($auto, 'removeSpecialChars|ucfirst')?><?php if ($this->v($this->contain($auto, 'audi'))): ?> <b>Voiture
+        de luxe trouvé</b><?php endif; ?>
+    </li>
     <?php endforeach; ?>
-    </ul>
+</ul>
 </body>
 </html>

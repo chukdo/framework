@@ -6,8 +6,8 @@ Use \MicrosoftAzure\Storage\Blob\BlobRestProxy;
 /**
  * Azure streamWrapper
  *
- * @copyright 	licence MIT, Copyright (C) 2015 Domingo
- * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
+ * @copyright    licence MIT, Copyright (C) 2015 Domingo
+ * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class AzureStream extends AbstractStream
 {
@@ -28,13 +28,13 @@ class AzureStream extends AbstractStream
         $scheme = $this->getScheme();
 
         try {
-            $stream = ServiceLocator::getInstance()->getResource($scheme);
-        } catch (\Exception $e) {
-            throw new StreamException(sprintf('[%s] is not a registred resource', $scheme), $e->getCode(), $e);
+            $stream = ServiceLocator::getInstance()->getResource( $scheme );
+        } catch ( \Exception $e ) {
+            throw new StreamException( sprintf( '[%s] is not a registred resource', $scheme ), $e->getCode(), $e );
         }
 
-        if (!($stream instanceof BlobRestProxy)) {
-            throw new StreamException(sprintf('service [%s] is not a azure BlobRestProxy instance', $scheme));
+        if ( !( $stream instanceof BlobRestProxy ) ) {
+            throw new StreamException( sprintf( 'service [%s] is not a azure BlobRestProxy instance', $scheme ) );
         }
 
         return $stream;
@@ -48,7 +48,7 @@ class AzureStream extends AbstractStream
      */
     protected function getStream(): BlobRestProxy
     {
-        if ($this->stream instanceof BlobRestProxy) {
+        if ( $this->stream instanceof BlobRestProxy ) {
             return $this->stream;
         }
 
@@ -63,9 +63,9 @@ class AzureStream extends AbstractStream
      */
     public function streamGet()
     {
-        if ($this->streamContent == null) {
-            $this->streamContent    = stream_get_contents($this->getStream()->getBlob($this->getHost(), $this->getPath())->getContentStream());
-            $this->streamLenght     = strlen($this->streamContent);
+        if ( $this->streamContent == null ) {
+            $this->streamContent = stream_get_contents( $this->getStream()->getBlob( $this->getHost(), $this->getPath() )->getContentStream() );
+            $this->streamLenght = strlen( $this->streamContent );
         }
 
         return $this->streamContent;
@@ -76,19 +76,20 @@ class AzureStream extends AbstractStream
      *
      * @param int $offset
      * @param int $length
+     *
      * @return string|null
      * @throws StreamException
      */
-    public function streamGetRange(int $offset, int $length): ?string
+    public function streamGetRange( int $offset, int $length ): ?string
     {
-        if ($this->streamContent == null) {
+        if ( $this->streamContent == null ) {
             $this->streamGet();
         }
 
-        if ($offset >= $this->streamLenght) {
+        if ( $offset >= $this->streamLenght ) {
             return null;
         } else {
-            return substr($this->streamContent, $offset, $length);
+            return substr( $this->streamContent, $offset, $length );
         }
     }
 
@@ -97,36 +98,39 @@ class AzureStream extends AbstractStream
      *
      * @param int $offset
      * @param string $content
+     *
      * @return bool
      * @throws StreamException
      */
-    public function streamSetRange(int $offset, string $content): bool
+    public function streamSetRange( int $offset, string $content ): bool
     {
-        throw new StreamException('[streamGetRange] not implemented');
+        throw new StreamException( '[streamGetRange] not implemented' );
     }
 
     /**
      * Ajoute du contenu au debut du fichier
      *
      * @param string|null $content
+     *
      * @return bool
      * @throws StreamException
      */
-    public function streamSet(?string $content): bool
+    public function streamSet( ?string $content ): bool
     {
-        return (bool) $this->getStream()->createBlockBlob($this->getHost(), $this->getPath(), $content);
+        return (bool) $this->getStream()->createBlockBlob( $this->getHost(), $this->getPath(), $content );
     }
 
     /**
      * Ajoute du contenu à la fin du fichier
      *
      * @param string $content
+     *
      * @return bool
      * @throws StreamException
      */
-    public function streamAppend(string $content): bool
+    public function streamAppend( string $content ): bool
     {
-        return (bool) $this->getStream()->appendBlock($this->getHost(), $this->getPath(), $content);
+        return (bool) $this->getStream()->appendBlock( $this->getHost(), $this->getPath(), $content );
     }
 
     /**
@@ -138,7 +142,8 @@ class AzureStream extends AbstractStream
     {
         try {
             return (bool) $this->streamSize() > 0;
-        } catch (\Throwable $e) {}
+        } catch ( \Throwable $e ) {
+        }
 
         return false;
     }
@@ -151,9 +156,9 @@ class AzureStream extends AbstractStream
      */
     public function streamSize(): int
     {
-        if ($this->streamLenght == 0) {
+        if ( $this->streamLenght == 0 ) {
             $this->streamLenght = (int) $this->getStream()
-                ->getBlob($this->getHost(), $this->getPath())
+                ->getBlob( $this->getHost(), $this->getPath() )
                 ->getProperties()
                 ->getContentLength();
         }
@@ -169,7 +174,7 @@ class AzureStream extends AbstractStream
      */
     public function streamDelete(): bool
     {
-        $this->getStream()->deleteBlob($this->getHost(), $this->getPath());
+        $this->getStream()->deleteBlob( $this->getHost(), $this->getPath() );
         return true;
     }
 
@@ -177,13 +182,14 @@ class AzureStream extends AbstractStream
      * Renomme le fichier ou le dossier
      *
      * @param string $path
+     *
      * @return bool
      * @throws StreamException
      */
-    public function streamRename(string $path): bool
+    public function streamRename( string $path ): bool
     {
-        $this->getStream()->copyBlob($this->getHost(), $path, $this->getHost(), $this->getPath());
-        $this->getStream()->deleteBlob($this->getHost(), $this->getPath());
+        $this->getStream()->copyBlob( $this->getHost(), $path, $this->getHost(), $this->getPath() );
+        $this->getStream()->deleteBlob( $this->getHost(), $this->getPath() );
         return true;
     }
 
@@ -191,9 +197,10 @@ class AzureStream extends AbstractStream
      * Crée un dossier
      *
      * @param bool $recursive
+     *
      * @return bool
      */
-    public function streamSetDir(bool $recursive): bool
+    public function streamSetDir( bool $recursive ): bool
     {
         return true;
     }
@@ -226,23 +233,23 @@ class AzureStream extends AbstractStream
      */
     public function streamListDir(): array
     {
-        $path       = $this->getPath();
-        $blobs      = $this->getStream()->listBlobs($this->getHost())->getBlobs();
-        $list       = [];
+        $path = $this->getPath();
+        $blobs = $this->getStream()->listBlobs( $this->getHost() )->getBlobs();
+        $list = [];
 
-        foreach ($blobs as $blob) {
+        foreach ( $blobs as $blob ) {
             $name = $blob->getName();
 
-            if ($path) {
-                if (strpos($name, $path) === 0) {
-                    $list[] = trim(substr($name, strlen($path)), '/');
+            if ( $path ) {
+                if ( strpos( $name, $path ) === 0 ) {
+                    $list[] = trim( substr( $name, strlen( $path ) ), '/' );
                 }
             } else {
                 $list[] = $name;
             }
         }
 
-        natcasesort($list);
+        natcasesort( $list );
 
         return $list;
     }
@@ -251,9 +258,10 @@ class AzureStream extends AbstractStream
      * Defini ou retourne la derniere date d'acces au fichier
      *
      * @param bool $time
+     *
      * @return int
      */
-    public function streamAccessTime($time = false): int
+    public function streamAccessTime( $time = false ): int
     {
         return 0;
     }
@@ -262,9 +270,10 @@ class AzureStream extends AbstractStream
      * Defini ou retourne la date de creation du fichier
      *
      * @param bool $time
+     *
      * @return int
      */
-    public function streamCreatedTime($time = false): int
+    public function streamCreatedTime( $time = false ): int
     {
         return 0;
     }
@@ -273,17 +282,18 @@ class AzureStream extends AbstractStream
      * Defini ou retourne la derniere date de modification au fichier
      *
      * @param bool $time
+     *
      * @return int
      * @throws StreamException
      */
-    public function streamModifiedTime($time = false): int
+    public function streamModifiedTime( $time = false ): int
     {
-        if ($time) {
+        if ( $time ) {
             return time();
         }
 
         return (int) $this->getStream()
-            ->getBlob($this->getHost(), $this->getPath())
+            ->getBlob( $this->getHost(), $this->getPath() )
             ->getProperties()
             ->getLastModified()
             ->getTimestamp();

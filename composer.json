@@ -1,38 +1,42 @@
 {
-    "name": "modelo/chukdo",
-    "type": "framework",
-    "version": "1.0.0",
-    "description": "Small Framework using AZURE Storage and MONGODB Database",
-    "homepage": "http://git.modelo.fr/jpdomingo/chukdo",
-    "keywords": [ "framework", "modelo", "chukdo"],
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Jean-Pierre Domingo",
-            "email": "jp.domingo@modelo.fr",
-            "homepage": "http://git.modelo.fr/jpdomingo/chukdo",
-            "role": "Author"
-        }
-    ],
-    "require": {
-        "php": ">=7.2.0",
-        "ext-json": "*",
-        "ext-zip": "*",
-        "ext-zlib": "*",
-        "ext-dom": "*",
-        "ext-openssl": "*",
-        "ext-simplexml": "*",
-        "ext-mongodb": "^1.5.0",
-        "mongodb/mongodb": "~1.4.0",
-        "microsoft/azure-storage-common": "~1.2.0",
-        "microsoft/azure-storage-blob": "~1.2.0",
-        "guzzlehttp/guzzle": "~6.0",
-        "elasticsearch/elasticsearch": "~6.0",
-        "wp-cli/php-cli-tools": "^0.11.11"
-    },
-    "autoload": {
-        "psr-4": {
-            "Chukdo\\": "src/"
-        }
+  "name": "modelo/chukdo",
+  "type": "framework",
+  "version": "1.0.0",
+  "description": "Small Framework using AZURE Storage and MONGODB Database",
+  "homepage": "http://git.modelo.fr/jpdomingo/chukdo",
+  "keywords": [
+    "framework",
+    "modelo",
+    "chukdo"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jean-Pierre Domingo",
+      "email": "jp.domingo@modelo.fr",
+      "homepage": "http://git.modelo.fr/jpdomingo/chukdo",
+      "role": "Author"
     }
+  ],
+  "require": {
+    "php": ">=7.2.0",
+    "ext-json": "*",
+    "ext-zip": "*",
+    "ext-zlib": "*",
+    "ext-dom": "*",
+    "ext-openssl": "*",
+    "ext-simplexml": "*",
+    "ext-mongodb": "^1.5.0",
+    "mongodb/mongodb": "~1.4.0",
+    "microsoft/azure-storage-common": "~1.2.0",
+    "microsoft/azure-storage-blob": "~1.2.0",
+    "guzzlehttp/guzzle": "~6.0",
+    "elasticsearch/elasticsearch": "~6.0",
+    "wp-cli/php-cli-tools": "^0.11.11"
+  },
+  "autoload": {
+    "psr-4": {
+      "Chukdo\\": "src/"
+    }
+  }
 }

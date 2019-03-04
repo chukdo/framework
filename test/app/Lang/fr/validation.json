@@ -1,3 +1,4 @@
 {
-  "required" : "Le champs %s est requis"
+  "required": "Le champs %s est requis",
+  "title.required": "Le titre est obligatoire"
 }

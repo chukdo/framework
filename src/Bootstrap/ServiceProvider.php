@@ -3,24 +3,27 @@
 /**
  * Gestion des exceptions
  *
- * @package 	Exception
- * @version 	1.0.0
- * @copyright 	licence MIT, Copyright (C) 2019 Domingo
- * @since 		08/01/2019
- * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
+ * @package    Exception
+ * @version    1.0.0
+ * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @since        08/01/2019
+ * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class ServiceProviderException extends \Exception {}
+class ServiceProviderException extends \Exception
+{
+}
 
 /**
  * Service Provider
  *
- * @package 	bootstrap
- * @version 	1.0.0
- * @copyright 	licence MIT, Copyright (C) 2019 Domingo
- * @since 		08/01/2019
- * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
+ * @package    bootstrap
+ * @version    1.0.0
+ * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @since        08/01/2019
+ * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-abstract class ServiceProvider {
+abstract class ServiceProvider
+{
 
     /**
      * @var App
@@ -29,9 +32,10 @@ abstract class ServiceProvider {
 
     /**
      * ServiceProvider constructor.
+     *
      * @param App $app
      */
-    public function __construct(App $app)
+    public function __construct( App $app )
     {
         $this->app = $app;
     }
@@ -40,9 +44,9 @@ abstract class ServiceProvider {
      * @param string $name
      * @param string $alias
      */
-    public function setClassAlias(string $name, string $alias): void
+    public function setClassAlias( string $name, string $alias ): void
     {
-        class_alias($name, $alias);
+        class_alias( $name, $alias );
     }
 
     /**

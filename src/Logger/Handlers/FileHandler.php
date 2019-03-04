@@ -3,11 +3,11 @@
 /**
  * Gestionnaire des logs pour fichier
  *
- * @package 	Logger
- * @version 	1.0.0
- * @copyright 	licence MIT, Copyright (C) 2019 Domingo
- * @since 		08/01/2019
- * @author 		Domingo Jean-Pierre <jp.domingo@gmail.com>
+ * @package    Logger
+ * @version    1.0.0
+ * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @since        08/01/2019
+ * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class FileHandler extends AbstractHandler
 {
@@ -18,9 +18,10 @@ class FileHandler extends AbstractHandler
 
     /**
      * FileHandler constructor.
+     *
      * @param string $file
      */
-    public function __construct(string $file)
+    public function __construct( string $file )
     {
         $this->file = $file;
 
@@ -39,14 +40,15 @@ class FileHandler extends AbstractHandler
 
     /**
      * @param string $record
+     *
      * @return bool
      */
-    public function write($record): bool
+    public function write( $record ): bool
     {
-        $fp = fopen($this->file, 'a');
-        $r  = fwrite($fp, $record."\n");
+        $fp = fopen( $this->file, 'a' );
+        $r = fwrite( $fp, $record . "\n" );
 
-        fclose($fp);
+        fclose( $fp );
 
         return (bool) $r;
     }

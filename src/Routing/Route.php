@@ -5,10 +5,10 @@ Use \Closure;
 /**
  * Gestion d'une Route
  *
- * @package		Routing
- * @version 	1.0.0
- * @copyright 	licence MIT, Copyright (C) 2019 Domingo
- * @since 		08/01/2019
+ * @package        Routing
+ * @version    1.0.0
+ * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @since        08/01/2019
  * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Route
@@ -25,12 +25,13 @@ class Route
 
     /**
      * Route constructor.
+     *
      * @param Router $router
      * @param Closure $closure
      */
-    public function __construct(Router $router, Closure $closure)
+    public function __construct( Router $router, Closure $closure )
     {
-        $this->router   = $router;
-        $this->closure  = $closure;
+        $this->router = $router;
+        $this->closure = $closure;
     }
 }
