@@ -24,19 +24,26 @@ class Rule
     /**
      * @var
      */
-    protected $attributes;
+    protected $input;
+
+    /**
+     * @var array
+     */
+    protected $attributes = [];
 
     /**
      * Rule constructor.
      *
      * @param string $name
      * @param string $rule
+     * @param $input
      * @param array $attributes
      */
-    public function __construct( string $name, string $rule, array $attributes = [] )
+    public function __construct( string $name, string $rule, $input, array $attributes = [] )
     {
-        $this->name = trim( $name );
-        $this->rule = trim( $rule );
+        $this->name       = trim( $name );
+        $this->rule       = trim( $rule );
+        $this->input      = $input;
         $this->attributes = array_map( 'trim', $attributes );
     }
 
@@ -62,6 +69,14 @@ class Rule
     public function rule(): string
     {
         return $this->rule;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function input()
+    {
+        return $this->input;
     }
 
     /**

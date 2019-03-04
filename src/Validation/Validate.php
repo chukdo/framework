@@ -1,7 +1,6 @@
 <?php namespace Chukdo\Validation;
 
 use Chukdo\Contracts\Validation\Validate as ValidateInterface;
-use Chukdo\Json\Input;
 
 /**
  * Validation de données
@@ -33,11 +32,10 @@ class Validate
 
     /**
      * @param Rule $rule
-     * @param Input $inputs
      *
      * @return bool
      */
-    public function validate( Rule $rule, Input $inputs ): bool
+    public function validate( Rule $rule ): bool
     {
 
     }

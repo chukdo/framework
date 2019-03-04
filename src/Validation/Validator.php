@@ -4,6 +4,7 @@ use Chukdo\Json\Input;
 use Chukdo\Json\Lang;
 use Chukdo\Contracts\Validation\Validate as ValidateInterface;
 use Chukdo\Json\Message;
+use Chukdo\View\ValidationException;
 
 /**
  * Validation de données
@@ -55,35 +56,11 @@ class Validator
      */
     public function __construct( Input $inputs, array $rules, Lang $messages )
     {
-        $this->inputs = $inputs;
+        $this->inputs   = $inputs;
         $this->messages = $messages;
         $this->validate = new Validate();
-        $this->rules = new Rules( $rules );
-        $this->error = new Message( 'error' );
-    }
-
-    /**
-     * @return Input
-     */
-    public function inputs(): Input
-    {
-        return $this->inputs;
-    }
-
-    /**
-     * @return Rules
-     */
-    public function rules(): Rules
-    {
-        return $this->rules;
-    }
-
-    /**
-     * @return Lang
-     */
-    public function messages(): Lang
-    {
-        return $this->messages;
+        $this->rules    = new Rules( $rules, $inputs );
+        $this->error    = new Message( 'error' );
     }
 
     /**
@@ -101,24 +78,9 @@ class Validator
     /**
      * @return bool
      */
-    public function validate(): bool
+    public function fails(): bool
     {
-        $r = true;
-
-        foreach ( $this->rules() as $rule ) {
-            if ( !$this->validate->validate( $rule, $this->inputs(), $this->messages() ) ) {
-                $r .= false;
-            }
-        }
-
-        // error $this->messages()->get($rule->namespace()) || $this->messages()->get($rule->name()) || throw exception(message no exist)
-        // validate => passe error
-        // rule.name() => correspondance en erreur dans this->inputs !!!
-
-        //$this->error->offsetSet($rule->name(), $this->messages()->get());
-        // $rule->rule() == int / required account.price / account.mail => champ account[mail] to.*.email => to[0][email] et to[1][email]
-
-        return $r;
+        return !$this->validated();
     }
 
     /**
@@ -136,9 +98,62 @@ class Validator
     /**
      * @return bool
      */
-    public function fails(): bool
+    public function validate(): bool
     {
-        return !$this->validated();
+        $r = true;
+
+        foreach ( $this->rules() as $rule ) {
+            if ( !$this->validate->validate( $rule ) ) {
+                $this->error->offsetSet( $rule->field(), $this->messageFromRule($rule) );
+                $r .= false;
+            }
+        }
+
+
+        // account.mail => champ account[mail] to.*.email => to[0][email] et to[1][email] -> field
+        // to.*.email => email pour message comment l'associer ?!
+
+        return $r;
+    }
+
+    /**
+     * @param Rule $rule
+     *
+     * @return string
+     */
+    public function messageFromRule(Rule $rule): string
+    {
+        if ( !( $message = $this->messages->offsetGet( $rule->namespace() ) ) ) {
+            if ( !( $message = $this->messages()->offsetGet( $rule->name() ) ) ) {
+                throw new ValidationException( sprintf( 'Message [%s] cannot be found', $rule->name() ) );
+            }
+        }
+
+        return $message;
+    }
+
+    /**
+     * @return Rules
+     */
+    public function rules(): Rules
+    {
+        return $this->rules;
+    }
+
+    /**
+     * @return Input
+     */
+    public function inputs(): Input
+    {
+        return $this->inputs;
+    }
+
+    /**
+     * @return Lang
+     */
+    public function messages(): Lang
+    {
+        return $this->messages;
     }
 
     /**
