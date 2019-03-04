@@ -28,15 +28,31 @@ class JsonLang extends Json
         }
 
         foreach ($files as $file) {
-            $json = $storage->get($file);
-
-            if (Is::json($json)) {
-                foreach (json_decode($json, true) as $k => $v) {
-                    $this->offsetSet($k, $v);
-                }
-            } else {
+            if (!$this->loadFile($file)) {
                 return false;
             }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $file
+     * @return bool
+     */
+    protected function loadFile(string $file): bool
+    {
+        $storage    = new Storage();
+        $name       = basename($file, '.json');
+        $json       = $storage->get($file);
+        $root       = $this->offsetGetOrSet($name, []);
+
+        if (!Is::json($json)) {
+            return false;
+        }
+
+        foreach (json_decode($json, true) as $k => $v) {
+            $root->offsetSet($k, $v);
         }
 
         return true;

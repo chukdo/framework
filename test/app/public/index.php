@@ -40,6 +40,7 @@ Facade::setClassAlias(\Chukdo\Facades\Router::class, 'Router');
 
 /** Configuration */
 Lang::load(LANG_PATH);
+//dd(Lang::all());
 Conf::load(CONF_PATH.'Conf.json');
 //Conf::load(CONF_PATH.'conf_prod.json');
 
