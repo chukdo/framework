@@ -12,7 +12,7 @@ use Chukdo\Helper\Is;
  * @since 		08/01/2019
  * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class JsonLang extends Json
+class Lang extends Json
 {
     /**
      * @param string $dir

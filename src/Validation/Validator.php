@@ -1,7 +1,9 @@
 <?php namespace Chukdo\Validation;
 
-use Chukdo\Json\JsonInput;
-use Chukdo\Json\JsonLang;
+use Chukdo\Json\Input;
+use Chukdo\Json\Lang;
+use Chukdo\Json\Message;
+use Chukdo\Contracts\Validation\Validate as ValidateInterface;
 
 /**
  * Validation de données
@@ -16,77 +18,104 @@ use Chukdo\Json\JsonLang;
 class Validator
 {
     /**
-     * @var JsonInput
+     * @var bool
+     */
+    protected $validated = null;
+
+    /**
+     * @var Input
      */
     protected $inputs;
 
     /**
-     * @var array
+     * @var Rules
      */
-    protected $rules = [];
+    protected $rules;
 
     /**
-     * @var array
+     * @var Validate
      */
-    protected $messages = [];
+    protected $validate;
+
+    /**
+     * @var Message
+     */
+    protected $message;
 
     /**
      * Validator constructor.
-     * @param JsonInput $inputs
+     * @param Input $inputs
      * @param array $rules
-     * @param JsonLang $messages
+     * @param Lang $messages
      */
-    public function __construct(JsonInput $inputs, array $rules, JsonLang $messages)
+    public function __construct(Input $inputs, array $rules, Lang $messages)
     {
-        $this->inputs   = $inputs;
-        $this->rules    = $rules;
-        $this->messages = $messages;
+        $this->validate = new Validate();
+        $this->rules    = new Rules($inputs, $rules, $messages, $this->validate);
+        $this->message  = new Message();
     }
 
     /**
-     * @return array
+     * @return Rules
      */
-    public function rules(): array
+    public function rules(): Rules
     {
         return $this->rules;
     }
 
     /**
-     * @return array
+     * @return Message
      */
-    public function messages(): array
+    public function messages(): Message
     {
-        return $this->messages;
+        return $this->message;
     }
 
-    public function register()
+    /**
+     * @param ValidateInterface $validate
+     * @return Validator
+     */
+    public function register(ValidateInterface $validate): self
     {
-        // objet
-        // getRules()
+        $this->validate->register($validate);
+
+        return $this;
     }
 
     public function validate()
     {
-        /**
-        each $rules as $path => $rule
-         * explode(| $rule)
-         * input->wildcard($path)
-         * check call function issu d'un tableau de fonction registreed
-        */
+        foreach ($this->rules() as $rule) {
+            if (!$rule->validate()) {
+                $this->message->error($rule->getMessage());
+            }
+        }
     }
 
-    public function validated()
+    /**
+     * @return bool
+     */
+    public function validated(): bool
     {
+        if ($this->validated === null) {
+            $this->validate();
+        }
 
+        return $this->validated;
     }
 
-    public function fails()
+    /**
+     * @return bool
+     */
+    public function fails(): bool
     {
-
+        return !$this->validated();
     }
 
-    public function errors()
+    /**
+     * @return Message
+     */
+    public function errors(): Message
     {
-        // sous la forme d'un json
+        return $this->message->offsetGet('messages');
     }
 }

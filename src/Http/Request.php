@@ -4,7 +4,7 @@ use Chukdo\Bootstrap\App;
 use Chukdo\Helper\Str;
 use Chukdo\Helper\Http;
 use Chukdo\Json\Json;
-use Chukdo\Json\JsonInput;
+use Chukdo\Json\Input;
 use Chukdo\Validation\Validator;
 use Chukdo\Storage\FileUploaded;
 
@@ -26,7 +26,7 @@ class Request
     protected $app;
 
     /**
-     * @param JsonInput
+     * @param Input
      */
     protected $inputs;
 
@@ -54,7 +54,7 @@ class Request
     public function __construct(App $app)
     {
         $this->app      = $app;
-        $this->inputs   = $app->make('Chukdo\Json\JsonInput');
+        $this->inputs   = $app->make('Chukdo\Json\Input');
         $this->header   = new Header();
         $this->url      = new Url(Http::server('SCRIPT_URI'));
         $this->method   = Http::request('httpverb') ?: Http::server('REQUEST_METHOD');
@@ -87,7 +87,7 @@ class Request
      */
     public function validate(Iterable $rules): Validator
     {
-        return $this->inputs->validate($rules, $this->app->make('Chukdo\Json\JsonLang'));
+        return $this->inputs->validate($rules, $this->app->make('Chukdo\Json\Lang'));
     }
 
     /**
@@ -102,9 +102,9 @@ class Request
     }
 
     /**
-     * @return JsonInput
+     * @return Input
      */
-    public function inputs(): JsonInput
+    public function inputs(): Input
     {
         return $this->inputs;
     }

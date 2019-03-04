@@ -64,6 +64,14 @@ $json = new \Chukdo\Json\Json([
     ]
 ]);
 
+$validator = new \Chukdo\Validation\Validator(
+    Input::all(),
+    ['title' => 'required'],
+    Lang::all()
+);
+$validator->register(new \Chukdo\Validation\Validate\Required());
+$validator->validate();
+
 Response::header('X-jpd', 'de la balle');
 View::setDefaultFolder(TPL_PATH);
 View::loadFunction(new \Chukdo\View\Functions\Basic());

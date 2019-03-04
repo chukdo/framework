@@ -12,10 +12,10 @@ use Chukdo\Validation\Validator;
  * @since 		08/01/2019
  * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class JsonInput extends Json
+class Input extends Json
 {
     /**
-     * JsonInput constructor.
+     * Input constructor.
      */
     public function __construct()
     {
@@ -24,10 +24,10 @@ class JsonInput extends Json
 
     /**
      * @param iterable $rules
-     * @param JsonLang $messages
+     * @param Lang $messages
      * @return Validator
      */
-    public function validate(Iterable $rules, JsonLang $messages): Validator
+    public function validate(Iterable $rules, Lang $messages): Validator
     {
         return new Validator($this, (array) $rules, $messages);
     }

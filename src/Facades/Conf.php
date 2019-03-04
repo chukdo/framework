@@ -13,6 +13,6 @@ class Conf extends Facade
 {
 	public static function name(): string
 	{
-		return \Chukdo\Json\JsonConf::class;
+		return \Chukdo\Json\Conf::class;
 	}
 }

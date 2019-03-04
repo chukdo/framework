@@ -13,6 +13,6 @@ class Input extends Facade
 {
 	public static function name(): string
 	{
-		return \Chukdo\Json\JsonInput::class;
+		return \Chukdo\Json\Input::class;
 	}
 }

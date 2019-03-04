@@ -11,7 +11,7 @@ use Chukdo\Storage\Storage;
  * @since 		08/01/2019
  * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class JsonConf extends Json
+class Conf extends Json
 {
     /**
      * @param string $file

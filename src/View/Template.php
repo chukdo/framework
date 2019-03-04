@@ -2,8 +2,7 @@
 
 use Chukdo\Json\Json;
 use Chukdo\Helper\Str;
-use Chukdo\Helper\Is;
-use Chukdo\Helper\To;
+
 /**
  * Moteur de template
  *

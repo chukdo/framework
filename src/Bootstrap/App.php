@@ -98,7 +98,7 @@ class App extends Service
      */
     public function getConf(string $key): ?string
     {
-        return $this->make('Chukdo\Json\JsonConf')->offsetGet($key);
+        return $this->make('Chukdo\Json\Conf')->offsetGet($key);
     }
 
     /**
