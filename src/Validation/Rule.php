@@ -66,6 +66,15 @@ class Rule
     /**
      * @return string
      */
+    public function field(): string
+    {
+        // account.mail => champ account[mail] to.*.email => to[0][email] et to[1][email] -> field
+        // to.*.email => email pour message comment l'associer ?!
+    }
+
+    /**
+     * @return string
+     */
     public function rule(): string
     {
         return $this->rule;

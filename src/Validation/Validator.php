@@ -4,7 +4,6 @@ use Chukdo\Json\Input;
 use Chukdo\Json\Lang;
 use Chukdo\Contracts\Validation\Validate as ValidateInterface;
 use Chukdo\Json\Message;
-use Chukdo\View\ValidationException;
 
 /**
  * Validation de données
@@ -18,9 +17,9 @@ use Chukdo\View\ValidationException;
 class Validator
 {
     /**
-     * @var bool
+     * @var Input
      */
-    protected $validated = null;
+    protected $validated;
 
     /**
      * @var Input
@@ -58,9 +57,9 @@ class Validator
     {
         $this->inputs   = $inputs;
         $this->messages = $messages;
-        $this->validate = new Validate();
-        $this->rules    = new Rules( $rules, $inputs );
         $this->error    = new Message( 'error' );
+        $this->rules    = new Rules( $rules, $inputs );
+        $this->validate = new Validate($this);
     }
 
     /**
@@ -84,9 +83,9 @@ class Validator
     }
 
     /**
-     * @return bool
+     * @return Input
      */
-    public function validated(): bool
+    public function validated(): Input
     {
         if ( $this->validated === null ) {
             $this->validate();
@@ -96,40 +95,21 @@ class Validator
     }
 
     /**
-     * @return bool
+     * @return Input
      */
-    public function validate(): bool
+    public function validate(): Input
     {
         $r = true;
 
         foreach ( $this->rules() as $rule ) {
+
             if ( !$this->validate->validate( $rule ) ) {
-                $this->error->offsetSet( $rule->field(), $this->messageFromRule($rule) );
+
                 $r .= false;
             }
         }
 
-
-        // account.mail => champ account[mail] to.*.email => to[0][email] et to[1][email] -> field
-        // to.*.email => email pour message comment l'associer ?!
-
         return $r;
-    }
-
-    /**
-     * @param Rule $rule
-     *
-     * @return string
-     */
-    public function messageFromRule(Rule $rule): string
-    {
-        if ( !( $message = $this->messages->offsetGet( $rule->namespace() ) ) ) {
-            if ( !( $message = $this->messages()->offsetGet( $rule->name() ) ) ) {
-                throw new ValidationException( sprintf( 'Message [%s] cannot be found', $rule->name() ) );
-            }
-        }
-
-        return $message;
     }
 
     /**

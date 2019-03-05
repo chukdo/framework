@@ -16,10 +16,12 @@ class Input extends Json
 {
     /**
      * Input constructor.
+     *
+     * @param null $data
      */
-    public function __construct()
+    public function __construct( $data = null )
     {
-        parent::__construct( $_REQUEST );
+        parent::__construct( $data ?: $_REQUEST );
     }
 
     /**

@@ -1,6 +1,7 @@
 <?php namespace Chukdo\Validation;
 
 use Chukdo\Contracts\Validation\Validate as ValidateInterface;
+use Chukdo\View\ValidationException;
 
 /**
  * Validation de données
@@ -19,6 +20,21 @@ class Validate
     protected $validate = [];
 
     /**
+     * @var Validator
+     */
+    protected $validator;
+
+    /**
+     * Validate constructor.
+     *
+     * @param Validator $validator
+     */
+    public function __construct( Validator $validator )
+    {
+        $this->validator = $validator;
+    }
+
+    /**
      * @param ValidateInterface $validate
      *
      * @return Validate
@@ -32,11 +48,30 @@ class Validate
 
     /**
      * @param Rule $rule
-     *
-     * @return bool
      */
-    public function validate( Rule $rule ): bool
+    public function validate( Rule $rule )
     {
+        // isset validate $rule->name();
+        // call user func
+        // ko => validator->error()
+        // $this->error->offsetSet( $rule->field(), $this->messageFromRule( $rule ) );
+        // ok =>
+    }
 
+    /**
+     * @param Rule $rule
+     *
+     * @return string
+     */
+    public function messageFromRule( Rule $rule ): string
+    {
+        $messages = $this->validator->messages();
+        $message  = $messages->offsetGet( $rule->namespace() ) ?: $messages->offsetGet( $rule->name() );
+
+        if ( $message ) {
+            return $message;
+        }
+
+        throw new ValidationException( sprintf( 'Message [%s] cannot be found', $rule->name() ) );
     }
 }
