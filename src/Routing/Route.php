@@ -31,7 +31,7 @@ class Route
      */
     public function __construct( Router $router, Closure $closure )
     {
-        $this->router = $router;
+        $this->router  = $router;
         $this->closure = $closure;
     }
 }

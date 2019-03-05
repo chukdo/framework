@@ -21,7 +21,10 @@ class Input extends Json
      */
     public function __construct( $data = null )
     {
-        parent::__construct( $data ?: $_REQUEST );
+        parent::__construct(
+            $data
+                ?: $_REQUEST
+        );
     }
 
     /**
@@ -32,7 +35,11 @@ class Input extends Json
      */
     public function validate( Iterable $rules, Lang $messages ): Validator
     {
-        return new Validator( $this, (array) $rules, $messages );
+        return new Validator(
+            $this,
+            (array) $rules,
+            $messages
+        );
     }
 
     /**
@@ -44,6 +51,10 @@ class Input extends Json
      */
     public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): FileUploaded
     {
-        return new FileUploaded( $name, $allowedMimeTypes, $maxFileSize );
+        return new FileUploaded(
+            $name,
+            $allowedMimeTypes,
+            $maxFileSize
+        );
     }
 }

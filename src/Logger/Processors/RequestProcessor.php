@@ -26,15 +26,20 @@ class RequestProcessor implements ProcessorInterface
         $browser = Http::getUserAgent( Http::server( 'HTTP_USER_AGENT' ) );
 
         $record[ 'extra' ][ 'request' ] = [
-            'uri' => Http::server( 'REQUEST_URI' ) ?: implode( ' ', Http::argv() ),
-            'remote' => Http::server( 'REMOTE_ADDR' ),
-            'referer' => Http::server( 'HTTP_REFERER' ),
-            'method' => Http::server( 'REQUEST_METHOD' ),
+            'uri'       => Http::server( 'REQUEST_URI' )
+                ?: implode(
+                    ' ',
+                    Http::argv()
+                ),
+            'remote'    => Http::server( 'REMOTE_ADDR' ),
+            'referer'   => Http::server( 'HTTP_REFERER' ),
+            'method'    => Http::server( 'REQUEST_METHOD' ),
             'useragent' => [
-                'platform' => $browser[ 'platform' ] ?: 'Cli',
-                'browser' => $browser[ 'browser' ],
-                'version' => $browser[ 'version' ],
-                'mobile' => $browser[ 'mobile' ]
+                'platform' => $browser[ 'platform' ]
+                    ?: 'Cli',
+                'browser'  => $browser[ 'browser' ],
+                'version'  => $browser[ 'version' ],
+                'mobile'   => $browser[ 'mobile' ]
             ]
         ];
 

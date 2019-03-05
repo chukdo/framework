@@ -32,7 +32,8 @@ class RedisHandler extends AbstractHandler
     public function __construct( RedisInterface $redis, string $key = null )
     {
         $this->redis = $redis;
-        $this->key = $key ?: 'log';
+        $this->key   = $key
+            ?: 'log';
 
         parent::__construct();
     }
@@ -56,7 +57,10 @@ class RedisHandler extends AbstractHandler
     public function write( $record ): bool
     {
         try {
-            $this->redis->rpush( $this->key, $record );
+            $this->redis->rpush(
+                $this->key,
+                $record
+            );
             return true;
 
         } catch ( \Exception $e ) {

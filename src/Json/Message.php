@@ -46,7 +46,7 @@ class Message extends Json
     public function toArray(): array
     {
         return [
-            'result' => $this->name,
+            'result'   => $this->name,
             'messages' => $this->getArrayCopy()
         ];
     }

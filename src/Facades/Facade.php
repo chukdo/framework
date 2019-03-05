@@ -68,7 +68,10 @@ class Facade
     public static function getInstance( string $name )
     {
         if ( !isset( static::$facades[ $name ] ) ) {
-            static::$facades[ $name ] = static::$app->make( $name, true );
+            static::$facades[ $name ] = static::$app->make(
+                $name,
+                true
+            );
         }
 
         return static::$facades[ $name ];
@@ -80,7 +83,10 @@ class Facade
      */
     public static function setClassAlias( string $name, string $alias ): void
     {
-        class_alias( $name, $alias );
+        class_alias(
+            $name,
+            $alias
+        );
     }
 
     /**
@@ -108,12 +114,25 @@ class Facade
         $name = static::name();
         $instance = static::getInstance( $name );
 
-        if ( !method_exists( $instance, $method ) && !method_exists( $instance, '__call' ) ) {
+        if ( !method_exists(
+                $instance,
+                $method
+            )
+            && !method_exists(
+                $instance,
+                '__call'
+            ) ) {
             $class = get_called_class();
 
             throw new FacadeException( "[$class] does not implement [$method] method." );
         }
 
-        return call_user_func_array( [ $instance, $method ], $args );
+        return call_user_func_array(
+            [
+                $instance,
+                $method
+            ],
+            $args
+        );
     }
 }

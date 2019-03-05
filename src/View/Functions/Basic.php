@@ -23,7 +23,15 @@ class Basic implements FunctionsInterface
     {
         foreach ( get_class_methods( $this ) as $method ) {
             if ( $method != 'register' ) {
-                $view->registerFunction( $method, Closure::fromCallable( [ $this, $method ] ) );
+                $view->registerFunction(
+                    $method,
+                    Closure::fromCallable(
+                        [
+                            $this,
+                            $method
+                        ]
+                    )
+                );
             }
         }
     }
@@ -36,7 +44,10 @@ class Basic implements FunctionsInterface
      */
     public function contain( string $data, string $search ): bool
     {
-        return Str::contain( $data, $search );
+        return Str::contain(
+            $data,
+            $search
+        );
     }
 
     /**

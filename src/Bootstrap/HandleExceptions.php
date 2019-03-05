@@ -30,10 +30,28 @@ class HandleExceptions
         $this->app = $app;
 
         error_reporting( -1 );
-        set_error_handler( [ $this, 'handleError' ] );
-        set_exception_handler( [ $this, 'handleException' ] );
-        register_shutdown_function( [ $this, 'handleShutdown' ] );
-        ini_set( 'display_errors', 'Off' );
+        set_error_handler(
+            [
+                $this,
+                'handleError'
+            ]
+        );
+        set_exception_handler(
+            [
+                $this,
+                'handleException'
+            ]
+        );
+        register_shutdown_function(
+            [
+                $this,
+                'handleShutdown'
+            ]
+        );
+        ini_set(
+            'display_errors',
+            'Off'
+        );
     }
 
     /**
@@ -48,7 +66,13 @@ class HandleExceptions
     {
 
         if ( error_reporting() & $level ) {
-            throw new ErrorException( $message, 0, $level, $file, $line );
+            throw new ErrorException(
+                $message,
+                0,
+                $level,
+                $file,
+                $line
+            );
         }
     }
 
@@ -61,7 +85,11 @@ class HandleExceptions
     public function handleException( Throwable $e )
     {
         if ( !$e instanceof Exception ) {
-            $e = new AppException( $e->getMessage(), $e->getCode(), $e );
+            $e = new AppException(
+                $e->getMessage(),
+                $e->getCode(),
+                $e
+            );
         }
 
         $exceptionHandler = $this->getExceptionHandler();
@@ -97,7 +125,11 @@ class HandleExceptions
     protected function fatalExceptionFromError( array $error ): ErrorException
     {
         return new ErrorException(
-            $error[ 'message' ], 0, $error[ 'type' ], $error[ 'file' ], $error[ 'line' ]
+            $error[ 'message' ],
+            0,
+            $error[ 'type' ],
+            $error[ 'file' ],
+            $error[ 'line' ]
         );
     }
 
@@ -108,7 +140,15 @@ class HandleExceptions
      */
     protected function isFatal( int $type ): bool
     {
-        return in_array( $type, [ E_COMPILE_ERROR, E_CORE_ERROR, E_ERROR, E_PARSE ] );
+        return in_array(
+            $type,
+            [
+                E_COMPILE_ERROR,
+                E_CORE_ERROR,
+                E_ERROR,
+                E_PARSE
+            ]
+        );
     }
 
     /**

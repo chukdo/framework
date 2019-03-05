@@ -14,17 +14,18 @@ class Url
     /**
      * @var array
      */
-    protected $url = [
-        'scheme' => 'file',
-        'host' => '',
-        'port' => '',
-        'user' => '',
-        'pass' => '',
-        'dir' => '',
-        'file' => '',
-        'input' => [],
-        'fragment' => ''
-    ];
+    protected $url
+        = [
+            'scheme'   => 'file',
+            'host'     => '',
+            'port'     => '',
+            'user'     => '',
+            'pass'     => '',
+            'dir'      => '',
+            'file'     => '',
+            'input'    => [],
+            'fragment' => ''
+        ];
 
     /**
      * Url constructor.
@@ -156,7 +157,10 @@ class Url
      */
     public function getPath(): string
     {
-        return rtrim( $this->getDir(), '/' ) . '/' . $this->getFile();
+        return rtrim(
+                $this->getDir(),
+                '/'
+            ) . '/' . $this->getFile();
     }
 
     /**
@@ -219,9 +223,9 @@ class Url
      */
     public function getInput( string $key ): string
     {
-        return isset( $this->url[ 'input' ][ $key ] ) ?
-            $this->url[ 'input' ][ $key ] :
-            '';
+        return isset( $this->url[ 'input' ][ $key ] )
+            ? $this->url[ 'input' ][ $key ]
+            : '';
     }
 
     /**
@@ -231,7 +235,10 @@ class Url
      */
     public function setQuery( string $query ): Url
     {
-        parse_str( $query, $this->url[ 'input' ] );
+        parse_str(
+            $query,
+            $this->url[ 'input' ]
+        );
 
         return $this;
     }
@@ -272,26 +279,26 @@ class Url
     public function parseUrl( string $url ): Url
     {
         $mergeUrl = [
-            'scheme' => 'file',
-            'host' => '',
-            'port' => '',
-            'user' => '',
-            'pass' => '',
-            'path' => '',
-            'query' => '',
+            'scheme'   => 'file',
+            'host'     => '',
+            'port'     => '',
+            'user'     => '',
+            'pass'     => '',
+            'path'     => '',
+            'query'    => '',
             'fragment' => ''
         ];
 
-        $url = array_merge( $mergeUrl, (array) parse_url( $url ) );
+        $url = array_merge(
+            $mergeUrl,
+            (array) parse_url( $url )
+        );
 
-        $this->setScheme( $url[ 'scheme' ] )
-            ->setHost( $url[ 'host' ] )
-            ->setPort( $url[ 'port' ] )
-            ->setUser( $url[ 'user' ] )
-            ->setPass( $url[ 'pass' ] )
-            ->setPath( $url[ 'path' ] )
-            ->setQuery( $url[ 'query' ] )
-            ->SetFragment( $url[ 'fragment' ] );
+        $this->setScheme( $url[ 'scheme' ] )->setHost( $url[ 'host' ] )->setPort( $url[ 'port' ] )->setUser(
+                $url[ 'user' ]
+            )->setPass( $url[ 'pass' ] )->setPath( $url[ 'path' ] )->setQuery( $url[ 'query' ] )->SetFragment(
+                $url[ 'fragment' ]
+            );
 
         return $this;
     }
@@ -351,10 +358,7 @@ class Url
      */
     public function buildDsn(): string
     {
-        return $this->buildScheme()
-            . $this->buildAuth()
-            . $this->buildHost()
-            . $this->BuildPort();
+        return $this->buildScheme() . $this->buildAuth() . $this->buildHost() . $this->BuildPort();
     }
 
     /**
@@ -394,10 +398,7 @@ class Url
      */
     public function buildUrl(): string
     {
-        return $this->buildDsn()
-            . $this->buildPath()
-            . $this->buildQuery()
-            . $this->buildFragment();
+        return $this->buildDsn() . $this->buildPath() . $this->buildQuery() . $this->buildFragment();
     }
 }
 

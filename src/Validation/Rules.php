@@ -35,7 +35,7 @@ class Rules implements IteratorAggregate
      */
     public function __construct( Iterable $rules, Input $inputs, Lang $messages )
     {
-        $this->rules = new Arr();
+        $this->rules    = new Arr();
         $this->messages = $messages;
 
         foreach ( $rules as $name => $rulesPiped ) {

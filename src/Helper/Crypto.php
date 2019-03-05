@@ -19,10 +19,16 @@ final class Crypto
      */
     public static function encodeCsrf( int $duration = null ): string
     {
-        return self::encrypt( json_encode( [
-            'time' => time(),
-            'duration' => (int) $duration ?: 60
-        ] ), '[A"[6cnTDT{J[6s\'' );
+        return self::encrypt(
+            json_encode(
+                [
+                    'time'     => time(),
+                    'duration' => (int) $duration
+                        ?: 60
+                ]
+            ),
+            '[A"[6cnTDT{J[6s\''
+        );
     }
 
     /**
@@ -33,13 +39,25 @@ final class Crypto
     public static function decodeCsrf( string $token ): bool
     {
         /** URI Decode */
-        if ( strpos( $token, '%' ) !== false ) {
+        if ( strpos(
+                $token,
+                '%'
+            ) !== false ) {
             $token = rawurldecode( $token );
         }
 
         /** Hack decoding link ex. Outlook */
-        $token = str_replace( ' ', '+', $token );
-        $json = json_decode( self::decrypt( $token, '[A"[6cnTDT{J[6s\'' ) );
+        $token = str_replace(
+            ' ',
+            '+',
+            $token
+        );
+        $json  = json_decode(
+            self::decrypt(
+                $token,
+                '[A"[6cnTDT{J[6s\''
+            )
+        );
 
         if ( $json->time + $json->duration >= time() ) {
             return true;
@@ -55,8 +73,13 @@ final class Crypto
      */
     public static function password( int $length = null ): string
     {
-        $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?";
-        $password = substr( str_shuffle( $chars ), 0, $length ?: 8 );
+        $chars    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?";
+        $password = substr(
+            str_shuffle( $chars ),
+            0,
+            $length
+                ?: 8
+        );
 
         return $password;
     }
@@ -70,14 +93,17 @@ final class Crypto
      */
     public static function generateCode( int $length, bool $readable = true ): string
     {
-        $token = "";
-        $codeAlphabet = $readable ?
-            "abcdefghjkmnpqrstuvwxyz123456789" :
-            "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        $max = strlen( $codeAlphabet );
+        $token        = "";
+        $codeAlphabet = $readable
+            ? "abcdefghjkmnpqrstuvwxyz123456789"
+            : "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        $max          = strlen( $codeAlphabet );
 
         for ( $i = 0 ; $i < $length ; $i++ ) {
-            $token .= $codeAlphabet[ random_int( 0, $max - 1 ) ];
+            $token .= $codeAlphabet[ random_int(
+                0,
+                $max - 1
+            ) ];
         }
 
         return $token;
@@ -91,8 +117,13 @@ final class Crypto
      */
     public static function encrypt( string $data, string $salt ): string
     {
-        $encrypted = openssl_encrypt( $data, 'bf-ecb', $salt, true );
-        $result = base64_encode( $encrypted );
+        $encrypted = openssl_encrypt(
+            $data,
+            'bf-ecb',
+            $salt,
+            true
+        );
+        $result    = base64_encode( $encrypted );
 
         return $result;
     }
@@ -105,8 +136,13 @@ final class Crypto
      */
     public static function decrypt( string $data, string $salt ): string
     {
-        $data = base64_decode( $data );
-        $decrypted = openssl_decrypt( $data, 'bf-ecb', $salt, true );
+        $data      = base64_decode( $data );
+        $decrypted = openssl_decrypt(
+            $data,
+            'bf-ecb',
+            $salt,
+            true
+        );
 
         return $decrypted;
     }
@@ -123,7 +159,13 @@ final class Crypto
     {
         $file = crc32( $name );
         $path = '';
-        $hash = str_split( hash( 'crc32', $file ), 2 );
+        $hash = str_split(
+            hash(
+                'crc32',
+                $file
+            ),
+            2
+        );
 
         /** Hashlevel */
         for ( $i = 0 ; $i < $hashlevel ; $i++ ) {

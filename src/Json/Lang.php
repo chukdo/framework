@@ -22,7 +22,10 @@ class Lang extends Json
     public function load( string $dir ): bool
     {
         $storage = new Storage();
-        $files = $storage->files( $dir, '/\.json$/' );
+        $files   = $storage->files(
+            $dir,
+            '/\.json$/'
+        );
 
         if ( count( $files ) == 0 ) {
             return false;
@@ -45,16 +48,28 @@ class Lang extends Json
     protected function loadFile( string $file ): bool
     {
         $storage = new Storage();
-        $name = basename( $file, '.json' );
-        $json = $storage->get( $file );
-        $root = $this->offsetGetOrSet( $name, [] );
+        $name    = basename(
+            $file,
+            '.json'
+        );
+        $json    = $storage->get( $file );
+        $root    = $this->offsetGetOrSet(
+            $name,
+            []
+        );
 
         if ( !Is::json( $json ) ) {
             return false;
         }
 
-        foreach ( json_decode( $json, true ) as $k => $v ) {
-            $root->offsetSet( $k, $v );
+        foreach ( json_decode(
+            $json,
+            true
+        ) as $k => $v ) {
+            $root->offsetSet(
+                $k,
+                $v
+            );
         }
 
         return true;

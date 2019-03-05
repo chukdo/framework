@@ -88,7 +88,10 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      */
     protected function getPath(): ?string
     {
-        return trim( $this->getUrl()->getPath(), '/' );
+        return trim(
+            $this->getUrl()->getPath(),
+            '/'
+        );
     }
 
     /**
@@ -101,7 +104,11 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     protected function setMode( string $mode ): void
     {
         /** On ne tient pas compte du flag B(inary) */
-        $this->mode = str_replace( 'b', '', $mode );
+        $this->mode = str_replace(
+            'b',
+            '',
+            $mode
+        );
     }
 
     /**
@@ -178,7 +185,9 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
         if ( $size = $this->streamSize() ) {
             return [
                 'size' => $size,
-                'mode' => $this->streamIsDir() ? 16895 : 33279,
+                'mode' => $this->streamIsDir()
+                    ? 16895
+                    : 33279,
                 'ctime' => $this->streamCreatedTime(),
                 'atime' => $this->streamAccessTime(),
                 'mtime' => $this->streamModifiedTime()
@@ -270,12 +279,26 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
             case 'a' :
             case 'x' :
             case 'c' :
-                throw new StreamException( sprintf( "[%s] has writeonly mode [%s]", $this->getUrl()->getPath(), $this->getMode() ) );
+                throw new StreamException(
+                    sprintf(
+                        "[%s] has writeonly mode [%s]",
+                        $this->getUrl()->getPath(),
+                        $this->getMode()
+                    )
+                );
                 break;
         }
 
-        $read = $this->streamGetRange( $this->getTell(), $count );
-        $this->appendTell( min( strlen( $read ), $count ) );
+        $read = $this->streamGetRange(
+            $this->getTell(),
+            $count
+        );
+        $this->appendTell(
+            min(
+                strlen( $read ),
+                $count
+            )
+        );
 
         if ( $this->getTell() >= $this->streamSize() ) {
             $this->setEof();
@@ -297,18 +320,35 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
         $size = $this->streamSize();
 
         if ( $new_size > $size ) {
-            return $this->streamSetRange( $size, str_repeat( chr( 0 ), $new_size - $size ) );
+            return $this->streamSetRange(
+                $size,
+                str_repeat(
+                    chr( 0 ),
+                    $new_size - $size
+                )
+            );
 
         } else if ( $new_size < $size ) {
             if ( $new_size == 0 ) {
                 $this->streamSet( null );
 
             } else {
-                $this->streamSet( $this->streamGetRange( 0, $new_size ) );
+                $this->streamSet(
+                    $this->streamGetRange(
+                        0,
+                        $new_size
+                    )
+                );
             }
 
             if ( $this->getTell() > $new_size ) {
-                $this->streamSetRange( $new_size, str_repeat( chr( 0 ), $this->getTell() - $new_size ) );
+                $this->streamSetRange(
+                    $new_size,
+                    str_repeat(
+                        chr( 0 ),
+                        $this->getTell() - $new_size
+                    )
+                );
             }
         }
 
@@ -348,7 +388,12 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
             case 'r' :
             case 'r+' :
                 if ( !$exits ) {
-                    throw new StreamException( sprintf( "File [%s] doesn't exists", $this->getUrl()->getPath() ) );
+                    throw new StreamException(
+                        sprintf(
+                            "File [%s] doesn't exists",
+                            $this->getUrl()->getPath()
+                        )
+                    );
                 }
                 break;
             case 'w' :
@@ -366,7 +411,12 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
             case 'x' :
             case 'x+' :
                 if ( $exits ) {
-                    throw new StreamException( sprintf( "Mode X not allow [%s] file exists", $this->getUrl()->getPath() ) );
+                    throw new StreamException(
+                        sprintf(
+                            "Mode X not allow [%s] file exists",
+                            $this->getUrl()->getPath()
+                        )
+                    );
                 }
 
                 $this->streamSet( null );
@@ -409,12 +459,20 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
         switch ( $this->getMode() ) {
             case 'r' :
-                throw new StreamException( sprintf( "[%s] is in readonly mode", $this->getUrl()->getPath() ) );
+                throw new StreamException(
+                    sprintf(
+                        "[%s] is in readonly mode",
+                        $this->getUrl()->getPath()
+                    )
+                );
                 break;
             case 'r+' :
             case 'c' :
             case 'c+' :
-                $this->streamSetRange( $this->getTell(), $data );
+                $this->streamSetRange(
+                    $this->getTell(),
+                    $data
+                );
                 $this->appendTell( $strlen );
                 break;
             case 'w' :
@@ -491,7 +549,10 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
             return false;
         }
 
-        $rename = trim( $urlTo->getPath(), '/' );
+        $rename = trim(
+            $urlTo->getPath(),
+            '/'
+        );
 
         if ( $this->streamRename( $rename ) ) {
             $this->url = $urlTo;

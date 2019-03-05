@@ -46,7 +46,12 @@ class ServiceLocator extends Singleton
     public function getService( $scheme ): Closure
     {
         if ( !isset( $this->resources[ $scheme ] ) ) {
-            throw new ServiceLocatorException( sprintf( '[%s] is not a registered service', $scheme ) );
+            throw new ServiceLocatorException(
+                sprintf(
+                    '[%s] is not a registered service',
+                    $scheme
+                )
+            );
         }
 
         return $this->resources[ $scheme ];
@@ -69,7 +74,10 @@ class ServiceLocator extends Singleton
         $service = $this->getService( $scheme );
         $resource = call_user_func( $service );
 
-        $this->cacheResource( $scheme, $resource );
+        $this->cacheResource(
+            $scheme,
+            $resource
+        );
 
         return $resource;
     }
@@ -96,9 +104,9 @@ class ServiceLocator extends Singleton
      */
     public function getCacheResource( string $scheme )
     {
-        return isset( $this->cache[ $scheme ] ) ?
-            $this->cache[ $scheme ] :
-            null;
+        return isset( $this->cache[ $scheme ] )
+            ? $this->cache[ $scheme ]
+            : null;
     }
 
     /**

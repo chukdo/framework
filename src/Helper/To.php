@@ -47,10 +47,18 @@ final class To
      */
     public static function qualifiedName( string $name, $prefix = null ): string
     {
-        $qname = str_replace( ' ', '_', Str::allText( $name ) );
+        $qname = str_replace(
+            ' ',
+            '_',
+            Str::allText( $name )
+        );
 
-        if ( !preg_match( '/^[a-z]/', $qname ) ) {
-            $qname = $prefix ?: 'error';
+        if ( !preg_match(
+            '/^[a-z]/',
+            $qname
+        ) ) {
+            $qname = $prefix
+                ?: 'error';
         }
 
         return $qname;
@@ -90,8 +98,14 @@ final class To
         $value = (string) $value;
 
         if ( $value !== false ) {
-            if ( !mb_check_encoding( $value, 'UTF-8' ) ) {
-                $value = mb_convert_encoding( $value, 'UTF-8' );
+            if ( !mb_check_encoding(
+                $value,
+                'UTF-8'
+            ) ) {
+                $value = mb_convert_encoding(
+                    $value,
+                    'UTF-8'
+                );
             }
         }
         return $value;
@@ -114,13 +128,32 @@ final class To
      */
     public static function float( $value ): float
     {
-        $value = str_replace( ' ', '', self::scalar( $value ) );
+        $value = str_replace(
+            ' ',
+            '',
+            self::scalar( $value )
+        );
 
-        if ( strpos( $value, '.' ) !== false && strpos( $value, ',' ) !== false ) {
-            $value = str_replace( '.', '', $value );
+        if ( strpos(
+                $value,
+                '.'
+            ) !== false
+            && strpos(
+                $value,
+                ','
+            ) !== false ) {
+            $value = str_replace(
+                '.',
+                '',
+                $value
+            );
         }
 
-        return (float) str_replace( ',', '.', $value );
+        return (float) str_replace(
+            ',',
+            '.',
+            $value
+        );
     }
 
     /**
@@ -132,7 +165,11 @@ final class To
      */
     public static function date( string $value, string $format = null ): \DateTime
     {
-        $date = \DateTime::createFromFormat( $format ?: 'd/m/Y', $value );
+        $date = \DateTime::createFromFormat(
+            $format
+                ?: 'd/m/Y',
+            $value
+        );
 
         if ( $date instanceof \DateTime ) {
             return $date;
@@ -153,7 +190,10 @@ final class To
         if ( Is::scalar( $value ) ) {
             $scalar = $value;
 
-        } else if ( Is::object( $value, '__toString' ) ) {
+        } else if ( Is::object(
+            $value,
+            '__toString'
+        ) ) {
             $scalar = $value->__toString();
 
         } else if ( Is::traversable( $value ) ) {
@@ -188,13 +228,18 @@ final class To
             $array = [ $value ];
 
             /** La valeur est un object avec une fonction de transformation */
-        } else if ( Is::object( $value, 'toArray' ) ) {
+        } else if ( Is::object(
+            $value,
+            'toArray'
+        ) ) {
             $array = $value->toArray();
 
             /** La valeur est un tableau ou est travsersable */
         } else if ( Is::traversable( $value ) ) {
             foreach ( $value as $k => $v ) {
-                $array[ $k ] = is_scalar( $v ) ? $v : self::arr( $v );
+                $array[ $k ] = is_scalar( $v )
+                    ? $v
+                    : self::arr( $v );
             }
 
             /** retourne un tableau vide */
@@ -215,11 +260,17 @@ final class To
         if ( is_scalar( $value ) ) {
             return $value;
 
-        } else if ( Is::object( $value, 'toJson' ) ) {
+        } else if ( Is::object(
+            $value,
+            'toJson'
+        ) ) {
             return $value->toJson();
 
         } else {
-            return json_encode( self::arr( $value ), JSON_PRETTY_PRINT );
+            return json_encode(
+                self::arr( $value ),
+                JSON_PRETTY_PRINT
+            );
         }
     }
 
@@ -235,7 +286,10 @@ final class To
         if ( $value instanceof \Chukdo\Xml\Xml ) {
             return $value;
 
-        } else if ( Is::object( $value, 'toXml' ) ) {
+        } else if ( Is::object(
+            $value,
+            'toXml'
+        ) ) {
             return $value->toXml();
 
         } else {

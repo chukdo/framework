@@ -32,8 +32,12 @@ final class Image
         $image = imagecreatefromstring( $string );
 
         if ( $image !== false ) {
-            $f = finfo_open();
-            $mimeType = finfo_buffer( $f, $string, FILEINFO_MIME_TYPE );
+            $f        = finfo_open();
+            $mimeType = finfo_buffer(
+                $f,
+                $string,
+                FILEINFO_MIME_TYPE
+            );
 
             return [
                 'w' => imagesx( $image ),
@@ -69,7 +73,13 @@ final class Image
     {
         $pattern = '/^data:image\/[a-z]{3,4};base64,/';
 
-        if ( $string = base64_decode( preg_replace( $pattern, '', $base64 ) ) ) {
+        if ( $string = base64_decode(
+            preg_replace(
+                $pattern,
+                '',
+                $base64
+            )
+        ) ) {
             return self::loadImageFromString( $string );
         }
 
@@ -94,13 +104,34 @@ final class Image
                 imagegif( $image );
                 break;
             case 'image/jpeg' :
-                imagejpeg( $image, null, $quality ?: 85 );
+                imagejpeg(
+                    $image,
+                    null,
+                    $quality
+                        ?: 85
+                );
                 break;
             case 'image/png' :
-                $quality = 9 - abs( floor( ( ( $quality ?: 85 ) - 1 ) / 10 ) );
-                imagealphablending( $image, false );
-                imagesavealpha( $image, true );
-                imagepng( $image, null, $quality ?: 85 );
+                $quality = 9 - abs(
+                        floor(
+                            ( ( $quality
+                                    ?: 85 ) - 1 ) / 10
+                        )
+                    );
+                imagealphablending(
+                    $image,
+                    false
+                );
+                imagesavealpha(
+                    $image,
+                    true
+                );
+                imagepng(
+                    $image,
+                    null,
+                    $quality
+                        ?: 85
+                );
                 break;
         }
 
@@ -122,14 +153,31 @@ final class Image
     public static function convert( array $image, int $format, int $quality = null ): ?string
     {
         if ( $image ) {
-            $w = $image[ 'w' ];
-            $h = $image[ 'h' ];
+            $w   = $image[ 'w' ];
+            $h   = $image[ 'h' ];
             $src = $image[ 'i' ];
-            $dst = imagecreatetruecolor( $w, $h );
+            $dst = imagecreatetruecolor(
+                $w,
+                $h
+            );
 
             if ( $src && $dst ) {
-                imagecopy( $dst, $src, 0, 0, 0, 0, $w, $h );
-                $r = self::getImage( $dst, $format, $quality ?: 92 );
+                imagecopy(
+                    $dst,
+                    $src,
+                    0,
+                    0,
+                    0,
+                    0,
+                    $w,
+                    $h
+                );
+                $r = self::getImage(
+                    $dst,
+                    $format,
+                    $quality
+                        ?: 92
+                );
                 imagedestroy( $src );
                 imagedestroy( $dst );
 
@@ -148,7 +196,11 @@ final class Image
      */
     public static function convertToJpg( array $image, int $quality ): ?string
     {
-        return self::convert( $image, IMAGETYPE_JPEG, $quality );
+        return self::convert(
+            $image,
+            IMAGETYPE_JPEG,
+            $quality
+        );
     }
 
     /**
@@ -159,7 +211,11 @@ final class Image
      */
     public static function convertToPng( array $image, $quality )
     {
-        return self::convert( $image, IMAGETYPE_PNG, $quality );
+        return self::convert(
+            $image,
+            IMAGETYPE_PNG,
+            $quality
+        );
     }
 
     /**
@@ -169,7 +225,10 @@ final class Image
      */
     public static function convertToGif( array $image )
     {
-        return self::convert( $image, IMAGETYPE_GIF );
+        return self::convert(
+            $image,
+            IMAGETYPE_GIF
+        );
     }
 
     /**
@@ -185,15 +244,18 @@ final class Image
     {
         $sw = $image[ 'w' ];
         $sh = $image[ 'h' ];
-        $h = 0;
-        $w = 0;
+        $h  = 0;
+        $w  = 0;
 
         if ( $dw > 0 && $dh > 0 ) {
             $rw = $sw / $dw;
             $rh = $sh / $dh;
-            $r = max( $rw, $rh );
-            $w = $sw / $r;
-            $h = $sh / $r;
+            $r  = max(
+                $rw,
+                $rh
+            );
+            $w  = $sw / $r;
+            $h  = $sh / $r;
         } else if ( $dw > 0 ) {
             $w = $dw;
             $h = $w * $sh / $sw;
@@ -204,15 +266,24 @@ final class Image
 
         /** Image source trop petite pour etre redimensionner */
         $whd = $dw > 0 && $dh > 0 && $dw >= $sw && $dh >= $sh;
-        $wd = $dw > 0 && $dw >= $sw;
-        $hd = $dh > 0 && $dh >= $sh;
+        $wd  = $dw > 0 && $dw >= $sw;
+        $hd  = $dh > 0 && $dh >= $sh;
 
         if ( $whd || $wd || $hd ) {
-            return self::getImage( $image[ 'i' ], $image[ 't' ] );
+            return self::getImage(
+                $image[ 'i' ],
+                $image[ 't' ]
+            );
         }
 
         if ( $w > 0 && $h > 0 ) {
-            return self::resampleImage( $image, 0, 0, $w, $h );
+            return self::resampleImage(
+                $image,
+                0,
+                0,
+                $w,
+                $h
+            );
         }
 
         return null;
@@ -239,7 +310,15 @@ final class Image
             return false;
         }
 
-        return self::resampleImage( $image, $dx, $dy, $dw, $dh, $dw, $dh );
+        return self::resampleImage(
+            $image,
+            $dx,
+            $dy,
+            $dw,
+            $dh,
+            $dw,
+            $dh
+        );
     }
 
     /**
@@ -255,26 +334,62 @@ final class Image
      *
      * @return string si l'operation reussi false si le resize n'est pas nécessaire
      */
-    public static function resampleImage( array $image, int $sx, int $sy, int $dw, int $dh, int $sw = 0, int $sh = null ): ?string
-    {
+    public static function resampleImage( array $image, int $sx, int $sy, int $dw, int $dh, int $sw = 0, int $sh = null
+    ): ?string {
         $type = $image[ 't' ];
-        $src = $image[ 'i' ];
-        $dst = imagecreatetruecolor( $dw, $dh );
-        $sw = $sw > 0 ? $sw : $image[ 'w' ];
-        $sh = $sh > 0 ? $sh : $image[ 'h' ];
-        $dx = 0;
-        $dy = 0;
+        $src  = $image[ 'i' ];
+        $dst  = imagecreatetruecolor(
+            $dw,
+            $dh
+        );
+        $sw   = $sw > 0
+            ? $sw
+            : $image[ 'w' ];
+        $sh   = $sh > 0
+            ? $sh
+            : $image[ 'h' ];
+        $dx   = 0;
+        $dy   = 0;
 
         if ( $type == 'image/png' ) {
-            imagesavealpha( $dst, true );
-            $alpha = imagecolorallocatealpha( $dst, 255, 255, 255, 127 );
-            imagefill( $dst, 0, 0, $alpha );
+            imagesavealpha(
+                $dst,
+                true
+            );
+            $alpha = imagecolorallocatealpha(
+                $dst,
+                255,
+                255,
+                255,
+                127
+            );
+            imagefill(
+                $dst,
+                0,
+                0,
+                $alpha
+            );
         }
 
         if ( $src && $dst ) {
-            imagecopyresampled( $dst, $src, $dx, $dy, $sx, $sy, $dw, $dh, $sw, $sh );
+            imagecopyresampled(
+                $dst,
+                $src,
+                $dx,
+                $dy,
+                $sx,
+                $sy,
+                $dw,
+                $dh,
+                $sw,
+                $sh
+            );
 
-            $r = self::getImage( $dst, $type, 92 );
+            $r = self::getImage(
+                $dst,
+                $type,
+                92
+            );
 
             imagedestroy( $src );
             imagedestroy( $dst );

@@ -62,7 +62,10 @@ abstract class AbstractHandler implements HandlerInterface
      */
     public function isHandling( array $record ): bool
     {
-        return in_array( $record[ 'level' ], $this->levels );
+        return in_array(
+            $record[ 'level' ],
+            $this->levels
+        );
     }
 
     /**
@@ -106,7 +109,10 @@ abstract class AbstractHandler implements HandlerInterface
      */
     public function pushProcessor( ProcessorInterface $processor ): HandlerInterface
     {
-        array_push( $this->processors, $processor );
+        array_push(
+            $this->processors,
+            $processor
+        );
 
         return $this;
     }

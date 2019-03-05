@@ -87,9 +87,15 @@ final class Is
     {
         if ( is_object( $value ) ) {
             if ( $method != false ) {
-                return method_exists( $value, $method );
+                return method_exists(
+                    $value,
+                    $method
+                );
             } else if ( $property != false ) {
-                return property_exists( $value, $property );
+                return property_exists(
+                    $value,
+                    $property
+                );
             }
 
             return true;
@@ -105,13 +111,16 @@ final class Is
      */
     public static function qualifiedName( string $name ): bool
     {
-        $letter = " [^\d\W] ";
-        $digit = " \d ";
+        $letter     = " [^\d\W] ";
+        $digit      = " \d ";
         $ncnamechar = " $letter | $digit | \. | - | _ ";
-        $ncname = " (?: $letter | _ )(?: $ncnamechar )* ";
-        $qname = " (?: $ncname: )? $ncname ";
+        $ncname     = " (?: $letter | _ )(?: $ncnamechar )* ";
+        $qname      = " (?: $ncname: )? $ncname ";
 
-        return preg_match( '/^' . $qname . '$/x', $name );
+        return preg_match(
+            '/^' . $qname . '$/x',
+            $name
+        );
     }
 
     /**
@@ -211,8 +220,12 @@ final class Is
      */
     public static function date( $value, string $format = null ): bool
     {
-        $format = $format ?: 'd/m/Y';
-        $checkDate = \DateTime::createFromFormat( $format, $value );
+        $format    = $format
+            ?: 'd/m/Y';
+        $checkDate = \DateTime::createFromFormat(
+            $format,
+            $value
+        );
 
         return $value == $checkDate->format( $format );
     }

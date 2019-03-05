@@ -120,7 +120,10 @@ class Arr implements \Iterator
      */
     public function join( string $glue ): string
     {
-        return implode( $glue, $this->arr );
+        return implode(
+            $glue,
+            $this->arr
+        );
     }
 
     /**
@@ -130,7 +133,8 @@ class Arr implements \Iterator
     {
         $first = reset( $this->arr );
 
-        return $first ?: null;
+        return $first
+            ?: null;
     }
 
     /**
@@ -140,7 +144,8 @@ class Arr implements \Iterator
     {
         $end = end( $this->arr );
 
-        return $end ?: null;
+        return $end
+            ?: null;
     }
 
     /**
@@ -181,7 +186,7 @@ class Arr implements \Iterator
     public function getNextAndRemove()
     {
         $offset = $this->offset;
-        $next = $this->getNext();
+        $next   = $this->getNext();
 
         if ( $next !== null ) {
             unset( $this->arr[ $offset ] );

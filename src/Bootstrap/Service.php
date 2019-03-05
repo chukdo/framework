@@ -72,7 +72,10 @@ class Service implements ArrayAccess
      */
     protected function formatNameSpace( string $name ): string
     {
-        return trim( $name, '\\' );
+        return trim(
+            $name,
+            '\\'
+        );
     }
 
     /**
@@ -175,7 +178,10 @@ class Service implements ArrayAccess
      */
     public function getConf( string $key ): ?string
     {
-        $key = '/' . trim( $key, '/' );
+        $key = '/' . trim(
+                $key,
+                '/'
+            );
 
         if ( isset( $this->conf[ $key ] ) ) {
             return $this->conf[ $key ];
@@ -195,9 +201,9 @@ class Service implements ArrayAccess
     {
         $name = $this->formatNameSpace( $name );
 
-        return isset( $this->instances[ $name ] ) ?
-            $this->instances[ $name ] :
-            null;
+        return isset( $this->instances[ $name ] )
+            ? $this->instances[ $name ]
+            : null;
     }
 
     /**
@@ -211,9 +217,9 @@ class Service implements ArrayAccess
     {
         $name = $this->formatNameSpace( $name );
 
-        return isset( $this->singletons[ $name ] ) ?
-            $this->singletons[ $name ] :
-            null;
+        return isset( $this->singletons[ $name ] )
+            ? $this->singletons[ $name ]
+            : null;
     }
 
     /**
@@ -227,9 +233,9 @@ class Service implements ArrayAccess
     {
         $name = $this->formatNameSpace( $name );
 
-        return isset( $this->bindings[ $name ] ) ?
-            $this->bindings[ $name ] :
-            null;
+        return isset( $this->bindings[ $name ] )
+            ? $this->bindings[ $name ]
+            : null;
     }
 
     /**
@@ -245,7 +251,10 @@ class Service implements ArrayAccess
             return $instance;
 
         } else if ( $singleton = $this->getSingleton( $name ) ) {
-            $this->instance( $name, $closure = $this->getClosure( $name ) );
+            $this->instance(
+                $name,
+                $closure = $this->getClosure( $name )
+            );
             return $closure;
         }
 
@@ -261,7 +270,8 @@ class Service implements ArrayAccess
      */
     private function getClosure( string $name )
     {
-        $bind = $this->getBind( $name ) ?: $this->getSingleton( $name );
+        $bind = $this->getBind( $name )
+            ?: $this->getSingleton( $name );
 
         if ( $bind ) {
             if ( $bind instanceof Closure ) {
@@ -271,8 +281,18 @@ class Service implements ArrayAccess
                 return $this->getClosure( $bind );
 
             } else if ( is_array( $bind ) ) {
-                if ( array_key_exists( 'class', $bind ) && array_key_exists( 'args', $bind ) ) {
-                    return $this->resolveService( $bind[ 'class' ], $bind[ 'args' ] );
+                if ( array_key_exists(
+                        'class',
+                        $bind
+                    )
+                    && array_key_exists(
+                        'args',
+                        $bind
+                    ) ) {
+                    return $this->resolveService(
+                        $bind[ 'class' ],
+                        $bind[ 'args' ]
+                    );
                 }
             }
         }
@@ -300,7 +320,10 @@ class Service implements ArrayAccess
             }
         }
 
-        return $this->resolveClass( $class, $args );
+        return $this->resolveClass(
+            $class,
+            $args
+        );
     }
 
     /**
@@ -312,8 +335,15 @@ class Service implements ArrayAccess
      */
     private function resolveServiceArg( string $arg )
     {
-        $firstPart = substr( $arg, 0, 1 );
-        $lastPart = substr( $arg, 1 );
+        $firstPart = substr(
+            $arg,
+            0,
+            1
+        );
+        $lastPart  = substr(
+            $arg,
+            1
+        );
 
         if ( $firstPart == '@' ) {
             return $this->make( $lastPart );
@@ -349,7 +379,9 @@ class Service implements ArrayAccess
             return new $class;
         }
 
-        $args = empty( $args ) ? $this->resolveArgs( $constructor ) : $args;
+        $args = empty( $args )
+            ? $this->resolveArgs( $constructor )
+            : $args;
 
         return $reflector->newInstanceArgs( $args );
     }
@@ -363,7 +395,7 @@ class Service implements ArrayAccess
      */
     private function resolveArgs( ReflectionMethod $constructor ): array
     {
-        $args = [];
+        $args       = [];
         $parameters = $constructor->getParameters();
 
         foreach ( $parameters as $parameter ) {
@@ -382,7 +414,7 @@ class Service implements ArrayAccess
      */
     private function resolveArg( ReflectionParameter $parameter )
     {
-        $name = $parameter->getName();
+        $name  = $parameter->getName();
         $class = $parameter->getClass();
 
         /** Le parametre est un objet on cherche à le resoudre  */
@@ -405,13 +437,13 @@ class Service implements ArrayAccess
      */
     public function offsetExists( $key ): bool
     {
-        return isset( $this->bindings[ $key ] ) ?
-            true :
-            isset( $this->instances[ $key ] ) ?
-                true :
-                isset( $this->singletons[ $key ] ) ?
-                    true :
-                    false;
+        return isset( $this->bindings[ $key ] )
+            ? true
+            : isset( $this->instances[ $key ] )
+                ? true
+                : isset( $this->singletons[ $key ] )
+                    ? true
+                    : false;
     }
 
     /**
@@ -432,7 +464,10 @@ class Service implements ArrayAccess
      */
     public function offsetSet( $key, $value ): void
     {
-        $this->bind( $key, $value );
+        $this->bind(
+            $key,
+            $value
+        );
     }
 
     /**
@@ -441,9 +476,7 @@ class Service implements ArrayAccess
     public function offsetUnset( $key )
     {
         unset(
-            $this->bindings[ $key ],
-            $this->instances[ $key ],
-            $this->singletons[ $key ]
+            $this->bindings[ $key ], $this->instances[ $key ], $this->singletons[ $key ]
         );
     }
 }

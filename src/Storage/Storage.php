@@ -21,7 +21,11 @@ class Storage
      */
     public function makeDirectory( string $directory, int $visibility = 0777 ): bool
     {
-        return mkdir( $directory, $visibility, true );
+        return mkdir(
+            $directory,
+            $visibility,
+            true
+        );
     }
 
     /**
@@ -59,7 +63,7 @@ class Storage
     public function directories( string $directory ): array
     {
         $list = [];
-        $dir = opendir( $directory );
+        $dir  = opendir( $directory );
 
         while ( ( $file = readdir( $dir ) ) !== false ) {
             if ( ( $file != '.' ) && ( $file != '..' ) ) {
@@ -86,14 +90,17 @@ class Storage
     public function allDirectories( string $directory ): array
     {
         $list = [];
-        $dir = opendir( $directory );
+        $dir  = opendir( $directory );
 
         while ( ( $file = readdir( $dir ) ) !== false ) {
             if ( ( $file != '.' ) && ( $file != '..' ) ) {
                 $full = $directory . '/' . $file;
 
                 if ( is_dir( $full ) ) {
-                    $list = array_merge( $list, $this->allDirectories( $full ) );
+                    $list = array_merge(
+                        $list,
+                        $this->allDirectories( $full )
+                    );
                 }
             }
         }
@@ -131,7 +138,10 @@ class Storage
      */
     public function put( string $file, string $content ): bool
     {
-        return (bool) file_put_contents( $file, $content );
+        return (bool) file_put_contents(
+            $file,
+            $content
+        );
     }
 
     /**
@@ -152,7 +162,10 @@ class Storage
      */
     public function copy( string $oldFile, string $newFile ): bool
     {
-        return $this->put( $newFile, $this->get( $oldFile ) );
+        return $this->put(
+            $newFile,
+            $this->get( $oldFile )
+        );
     }
 
     /**
@@ -163,7 +176,10 @@ class Storage
      */
     public function move( string $oldFile, string $newFile ): bool
     {
-        $r = $this->put( $newFile, $this->get( $oldFile ) );
+        $r = $this->put(
+            $newFile,
+            $this->get( $oldFile )
+        );
 
         $this->delete( $oldFile );
 
@@ -189,13 +205,17 @@ class Storage
     public function files( string $directory, string $match = null ): array
     {
         $list = [];
-        $dir = opendir( $directory );
+        $dir  = opendir( $directory );
 
         while ( ( $file = readdir( $dir ) ) !== false ) {
             if ( ( $file != '.' ) && ( $file != '..' ) ) {
                 $full = $directory . '/' . $file;
 
-                if ( !is_dir( $full ) && Str::match( $match, $full ) ) {
+                if ( !is_dir( $full )
+                    && Str::match(
+                        $match,
+                        $full
+                    ) ) {
                     $list[] = $full;
                 }
             }
@@ -215,14 +235,24 @@ class Storage
     public function allFiles( string $directory, string $match = null ): array
     {
         $list = [];
-        $dir = opendir( $directory );
+        $dir  = opendir( $directory );
 
         while ( ( $file = readdir( $dir ) ) !== false ) {
             if ( ( $file != '.' ) && ( $file != '..' ) ) {
                 $full = $directory . '/' . $file;
 
-                if ( !is_dir( $full ) && Str::match( $match, $full ) ) {
-                    $list = array_merge( $list, $this->allFiles( $full, $match ) );
+                if ( !is_dir( $full )
+                    && Str::match(
+                        $match,
+                        $full
+                    ) ) {
+                    $list = array_merge(
+                        $list,
+                        $this->allFiles(
+                            $full,
+                            $match
+                        )
+                    );
                 }
             }
         }

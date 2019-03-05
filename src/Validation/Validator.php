@@ -57,7 +57,11 @@ class Validator
     public function __construct( Input $inputs, array $rules, Lang $messages )
     {
         $this->error     = new Message( 'error' );
-        $this->rules     = new Rules( $rules, $inputs, $messages );
+        $this->rules     = new Rules(
+            $rules,
+            $inputs,
+            $messages
+        );
         $this->validated = new Input( [] );
     }
 

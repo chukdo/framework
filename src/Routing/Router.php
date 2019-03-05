@@ -45,7 +45,7 @@ class Router
      */
     public function __construct( App $app )
     {
-        $this->app = $app;
+        $this->app     = $app;
         $this->request = $app->make( 'Chukdo\Http\Request' );
     }
 
@@ -68,7 +68,11 @@ class Router
      */
     public function get( string $uri, Closure $closure ): Route
     {
-        return $this->stack( 'GET', $uri, $closure );
+        return $this->stack(
+            'GET',
+            $uri,
+            $closure
+        );
     }
 
     /**
@@ -79,7 +83,11 @@ class Router
      */
     public function post( string $uri, Closure $closure ): Route
     {
-        return $this->stack( 'POST', $uri, $closure );
+        return $this->stack(
+            'POST',
+            $uri,
+            $closure
+        );
     }
 
     /**
@@ -90,7 +98,11 @@ class Router
      */
     public function put( string $uri, Closure $closure ): Route
     {
-        return $this->stack( 'PUT', $uri, $closure );
+        return $this->stack(
+            'PUT',
+            $uri,
+            $closure
+        );
     }
 
     /**
@@ -101,7 +113,11 @@ class Router
      */
     public function delete( string $uri, Closure $closure ): Route
     {
-        return $this->stack( 'DELETE', $uri, $closure );
+        return $this->stack(
+            'DELETE',
+            $uri,
+            $closure
+        );
     }
 
     /**
@@ -112,7 +128,11 @@ class Router
      */
     public function any( string $uri, Closure $closure ): Route
     {
-        return $this->stack( 'ALL', $uri, $closure );
+        return $this->stack(
+            'ALL',
+            $uri,
+            $closure
+        );
     }
 
     /**
@@ -123,7 +143,11 @@ class Router
      */
     public function console( string $uri, Closure $closure ): Route
     {
-        return $this->stack( 'CLI', $uri, $closure );
+        return $this->stack(
+            'CLI',
+            $uri,
+            $closure
+        );
     }
 
     /**
@@ -135,7 +159,10 @@ class Router
      */
     public function stack( string $method, string $uri, Closure $closure ): Route
     {
-        $route = new Route( $this, $closure );
+        $route                                 = new Route(
+            $this,
+            $closure
+        );
         $this->stack[ $method . '://' . $uri ] = $route;
 
         return $route;

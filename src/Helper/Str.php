@@ -22,10 +22,19 @@ final class Str
     public static function extension( string $name ): string
     {
         $name = strtolower( $name );
-        $pos = strrpos( $name, '.' );
+        $pos  = strrpos(
+            $name,
+            '.'
+        );
 
         if ( $pos !== false ) {
-            return substr( $name, strrpos( $name, '.' ) + 1 );
+            return substr(
+                $name,
+                strrpos(
+                    $name,
+                    '.'
+                ) + 1
+            );
         }
 
         return $name;
@@ -41,7 +50,12 @@ final class Str
      */
     public static function contain( string $haystack, string $needle ): bool
     {
-        return strpos( $haystack, $needle ) === false ? false : true;
+        return strpos(
+            $haystack,
+            $needle
+        ) === false
+            ? false
+            : true;
     }
 
     /**
@@ -54,7 +68,10 @@ final class Str
      */
     public static function notContain( string $haystack, string $needle ): bool
     {
-        return !self::contain( $haystack, $needle );
+        return !self::contain(
+            $haystack,
+            $needle
+        );
     }
 
     /**
@@ -68,7 +85,11 @@ final class Str
     public static function charAt( string $string, int $index ): string
     {
         if ( $index < strlen( $string ) ) {
-            return substr( $string, $index, 1 );
+            return substr(
+                $string,
+                $index,
+                1
+            );
         } else {
             return -1;
         }
@@ -84,7 +105,12 @@ final class Str
     {
         $match = new Json();
         $matches = [];
-        preg_match_all( $pattern, $value, $matches, PREG_SET_ORDER );
+        preg_match_all(
+            $pattern,
+            $value,
+            $matches,
+            PREG_SET_ORDER
+        );
 
         foreach ( $matches as $k => $array ) {
             switch ( count( $array ) ) {
@@ -113,7 +139,11 @@ final class Str
     public static function match( string $pattern, string $value )
     {
         $match = [];
-        preg_match( $pattern, $value, $match );
+        preg_match(
+            $pattern,
+            $value,
+            $match
+        );
 
         switch ( count( $match ) ) {
             case 0  :
@@ -137,7 +167,11 @@ final class Str
      */
     public static function replace( $pattern, $replacement, string $value ): string
     {
-        return preg_replace( $pattern, $replacement, $value );
+        return preg_replace(
+            $pattern,
+            $replacement,
+            $value
+        );
     }
 
     /**
@@ -150,10 +184,17 @@ final class Str
      */
     public static function split( string $value, string $delimiter, int $pad = null, $padValue = null ): array
     {
-        $split = explode( $delimiter, $value );
+        $split = explode(
+            $delimiter,
+            $value
+        );
 
         if ( $pad ) {
-            $split = array_pad( $split, $pad, $padValue );
+            $split = array_pad(
+                $split,
+                $pad,
+                $padValue
+            );
         }
 
         return $split;
@@ -167,7 +208,10 @@ final class Str
      */
     public static function join( array $value, string $glue ): string
     {
-        return implode( $glue, $value );
+        return implode(
+            $glue,
+            $value
+        );
     }
 
     /**
@@ -178,11 +222,20 @@ final class Str
     public static function time( int $time = null ): string
     {
         if ( $time < 0.1 ) {
-            return round( $time * 1000, 3 ) . ' Micro-secondes';
+            return round(
+                    $time * 1000,
+                    3
+                ) . ' Micro-secondes';
         } else if ( $time < 1 ) {
-            return round( $time * 1000, 3 ) . ' Milli-secondes';
+            return round(
+                    $time * 1000,
+                    3
+                ) . ' Milli-secondes';
         } else if ( $time ) {
-            return round( $time, 3 ) . ' Secondes';
+            return round(
+                    $time,
+                    3
+                ) . ' Secondes';
         } else {
             return '0';
         }
@@ -198,9 +251,15 @@ final class Str
         if ( $mem < 1024 ) {
             return $mem . ' Octets';
         } else if ( $mem < 1048576 ) {
-            return round( $mem / 1024, 2 ) . ' Kilo-octets';
+            return round(
+                    $mem / 1024,
+                    2
+                ) . ' Kilo-octets';
         } else if ( $mem ) {
-            return round( $mem / 1048576, 2 ) . ' Mega-octets';
+            return round(
+                    $mem / 1048576,
+                    2
+                ) . ' Mega-octets';
         } else {
             return '0';
         }
@@ -213,7 +272,12 @@ final class Str
      */
     public static function uid( string $prefix = null ): string
     {
-        return $prefix . md5( uniqid( rand(), true ) );
+        return $prefix . md5(
+                uniqid(
+                    rand(),
+                    true
+                )
+            );
     }
 
     /**
@@ -223,7 +287,13 @@ final class Str
      */
     public static function stripSpaceBetweenTag( string $value ): string
     {
-        return self::trim( preg_replace( '/>[\s|\t|\r|\n]+</', '><', $value ) );
+        return self::trim(
+            preg_replace(
+                '/>[\s|\t|\r|\n]+</',
+                '><',
+                $value
+            )
+        );
     }
 
     /**
@@ -235,7 +305,11 @@ final class Str
     public static function ellipsis( string $value, int $len ): string
     {
         if ( strlen( $value ) > $len ) {
-            return substr( $value, 0, $len ) . '...';
+            return substr(
+                    $value,
+                    0,
+                    $len
+                ) . '...';
         }
 
         return $value;
@@ -250,7 +324,12 @@ final class Str
      */
     public static function stripTag( string $value, string $tag = null, string $replacement = null ): string
     {
-        return self::replace( '/<\/?\s*' . $tag . '[^>]*>/', $replacement ?: ' ', $value );
+        return self::replace(
+            '/<\/?\s*' . $tag . '[^>]*>/',
+            $replacement
+                ?: ' ',
+            $value
+        );
     }
 
     /**
@@ -260,8 +339,16 @@ final class Str
      */
     public static function trim( string $value ): string
     {
-        $value = self::replace( '/\n|\r|\t/', ' ', $value );
-        $value = self::replace( '/\s{2,}/', ' ', $value );
+        $value = self::replace(
+            '/\n|\r|\t/',
+            ' ',
+            $value
+        );
+        $value = self::replace(
+            '/\s{2,}/',
+            ' ',
+            $value
+        );
 
         return trim( $value );
     }
@@ -273,7 +360,11 @@ final class Str
      */
     public static function allDigit( string $value ): string
     {
-        return self::replace( '/[^\d]/u', '', $value );
+        return self::replace(
+            '/[^\d]/u',
+            '',
+            $value
+        );
     }
 
     /**
@@ -283,11 +374,15 @@ final class Str
      */
     public static function allText( string $value ): string
     {
-        $text = trim( strtolower( self::replace(
-            '/[^[:alnum:]]/u',
-            ' ',
-            self::removeSpecialChars( self::stripTag( $value ) )
-        ) ) );
+        $text = trim(
+            strtolower(
+                self::replace(
+                    '/[^[:alnum:]]/u',
+                    ' ',
+                    self::removeSpecialChars( self::stripTag( $value ) )
+                )
+            )
+        );
 
         return $text;
     }
@@ -299,11 +394,15 @@ final class Str
      */
     public static function allSentence( string $value ): string
     {
-        $text = trim( strtolower( self::replace(
-            '/[^[:alnum:]_;:\., ]/u',
-            ' ',
-            self::removeSpecialChars( self::stripTag( $value ) )
-        ) ) );
+        $text = trim(
+            strtolower(
+                self::replace(
+                    '/[^[:alnum:]_;:\., ]/u',
+                    ' ',
+                    self::removeSpecialChars( self::stripTag( $value ) )
+                )
+            )
+        );
 
         return $text;
     }
@@ -326,17 +425,20 @@ final class Str
                 '/²/iu',
                 '/°/iu',
                 '/œ/iu'
-            ], [
-            'e',
-            'a',
-            'u',
-            'o',
-            'c',
-            'i',
-            '2',
-            '.',
-            'oe'
-        ], self::trim( $value ) );
+            ],
+            [
+                'e',
+                'a',
+                'u',
+                'o',
+                'c',
+                'i',
+                '2',
+                '.',
+                'oe'
+            ],
+            self::trim( $value )
+        );
     }
 
     /**
@@ -346,6 +448,10 @@ final class Str
      */
     public static function removeWhiteSpace( string $value ): string
     {
-        return self::replace( '/ /', '', $value );
+        return self::replace(
+            '/ /',
+            '',
+            $value
+        );
     }
 }

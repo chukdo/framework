@@ -46,7 +46,10 @@ abstract class ServiceProvider
      */
     public function setClassAlias( string $name, string $alias ): void
     {
-        class_alias( $name, $alias );
+        class_alias(
+            $name,
+            $alias
+        );
     }
 
     /**

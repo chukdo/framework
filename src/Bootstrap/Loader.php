@@ -42,7 +42,12 @@ class Loader
      */
     public function register(): void
     {
-        spl_autoload_register( [ $this, 'loadClass' ] );
+        spl_autoload_register(
+            [
+                $this,
+                'loadClass'
+            ]
+        );
     }
 
     /**
@@ -52,7 +57,12 @@ class Loader
      */
     public function unregister(): void
     {
-        spl_autoload_unregister( [ $this, 'loadClass' ] );
+        spl_autoload_unregister(
+            [
+                $this,
+                'loadClass'
+            ]
+        );
     }
 
     /**
@@ -68,12 +78,18 @@ class Loader
     public function registerNameSpace( string $ns, $paths, bool $prepend = false ): void
     {
         /** normalize namespace */
-        $ns = trim( $ns, '\\' );
+        $ns = trim(
+            $ns,
+            '\\'
+        );
 
         foreach ( (array) $paths as $path ) {
 
             /** normalize the base directory with a separator */
-            $path = rtrim( $path, DIRECTORY_SEPARATOR ) . DIRECTORY_SEPARATOR;
+            $path = rtrim(
+                    $path,
+                    DIRECTORY_SEPARATOR
+                ) . DIRECTORY_SEPARATOR;
 
             /** initialize the namespace array */
             if ( isset( $this->namespaces[ $ns ] ) === false ) {
@@ -82,9 +98,15 @@ class Loader
 
             /** retain the base directory for the namespace */
             if ( $prepend ) {
-                array_unshift( $this->namespaces[ $ns ], $path );
+                array_unshift(
+                    $this->namespaces[ $ns ],
+                    $path
+                );
             } else {
-                array_push( $this->namespaces[ $ns ], $path );
+                array_push(
+                    $this->namespaces[ $ns ],
+                    $path
+                );
             }
         }
     }
@@ -99,7 +121,10 @@ class Loader
     public function registerNameSpaces( array $namespaces ): void
     {
         foreach ( $namespaces as $ns => $paths ) {
-            $this->registerNameSpace( $ns, $paths );
+            $this->registerNameSpace(
+                $ns,
+                $paths
+            );
         }
     }
 
@@ -112,16 +137,31 @@ class Loader
      */
     public function loadClass( string $nsclass ): bool
     {
-        $ns = explode( '\\', $nsclass );
-        $class = [];
+        $ns      = explode(
+            '\\',
+            $nsclass
+        );
+        $class   = [];
         $class[] = array_pop( $ns );
 
         while ( !empty( $ns ) ) {
-            if ( $this->loadFile( implode( '\\', $ns ), implode( '\\', $class ) ) ) {
+            if ( $this->loadFile(
+                implode(
+                    '\\',
+                    $ns
+                ),
+                implode(
+                    '\\',
+                    $class
+                )
+            ) ) {
                 return true;
             }
 
-            array_unshift( $class, array_pop( $ns ) );
+            array_unshift(
+                $class,
+                array_pop( $ns )
+            );
         }
 
         return false;
@@ -142,7 +182,11 @@ class Loader
         }
 
         foreach ( $this->namespaces[ $ns ] as $path ) {
-            $file = $path . str_replace( '\\', DIRECTORY_SEPARATOR, $class ) . '.php';
+            $file = $path . str_replace(
+                    '\\',
+                    DIRECTORY_SEPARATOR,
+                    $class
+                ) . '.php';
 
             if ( $this->requireFile( $file ) ) {
                 $this->log[ $class ] = $file;

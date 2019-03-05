@@ -51,7 +51,10 @@ class Rule
         $this->rule       = trim( $rule );
         $this->input      = $input;
         $this->message    = $message;
-        $this->attributes = array_map( 'trim', $attributes );
+        $this->attributes = array_map(
+            'trim',
+            $attributes
+        );
     }
 
     /**

@@ -57,6 +57,15 @@ class Singleton
      */
     public static function __callStatic( $name, $args )
     {
-        return call_user_func_array( [ self::getInstance(), trim( $name, '_' ) ], $args );
+        return call_user_func_array(
+            [
+                self::getInstance(),
+                trim(
+                    $name,
+                    '_'
+                )
+            ],
+            $args
+        );
     }
 }

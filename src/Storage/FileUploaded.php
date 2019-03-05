@@ -45,13 +45,18 @@ class FileUploaded
         $uploadedFiles = $this->normalizeUploadedFiles();
 
         if ( isset( $uploadedFiles[ $name ] ) ) {
-            $this->name = $name;
-            $this->maxFileSize = $maxFileSize;
+            $this->name             = $name;
+            $this->maxFileSize      = $maxFileSize;
             $this->allowedMimeTypes = $allowedMimeTypes;
-            $this->uploadedFile = $uploadedFiles[ $name ];
+            $this->uploadedFile     = $uploadedFiles[ $name ];
         }
 
-        throw new FileUploadedException( sprintf( 'Uploaded file [%s] does not exist', $name ) );
+        throw new FileUploadedException(
+            sprintf(
+                'Uploaded file [%s] does not exist',
+                $name
+            )
+        );
     }
 
     /**
@@ -128,8 +133,14 @@ class FileUploaded
     public function isValidMimeType(): bool
     {
         if ( $this->allowedMimeTypes ) {
-            foreach ( str::split( $this->allowedMimeTypes, ',' ) as $allowedMimeType ) {
-                if ( preg_match( "#$allowedMimeType#i", $this->mimeType() ) ) {
+            foreach ( str::split(
+                $this->allowedMimeTypes,
+                ','
+            ) as $allowedMimeType ) {
+                if ( preg_match(
+                    "#$allowedMimeType#i",
+                    $this->mimeType()
+                ) ) {
                     return true;
                 }
             }
@@ -148,14 +159,28 @@ class FileUploaded
     public function store( $path ): bool
     {
         if ( $this->isValid() ) {
-            if ( move_uploaded_file( $this->path(), $path ) ) {
+            if ( move_uploaded_file(
+                $this->path(),
+                $path
+            ) ) {
                 return true;
             } else {
-                throw new FileUploadedException( sprintf( 'Can\'t store uploaded file [%s] to [%s]', $this->name, $path ) );
+                throw new FileUploadedException(
+                    sprintf(
+                        'Can\'t store uploaded file [%s] to [%s]',
+                        $this->name,
+                        $path
+                    )
+                );
             }
         }
 
-        throw new FileUploadedException( sprintf( 'Uploaded file [%s] is not valid', $this->name ) );
+        throw new FileUploadedException(
+            sprintf(
+                'Uploaded file [%s] is not valid',
+                $this->name
+            )
+        );
     }
 
     /**

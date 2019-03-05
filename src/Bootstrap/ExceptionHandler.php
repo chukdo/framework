@@ -40,10 +40,9 @@ Class ExceptionHandler Implements Handler
      */
     public function report( Exception $e ): void
     {
-        $this
-            ->app
-            ->make( 'ExceptionLogger' )
-            ->emergency( '#' . $e->getCode() . ' ' . $e->getMessage() . ' ' . $e->getFile() . '(' . $e->getLine() . ')' );
+        $this->app->make( 'ExceptionLogger' )->emergency(
+                '#' . $e->getCode() . ' ' . $e->getMessage() . ' ' . $e->getFile() . '(' . $e->getLine() . ')'
+            );
     }
 
     /**
@@ -55,9 +54,12 @@ Class ExceptionHandler Implements Handler
     public function render( Exception $e ): void
     {
         $response = $this->app->make( 'Chukdo\Http\Response' );
-        $message = new JsonException();
+        $message  = new JsonException();
 
-        $message->set( 'Error', 'Error happened' );
+        $message->set(
+            'Error',
+            'Error happened'
+        );
 
         /** Dev mode */
         if ( $this->app->env() == 0 ) {
@@ -66,28 +68,29 @@ Class ExceptionHandler Implements Handler
 
         switch ( Str::extension( Http::server( 'SCRIPT_URL' ) ) ) {
             case 'xml' :
-                $content = $message->toXml()->toXmlString();
+                $content     = $message->toXml()->toXmlString();
                 $contentType = Http::mimeContentType( 'xml' );
                 break;
             case 'json' :
-                $content = $message->toJson( true );
+                $content     = $message->toJson( true );
                 $contentType = Http::mimeContentType( 'json' );
                 break;
             case 'html' :
             default :
-                $content = $message->toHtml( get_class( $e ), 500 );
+                $content     = $message->toHtml(
+                    get_class( $e ),
+                    500
+                );
                 $contentType = Http::mimeContentType( 'html' );
         }
 
         /** Important: purge des ob_start avant l'envoi d'une réponse */
         ob_end_clean();
 
-        $response
-            ->status( 500 )
-            ->header( 'Content-Type', $contentType . '; charset=utf-8' )
-            ->content( $content )
-            ->send()
-            ->end();
+        $response->status( 500 )->header(
+                'Content-Type',
+                $contentType . '; charset=utf-8'
+            )->content( $content )->send()->end();
     }
 
     /**

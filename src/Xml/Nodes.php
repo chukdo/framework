@@ -22,7 +22,13 @@ class Nodes extends Json
     public function __call( string $name, array $params = [] )
     {
         foreach ( $this as $node ) {
-            call_user_func_array( array( $node, $name ), $params );
+            call_user_func_array(
+                array(
+                    $node,
+                    $name
+                ),
+                $params
+            );
         }
 
         return $this;

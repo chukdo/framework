@@ -67,7 +67,10 @@ class Event
         foreach ( $this->getListeners( $event ) as $listener ) {
 
             /** Stop la propagation si une reponse = false */
-            if ( call_user_func_array( $listener, $payload ) === false ) {
+            if ( call_user_func_array(
+                    $listener,
+                    $payload
+                ) === false ) {
                 return;
             }
         }

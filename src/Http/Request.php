@@ -58,19 +58,38 @@ class Request
         $this->inputs = $app->make( 'Chukdo\Json\Input' );
         $this->header = new Header();
         $this->url = new Url( Http::server( 'SCRIPT_URI' ) );
-        $this->method = Http::request( 'httpverb' ) ?: Http::server( 'REQUEST_METHOD' );
+        $this->method = Http::request( 'httpverb' )
+            ?: Http::server( 'REQUEST_METHOD' );
 
-        $this->header->setHeader( 'Content-Type', Http::server( 'CONTENT_TYPE', '' ) );
-        $this->header->setHeader( 'Content-Length', Http::server( 'CONTENT_LENGTH', '' ) );
+        $this->header->setHeader(
+            'Content-Type',
+            Http::server(
+                'CONTENT_TYPE',
+                ''
+            )
+        );
+        $this->header->setHeader(
+            'Content-Length',
+            Http::server(
+                'CONTENT_LENGTH',
+                ''
+            )
+        );
 
         foreach ( $_SERVER as $key => $value ) {
-            if ( $name = Str::match( '/^HTTP_(.*)/', $key ) ) {
+            if ( $name = Str::match(
+                '/^HTTP_(.*)/',
+                $key
+            ) ) {
                 switch ( $name ) {
                     case 'HOST' :
                     case 'COOKIE' :
                         break;
                     default :
-                        $this->header->setHeader( $name, $value );
+                        $this->header->setHeader(
+                            $name,
+                            $value
+                        );
                 }
             }
         }
@@ -89,7 +108,10 @@ class Request
      */
     public function validate( Iterable $rules ): Validator
     {
-        return $this->inputs->validate( $rules, $this->app->make( 'Chukdo\Json\Lang' )->offsetGet( 'validation' ) );
+        return $this->inputs->validate(
+            $rules,
+            $this->app->make( 'Chukdo\Json\Lang' )->offsetGet( 'validation' )
+        );
     }
 
     /**
@@ -101,7 +123,11 @@ class Request
      */
     public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): FileUploaded
     {
-        return $this->inputs->file( $name, $allowedMimeTypes, $maxFileSize );
+        return $this->inputs->file(
+            $name,
+            $allowedMimeTypes,
+            $maxFileSize
+        );
     }
 
     /**
@@ -194,10 +220,11 @@ class Request
     public function from(): ?string
     {
         return parse_url(
-            Http::server( 'HTTP_ORIGIN' ) ?:
-                Http::server( 'HTTP_REFERER' ) ?:
-                    Http::server( 'REMOTE_ADDR' ),
-            PHP_URL_HOST );
+            Http::server( 'HTTP_ORIGIN' )
+                ?: Http::server( 'HTTP_REFERER' )
+                ?: Http::server( 'REMOTE_ADDR' ),
+            PHP_URL_HOST
+        );
     }
 
     /**
@@ -229,9 +256,9 @@ class Request
      */
     public function secured(): bool
     {
-        return
-            Http::server( 'HTTPS' ) ||
-            Http::server( 'SERVER_PORT' ) == '443' ||
-            Http::server( 'REQUEST_SCHEME' ) == 'https';
+        return Http::server( 'HTTPS' ) || Http::server( 'SERVER_PORT' ) == '443'
+            || Http::server(
+                'REQUEST_SCHEME'
+            ) == 'https';
     }
 }

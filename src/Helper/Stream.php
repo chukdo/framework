@@ -27,7 +27,10 @@ final class Stream
         if ( self::exists( $name ) ) {
             stream_wrapper_unregister( $name );
         }
-        stream_wrapper_register( $name, $class );
+        stream_wrapper_register(
+            $name,
+            $class
+        );
     }
 
     /**
@@ -37,6 +40,9 @@ final class Stream
      */
     public static function exists( string $name ): bool
     {
-        return (bool) in_array( $name, stream_get_wrappers() );
+        return (bool) in_array(
+            $name,
+            stream_get_wrappers()
+        );
     }
 }

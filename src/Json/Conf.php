@@ -24,7 +24,10 @@ class Conf extends Json
 
         if ( $storage->exists( $file ) ) {
             $load = new Json( $storage->get( $file ) );
-            $this->merge( $load->toSimpleArray(), true );
+            $this->merge(
+                $load->toSimpleArray(),
+                true
+            );
             return true;
         }
 

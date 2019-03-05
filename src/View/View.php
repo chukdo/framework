@@ -79,7 +79,10 @@ class View
      */
     public function setDefaultFolder( string $folder = null ): void
     {
-        $this->defaultFolder = rtrim( $folder, '/' );
+        $this->defaultFolder = rtrim(
+            $folder,
+            '/'
+        );
     }
 
     /**
@@ -90,7 +93,10 @@ class View
      */
     public function addFolder( string $name, string $folder ): self
     {
-        $this->folders[ $name ] = rtrim( $folder, '/' );
+        $this->folders[ $name ] = rtrim(
+            $folder,
+            '/'
+        );
 
         return $this;
     }
@@ -112,28 +118,32 @@ class View
      */
     public function path( string $template ): ?array
     {
-        list ( $folder, $name ) = Str::split( $template, '::', 2 );
+        list ( $folder, $name ) = Str::split(
+            $template,
+            '::',
+            2
+        );
 
         $r = [
             'folder' => null,
-            'name' => null,
-            'file' => null,
+            'name'   => null,
+            'file'   => null,
             'exists' => false
         ];
 
         if ( $name ) {
             $r[ 'folder' ] = $folder;
-            $r[ 'name' ] = $name;
+            $r[ 'name' ]   = $name;
 
             if ( isset( $this->folders[ $folder ] ) ) {
-                $r[ 'file' ] = $this->folders[ $folder ] . '/' . $name . '.html';
+                $r[ 'file' ]   = $this->folders[ $folder ] . '/' . $name . '.html';
                 $r[ 'exists' ] = file_exists( $r[ 'file' ] );
             }
         } else {
             $r[ 'name' ] = $folder;
 
             if ( $this->defaultFolder ) {
-                $r[ 'file' ] = $this->defaultFolder . '/' . $folder . '.html';
+                $r[ 'file' ]   = $this->defaultFolder . '/' . $folder . '.html';
                 $r[ 'exists' ] = file_exists( $r[ 'file' ] );
             }
         }
@@ -228,7 +238,12 @@ class View
             return $this->functions[ $function ];
         }
 
-        throw new ViewException( sprintf( 'Method [%s] is not a template registered function', $function ) );
+        throw new ViewException(
+            sprintf(
+                'Method [%s] is not a template registered function',
+                $function
+            )
+        );
     }
 
     /**
@@ -239,7 +254,11 @@ class View
      */
     public function make( string $template, iterable $data = null ): Template
     {
-        return new Template( $template, $data, $this );
+        return new Template(
+            $template,
+            $data,
+            $this
+        );
     }
 
     /**
@@ -248,6 +267,9 @@ class View
      */
     public function render( string $template, iterable $data = null )
     {
-        $this->make( $template, $data )->render();
+        $this->make(
+            $template,
+            $data
+        )->render();
     }
 }

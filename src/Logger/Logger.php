@@ -33,16 +33,17 @@ class Logger implements LoggerInterface
      *
      * @var array $levels
      */
-    public static $levels = [
-        100 => 'Debug',
-        200 => 'Info',
-        250 => 'Notice',
-        300 => 'Warning',
-        400 => 'Error',
-        500 => 'Critical',
-        550 => 'Alert',
-        600 => 'Emergency',
-    ];
+    public static $levels
+        = [
+            100 => 'Debug',
+            200 => 'Info',
+            250 => 'Notice',
+            300 => 'Warning',
+            400 => 'Error',
+            500 => 'Critical',
+            550 => 'Alert',
+            600 => 'Emergency',
+        ];
 
     /**
      * @var string
@@ -135,7 +136,10 @@ class Logger implements LoggerInterface
      */
     public function pushHandler( HandlerInterface $handler ): self
     {
-        array_push( $this->handlers, $handler );
+        array_push(
+            $this->handlers,
+            $handler
+        );
 
         return $this;
     }
@@ -149,7 +153,10 @@ class Logger implements LoggerInterface
      */
     public function pushProcessor( ProcessorInterface $processor ): self
     {
-        array_push( $this->processors, $processor );
+        array_push(
+            $this->processors,
+            $processor
+        );
 
         return $this;
     }
@@ -163,7 +170,11 @@ class Logger implements LoggerInterface
      */
     public function alert( string $message, array $context = [] ): bool
     {
-        return $this->log( self::ALERT, $message, $context );
+        return $this->log(
+            self::ALERT,
+            $message,
+            $context
+        );
     }
 
     /**
@@ -175,7 +186,11 @@ class Logger implements LoggerInterface
      */
     public function critical( string $message, array $context = [] ): bool
     {
-        return $this->log( self::CRITICAL, $message, $context );
+        return $this->log(
+            self::CRITICAL,
+            $message,
+            $context
+        );
     }
 
     /**
@@ -187,7 +202,11 @@ class Logger implements LoggerInterface
      */
     public function emergency( string $message, array $context = [] ): bool
     {
-        return $this->log( self::EMERGENCY, $message, $context );
+        return $this->log(
+            self::EMERGENCY,
+            $message,
+            $context
+        );
     }
 
     /**
@@ -199,7 +218,11 @@ class Logger implements LoggerInterface
      */
     public function error( string $message, array $context = [] ): bool
     {
-        return $this->log( self::ERROR, $message, $context );
+        return $this->log(
+            self::ERROR,
+            $message,
+            $context
+        );
     }
 
     /**
@@ -211,7 +234,11 @@ class Logger implements LoggerInterface
      */
     public function warning( string $message, array $context = [] ): bool
     {
-        return $this->log( self::WARNING, $message, $context );
+        return $this->log(
+            self::WARNING,
+            $message,
+            $context
+        );
     }
 
     /**
@@ -223,7 +250,11 @@ class Logger implements LoggerInterface
      */
     public function notice( string $message, array $context = [] ): bool
     {
-        return $this->log( self::NOTICE, $message, $context );
+        return $this->log(
+            self::NOTICE,
+            $message,
+            $context
+        );
     }
 
     /**
@@ -235,7 +266,11 @@ class Logger implements LoggerInterface
      */
     public function info( string $message, array $context = [] ): bool
     {
-        return $this->log( self::INFO, $message, $context );
+        return $this->log(
+            self::INFO,
+            $message,
+            $context
+        );
     }
 
     /**
@@ -247,7 +282,11 @@ class Logger implements LoggerInterface
      */
     public function debug( string $message, array $context = [] ): bool
     {
-        return $this->log( self::DEBUG, $message, $context );
+        return $this->log(
+            self::DEBUG,
+            $message,
+            $context
+        );
     }
 
     /**
@@ -269,7 +308,10 @@ class Logger implements LoggerInterface
         }
 
         $record = [
-            'message' => $this->interpolate( $message, $context ),
+            'message' => $this->interpolate(
+                $message,
+                $context
+            ),
             'level' => $level,
             'levelname' => $this->getLevel( $level ),
             'channel' => $this->getName(),
@@ -292,12 +334,20 @@ class Logger implements LoggerInterface
         $replace = [];
 
         foreach ( $context as $key => $val ) {
-            if ( !is_array( $val ) && ( !is_object( $val ) || method_exists( $val, '__toString' ) ) ) {
+            if ( !is_array( $val )
+                && ( !is_object( $val )
+                    || method_exists(
+                        $val,
+                        '__toString'
+                    ) ) ) {
                 $replace[ '{' . $key . '}' ] = $val;
             }
         }
 
-        return strtr( $message, $replace );
+        return strtr(
+            $message,
+            $replace
+        );
     }
 
     /**
