@@ -22,6 +22,11 @@ class Rule
     protected $rule;
 
     /**
+     * @var string
+     */
+    protected $message;
+
+    /**
      * @var
      */
     protected $input;
@@ -36,14 +41,16 @@ class Rule
      *
      * @param string $name
      * @param string $rule
+     * @param string $message
      * @param $input
      * @param array $attributes
      */
-    public function __construct( string $name, string $rule, $input, array $attributes = [] )
+    public function __construct( string $name, string $rule, string $message, $input, array $attributes = [] )
     {
         $this->name       = trim( $name );
         $this->rule       = trim( $rule );
         $this->input      = $input;
+        $this->message    = $message;
         $this->attributes = array_map( 'trim', $attributes );
     }
 
@@ -58,18 +65,9 @@ class Rule
     /**
      * @return string
      */
-    public function namespace(): string
+    public function message(): string
     {
-        return $this->name() . '.' . $this->rule();
-    }
-
-    /**
-     * @return string
-     */
-    public function field(): string
-    {
-        // account.mail => champ account[mail] to.*.email => to[0][email] et to[1][email] -> field
-        // to.*.email => email pour message comment l'associer ?!
+        return $this->message;
     }
 
     /**

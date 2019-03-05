@@ -36,7 +36,7 @@ class JsonException extends Json
                 'Call' => $trace->offsetGet( 'class' ) . $trace->offsetGet( 'type' ) . $trace->offsetGet( 'function' ) . '()',
                 'File' => $file,
                 'Line' => $line,
-                'Php' => $file && $line ? $this->getCode( $trace->offsetGet( 'file' ), $trace->offsetGet( 'line' ) ) : ''
+                'Php'  => $file && $line ? $this->getCode( $trace->offsetGet( 'file' ), $trace->offsetGet( 'line' ) ) : ''
             ];
         }
 

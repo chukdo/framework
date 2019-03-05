@@ -1,4 +1,4 @@
-<?php namespace Chukdo\View;
+<?php namespace Chukdo\Validation;
 
 use Chukdo\Bootstrap\AppException;
 

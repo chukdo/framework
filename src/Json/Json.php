@@ -29,11 +29,20 @@ class Json extends \ArrayObject
 
         if ( Is::arr( $data ) ) {
             foreach ( $data as $k => $v ) {
-                $this->offsetSet( $k, $v );
+                $this->offsetSet(
+                    $k,
+                    $v
+                );
             }
         } else if ( Is::json( $data ) ) {
-            foreach ( json_decode( $data, true ) as $k => $v ) {
-                $this->offsetSet( $k, $v );
+            foreach ( json_decode(
+                $data,
+                true
+            ) as $k => $v ) {
+                $this->offsetSet(
+                    $k,
+                    $v
+                );
             }
         }
     }
@@ -59,7 +68,9 @@ class Json extends \ArrayObject
      */
     public function isEmpty(): bool
     {
-        return $this->count() == 0 ? true : false;
+        return $this->count() == 0
+            ? true
+            : false;
     }
 
     /**
@@ -82,7 +93,10 @@ class Json extends \ArrayObject
         parent::__construct( [] );
 
         foreach ( $reset as $key => $value ) {
-            $this->offsetSet( $key, $value );
+            $this->offsetSet(
+                $key,
+                $value
+            );
         }
 
         return $this;
@@ -161,7 +175,11 @@ class Json extends \ArrayObject
             $toSort[ $k ] = $v[ $key ];
         }
 
-        array_multisort( $toSort, $order, $array );
+        array_multisort(
+            $toSort,
+            $order,
+            $array
+        );
 
         $this->reset( $array );
 
@@ -201,6 +219,23 @@ class Json extends \ArrayObject
     }
 
     /**
+     * @param array $keys
+     * @param null $default
+     *
+     * @return mixed|null
+     */
+    public function offsetGetFirstInList( array $keys, $default = null )
+    {
+        foreach ( $keys as $key ) {
+            if ( $get = $this->offsetGet( $key ) ) {
+                return $get;
+            }
+        }
+
+        return $default;
+    }
+
+    /**
      * @param $key
      * @param mixed $value
      *
@@ -211,7 +246,11 @@ class Json extends \ArrayObject
         if ( $this->offsetExists( $key ) ) {
             return parent::offsetGet( $key );
         } else {
-            return $this->offsetSet( $key, $value ?: [] )->offsetGet( $key );
+            return $this->offsetSet(
+                $key,
+                $value
+                    ?: []
+            )->offsetGet( $key );
         }
     }
 
@@ -224,9 +263,15 @@ class Json extends \ArrayObject
     public function offsetSet( $key, $value ): self
     {
         if ( Is::arr( $value ) ) {
-            parent::offsetSet( $key, new self( $value ) );
+            parent::offsetSet(
+                $key,
+                new self( $value )
+            );
         } else {
-            parent::offsetSet( $key, $value );
+            parent::offsetSet(
+                $key,
+                $value
+            );
         }
 
         return $this;
@@ -292,7 +337,10 @@ class Json extends \ArrayObject
         if ( $merge ) {
             foreach ( $merge as $k => $v ) {
                 if ( $overwrite || !$this->offsetExists( $k ) ) {
-                    $this->offsetSet( $k, $v );
+                    $this->offsetSet(
+                        $k,
+                        $v
+                    );
                 }
             }
         }
@@ -313,12 +361,18 @@ class Json extends \ArrayObject
 
                 /** Les deux sont iterables on boucle en recursif */
                 if ( is_iterable( $v ) && $this->offsetGet( $k ) instanceof Json ) {
-                    $this->offsetGet( $k )->mergeRecursive( $v, $overwrite );
+                    $this->offsetGet( $k )->mergeRecursive(
+                        $v,
+                        $overwrite
+                    );
                     continue;
                 }
 
                 if ( $overwrite || !$this->offsetExists( $k ) ) {
-                    $this->offsetSet( $k, $v );
+                    $this->offsetSet(
+                        $k,
+                        $v
+                    );
                 }
             }
         }
@@ -352,7 +406,13 @@ class Json extends \ArrayObject
     public function filter( Closure $closure ): self
     {
         foreach ( $this as $k => $v ) {
-            $this->offsetSet( $k, $closure( $k, $v ) );
+            $this->offsetSet(
+                $k,
+                $closure(
+                    $k,
+                    $v
+                )
+            );
         }
 
         return $this;
@@ -371,7 +431,13 @@ class Json extends \ArrayObject
             if ( $v instanceof Json ) {
                 $v->filterRecursive( $closure );
             } else {
-                $this->offsetSet( $k, $closure( $k, $v ) );
+                $this->offsetSet(
+                    $k,
+                    $closure(
+                        $k,
+                        $v
+                    )
+                );
             }
         }
 
@@ -395,7 +461,11 @@ class Json extends \ArrayObject
             }
 
             foreach ( $toCall as $key => $value ) {
-                $callback( $this, $key, $value );
+                $callback(
+                    $this,
+                    $key,
+                    $value
+                );
             }
         }
 
@@ -413,7 +483,10 @@ class Json extends \ArrayObject
 
         foreach ( $offsets as $offsetList ) {
             foreach ( (array) $offsetList as $offset ) {
-                $only->set( $offset, $this->get( $offset ) );
+                $only->set(
+                    $offset,
+                    $this->get( $offset )
+                );
             }
         }
 
@@ -477,8 +550,16 @@ class Json extends \ArrayObject
      */
     public function wildcard( string $path ): self
     {
-        $path      = rtrim( $path, '.*' );
-        $arr       = new Arr( Str::split( $path, '.' ) );
+        $path      = rtrim(
+            $path,
+            '.*'
+        );
+        $arr       = new Arr(
+            Str::split(
+                $path,
+                '.'
+            )
+        );
         $firstPath = $arr->getFirstAndRemove();
         $emptyPath = $arr->empty();
         $endPath   = $arr->join( '.' );
@@ -489,15 +570,24 @@ class Json extends \ArrayObject
             foreach ( $this as $key => $value ) {
                 if ( $value instanceof Json ) {
                     if ( ( $get = $value->wildcard( $endPath ) )->count() ) {
-                        $json->offsetSet( $key, $get );
+                        $json->offsetSet(
+                            $key,
+                            $get
+                        );
                     }
                 }
             }
         } else if ( $get instanceof Json && !$emptyPath ) {
-            $json->offsetSet( $firstPath, $get->wildcard( $endPath ) );
+            $json->offsetSet(
+                $firstPath,
+                $get->wildcard( $endPath )
+            );
 
         } else if ( $get && $emptyPath ) {
-            $json->offsetSet( $firstPath, $get );
+            $json->offsetSet(
+                $firstPath,
+                $get
+            );
         }
 
         return $json;
@@ -511,11 +601,22 @@ class Json extends \ArrayObject
      */
     public function get( string $path, $default = null )
     {
-        if ( Str::notContain( $path, '.' ) ) {
-            return $this->offsetGet( $path, $default );
+        if ( Str::notContain(
+            $path,
+            '.'
+        ) ) {
+            return $this->offsetGet(
+                $path,
+                $default
+            );
         }
 
-        $arr       = new Arr( Str::split( $path, '.' ) );
+        $arr       = new Arr(
+            Str::split(
+                $path,
+                '.'
+            )
+        );
         $firstPath = $arr->getFirstAndRemove();
         $endPath   = $arr->join( '.' );
         $get       = $this->offsetGet( $firstPath );
@@ -534,11 +635,19 @@ class Json extends \ArrayObject
      */
     public function unset( string $path )
     {
-        if ( Str::notContain( $path, '.' ) ) {
+        if ( Str::notContain(
+            $path,
+            '.'
+        ) ) {
             return $this->offsetUnset( $path );
         }
 
-        $arr       = new Arr( Str::split( $path, '.' ) );
+        $arr       = new Arr(
+            Str::split(
+                $path,
+                '.'
+            )
+        );
         $firstPath = $arr->getFirstAndRemove();
         $endPath   = $arr->join( '.' );
         $get       = $this->offsetGet( $firstPath );
@@ -558,15 +667,29 @@ class Json extends \ArrayObject
      */
     public function set( string $path, $value ): self
     {
-        if ( Str::notContain( $path, '.' ) ) {
-            return $this->offsetSet( $path, $value );
+        if ( Str::notContain(
+            $path,
+            '.'
+        ) ) {
+            return $this->offsetSet(
+                $path,
+                $value
+            );
         }
 
-        $arr       = new Arr( Str::split( $path, '.' ) );
+        $arr       = new Arr(
+            Str::split(
+                $path,
+                '.'
+            )
+        );
         $firstPath = $arr->getFirstAndRemove();
         $endPath   = $arr->join( '.' );
 
-        return $this->offsetGetOrSet( $firstPath )->set( $endPath, $value );
+        return $this->offsetGetOrSet( $firstPath )->set(
+            $endPath,
+            $value
+        );
     }
 
     /**
@@ -581,10 +704,16 @@ class Json extends \ArrayObject
         $mixed = [];
 
         foreach ( $this as $k => $v ) {
-            $k = trim( $path . '.' . $k, '.' );
+            $k = trim(
+                $path . '.' . $k,
+                '.'
+            );
 
             if ( $v instanceof Json ) {
-                $mixed = array_merge( $mixed, $v->toSimpleArray( $k ) );
+                $mixed = array_merge(
+                    $mixed,
+                    $v->toSimpleArray( $k )
+                );
             } else {
                 $mixed[ $k ] = $v;
             }
@@ -608,7 +737,12 @@ class Json extends \ArrayObject
      */
     public function toJson( bool $prettyfy = false ): string
     {
-        return json_encode( $this->toArray(), $prettyfy ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES : JSON_UNESCAPED_SLASHES );
+        return json_encode(
+            $this->toArray(),
+            $prettyfy
+                ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+                : JSON_UNESCAPED_SLASHES
+        );
     }
 
     /**
@@ -633,29 +767,37 @@ class Json extends \ArrayObject
      */
     public function toHtml( string $title = null, string $color = null, string $widthFirstCol = null ): string
     {
-        $html = "<table id=\"JsonTableRender\" style=\"border-spacing:0;border-collapse:collapse;font-family:Helvetica;width:100%;word-break:break-word;\">";
+        $html  = '';
+        $style = 'border-spacing:0;border-collapse:collapse;font-family:Arial;width:100%;word-break:break-word;';
 
         if ( $title ) {
-            $color = $color ?: '#499cef';
-            $html  .= "<thead style=\"color: #fff;background: $color;\">" .
-                "<tr>" .
-                "<th colspan=\"2\" style=\"padding:20px;font-size:30px;\">$title</th>" .
-                "</tr>" .
-                "</thead>";
+            $color = $color
+                ?: '#499cef';
+            $html  .= "
+                <thead style=\"color: #fff;background: $color;\">
+                    <tr>
+                        <th colspan=\"2\" style=\"padding:20px;font-size:30px;\">$title</th>
+                    </tr>
+                </thead>";
         }
 
         foreach ( $this as $k => $v ) {
-            $v = $v instanceof Json ?
-                $v->toHtml( null, null, $widthFirstCol ) :
-                $v;
+            $v = $v instanceof Json
+                ? $v->toHtml(
+                    null,
+                    null,
+                    $widthFirstCol
+                )
+                : $v;
 
-            $html .= "<tr>" .
-                "<td style=\"background:#eee;padding:6px;border:1px solid #eee;width:$widthFirstCol;\">$k</td>" .
-                "<td  style=\"padding:6px;border:1px solid #eee;\">$v</td>" .
-                "</tr>";
+            $html .= "
+                <tr>
+                    <td style=\"background:#eee;padding:6px;border:1px solid #eee;width:$widthFirstCol;\">$k</td>
+                    <td  style=\"padding:6px;border:1px solid #eee;\">$v</td>
+                </tr>";
         }
 
-        return $html . '</table>';
+        return "<table id=\"JsonTableRender\" style=\"$style\">$html</table>";
     }
 
     /**
@@ -679,7 +821,13 @@ class Json extends \ArrayObject
         $function   = array_shift( $param );
         $param[ 0 ] = $this->get( $param[ 0 ] );
 
-        return call_user_func_array( [ '\Chukdo\Helper\To', $function ], $param );
+        return call_user_func_array(
+            [
+                '\Chukdo\Helper\To',
+                $function
+            ],
+            $param
+        );
     }
 
     /**
@@ -692,7 +840,13 @@ class Json extends \ArrayObject
         $function   = array_shift( $param );
         $param[ 0 ] = $this->get( $param[ 0 ] );
 
-        return call_user_func_array( [ '\Chukdo\Helper\Is', $function ], $param );
+        return call_user_func_array(
+            [
+                '\Chukdo\Helper\Is',
+                $function
+            ],
+            $param
+        );
     }
 
     /**
@@ -719,7 +873,10 @@ class Json extends \ArrayObject
      */
     public function __set( string $key, $value ): void
     {
-        $this->offsetSet( $key, $value );
+        $this->offsetSet(
+            $key,
+            $value
+        );
     }
 
     /**
@@ -729,9 +886,9 @@ class Json extends \ArrayObject
      */
     public function __get( string $key )
     {
-        return $this->offsetExists( $key ) ?
-            $this->offsetGet( $key ) :
-            null;
+        return $this->offsetExists( $key )
+            ? $this->offsetGet( $key )
+            : null;
     }
 
     /**

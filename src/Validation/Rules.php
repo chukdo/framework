@@ -2,7 +2,7 @@
 
 use Chukdo\Json\Arr;
 use Chukdo\Json\Input;
-use Chukdo\View\ValidationException;
+use Chukdo\Json\Lang;
 use IteratorAggregate;
 
 /**
@@ -22,33 +22,55 @@ class Rules implements IteratorAggregate
     protected $rules;
 
     /**
+     * @var Lang
+     */
+    protected $messages;
+
+    /**
      * Rules constructor.
      *
      * @param iterable $rules
      * @param Input $inputs
+     * @param Lang $messages
      */
-    public function __construct( Iterable $rules, Input $inputs )
+    public function __construct( Iterable $rules, Input $inputs, Lang $messages )
     {
         $this->rules = new Arr();
+        $this->messages = $messages;
 
-        foreach ( $rules as $name => $rule ) {
-            $this->rules->merge( $this->parseRules( $name, $rule , $inputs->wildcard($name) ) );
+        foreach ( $rules as $name => $rulesPiped ) {
+            $this->rules->merge(
+                $this->parseRules(
+                    $name,
+                    $rulesPiped,
+                    $inputs->wildcard( $name )
+                )
+            );
         }
     }
 
     /**
      * @param string $name
-     * @param string $rules
+     * @param string $rulesPiped
      * @param $input
      *
      * @return Arr
      */
-    protected function parseRules( string $name, string $rules, $input ): Arr
+    protected function parseRules( string $name, string $rulesPiped, $input ): Arr
     {
         $parseRules = new Arr();
 
-        foreach ( explode( '|', $rules ) as $rule ) {
-            $parseRules->append( $this->parseRule( $name, $rule, $input ) );
+        foreach ( explode(
+            '|',
+            $rulesPiped
+        ) as $rule ) {
+            $parseRules->append(
+                $this->parseRule(
+                    $name,
+                    $rule,
+                    $input
+                )
+            );
         }
 
         return $parseRules;
@@ -56,24 +78,43 @@ class Rules implements IteratorAggregate
 
     /**
      * @param string $name
-     * @param string $rule
+     * @param string $ruleColon
      * @param $input
      *
      * @return Rule
      */
-    protected function parseRule( string $name, string $rule, $input ): Rule
+    protected function parseRule( string $name, string $ruleColon, $input ): Rule
     {
-        $ruleItems = explode( ':', $rule );
-        $countItems = count( $ruleItems );
+        list( $rule, $param ) = array_pad(
+            explode(
+                ':',
+                $ruleColon
+            ),
+            2,
+            ''
+        );
 
-        switch ( $countItems ) {
-            case 1 :
-                return new Rule( $name, $ruleItems[ 0 ], $input );
-            case 2 :
-                return new Rule( $name, $ruleItems[ 0 ], $input, explode( ',', $ruleItems[ 1 ] ) );
-        }
+        $message = $this->messages->offsetGetFirstInList(
+            [
+                $name,
+                $name . '.' . $rule
+            ],
+            sprintf(
+                'Validation message [%s] cannot be found',
+                $name
+            )
+        );
 
-        throw new ValidationException( sprintf( 'Rule [%s] format error', $rule ) );
+        return new Rule(
+            $name,
+            $rule,
+            $message,
+            $input,
+            explode(
+                ',',
+                $param
+            )
+        );
     }
 
     /**

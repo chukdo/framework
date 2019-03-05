@@ -4,6 +4,7 @@ use Chukdo\Json\Input;
 use Chukdo\Json\Lang;
 use Chukdo\Contracts\Validation\Validate as ValidateInterface;
 use Chukdo\Json\Message;
+use Chukdo\View\ValidationException;
 
 /**
  * Validation de données
@@ -34,7 +35,7 @@ class Validator
     /**
      * @var Validate
      */
-    protected $validate;
+    protected $validate = [];
 
     /**
      * @var Lang
@@ -55,11 +56,9 @@ class Validator
      */
     public function __construct( Input $inputs, array $rules, Lang $messages )
     {
-        $this->inputs   = $inputs;
-        $this->messages = $messages;
-        $this->error    = new Message( 'error' );
-        $this->rules    = new Rules( $rules, $inputs );
-        $this->validate = new Validate( $this );
+        $this->error     = new Message( 'error' );
+        $this->rules     = new Rules( $rules, $inputs, $messages );
+        $this->validated = new Input( [] );
     }
 
     /**
@@ -69,17 +68,9 @@ class Validator
      */
     public function register( ValidateInterface $validate ): self
     {
-        $this->validate->register( $validate );
+        $this->validate[ $validate->name() ] = $validate;
 
         return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function fails(): bool
-    {
-        return !$this->validated();
     }
 
     /**
@@ -87,29 +78,38 @@ class Validator
      */
     public function validated(): Input
     {
-        if ( $this->validated === null ) {
-            $this->validate();
-        }
-
         return $this->validated;
     }
 
     /**
-     * @return Input
+     * @return bool
      */
-    public function validate(): Input
+    public function validate(): bool
     {
-        $r = true;
-
         foreach ( $this->rules() as $rule ) {
+            // cas rule->input() = array (multiple)
 
-            if ( !$this->validate->validate( $rule ) ) {
+            // required ok
+            // array ok
+            // int ok (loop var) car wildcard !!! solution
 
-                $r .= false;
-            }
+            // isset validate $rule->name();
+            // call user func
+            // ko => validator->error()
+            // $this->error->offsetSet( $rule->field(), $this->messageFromRule( $rule ) );
+            // ok =>
         }
 
-        return $r;
+        return true;
+    }
+
+    /**
+     * @return string
+     */
+    public function field(): string
+    {
+        // account.mail => champ account[mail] to.*.email => to[0][email] et to[1][email] -> field
+        // to.*.email => email pour message comment l'associer ?!
     }
 
     /**
