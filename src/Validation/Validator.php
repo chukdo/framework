@@ -59,7 +59,7 @@ class Validator
         $this->messages = $messages;
         $this->error    = new Message( 'error' );
         $this->rules    = new Rules( $rules, $inputs );
-        $this->validate = new Validate($this);
+        $this->validate = new Validate( $this );
     }
 
     /**

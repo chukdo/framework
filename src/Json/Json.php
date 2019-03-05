@@ -154,7 +154,7 @@ class Json extends \ArrayObject
      */
     public function sort( string $key, int $order = SORT_ASC ): self
     {
-        $array = $this->getArrayCopy();
+        $array  = $this->getArrayCopy();
         $toSort = [];
 
         foreach ( $array as $k => $v ) {
@@ -477,13 +477,13 @@ class Json extends \ArrayObject
      */
     public function wildcard( string $path ): self
     {
-        $path = rtrim( $path, '.*' );
-        $arr = new Arr( Str::split( $path, '.' ) );
+        $path      = rtrim( $path, '.*' );
+        $arr       = new Arr( Str::split( $path, '.' ) );
         $firstPath = $arr->getFirstAndRemove();
         $emptyPath = $arr->empty();
-        $endPath = $arr->join( '.' );
-        $json = new self();
-        $get = $this->offsetGet( $firstPath );
+        $endPath   = $arr->join( '.' );
+        $json      = new self();
+        $get       = $this->offsetGet( $firstPath );
 
         if ( $firstPath == '*' ) {
             foreach ( $this as $key => $value ) {
@@ -515,10 +515,10 @@ class Json extends \ArrayObject
             return $this->offsetGet( $path, $default );
         }
 
-        $arr = new Arr( Str::split( $path, '.' ) );
+        $arr       = new Arr( Str::split( $path, '.' ) );
         $firstPath = $arr->getFirstAndRemove();
-        $endPath = $arr->join( '.' );
-        $get = $this->offsetGet( $firstPath );
+        $endPath   = $arr->join( '.' );
+        $get       = $this->offsetGet( $firstPath );
 
         if ( $get instanceof Json ) {
             return $get->get( $endPath );
@@ -538,10 +538,10 @@ class Json extends \ArrayObject
             return $this->offsetUnset( $path );
         }
 
-        $arr = new Arr( Str::split( $path, '.' ) );
+        $arr       = new Arr( Str::split( $path, '.' ) );
         $firstPath = $arr->getFirstAndRemove();
-        $endPath = $arr->join( '.' );
-        $get = $this->offsetGet( $firstPath );
+        $endPath   = $arr->join( '.' );
+        $get       = $this->offsetGet( $firstPath );
 
         if ( $get instanceof Json ) {
             return $get->unset( $endPath );
@@ -562,9 +562,9 @@ class Json extends \ArrayObject
             return $this->offsetSet( $path, $value );
         }
 
-        $arr = new Arr( Str::split( $path, '.' ) );
+        $arr       = new Arr( Str::split( $path, '.' ) );
         $firstPath = $arr->getFirstAndRemove();
-        $endPath = $arr->join( '.' );
+        $endPath   = $arr->join( '.' );
 
         return $this->offsetGetOrSet( $firstPath )->set( $endPath, $value );
     }
@@ -608,12 +608,7 @@ class Json extends \ArrayObject
      */
     public function toJson( bool $prettyfy = false ): string
     {
-        return json_encode(
-            $this->toArray(),
-            $prettyfy ?
-                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES :
-                JSON_UNESCAPED_SLASHES
-        );
+        return json_encode( $this->toArray(), $prettyfy ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES : JSON_UNESCAPED_SLASHES );
     }
 
     /**
@@ -642,19 +637,22 @@ class Json extends \ArrayObject
 
         if ( $title ) {
             $color = $color ?: '#499cef';
-            $html .= "<thead style=\"color: #fff;background: $color;\">"
-                . "<tr>"
-                . "<th colspan=\"2\" style=\"padding:20px;font-size:30px;\">$title</th>"
-                . "</tr>"
-                . "</thead>";
+            $html  .= "<thead style=\"color: #fff;background: $color;\">" .
+                "<tr>" .
+                "<th colspan=\"2\" style=\"padding:20px;font-size:30px;\">$title</th>" .
+                "</tr>" .
+                "</thead>";
         }
 
         foreach ( $this as $k => $v ) {
-            $v = $v instanceof Json ? $v->toHtml( null, null, $widthFirstCol ) : $v;
-            $html .= "<tr>"
-                . "<td style=\"background:#eee;padding:6px;border:1px solid #eee;width:$widthFirstCol;\">$k</td>"
-                . "<td  style=\"padding:6px;border:1px solid #eee;\">$v</td>"
-                . "</tr>";
+            $v = $v instanceof Json ?
+                $v->toHtml( null, null, $widthFirstCol ) :
+                $v;
+
+            $html .= "<tr>" .
+                "<td style=\"background:#eee;padding:6px;border:1px solid #eee;width:$widthFirstCol;\">$k</td>" .
+                "<td  style=\"padding:6px;border:1px solid #eee;\">$v</td>" .
+                "</tr>";
         }
 
         return $html . '</table>';
@@ -678,7 +676,7 @@ class Json extends \ArrayObject
      */
     public function to( ...$param )
     {
-        $function = array_shift( $param );
+        $function   = array_shift( $param );
         $param[ 0 ] = $this->get( $param[ 0 ] );
 
         return call_user_func_array( [ '\Chukdo\Helper\To', $function ], $param );
@@ -691,7 +689,7 @@ class Json extends \ArrayObject
      */
     public function is( ...$param )
     {
-        $function = array_shift( $param );
+        $function   = array_shift( $param );
         $param[ 0 ] = $this->get( $param[ 0 ] );
 
         return call_user_func_array( [ '\Chukdo\Helper\Is', $function ], $param );
@@ -731,7 +729,9 @@ class Json extends \ArrayObject
      */
     public function __get( string $key )
     {
-        return $this->offsetExists( $key ) ? $this->offsetGet( $key ) : null;
+        return $this->offsetExists( $key ) ?
+            $this->offsetGet( $key ) :
+            null;
     }
 
     /**

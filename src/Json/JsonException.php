@@ -73,6 +73,7 @@ class JsonException extends Json
 
         $code = highlight_string( '<?php ' . $code, true );
         $code = str_replace( '&lt;?php&nbsp;', '', $code );
+        $code = '<span style="line-height:0.6rem">' . $code . '</span>';
 
         return $code;
     }

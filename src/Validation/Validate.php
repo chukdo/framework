@@ -51,6 +51,8 @@ class Validate
      */
     public function validate( Rule $rule )
     {
+        // cas rule->input() = array (multiple)
+
         // isset validate $rule->name();
         // call user func
         // ko => validator->error()
