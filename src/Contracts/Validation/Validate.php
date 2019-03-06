@@ -17,9 +17,10 @@ interface Validate
     public function name(): string;
 
     /**
-     * @param mixed ...$data
+     * @param $input
+     * @param array $param
      *
      * @return bool
      */
-    public function validate( ...$data ): bool;
+    public function validate( $input, array $param = [] ): bool;
 }

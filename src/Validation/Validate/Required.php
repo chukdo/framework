@@ -22,12 +22,13 @@ class Required implements Validate
     }
 
     /**
-     * @param mixed ...$data
+     * @param $input
+     * @param array $param
      *
      * @return bool
      */
-    public function validate( ...$data ): bool
+    public function validate( $input, array $param = [] ): bool
     {
-        return count( $data ) > 0;
+        return $input !== null;
     }
 }

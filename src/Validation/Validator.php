@@ -4,7 +4,7 @@ use Chukdo\Json\Input;
 use Chukdo\Json\Lang;
 use Chukdo\Contracts\Validation\Validate as ValidateInterface;
 use Chukdo\Json\Message;
-use Chukdo\View\ValidationException;
+use Chukdo\Validation\ValidationException;
 
 /**
  * Validation de données
@@ -91,7 +91,13 @@ class Validator
     public function validate(): bool
     {
         foreach ( $this->rules() as $rule ) {
-            // cas rule->input() = array (multiple)
+            if ( $this->validateRule( $rule ) ) {
+
+            } else {
+
+            }
+
+            //$validate = $this->validate[$rule->rule()]->validate($rule->inputs(), $rule->attributes());
 
             // required ok
             // array ok
@@ -105,6 +111,45 @@ class Validator
         }
 
         return true;
+    }
+
+    /**
+     * @param Rule $rule
+     *
+     * @return bool
+     */
+    public function validateRule( Rule $rule ): bool
+    {
+        if ( is_iterable( $rule->input() ) ) {
+            foreach ( $rule->input() as $input ) {
+                $this->validateInput($rule, $input);
+            }
+        } else {
+            $this->validateInput($rule, $rule->input());
+        }
+    }
+
+    /**
+     * @param Rule $rule
+     * @param $input
+     *
+     * @return bool
+     */
+    public function validateInput( Rule $rule, $input ): bool
+    {
+        if ( isset( $this->validate[ $rule->rule() ] ) ) {
+            $validate = $this->validate[ $rule->rule() ]->validate(
+                $input,
+                $rule->attributes()
+            );
+        }
+
+        throw new ValidationException(
+            sprintf(
+                'Validation Rule [%s] does not exist',
+                $rule->rule()
+            )
+        );
     }
 
     /**
