@@ -33,14 +33,9 @@ class Validator
     protected $rules;
 
     /**
-     * @var Validate
+     * @var array
      */
     protected $validate = [];
-
-    /**
-     * @var Lang
-     */
-    protected $messages;
 
     /**
      * @var Message
@@ -56,8 +51,8 @@ class Validator
      */
     public function __construct( Input $inputs, array $rules, Lang $messages )
     {
-        $this->error     = new Message( 'error' );
-        $this->rules     = new Rules(
+        $this->error = new Message( 'error' );
+        $this->rules = new Rules(
             $rules,
             $inputs,
             $messages
@@ -88,29 +83,23 @@ class Validator
     /**
      * @return bool
      */
+    public function fails(): bool
+    {
+        return $this->error->count() > 0;
+    }
+
+    /**
+     * @return bool
+     */
     public function validate(): bool
     {
+        $validate = true;
+
         foreach ( $this->rules() as $rule ) {
-            if ( $this->validateRule( $rule ) ) {
-
-            } else {
-
-            }
-
-            //$validate = $this->validate[$rule->rule()]->validate($rule->inputs(), $rule->attributes());
-
-            // required ok
-            // array ok
-            // int ok (loop var) car wildcard !!! solution
-
-            // isset validate $rule->name();
-            // call user func
-            // ko => validator->error()
-            // $this->error->offsetSet( $rule->field(), $this->messageFromRule( $rule ) );
-            // ok =>
+            $validate .= $this->validateRule( $rule );
         }
 
-        return true;
+        return $validate;
     }
 
     /**
@@ -120,13 +109,23 @@ class Validator
      */
     public function validateRule( Rule $rule ): bool
     {
+        $validate = true;
+
         if ( is_iterable( $rule->input() ) ) {
             foreach ( $rule->input() as $input ) {
-                $this->validateInput($rule, $input);
+                $validate .= $this->validateInput(
+                    $rule,
+                    $input
+                );
             }
         } else {
-            $this->validateInput($rule, $rule->input());
+            $validate = $this->validateInput(
+                $rule,
+                $rule->input()
+            );
         }
+
+        return $validate;
     }
 
     /**
@@ -138,27 +137,26 @@ class Validator
     public function validateInput( Rule $rule, $input ): bool
     {
         if ( isset( $this->validate[ $rule->rule() ] ) ) {
-            $validate = $this->validate[ $rule->rule() ]->validate(
-                $input,
-                $rule->attributes()
+            throw new ValidationException(
+                sprintf(
+                    'Validation Rule [%s] does not exist',
+                    $rule->rule()
+                )
             );
         }
 
-        throw new ValidationException(
-            sprintf(
-                'Validation Rule [%s] does not exist',
-                $rule->rule()
-            )
+        $validate = $this->validate[ $rule->rule() ]->validate(
+            $input,
+            $rule->attributes()
         );
-    }
 
-    /**
-     * @return string
-     */
-    public function field(): string
-    {
-        // account.mail => champ account[mail] to.*.email => to[0][email] et to[1][email] -> field
-        // to.*.email => email pour message comment l'associer ?!
+        if ($validate === true) {
+            $this->validated->offsetSet($rule->name(), $rule->input());
+            return true;
+        }
+
+        $this->error->offsetSet($rule->name(), $rule->message());
+        return false;
     }
 
     /**
@@ -175,14 +173,6 @@ class Validator
     public function inputs(): Input
     {
         return $this->inputs;
-    }
-
-    /**
-     * @return Lang
-     */
-    public function messages(): Lang
-    {
-        return $this->messages;
     }
 
     /**

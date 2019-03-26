@@ -1,5 +1,7 @@
 <?php namespace Chukdo\Helper;
 
+use Chukdo\Json\Arr;
+
 /**
  * Classe Is
  * Fonctionnalités de test des données
@@ -63,7 +65,7 @@ final class Is
      */
     public static function arr( $value ): bool
     {
-        return is_array( $value ) || $value instanceof \ArrayObject;
+        return is_array( $value ) || $value instanceof \ArrayObject || $value instanceof Arr;
     }
 
     /**

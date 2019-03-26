@@ -265,7 +265,7 @@ class Json extends \ArrayObject
         if ( Is::arr( $value ) ) {
             parent::offsetSet(
                 $key,
-                new self( $value )
+                new static( $value )
             );
         } else {
             parent::offsetSet(
@@ -479,7 +479,7 @@ class Json extends \ArrayObject
      */
     public function only( ...$offsets ): self
     {
-        $only = new self();
+        $only = new static();
 
         foreach ( $offsets as $offsetList ) {
             foreach ( (array) $offsetList as $offset ) {
@@ -500,7 +500,7 @@ class Json extends \ArrayObject
      */
     public function except( ...$offsets ): self
     {
-        $except = new self( $this->getArrayCopy() );
+        $except = new static( $this->getArrayCopy() );
 
         foreach ( $offsets as $offsetList ) {
             foreach ( (array) $offsetList as $offset ) {
@@ -563,7 +563,7 @@ class Json extends \ArrayObject
         $firstPath = $arr->getFirstAndRemove();
         $emptyPath = $arr->empty();
         $endPath   = $arr->join( '.' );
-        $json      = new self();
+        $json      = new static();
         $get       = $this->offsetGet( $firstPath );
 
         if ( $firstPath == '*' ) {

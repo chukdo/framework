@@ -70,7 +70,10 @@ class Rule
      */
     public function message(): string
     {
-        return $this->message;
+        return sprintf(
+            $this->message,
+            $this->name
+        );
     }
 
     /**

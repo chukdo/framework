@@ -36,7 +36,7 @@ class Arr implements \Iterator
      */
     public function current()
     {
-        $this->arr[ $this->offset ];
+        return $this->arr[ $this->offset ];
     }
 
     /**
