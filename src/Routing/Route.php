@@ -1,14 +1,18 @@
-<?php namespace Chukdo\Routing;
+<?php
 
-Use \Closure;
+namespace Chukdo\Routing;
+
+use Closure;
 
 /**
- * Gestion d'une Route
+ * Gestion d'une Route.
  *
- * @package        Routing
  * @version    1.0.0
+ *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ *
  * @since        08/01/2019
+ *
  * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Route
@@ -26,12 +30,12 @@ class Route
     /**
      * Route constructor.
      *
-     * @param Router $router
+     * @param Router  $router
      * @param Closure $closure
      */
-    public function __construct( Router $router, Closure $closure )
+    public function __construct(Router $router, Closure $closure)
     {
-        $this->router  = $router;
+        $this->router = $router;
         $this->closure = $closure;
     }
 }

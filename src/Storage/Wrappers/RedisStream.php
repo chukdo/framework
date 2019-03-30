@@ -1,10 +1,12 @@
-<?php namespace Chukdo\Storage\Wrappers;
+<?php
+
+namespace Chukdo\Storage\Wrappers;
 
 use Chukdo\Contracts\Db\Redis as RedisInterface;
 use Chukdo\Storage\ServiceLocator;
 
 /**
- * Redis streamWrapper
+ * Redis streamWrapper.
  *
  * @copyright    licence MIT, Copyright (C) 2015 Domingo
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
@@ -18,17 +20,18 @@ class RedisStream extends AbstractStream
 
     /**
      * @return RedisInterface
+     *
      * @throws StreamException
      */
     public function initStream(): RedisInterface
     {
         $scheme = $this->getScheme();
-        $host   = (int) $this->getHost();
+        $host = (int) $this->getHost();
 
         try {
-            $stream = ServiceLocator::getInstance()->getResource( $scheme );
-            $stream->select( $host );
-        } catch ( \Exception $e ) {
+            $stream = ServiceLocator::getInstance()->getResource($scheme);
+            $stream->select($host);
+        } catch (\Exception $e) {
             throw new StreamException(
                 sprintf(
                     '[%s] is not a registred resource',
@@ -39,7 +42,7 @@ class RedisStream extends AbstractStream
             );
         }
 
-        if ( !( $stream instanceof RedisInterface ) ) {
+        if (!($stream instanceof RedisInterface)) {
             throw new StreamException(
                 sprintf(
                     'service [%s] is not a redis interface',
@@ -52,14 +55,15 @@ class RedisStream extends AbstractStream
     }
 
     /**
-     * Lit les informations sur une ressource de fichier
+     * Lit les informations sur une ressource de fichier.
      *
      * @return RedisInterface
+     *
      * @throws StreamException
      */
     protected function getStream(): RedisInterface
     {
-        if ( $this->stream instanceof RedisInterface ) {
+        if ($this->stream instanceof RedisInterface) {
             return $this->stream;
         }
 
@@ -67,28 +71,30 @@ class RedisStream extends AbstractStream
     }
 
     /**
-     * Retourne le contenu du fichier
+     * Retourne le contenu du fichier.
      *
      * @return mixed
+     *
      * @throws StreamException
      */
     public function streamGet()
     {
-        return $this->getStream()->get( $this->getPath() );
+        return $this->getStream()->get($this->getPath());
     }
 
     /**
-     * Retourne une portion du contenu du fichier
+     * Retourne une portion du contenu du fichier.
      *
      * @param int $offset
      * @param int $length
      *
      * @return string|null
+     *
      * @throws StreamException
      */
-    public function streamGetRange( int $offset, int $length ): ?string
+    public function streamGetRange(int $offset, int $length): ?string
     {
-        if ( $length > 0 ) {
+        if ($length > 0) {
             return $this->getStream()->getRange(
                 $this->getPath(),
                 $offset,
@@ -100,15 +106,16 @@ class RedisStream extends AbstractStream
     }
 
     /**
-     * Ecris une portion de contenu en commencant à l'offset défini
+     * Ecris une portion de contenu en commencant à l'offset défini.
      *
-     * @param int $offset
+     * @param int    $offset
      * @param string $content
      *
      * @return bool
+     *
      * @throws StreamException
      */
-    public function streamSetRange( int $offset, string $content ): bool
+    public function streamSetRange(int $offset, string $content): bool
     {
         return (bool) $this->getStream()->setRange(
             $this->getPath(),
@@ -118,14 +125,15 @@ class RedisStream extends AbstractStream
     }
 
     /**
-     * Ajoute du contenu au debut du fichier
+     * Ajoute du contenu au debut du fichier.
      *
      * @param string|null $content
      *
      * @return bool
+     *
      * @throws StreamException
      */
-    public function streamSet( ?string $content ): bool
+    public function streamSet(?string $content): bool
     {
         return (bool) $this->getStream()->set(
             $this->getPath(),
@@ -134,14 +142,15 @@ class RedisStream extends AbstractStream
     }
 
     /**
-     * Ajoute du contenu à la fin du fichier
+     * Ajoute du contenu à la fin du fichier.
      *
      * @param string $content
      *
      * @return bool
+     *
      * @throws StreamException
      */
-    public function streamAppend( string $content ): bool
+    public function streamAppend(string $content): bool
     {
         return (bool) $this->getStream()->append(
             $this->getPath(),
@@ -150,52 +159,56 @@ class RedisStream extends AbstractStream
     }
 
     /**
-     * Retourne si le fichier existe
+     * Retourne si le fichier existe.
      *
      * @return bool
+     *
      * @throws StreamException
      */
     public function streamExists(): bool
     {
-        return (bool) $this->getStream()->exists( $this->getPath() );
+        return (bool) $this->getStream()->exists($this->getPath());
     }
 
     /**
-     * Retourne la taille du fichier
+     * Retourne la taille du fichier.
      *
      * @return int
+     *
      * @throws StreamException
      */
     public function streamSize(): int
     {
-        return (int) $this->getStream()->strlen( $this->getPath() );
+        return (int) $this->getStream()->strlen($this->getPath());
     }
 
     /**
-     * Supprime fichier
+     * Supprime fichier.
      *
      * @return bool
+     *
      * @throws StreamException
      */
     public function streamDelete(): bool
     {
-        return (bool) $this->getStream()->del( $this->getPath() );
+        return (bool) $this->getStream()->del($this->getPath());
     }
 
     /**
-     * Renomme le fichier ou le dossier
+     * Renomme le fichier ou le dossier.
      *
      * @param string $path
      *
      * @return bool
+     *
      * @throws StreamException
      */
-    public function streamRename( string $path ): bool
+    public function streamRename(string $path): bool
     {
-        if ( (bool) $this->getStream()->rename(
+        if ((bool) $this->getStream()->rename(
             $this->getPath(),
             $path
-        ) ) {
+        )) {
             return true;
         }
 
@@ -203,19 +216,19 @@ class RedisStream extends AbstractStream
     }
 
     /**
-     * Crée un dossier
+     * Crée un dossier.
      *
      * @param bool $recursive
      *
      * @return bool
      */
-    public function streamSetDir( bool $recursive ): bool
+    public function streamSetDir(bool $recursive): bool
     {
         return true;
     }
 
     /**
-     * Supprime un dossier
+     * Supprime un dossier.
      *
      * @return bool
      */
@@ -225,9 +238,10 @@ class RedisStream extends AbstractStream
     }
 
     /**
-     * Retourne si le fichier est un dossier
+     * Retourne si le fichier est un dossier.
      *
      * @return bool
+     *
      * @throws StreamException
      */
     public function streamIsDir(): bool
@@ -236,18 +250,19 @@ class RedisStream extends AbstractStream
     }
 
     /**
-     * Retourne la liste des fichiers present dans le dossier
+     * Retourne la liste des fichiers present dans le dossier.
      *
      * @return array
+     *
      * @throws StreamException
      */
     public function streamListDir(): array
     {
         $path = $this->getPath();
-        $list = $this->getStream()->keys( $path . '/*' );
+        $list = $this->getStream()->keys($path.'/*');
 
-        foreach ( $list as $k => $v ) {
-            $list[ $k ] = trim(
+        foreach ($list as $k => $v) {
+            $list[$k] = trim(
                 str_replace(
                     $path,
                     '',
@@ -257,20 +272,21 @@ class RedisStream extends AbstractStream
             );
         }
 
-        natcasesort( $list );
+        natcasesort($list);
 
         return $list;
     }
 
     /**
-     * Defini ou retourne la derniere date d'acces au fichier
+     * Defini ou retourne la derniere date d'acces au fichier.
      *
      * @param bool $time
      *
      * @return int
+     *
      * @throws StreamException
      */
-    public function streamAccessTime( $time = false ): int
+    public function streamAccessTime($time = false): int
     {
         return (int) $this->streamInfo(
             $this->getPath(),
@@ -282,14 +298,15 @@ class RedisStream extends AbstractStream
     }
 
     /**
-     * Defini ou retourne la date de creation du fichier
+     * Defini ou retourne la date de creation du fichier.
      *
      * @param bool $time
      *
      * @return int
+     *
      * @throws StreamException
      */
-    public function streamCreatedTime( $time = false ): int
+    public function streamCreatedTime($time = false): int
     {
         return (int) $this->streamInfo(
             $this->getPath(),
@@ -301,14 +318,15 @@ class RedisStream extends AbstractStream
     }
 
     /**
-     * Defini ou retourne la derniere date de modification au fichier
+     * Defini ou retourne la derniere date de modification au fichier.
      *
      * @param bool $time
      *
      * @return int
+     *
      * @throws StreamException
      */
-    public function streamModifiedTime( $time = false ): int
+    public function streamModifiedTime($time = false): int
     {
         return (int) $this->streamInfo(
             $this->getPath(),
@@ -320,25 +338,27 @@ class RedisStream extends AbstractStream
     }
 
     /**
-     * Defini des meta données d'information sur le fichier
+     * Defini des meta données d'information sur le fichier.
      *
      * @param string $path
      * @param string $name
-     * @param null $value
+     * @param null   $value
      *
      * @return mixed
+     *
      * @throws StreamException
      */
-    protected function streamInfo( string $path, string $name, $value = null )
+    protected function streamInfo(string $path, string $name, $value = null)
     {
-        $path = 'info::' . $path;
+        $path = 'info::'.$path;
 
-        if ( $value !== null ) {
+        if ($value !== null) {
             $this->getStream()->hset(
                 $path,
                 $name,
                 $value
             );
+
             return $value;
         }
 
@@ -349,13 +369,14 @@ class RedisStream extends AbstractStream
     }
 
     /**
-     * Libere le flux
+     * Libere le flux.
      *
      * @return bool
      */
     public function streamClose(): bool
     {
         $this->stream = null;
+
         return true;
     }
 }

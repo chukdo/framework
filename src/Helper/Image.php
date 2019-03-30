@@ -1,38 +1,41 @@
-<?php namespace Chukdo\Helper;
+<?php
+
+namespace Chukdo\Helper;
 
 /**
  * Classe Image
- * Manipulation d'images
+ * Manipulation d'images.
  *
- * @package    Helper
  * @version    1.0.0
+ *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ *
  * @since        08/01/2019
+ *
  * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 final class Image
 {
     /**
-     * Constructeur privé, empeche l'intanciation de la classe statique
-     * @return void
+     * Constructeur privé, empeche l'intanciation de la classe statique.
      */
     private function __construct()
     {
     }
 
     /**
-     * Retourne les proprietes d'une images (largeur, hauteur, mime-type, image sous forme de resource)
+     * Retourne les proprietes d'une images (largeur, hauteur, mime-type, image sous forme de resource).
      *
      * @param string $string
      *
      * @return array|null
      */
-    public static function loadImageFromString( string $string ): ?array
+    public static function loadImageFromString(string $string): ?array
     {
-        $image = imagecreatefromstring( $string );
+        $image = imagecreatefromstring($string);
 
-        if ( $image !== false ) {
-            $f        = finfo_open();
+        if ($image !== false) {
+            $f = finfo_open();
             $mimeType = finfo_buffer(
                 $f,
                 $string,
@@ -40,10 +43,10 @@ final class Image
             );
 
             return [
-                'w' => imagesx( $image ),
-                'h' => imagesy( $image ),
+                'w' => imagesx($image),
+                'h' => imagesy($image),
                 't' => $mimeType,
-                'i' => $image
+                'i' => $image,
             ];
         }
 
@@ -55,10 +58,10 @@ final class Image
      *
      * @return array|null
      */
-    public static function loadImageFromFile( string $file ): ?array
+    public static function loadImageFromFile(string $file): ?array
     {
-        if ( $string = file_get_contents( $file ) ) {
-            return self::loadImageFromString( $string );
+        if ($string = file_get_contents($file)) {
+            return self::loadImageFromString($string);
         }
 
         return false;
@@ -69,55 +72,55 @@ final class Image
      *
      * @return array|null
      */
-    public static function loadImageFromBase64( string $base64 ): ?array
+    public static function loadImageFromBase64(string $base64): ?array
     {
         $pattern = '/^data:image\/[a-z]{3,4};base64,/';
 
-        if ( $string = base64_decode(
+        if ($string = base64_decode(
             preg_replace(
                 $pattern,
                 '',
                 $base64
             )
-        ) ) {
-            return self::loadImageFromString( $string );
+        )) {
+            return self::loadImageFromString($string);
         }
 
         return null;
     }
 
     /**
-     * Retourne le flux d'une nouvelle image (que l'on peut sauver dans un fichier)
+     * Retourne le flux d'une nouvelle image (que l'on peut sauver dans un fichier).
      *
-     * @param resource $image (imagecreatetruecolor)
-     * @param int $format type d'image (IMAGETYPE_GIF | IMAGETYPE_JPEG | IMAGETYPE_PNG)
+     * @param resource $image   (imagecreatetruecolor)
+     * @param int      $format  type d'image (IMAGETYPE_GIF | IMAGETYPE_JPEG | IMAGETYPE_PNG)
      * @param int|null $quality (0 à 100)
      *
      * @return string
      */
-    public static function getImage( $image, int $format, int $quality = null ): string
+    public static function getImage($image, int $format, int $quality = null): string
     {
         ob_start();
 
-        switch ( $format ) {
-            case 'image/gif' :
-                imagegif( $image );
+        switch ($format) {
+            case 'image/gif':
+                imagegif($image);
                 break;
-            case 'image/jpeg' :
+            case 'image/jpeg':
                 imagejpeg(
                     $image,
                     null,
                     $quality
-                        ?: 85
+                    ?: 85
                 );
                 break;
-            case 'image/png' :
+            case 'image/png':
                 $quality = 9 - abs(
-                        floor(
-                            ( ( $quality
-                                    ?: 85 ) - 1 ) / 10
-                        )
-                    );
+                    floor(
+                        (($quality
+                            ?: 85) - 1) / 10
+                    )
+                );
                 imagealphablending(
                     $image,
                     false
@@ -130,7 +133,7 @@ final class Image
                     $image,
                     null,
                     $quality
-                        ?: 85
+                    ?: 85
                 );
                 break;
         }
@@ -142,26 +145,26 @@ final class Image
     }
 
     /**
-     * Converti une image dans un autre format
+     * Converti une image dans un autre format.
      *
-     * @param array $image [w, h, t, i] (self::loadImage*)
-     * @param int $format type d'image (IMAGETYPE_GIF | IMAGETYPE_JPEG | IMAGETYPE_PNG)
+     * @param array    $image   [w, h, t, i] (self::loadImage*)
+     * @param int      $format  type d'image (IMAGETYPE_GIF | IMAGETYPE_JPEG | IMAGETYPE_PNG)
      * @param int|null $quality (0 à 100)
      *
      * @return string si l'operation reussi false sinon
      */
-    public static function convert( array $image, int $format, int $quality = null ): ?string
+    public static function convert(array $image, int $format, int $quality = null): ?string
     {
-        if ( $image ) {
-            $w   = $image[ 'w' ];
-            $h   = $image[ 'h' ];
-            $src = $image[ 'i' ];
+        if ($image) {
+            $w = $image['w'];
+            $h = $image['h'];
+            $src = $image['i'];
             $dst = imagecreatetruecolor(
                 $w,
                 $h
             );
 
-            if ( $src && $dst ) {
+            if ($src && $dst) {
                 imagecopy(
                     $dst,
                     $src,
@@ -176,10 +179,10 @@ final class Image
                     $dst,
                     $format,
                     $quality
-                        ?: 92
+                    ?: 92
                 );
-                imagedestroy( $src );
-                imagedestroy( $dst );
+                imagedestroy($src);
+                imagedestroy($dst);
 
                 return $r;
             }
@@ -189,12 +192,12 @@ final class Image
     }
 
     /**
-     * @param array $image [w, h, t, i] (self::loadImage*)
-     * @param int $quality
+     * @param array $image   [w, h, t, i] (self::loadImage*)
+     * @param int   $quality
      *
      * @return string|null
      */
-    public static function convertToJpg( array $image, int $quality ): ?string
+    public static function convertToJpg(array $image, int $quality): ?string
     {
         return self::convert(
             $image,
@@ -204,12 +207,12 @@ final class Image
     }
 
     /**
-     * @param array $image [w, h, t, i] (self::loadImage*)
-     * @param int $quality
+     * @param array $image   [w, h, t, i] (self::loadImage*)
+     * @param int   $quality
      *
      * @return string|null
      */
-    public static function convertToPng( array $image, $quality )
+    public static function convertToPng(array $image, $quality)
     {
         return self::convert(
             $image,
@@ -223,7 +226,7 @@ final class Image
      *
      * @return string|null
      */
-    public static function convertToGif( array $image )
+    public static function convertToGif(array $image)
     {
         return self::convert(
             $image,
@@ -232,51 +235,51 @@ final class Image
     }
 
     /**
-     * Resize une image (proportionnel)
+     * Resize une image (proportionnel).
      *
-     * @param array $image [w, h, t, i] (self::loadImage*)
-     * @param int $dw largeur
-     * @param int|null $dh hauteur
+     * @param array    $image [w, h, t, i] (self::loadImage*)
+     * @param int      $dw    largeur
+     * @param int|null $dh    hauteur
      *
      * @return string|null
      */
-    public static function resize( array $image, int $dw = 0, int $dh = null ): ?string
+    public static function resize(array $image, int $dw = 0, int $dh = null): ?string
     {
-        $sw = $image[ 'w' ];
-        $sh = $image[ 'h' ];
-        $h  = 0;
-        $w  = 0;
+        $sw = $image['w'];
+        $sh = $image['h'];
+        $h = 0;
+        $w = 0;
 
-        if ( $dw > 0 && $dh > 0 ) {
+        if ($dw > 0 && $dh > 0) {
             $rw = $sw / $dw;
             $rh = $sh / $dh;
-            $r  = max(
+            $r = max(
                 $rw,
                 $rh
             );
-            $w  = $sw / $r;
-            $h  = $sh / $r;
-        } else if ( $dw > 0 ) {
+            $w = $sw / $r;
+            $h = $sh / $r;
+        } elseif ($dw > 0) {
             $w = $dw;
             $h = $w * $sh / $sw;
-        } else if ( $dh > 0 ) {
+        } elseif ($dh > 0) {
             $h = $dh;
             $w = $h * $sw / $sh;
         }
 
         /** Image source trop petite pour etre redimensionner */
         $whd = $dw > 0 && $dh > 0 && $dw >= $sw && $dh >= $sh;
-        $wd  = $dw > 0 && $dw >= $sw;
-        $hd  = $dh > 0 && $dh >= $sh;
+        $wd = $dw > 0 && $dw >= $sw;
+        $hd = $dh > 0 && $dh >= $sh;
 
-        if ( $whd || $wd || $hd ) {
+        if ($whd || $wd || $hd) {
             return self::getImage(
-                $image[ 'i' ],
-                $image[ 't' ]
+                $image['i'],
+                $image['t']
             );
         }
 
-        if ( $w > 0 && $h > 0 ) {
+        if ($w > 0 && $h > 0) {
             return self::resampleImage(
                 $image,
                 0,
@@ -290,23 +293,23 @@ final class Image
     }
 
     /**
-     * Crop une image
+     * Crop une image.
      *
      * @param array $image [w, h, t, i]
-     * @param int $dx point de depart x
-     * @param int $dy point de depart y
-     * @param int $dw largeur
-     * @param int $dh hauteur
+     * @param int   $dx    point de depart x
+     * @param int   $dy    point de depart y
+     * @param int   $dw    largeur
+     * @param int   $dh    hauteur
      *
      * @return string|null
      */
-    public static function crop( array $image, int $dx, int $dy, int $dw, int $dh ): ?string
+    public static function crop(array $image, int $dx, int $dy, int $dw, int $dh): ?string
     {
-        $sw = $image[ 'w' ];
-        $sh = $image[ 'h' ];
+        $sw = $image['w'];
+        $sh = $image['h'];
 
-        /** Taille finale > taille initiale */
-        if ( $dx + $dw > $sw || $dy + $dh > $sh ) {
+        /* Taille finale > taille initiale */
+        if ($dx + $dw > $sw || $dy + $dh > $sh) {
             return false;
         }
 
@@ -322,36 +325,43 @@ final class Image
     }
 
     /**
-     * Retaille une image
+     * Retaille une image.
      *
-     * @param array $image [w, h, t, i]
-     * @param int $sx point de depart x
-     * @param int $sy point de depart y
-     * @param int $dw destination largeur
-     * @param int $dh destination hauteur
-     * @param int $sw source largeur
-     * @param int|null $sh source hauteur
+     * @param array    $image [w, h, t, i]
+     * @param int      $sx    point de depart x
+     * @param int      $sy    point de depart y
+     * @param int      $dw    destination largeur
+     * @param int      $dh    destination hauteur
+     * @param int      $sw    source largeur
+     * @param int|null $sh    source hauteur
      *
      * @return string si l'operation reussi false si le resize n'est pas nécessaire
      */
-    public static function resampleImage( array $image, int $sx, int $sy, int $dw, int $dh, int $sw = 0, int $sh = null
+    public static function resampleImage(
+        array $image,
+        int $sx,
+        int $sy,
+        int $dw,
+        int $dh,
+        int $sw = 0,
+        int $sh = null
     ): ?string {
-        $type = $image[ 't' ];
-        $src  = $image[ 'i' ];
-        $dst  = imagecreatetruecolor(
+        $type = $image['t'];
+        $src = $image['i'];
+        $dst = imagecreatetruecolor(
             $dw,
             $dh
         );
-        $sw   = $sw > 0
-            ? $sw
-            : $image[ 'w' ];
-        $sh   = $sh > 0
-            ? $sh
-            : $image[ 'h' ];
-        $dx   = 0;
-        $dy   = 0;
+        $sw = $sw > 0
+        ? $sw
+        : $image['w'];
+        $sh = $sh > 0
+        ? $sh
+        : $image['h'];
+        $dx = 0;
+        $dy = 0;
 
-        if ( $type == 'image/png' ) {
+        if ($type == 'image/png') {
             imagesavealpha(
                 $dst,
                 true
@@ -371,7 +381,7 @@ final class Image
             );
         }
 
-        if ( $src && $dst ) {
+        if ($src && $dst) {
             imagecopyresampled(
                 $dst,
                 $src,
@@ -391,8 +401,8 @@ final class Image
                 92
             );
 
-            imagedestroy( $src );
-            imagedestroy( $dst );
+            imagedestroy($src);
+            imagedestroy($dst);
 
             return $r;
         }

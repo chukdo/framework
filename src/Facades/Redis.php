@@ -1,7 +1,9 @@
-<?php namespace Chukdo\Facades;
+<?php
+
+namespace Chukdo\Facades;
 
 /**
- * Initialisation d'une facade Redis
+ * Initialisation d'une facade Redis.
  *
  * @copyright    licence MIT, Copyright (C) 2014 Domingo
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>

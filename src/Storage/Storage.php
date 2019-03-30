@@ -1,25 +1,29 @@
-<?php namespace Chukdo\Storage;
+<?php
+
+namespace Chukdo\Storage;
 
 use Chukdo\Helper\Str;
 
 /**
- * Gestion des fichiers
+ * Gestion des fichiers.
  *
- * @package     Storage
  * @version    1.0.0
+ *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ *
  * @since        08/01/2019
+ *
  * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Storage
 {
     /**
      * @param string $directory
-     * @param int $visibility
+     * @param int    $visibility
      *
      * @return bool
      */
-    public function makeDirectory( string $directory, int $visibility = 0777 ): bool
+    public function makeDirectory(string $directory, int $visibility = 0777): bool
     {
         return mkdir(
             $directory,
@@ -33,26 +37,25 @@ class Storage
      *
      * @return bool
      */
-    public function deleteDirectory( string $directory ): bool
+    public function deleteDirectory(string $directory): bool
     {
-        $dir = opendir( $directory );
+        $dir = opendir($directory);
 
-        while ( ( $file = readdir( $dir ) ) !== false ) {
-            if ( ( $file != '.' ) && ( $file != '..' ) ) {
-                $full = $directory . '/' . $file;
+        while (($file = readdir($dir)) !== false) {
+            if (($file != '.') && ($file != '..')) {
+                $full = $directory.'/'.$file;
 
-                if ( is_dir( $full ) ) {
-                    $this->deleteDirectory( $full );
-
+                if (is_dir($full)) {
+                    $this->deleteDirectory($full);
                 } else {
-                    $this->delete( $full );
+                    $this->delete($full);
                 }
             }
         }
 
-        closedir( $dir );
+        closedir($dir);
 
-        return rmdir( $directory );
+        return rmdir($directory);
     }
 
     /**
@@ -60,52 +63,52 @@ class Storage
      *
      * @return array
      */
-    public function directories( string $directory ): array
+    public function directories(string $directory): array
     {
         $list = [];
-        $dir  = opendir( $directory );
+        $dir = opendir($directory);
 
-        while ( ( $file = readdir( $dir ) ) !== false ) {
-            if ( ( $file != '.' ) && ( $file != '..' ) ) {
-                $full = $directory . '/' . $file;
+        while (($file = readdir($dir)) !== false) {
+            if (($file != '.') && ($file != '..')) {
+                $full = $directory.'/'.$file;
 
-                if ( is_dir( $full ) ) {
+                if (is_dir($full)) {
                     $list[] = $full;
                 }
             }
         }
 
-        closedir( $dir );
+        closedir($dir);
 
         return $list;
     }
 
     /**
-     * Recursive
+     * Recursive.
      *
      * @param string $directory
      *
      * @return array
      */
-    public function allDirectories( string $directory ): array
+    public function allDirectories(string $directory): array
     {
         $list = [];
-        $dir  = opendir( $directory );
+        $dir = opendir($directory);
 
-        while ( ( $file = readdir( $dir ) ) !== false ) {
-            if ( ( $file != '.' ) && ( $file != '..' ) ) {
-                $full = $directory . '/' . $file;
+        while (($file = readdir($dir)) !== false) {
+            if (($file != '.') && ($file != '..')) {
+                $full = $directory.'/'.$file;
 
-                if ( is_dir( $full ) ) {
+                if (is_dir($full)) {
                     $list = array_merge(
                         $list,
-                        $this->allDirectories( $full )
+                        $this->allDirectories($full)
                     );
                 }
             }
         }
 
-        closedir( $dir );
+        closedir($dir);
 
         return $list;
     }
@@ -115,9 +118,9 @@ class Storage
      *
      * @return bool
      */
-    public function exists( string $file ): bool
+    public function exists(string $file): bool
     {
-        return file_exists( $file );
+        return file_exists($file);
     }
 
     /**
@@ -125,9 +128,9 @@ class Storage
      *
      * @return int
      */
-    public function size( string $file ): int
+    public function size(string $file): int
     {
-        return filesize( $file );
+        return filesize($file);
     }
 
     /**
@@ -136,7 +139,7 @@ class Storage
      *
      * @return bool
      */
-    public function put( string $file, string $content ): bool
+    public function put(string $file, string $content): bool
     {
         return (bool) file_put_contents(
             $file,
@@ -149,9 +152,9 @@ class Storage
      *
      * @return string
      */
-    public function get( string $file ): string
+    public function get(string $file): string
     {
-        return file_get_contents( $file );
+        return file_get_contents($file);
     }
 
     /**
@@ -160,11 +163,11 @@ class Storage
      *
      * @return bool
      */
-    public function copy( string $oldFile, string $newFile ): bool
+    public function copy(string $oldFile, string $newFile): bool
     {
         return $this->put(
             $newFile,
-            $this->get( $oldFile )
+            $this->get($oldFile)
         );
     }
 
@@ -174,14 +177,14 @@ class Storage
      *
      * @return bool
      */
-    public function move( string $oldFile, string $newFile ): bool
+    public function move(string $oldFile, string $newFile): bool
     {
         $r = $this->put(
             $newFile,
-            $this->get( $oldFile )
+            $this->get($oldFile)
         );
 
-        $this->delete( $oldFile );
+        $this->delete($oldFile);
 
         return $r;
     }
@@ -191,61 +194,61 @@ class Storage
      *
      * @return bool
      */
-    public function delete( string $file ): bool
+    public function delete(string $file): bool
     {
-        return unlink( $file );
+        return unlink($file);
     }
 
     /**
-     * @param string $directory
+     * @param string      $directory
      * @param string|null $match
      *
      * @return array
      */
-    public function files( string $directory, string $match = null ): array
+    public function files(string $directory, string $match = null): array
     {
         $list = [];
-        $dir  = opendir( $directory );
+        $dir = opendir($directory);
 
-        while ( ( $file = readdir( $dir ) ) !== false ) {
-            if ( ( $file != '.' ) && ( $file != '..' ) ) {
-                $full = $directory . '/' . $file;
+        while (($file = readdir($dir)) !== false) {
+            if (($file != '.') && ($file != '..')) {
+                $full = $directory.'/'.$file;
 
-                if ( !is_dir( $full )
+                if (!is_dir($full)
                     && Str::match(
                         $match,
                         $full
-                    ) ) {
+                    )) {
                     $list[] = $full;
                 }
             }
         }
 
-        closedir( $dir );
+        closedir($dir);
 
         return $list;
     }
 
     /**
-     * @param string $directory
+     * @param string      $directory
      * @param string|null $match
      *
      * @return array
      */
-    public function allFiles( string $directory, string $match = null ): array
+    public function allFiles(string $directory, string $match = null): array
     {
         $list = [];
-        $dir  = opendir( $directory );
+        $dir = opendir($directory);
 
-        while ( ( $file = readdir( $dir ) ) !== false ) {
-            if ( ( $file != '.' ) && ( $file != '..' ) ) {
-                $full = $directory . '/' . $file;
+        while (($file = readdir($dir)) !== false) {
+            if (($file != '.') && ($file != '..')) {
+                $full = $directory.'/'.$file;
 
-                if ( !is_dir( $full )
+                if (!is_dir($full)
                     && Str::match(
                         $match,
                         $full
-                    ) ) {
+                    )) {
                     $list = array_merge(
                         $list,
                         $this->allFiles(
@@ -257,7 +260,7 @@ class Storage
             }
         }
 
-        closedir( $dir );
+        closedir($dir);
 
         return $list;
     }

@@ -1,0 +1,4 @@
+{
+    "phpcs.executablePath" : "/usr/local/php5-7.2.9-20180821-074958/bin/phpcs",
+    "phpcs.standard": "PSR2"
+}

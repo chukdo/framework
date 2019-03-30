@@ -1,43 +1,43 @@
 <?php
 
-function dd( $data )
+function dd($data)
 {
-    echo( "Dump and Die\n" . ( php_sapi_name() == 'cli'
+    echo  "Dump and Die\n".(php_sapi_name() == 'cli'
             ? ''
-            : '<pre>' ) );
-    var_dump( $data );
+            : '<pre>');
+    var_dump($data);
     exit;
 }
 
-/** Definition des chemins */
-DEFINE(
+/* Definition des chemins */
+define(
     'LANG_PATH',
     '/storage/www/chukdo/test/app/Lang/fr/'
 );
-DEFINE(
+define(
     'CONF_PATH',
     '/storage/www/chukdo/test/app/Conf/'
 );
-DEFINE(
+define(
     'APP_PATH',
     '/storage/www/chukdo/test/app/'
 );
-DEFINE(
+define(
     'TPL_PATH',
-    APP_PATH . 'Views/'
+    APP_PATH.'Views/'
 );
-DEFINE(
+define(
     'CHUKDO_PATH',
     '/storage/www/chukdo/src/'
 );
-DEFINE(
+define(
     'VENDOR_PATH',
     '/storage/www/chukdo/vendor/'
 );
 
 /** Inclusion des loaders */
-require_once( CHUKDO_PATH . 'Bootstrap/Loader.php' );
-require_once( VENDOR_PATH . 'autoload.php' );
+require_once CHUKDO_PATH.'Bootstrap/Loader.php';
+require_once VENDOR_PATH.'autoload.php';
 
 /** boostrap framework */
 $loader = new Chukdo\Bootstrap\loader();
@@ -53,11 +53,11 @@ $loader->register();
 
 $app = new \Chukdo\Bootstrap\App();
 
-/** Declaration des facades */
+/* Declaration des facades */
 
 use Chukdo\Facades\Facade;
 
-Facade::setFacadeApplication( $app );
+Facade::setFacadeApplication($app);
 Facade::setClassAlias(
     \Chukdo\Facades\Facade::class,
     'Facade'
@@ -103,18 +103,18 @@ Facade::setClassAlias(
     'Router'
 );
 
-/** Configuration */
-Lang::load( LANG_PATH );
+/* Configuration */
+Lang::load(LANG_PATH);
 //dd(Lang::all());
-Conf::load( CONF_PATH . 'Conf.json' );
+Conf::load(CONF_PATH.'Conf.json');
 //Conf::load(CONF_PATH.'conf_prod.json');
 
-/** App */
-App::env( App::getConf( 'env' ) );
-App::channel( 'orpi' );
-App::register( \App\Providers\ServiceLocatorServiceProvider::class );
-App::register( \App\Providers\LoggerHandlerServiceProvider::class );
-App::register( \App\Providers\ExceptionLoggerServiceProvider::class );
+/* App */
+App::env(App::getConf('env'));
+App::channel('orpi');
+App::register(\App\Providers\ServiceLocatorServiceProvider::class);
+App::register(\App\Providers\LoggerHandlerServiceProvider::class);
+App::register(\App\Providers\ExceptionLoggerServiceProvider::class);
 App::registerHandleExceptions();
 
 $json = new \Chukdo\Json\Json(
@@ -125,19 +125,19 @@ $json = new \Chukdo\Json\Json(
                 'bmw',
                 'audi',
                 'mercédes',
-                'peugeot'
-            ]
-        ]
+                'peugeot',
+            ],
+        ],
     ]
 );
 
 $validator = new \Chukdo\Validation\Validator(
     Input::all(),
-    [ 'title' => 'required' ],
+    ['title' => 'required'],
     Lang::offsetGet('validation')
 );
 
-$validator->register( new \Chukdo\Validation\Validate\Required() );
+$validator->register(new \Chukdo\Validation\Validate\Required());
 $validator->validate();
 
 dd($validator->errors());
@@ -146,8 +146,8 @@ Response::header(
     'X-jpd',
     'de la balle'
 );
-View::setDefaultFolder( TPL_PATH );
-View::loadFunction( new \Chukdo\View\Functions\Basic() );
+View::setDefaultFolder(TPL_PATH);
+View::loadFunction(new \Chukdo\View\Functions\Basic());
 View::render(
     'info',
     $json

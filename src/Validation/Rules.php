@@ -1,18 +1,21 @@
-<?php namespace Chukdo\Validation;
+<?php
+
+namespace Chukdo\Validation;
 
 use Chukdo\Json\Arr;
 use Chukdo\Json\Input;
-use Chukdo\Json\Json;
 use Chukdo\Json\Lang;
 use IteratorAggregate;
 
 /**
- * Validation des regles
+ * Validation des regles.
  *
- * @package     Validation
  * @version    1.0.0
+ *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ *
  * @since        08/01/2019
+ *
  * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Rules implements IteratorAggregate
@@ -31,20 +34,20 @@ class Rules implements IteratorAggregate
      * Rules constructor.
      *
      * @param iterable $rules
-     * @param Input $inputs
-     * @param Lang $messages
+     * @param Input    $inputs
+     * @param Lang     $messages
      */
-    public function __construct( Iterable $rules, Input $inputs, Lang $messages )
+    public function __construct(Iterable $rules, Input $inputs, Lang $messages)
     {
-        $this->rules    = new Arr();
+        $this->rules = new Arr();
         $this->messages = $messages;
 
-        foreach ( $rules as $name => $rulesPiped ) {
+        foreach ($rules as $name => $rulesPiped) {
             $this->rules->merge(
                 $this->parseRules(
                     $name,
                     $rulesPiped,
-                    $inputs->wildcard( $name )
+                    $inputs->wildcard($name)
                 )
             );
         }
@@ -53,18 +56,18 @@ class Rules implements IteratorAggregate
     /**
      * @param string $name
      * @param string $rulesPiped
-     * @param $input
+     * @param Input  $input
      *
      * @return Arr
      */
-    protected function parseRules( string $name, string $rulesPiped, $input ): Arr
+    protected function parseRules(string $name, string $rulesPiped, Input $input): Arr
     {
         $parseRules = new Arr();
 
-        foreach ( explode(
+        foreach (explode(
             '|',
             $rulesPiped
-        ) as $rule ) {
+        ) as $rule) {
             $parseRules->append(
                 $this->parseRule(
                     $name,
@@ -80,13 +83,13 @@ class Rules implements IteratorAggregate
     /**
      * @param string $name
      * @param string $ruleColon
-     * @param $input
+     * @param Input  $input
      *
      * @return Rule
      */
-    protected function parseRule( string $name, string $ruleColon, $input ): Rule
+    protected function parseRule(string $name, string $ruleColon, Input $input): Rule
     {
-        list( $rule, $param ) = array_pad(
+        list($rule, $param) = array_pad(
             explode(
                 ':',
                 $ruleColon
@@ -98,7 +101,7 @@ class Rules implements IteratorAggregate
         $message = $this->messages->offsetGetFirstInList(
             [
                 $name,
-                $name . '.' . $rule
+                $name.'.'.$rule,
             ],
             sprintf(
                 'Validation message [%s] cannot be found',

@@ -1,15 +1,19 @@
-<?php namespace Chukdo\Json;
+<?php
 
-Use \Throwable;
-Use \SplFileObject;
+namespace Chukdo\Json;
+
+use SplFileObject;
+use Throwable;
 
 /**
- * Intégration d'une exception dans Json
+ * Intégration d'une exception dans Json.
  *
- * @package    Exception
  * @version    1.0.0
+ *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ *
  * @since        08/01/2019
+ *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class JsonException extends Json
@@ -19,84 +23,83 @@ class JsonException extends Json
      *
      * @return JsonException
      */
-    public function loadException( Throwable $e ): self
+    public function loadException(Throwable $e): self
     {
         $backTrace = [];
 
-        if ( $previous = $e->getPrevious() ) {
+        if ($previous = $e->getPrevious()) {
             $e = $previous;
         }
 
-        foreach ( $e->getTrace() as $trace ) {
-            $trace = new Json( $trace );
-            $file  = $trace->offsetGet( 'file' );
-            $line  = $trace->offsetGet( 'line' );
+        foreach ($e->getTrace() as $trace) {
+            $trace = new Json($trace);
+            $file = $trace->offsetGet('file');
+            $line = $trace->offsetGet('line');
 
             $backTrace[] = [
-                'Call' => $trace->offsetGet( 'class' ) . $trace->offsetGet( 'type' ) . $trace->offsetGet(
-                        'function'
-                    ) . '()',
+                'Call' => $trace->offsetGet('class').$trace->offsetGet('type').$trace->offsetGet(
+                    'function'
+                ).'()',
                 'File' => $file,
                 'Line' => $line,
-                'Php'  => $file && $line
-                    ? $this->getCode(
-                        $trace->offsetGet( 'file' ),
-                        $trace->offsetGet( 'line' )
-                    )
-                    : ''
+                'Php' => $file && $line
+                ? $this->getCode(
+                    $trace->offsetGet('file'),
+                    $trace->offsetGet('line')
+                )
+                : '',
             ];
         }
 
         $this->set(
-                'Error',
-                $e->getMessage()
-            )->set(
-                'Code',
-                $e->getCode()
-            )->set(
-                'File',
-                $e->getFile()
-            )->set(
-                'Line',
+            'Error',
+            $e->getMessage()
+        )->set(
+            'Code',
+            $e->getCode()
+        )->set(
+            'File',
+            $e->getFile()
+        )->set(
+            'Line',
+            $e->getLine()
+        )->set(
+            'Php',
+            $this->getCode(
+                $e->getFile(),
                 $e->getLine()
-            )->set(
-                'Php',
-                $this->getCode(
-                    $e->getFile(),
-                    $e->getLine()
-                )
-            )->set(
-                'Trace',
-                $backTrace
-            );
+            )
+        )->set(
+            'Trace',
+            $backTrace
+        );
 
         return $this;
     }
 
     /**
      * @param string $file
-     * @param int $line
+     * @param int    $line
      *
      * @return string
      */
-    protected function getCode( string $file, int $line ): string
+    protected function getCode(string $file, int $line): string
     {
         $code = '';
-        $spl  = new SplFileObject( $file );
+        $spl = new SplFileObject($file);
 
-        for ( $i = -7 ; $i < 3 ; $i++ ) {
+        for ($i = -7; $i < 3; ++$i) {
             try {
-                $spl->seek( $line + $i );
-                $code .= ( $line + $i + 1 ) . ( $i == -1
-                        ? '> '
-                        : ': ' ) . $spl->current() . "\n";
-            } catch ( Throwable $e ) {
+                $spl->seek($line + $i);
+                $code .= ($line + $i + 1).($i == -1
+                    ? '> '
+                    : ': ').$spl->current()."\n";
+            } catch (Throwable $e) {
             }
-
         }
 
         $code = highlight_string(
-            '<?php ' . $code,
+            '<?php '.$code,
             true
         );
         $code = str_replace(
@@ -104,7 +107,7 @@ class JsonException extends Json
             '',
             $code
         );
-        $code = '<span style="line-height:0.6rem">' . $code . '</span>';
+        $code = '<span style="line-height:0.6rem">'.$code.'</span>';
 
         return $code;
     }
@@ -116,12 +119,12 @@ class JsonException extends Json
      *
      * @return string
      */
-    public function toHtml( string $title = null, string $code = null, string $widthFirstCol = null ): string
+    public function toHtml(string $title = null, string $code = null, string $widthFirstCol = null): string
     {
         return parent::toHtml(
-            ( $title
-                ?: 'Error' ) . ' (' . ( $code
-                ?: '500' ) . ')',
+            ($title
+                ?: 'Error').' ('.($code
+                ?: '500').')',
             'red',
             '45px'
         );
@@ -130,18 +133,18 @@ class JsonException extends Json
     /**
      * @param string|null $title
      */
-    public function toConsole( string $title = null ): void
+    public function toConsole(string $title = null): void
     {
         $table = new \cli\Table();
         $table->setHeaders(
             [
-                '%R' . strtoupper(
+                '%R'.strtoupper(
                     $title
-                        ?: 'Exception'
-                ) . '%n'
+                    ?: 'Exception'
+                ).'%n',
             ]
         );
-        $table->setRenderer( new \cli\table\Ascii( [ 80 ] ) );
+        $table->setRenderer(new \cli\table\Ascii([80]));
         $table->display();
 
         $table = new \cli\Table();
@@ -150,15 +153,15 @@ class JsonException extends Json
                 '%YCode%n',
                 '%YMessage%n',
                 '%YFile%n',
-                '%YLine%n'
+                '%YLine%n',
             ]
         );
         $table->addRow(
             [
-                $this->get( 'Code' ),
-                $this->get( 'Message' ),
-                $this->get( 'File' ),
-                $this->get( 'Line' )
+                $this->get('Code'),
+                $this->get('Message'),
+                $this->get('File'),
+                $this->get('Line'),
             ]
         );
 
@@ -168,30 +171,30 @@ class JsonException extends Json
                     5,
                     30,
                     40,
-                    5
+                    5,
                 ]
             )
         );
         $table->display();
 
-        $backTrace = $this->get( 'Trace' );
+        $backTrace = $this->get('Trace');
 
-        if ( $backTrace instanceof Json ) {
+        if ($backTrace instanceof Json) {
             $table = new \cli\Table();
             $table->setHeaders(
                 [
                     '%YFile%n',
                     '%YLine%n',
-                    '%YCall%n'
+                    '%YCall%n',
                 ]
             );
 
-            foreach ( $backTrace as $trace ) {
+            foreach ($backTrace as $trace) {
                 $table->addRow(
                     [
-                        $trace->get( 'File' ),
-                        $trace->get( 'Line' ),
-                        $trace->get( 'Call' )
+                        $trace->get('File'),
+                        $trace->get('Line'),
+                        $trace->get('Call'),
                     ]
                 );
             }
@@ -201,7 +204,7 @@ class JsonException extends Json
                     [
                         40,
                         5,
-                        35
+                        35,
                     ]
                 )
             );

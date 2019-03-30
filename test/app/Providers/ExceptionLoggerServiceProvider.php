@@ -1,28 +1,26 @@
-<?php namespace App\Providers;
+<?php
+
+namespace App\Providers;
 
 use Chukdo\Bootstrap\ServiceProvider;
 
 class ExceptionLoggerServiceProvider extends ServiceProvider
 {
-
-    /**
-     * @return void
-     */
     public function register(): void
     {
-        $this->app->singleton( 'ExceptionLogger', [
+        $this->app->singleton('ExceptionLogger', [
             'class' => \Chukdo\Logger\Logger::class,
             'args' => [
-                'exception_' . $this->app->channel() . '_' . $this->app->env(),
+                'exception_'.$this->app->channel().'_'.$this->app->env(),
                 [
-                    '@LoggerHandler'
+                    '@LoggerHandler',
                 ], [
                     '@\Chukdo\Logger\Processors\RequestProcessor',
-                    '@\Chukdo\Logger\Processors\BacktraceProcessor'
-                ]
-            ]
-        ] );
+                    '@\Chukdo\Logger\Processors\BacktraceProcessor',
+                ],
+            ],
+        ]);
 
-        $this->setClassAlias( \Chukdo\Facades\ExceptionLogger::class, 'ExceptionLogger' );
+        $this->setClassAlias(\Chukdo\Facades\ExceptionLogger::class, 'ExceptionLogger');
     }
 }

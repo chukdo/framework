@@ -1,18 +1,21 @@
-<?php namespace Chukdo\Validation;
+<?php
+
+namespace Chukdo\Validation;
 
 use Chukdo\Json\Input;
 use Chukdo\Json\Lang;
 use Chukdo\Contracts\Validation\Validate as ValidateInterface;
 use Chukdo\Json\Message;
-use Chukdo\Validation\ValidationException;
 
 /**
- * Validation de données
+ * Validation de données.
  *
- * @package     Validation
  * @version    1.0.0
+ *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ *
  * @since        08/01/2019
+ *
  * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Validator
@@ -47,17 +50,17 @@ class Validator
      *
      * @param Input $inputs
      * @param array $rules
-     * @param Lang $messages
+     * @param Lang  $messages
      */
-    public function __construct( Input $inputs, array $rules, Lang $messages )
+    public function __construct(Input $inputs, array $rules, Lang $messages)
     {
-        $this->error = new Message( 'error' );
+        $this->error = new Message('error');
         $this->rules = new Rules(
             $rules,
             $inputs,
             $messages
         );
-        $this->validated = new Input( [] );
+        $this->validated = new Input([]);
     }
 
     /**
@@ -65,9 +68,9 @@ class Validator
      *
      * @return Validator
      */
-    public function register( ValidateInterface $validate ): self
+    public function register(ValidateInterface $validate): self
     {
-        $this->validate[ $validate->name() ] = $validate;
+        $this->validate[$validate->name()] = $validate;
 
         return $this;
     }
@@ -95,8 +98,8 @@ class Validator
     {
         $validate = true;
 
-        foreach ( $this->rules() as $rule ) {
-            $validate .= $this->validateRule( $rule );
+        foreach ($this->rules() as $rule) {
+            $validate .= $this->validateRule($rule);
         }
 
         return $validate;
@@ -107,12 +110,12 @@ class Validator
      *
      * @return bool
      */
-    public function validateRule( Rule $rule ): bool
+    public function validateRule(Rule $rule): bool
     {
         $validate = true;
 
-        if ( is_iterable( $rule->input() ) ) {
-            foreach ( $rule->input() as $input ) {
+        if (is_iterable($rule->input())) {
+            foreach ($rule->input() as $input) {
                 $validate .= $this->validateInput(
                     $rule,
                     $input
@@ -134,9 +137,9 @@ class Validator
      *
      * @return bool
      */
-    public function validateInput( Rule $rule, $input ): bool
+    public function validateInput(Rule $rule, $input): bool
     {
-        if ( isset( $this->validate[ $rule->rule() ] ) ) {
+        if (isset($this->validate[$rule->rule()])) {
             throw new ValidationException(
                 sprintf(
                     'Validation Rule [%s] does not exist',
@@ -145,17 +148,19 @@ class Validator
             );
         }
 
-        $validate = $this->validate[ $rule->rule() ]->validate(
+        $validate = $this->validate[$rule->rule()]->validate(
             $input,
             $rule->attributes()
         );
 
         if ($validate === true) {
             $this->validated->offsetSet($rule->name(), $rule->input());
+
             return true;
         }
 
         $this->error->offsetSet($rule->name(), $rule->message());
+
         return false;
     }
 

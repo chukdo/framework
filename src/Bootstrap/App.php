@@ -1,27 +1,31 @@
-<?php namespace Chukdo\Bootstrap;
+<?php
 
-Use \Closure;
+namespace Chukdo\Bootstrap;
+
+use Closure;
 
 /**
- * Initialisation de l'application
+ * Initialisation de l'application.
  *
- * @package    Bootstrap
  * @version    1.0.0
+ *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ *
  * @since        08/01/2019
+ *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class App extends Service
 {
     /**
-     * Tableau des ecouteurs de resolution
+     * Tableau des ecouteurs de resolution.
      *
      * @var array
      */
     protected $resolving = [];
 
     /**
-     * Tableau des alias
+     * Tableau des alias.
      *
      * @var array
      */
@@ -39,9 +43,7 @@ class App extends Service
 
     /**
      * Constructeur
-     * Initialise l'objet
-     *
-     * @return void
+     * Initialise l'objet.
      */
     public function __construct()
     {
@@ -49,14 +51,13 @@ class App extends Service
             '\Chukdo\Bootstrap\App',
             $this
         );
+
+        $a = array(1, 2, 3);
     }
 
-    /**
-     *
-     */
     public function registerHandleExceptions()
     {
-        new HandleExceptions( $this );
+        new HandleExceptions($this);
     }
 
     /**
@@ -64,7 +65,7 @@ class App extends Service
      */
     public function runningInConsole(): bool
     {
-        return php_sapi_name() == "cli";
+        return php_sapi_name() == 'cli';
     }
 
     /**
@@ -72,9 +73,9 @@ class App extends Service
      *
      * @return string
      */
-    public function env( string $env = null ): string
+    public function env(string $env = null): string
     {
-        if ( $env != null ) {
+        if ($env != null) {
             $this->env = $env;
         }
 
@@ -86,9 +87,9 @@ class App extends Service
      *
      * @return string
      */
-    public function channel( string $channel = null ): string
+    public function channel(string $channel = null): string
     {
-        if ( $channel != null ) {
+        if ($channel != null) {
             $this->channel = $channel;
         }
 
@@ -99,21 +100,22 @@ class App extends Service
      * @param string $key
      *
      * @return string|null
+     *
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function getConf( string $key ): ?string
+    public function getConf(string $key): ?string
     {
-        return $this->make( 'Chukdo\Json\Conf' )->offsetGet( $key );
+        return $this->make('Chukdo\Json\Conf')->offsetGet($key);
     }
 
     /**
      * @param string $name
      * @param string $alias
      */
-    public function setAlias( string $name, string $alias ): void
+    public function setAlias(string $name, string $alias): void
     {
-        self::$aliases[ $name ] = $alias;
+        self::$aliases[$name] = $alias;
     }
 
     /**
@@ -121,32 +123,33 @@ class App extends Service
      *
      * @return string
      */
-    public function getAlias( string $name ): string
+    public function getAlias(string $name): string
     {
-        return isset( self::$aliases[ $name ] )
-            ? self::$aliases[ $name ]
-            : $name;
+        return isset(self::$aliases[$name])
+        ? self::$aliases[$name]
+        : $name;
     }
 
     /**
      * @param string $name
-     * @param bool $bindInstance
+     * @param bool   $bindInstance
      *
      * @return mixed|object|null
+     *
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function make( string $name, bool $bindInstance = false )
+    public function make(string $name, bool $bindInstance = false)
     {
-        $alias = $this->getAlias( $name );
-        $bindObject = parent::make( $alias );
+        $alias = $this->getAlias($name);
+        $bindObject = parent::make($alias);
 
         $this->resolve(
             $alias,
             $bindObject
         );
 
-        if ( $bindInstance == true ) {
+        if ($bindInstance == true) {
             $this->instance(
                 $name,
                 $bindObject
@@ -167,48 +170,48 @@ class App extends Service
     /**
      * @param string $name
      */
-    public function register( string $name ): void
+    public function register(string $name): void
     {
-        $instance = new $name( $this );
+        $instance = new $name($this);
         $instance->register();
     }
 
     /**
-     * Ecoute la resolution de tous les objets
+     * Ecoute la resolution de tous les objets.
      *
      * @param Closure $closure
      */
-    public function resolvingAny( Closure $closure ): void
+    public function resolvingAny(Closure $closure): void
     {
-        $this->resolving[ '__ANY__' ] = $closure;
+        $this->resolving['__ANY__'] = $closure;
     }
 
     /**
-     * Ecoute la resolution d'un objet
+     * Ecoute la resolution d'un objet.
      *
-     * @param string $name
+     * @param string  $name
      * @param Closure $closure
      */
-    public function resolving( string $name, Closure $closure ): void
+    public function resolving(string $name, Closure $closure): void
     {
-        $this->resolving[ $name ] = $closure;
+        $this->resolving[$name] = $closure;
     }
 
     /**
      * @param string $name
      * @param $bindObject
      */
-    protected function resolve( string $name, $bindObject )
+    protected function resolve(string $name, $bindObject)
     {
-        if ( isset( $this->resolving[ '__ANY__' ] ) ) {
-            $this->resolving[ '__ANY__' ](
+        if (isset($this->resolving['__ANY__'])) {
+            $this->resolving['__ANY__'](
                 $bindObject,
                 $name
             );
         }
 
-        if ( isset( $this->resolving[ $name ] ) ) {
-            $this->resolving[ $name ](
+        if (isset($this->resolving[$name])) {
+            $this->resolving[$name](
                 $bindObject,
                 $name
             );

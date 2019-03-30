@@ -1,13 +1,17 @@
-<?php namespace Chukdo\Helper;
+<?php
+
+namespace Chukdo\Helper;
 
 /**
  * Classe Str
- * Fonctionnalités de filtre sur les données
+ * Fonctionnalités de filtre sur les données.
  *
- * @package        helper
  * @version    1.0.0
+ *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ *
  * @since        08/01/2019
+ *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 final class Crypto
@@ -17,14 +21,14 @@ final class Crypto
      *
      * @return string
      */
-    public static function encodeCsrf( int $duration = null ): string
+    public static function encodeCsrf(int $duration = null): string
     {
         return self::encrypt(
             json_encode(
                 [
-                    'time'     => time(),
+                    'time' => time(),
                     'duration' => (int) $duration
-                        ?: 60
+                    ?: 60,
                 ]
             ),
             '[A"[6cnTDT{J[6s\''
@@ -36,14 +40,14 @@ final class Crypto
      *
      * @return bool
      */
-    public static function decodeCsrf( string $token ): bool
+    public static function decodeCsrf(string $token): bool
     {
-        /** URI Decode */
-        if ( strpos(
-                $token,
-                '%'
-            ) !== false ) {
-            $token = rawurldecode( $token );
+        /* URI Decode */
+        if (strpos(
+            $token,
+            '%'
+        ) !== false) {
+            $token = rawurldecode($token);
         }
 
         /** Hack decoding link ex. Outlook */
@@ -52,14 +56,14 @@ final class Crypto
             '+',
             $token
         );
-        $json  = json_decode(
+        $json = json_decode(
             self::decrypt(
                 $token,
                 '[A"[6cnTDT{J[6s\''
             )
         );
 
-        if ( $json->time + $json->duration >= time() ) {
+        if ($json->time + $json->duration >= time()) {
             return true;
         }
 
@@ -71,39 +75,40 @@ final class Crypto
      *
      * @return string
      */
-    public static function password( int $length = null ): string
+    public static function password(int $length = null): string
     {
-        $chars    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?";
+        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?';
         $password = substr(
-            str_shuffle( $chars ),
+            str_shuffle($chars),
             0,
             $length
-                ?: 8
+            ?: 8
         );
 
         return $password;
     }
 
     /**
-     * @param int $length
+     * @param int  $length
      * @param bool $readable
      *
      * @return string
+     *
      * @throws \Exception
      */
-    public static function generateCode( int $length, bool $readable = true ): string
+    public static function generateCode(int $length, bool $readable = true): string
     {
-        $token        = "";
+        $token = '';
         $codeAlphabet = $readable
-            ? "abcdefghjkmnpqrstuvwxyz123456789"
-            : "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        $max          = strlen( $codeAlphabet );
+        ? 'abcdefghjkmnpqrstuvwxyz123456789'
+        : '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $max = strlen($codeAlphabet);
 
-        for ( $i = 0 ; $i < $length ; $i++ ) {
-            $token .= $codeAlphabet[ random_int(
+        for ($i = 0; $i < $length; ++$i) {
+            $token .= $codeAlphabet[random_int(
                 0,
                 $max - 1
-            ) ];
+            )];
         }
 
         return $token;
@@ -115,7 +120,7 @@ final class Crypto
      *
      * @return string
      */
-    public static function encrypt( string $data, string $salt ): string
+    public static function encrypt(string $data, string $salt): string
     {
         $encrypted = openssl_encrypt(
             $data,
@@ -123,7 +128,7 @@ final class Crypto
             $salt,
             true
         );
-        $result    = base64_encode( $encrypted );
+        $result = base64_encode($encrypted);
 
         return $result;
     }
@@ -134,9 +139,9 @@ final class Crypto
      *
      * @return string
      */
-    public static function decrypt( string $data, string $salt ): string
+    public static function decrypt(string $data, string $salt): string
     {
-        $data      = base64_decode( $data );
+        $data = base64_decode($data);
         $decrypted = openssl_decrypt(
             $data,
             'bf-ecb',
@@ -148,16 +153,16 @@ final class Crypto
     }
 
     /**
-     * Hash un fichier et retourne son chemin de stockage
+     * Hash un fichier et retourne son chemin de stockage.
      *
-     * @param string $name nom du fichier
-     * @param int $hashlevel nombre de sous repertoire pour le stockage du fichier
+     * @param string $name      nom du fichier
+     * @param int    $hashlevel nombre de sous repertoire pour le stockage du fichier
      *
      * @return string chemin complet du fichier à stocker
      */
-    public static function hash( string $name, int $hashlevel = 2 ): string
+    public static function hash(string $name, int $hashlevel = 2): string
     {
-        $file = crc32( $name );
+        $file = crc32($name);
         $path = '';
         $hash = str_split(
             hash(
@@ -167,11 +172,11 @@ final class Crypto
             2
         );
 
-        /** Hashlevel */
-        for ( $i = 0 ; $i < $hashlevel ; $i++ ) {
-            $path .= $hash[ $i ] . '/';
+        /* Hashlevel */
+        for ($i = 0; $i < $hashlevel; ++$i) {
+            $path .= $hash[$i].'/';
         }
 
-        return $path . $file;
+        return $path.$file;
     }
 }

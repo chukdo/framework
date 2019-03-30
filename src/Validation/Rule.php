@@ -1,12 +1,18 @@
-<?php namespace Chukdo\Validation;
+<?php
+
+namespace Chukdo\Validation;
+
+use Chukdo\Json\Input;
 
 /**
- * Validation de regle
+ * Validation de regle.
  *
- * @package     Validation
  * @version    1.0.0
+ *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ *
  * @since        08/01/2019
+ *
  * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Rule
@@ -27,7 +33,7 @@ class Rule
     protected $message;
 
     /**
-     * @var
+     * @var Input
      */
     protected $input;
 
@@ -42,15 +48,15 @@ class Rule
      * @param string $name
      * @param string $rule
      * @param string $message
-     * @param $input
-     * @param array $attributes
+     * @param Input  $input
+     * @param array  $attributes
      */
-    public function __construct( string $name, string $rule, string $message, $input, array $attributes = [] )
+    public function __construct(string $name, string $rule, string $message, Input $input, array $attributes = [])
     {
-        $this->name       = trim( $name );
-        $this->rule       = trim( $rule );
-        $this->input      = $input;
-        $this->message    = $message;
+        $this->name = trim($name);
+        $this->rule = trim($rule);
+        $this->input = $input;
+        $this->message = $message;
         $this->attributes = array_map(
             'trim',
             $attributes

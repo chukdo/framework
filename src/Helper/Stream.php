@@ -1,12 +1,16 @@
-<?php namespace Chukdo\Helper;
+<?php
+
+namespace Chukdo\Helper;
 
 /**
- * Stream
+ * Stream.
  *
- * @package    Helper
  * @version    1.0.0
+ *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ *
  * @since        08/01/2019
+ *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 final class Stream
@@ -22,10 +26,10 @@ final class Stream
      * @param string $name
      * @param string $class
      */
-    public static function register( string $name, string $class ): void
+    public static function register(string $name, string $class): void
     {
-        if ( self::exists( $name ) ) {
-            stream_wrapper_unregister( $name );
+        if (self::exists($name)) {
+            stream_wrapper_unregister($name);
         }
         stream_wrapper_register(
             $name,
@@ -38,7 +42,7 @@ final class Stream
      *
      * @return bool
      */
-    public static function exists( string $name ): bool
+    public static function exists(string $name): bool
     {
         return (bool) in_array(
             $name,

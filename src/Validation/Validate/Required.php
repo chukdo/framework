@@ -1,14 +1,18 @@
-<?php namespace Chukdo\Validation\Validate;
+<?php
+
+namespace Chukdo\Validation\Validate;
 
 use Chukdo\Contracts\Validation\Validate;
 
 /**
- * Validate handler
+ * Validate handler.
  *
- * @package     Validation
  * @version    1.0.0
+ *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ *
  * @since        08/01/2019
+ *
  * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Required implements Validate
@@ -27,7 +31,7 @@ class Required implements Validate
      *
      * @return bool
      */
-    public function validate( $input, array $param = [] ): bool
+    public function validate($input, array $param = []): bool
     {
         return $input !== null;
     }

@@ -1,25 +1,29 @@
-<?php namespace Chukdo\Support;
+<?php
+
+namespace Chukdo\Support;
 
 /**
- * Singleton
+ * Singleton.
  *
- * @package    support
  * @version    1.0.0
+ *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ *
  * @since        08/01/2019
+ *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Singleton
 {
     /**
-     * Tableau des instances
+     * Tableau des instances.
      *
      * @var object
      */
-    private static $_instance = null;
+    private static $singletonInstance = null;
 
     /**
-     * Constructeur verouillé pour ne pas etre instancié depuis l'exterieur de la classe
+     * Constructeur verouillé pour ne pas etre instancié depuis l'exterieur de la classe.
      */
     private function __construct()
     {
@@ -29,21 +33,21 @@ class Singleton
      * Méthode qui crée l'unique instance de la classe
      * si elle n'existe pas encore puis la retourne.
      *
-     * @return    object Singleton $this
+     * @return object Singleton $this
      */
     public static function getInstance()
     {
-        if ( is_null( self::$_instance ) ) {
-            self::$_instance = new static();
+        if (is_null(self::$singletonInstance)) {
+            self::$singletonInstance = new static();
         }
 
-        return self::$_instance;
+        return self::$singletonInstance;
     }
 
     /**
-     * Bloque le clonage de l'objet
+     * Bloque le clonage de l'objet.
      */
-    final private function __clone()
+    private function __clone()
     {
     }
 
@@ -51,11 +55,11 @@ class Singleton
      * invoque des méthodes inaccessibles dans un contexte statique.
      *
      * @param string $name
-     * @param array $args
+     * @param array  $args
      *
      * @return mixed
      */
-    public static function __callStatic( $name, $args )
+    public static function __callStatic($name, $args)
     {
         return call_user_func_array(
             [
@@ -63,7 +67,7 @@ class Singleton
                 trim(
                     $name,
                     '_'
-                )
+                ),
             ],
             $args
         );
