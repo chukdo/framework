@@ -2,9 +2,9 @@
 
 namespace Chukdo\Validation;
 
+use Chukdo\Contracts\Validation\Validate as ValidateInterface;
 use Chukdo\Json\Input;
 use Chukdo\Json\Lang;
-use Chukdo\Contracts\Validation\Validate as ValidateInterface;
 use Chukdo\Json\Message;
 
 /**
@@ -24,11 +24,6 @@ class Validator
      * @var Input
      */
     protected $validated;
-
-    /**
-     * @var Input
-     */
-    protected $inputs;
 
     /**
      * @var Rules
@@ -112,19 +107,19 @@ class Validator
      */
     public function validateRule(Rule $rule): bool
     {
-        $validate = true;
-
-        if (is_iterable($rule->input())) {
-            foreach ($rule->input() as $input) {
-                $validate .= $this->validateInput(
-                    $rule,
-                    $input
-                );
-            }
-        } else {
-            $validate = $this->validateInput(
+        if (in_array($rule->rule(), ['array', 'scalar']) || !is_iterable($rule->input())) {
+            return $this->validateInput(
                 $rule,
                 $rule->input()
+            );
+        }
+
+        $validate = true;
+
+        foreach ($rule->input() as $input) {
+            $validate .= $this->validateInput(
+                $rule,
+                $input
             );
         }
 
@@ -139,7 +134,7 @@ class Validator
      */
     public function validateInput(Rule $rule, $input): bool
     {
-        if (isset($this->validate[$rule->rule()])) {
+        if (!isset($this->validate[$rule->rule()])) {
             throw new ValidationException(
                 sprintf(
                     'Validation Rule [%s] does not exist',
@@ -170,14 +165,6 @@ class Validator
     public function rules(): Rules
     {
         return $this->rules;
-    }
-
-    /**
-     * @return Input
-     */
-    public function inputs(): Input
-    {
-        return $this->inputs;
     }
 
     /**

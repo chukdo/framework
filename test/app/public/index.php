@@ -2,9 +2,9 @@
 
 function dd($data)
 {
-    echo  "Dump and Die\n".(php_sapi_name() == 'cli'
-            ? ''
-            : '<pre>');
+    echo "Dump and Die\n".(php_sapi_name() == 'cli'
+        ? ''
+        : '<pre>');
     var_dump($data);
     exit;
 }
@@ -40,7 +40,7 @@ require_once CHUKDO_PATH.'Bootstrap/Loader.php';
 require_once VENDOR_PATH.'autoload.php';
 
 /** boostrap framework */
-$loader = new Chukdo\Bootstrap\loader();
+$loader = new \Chukdo\Bootstrap\Loader();
 $loader->registerNameSpace(
     '\Chukdo',
     CHUKDO_PATH
@@ -133,14 +133,19 @@ $json = new \Chukdo\Json\Json(
 
 $validator = new \Chukdo\Validation\Validator(
     Input::all(),
-    ['title' => 'required'],
+    ['title' => 'required|array|string:3,6'],
     Lang::offsetGet('validation')
 );
 
-$validator->register(new \Chukdo\Validation\Validate\Required());
+$validator->register(new \Chukdo\Validation\Validate\RequiredValidator());
+$validator->register(new \Chukdo\Validation\Validate\ArrayValidator());
+$validator->register(new \Chukdo\Validation\Validate\ScalarValidator());
+$validator->register(new \Chukdo\Validation\Validate\StringValidator());
 $validator->validate();
 
-dd($validator->errors());
+if ($validator->fails()) {
+    dd($validator->errors());
+}
 
 Response::header(
     'X-jpd',
@@ -153,6 +158,6 @@ View::render(
     $json
 );
 
-//ExceptionLogger::emergency('coucou les loulous');
+ExceptionLogger::emergency('coucou les loulous');
 //Response::file('azure://files-dev/566170fe8bc5d2cf3d000000/5948da9a28b8b.pdf')->send()->end();
 //Response::json($json)->send()->end();

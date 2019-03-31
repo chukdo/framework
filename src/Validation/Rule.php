@@ -38,20 +38,25 @@ class Rule
     protected $input;
 
     /**
+     * @var bool
+     */
+    protected $isArray = false;
+
+    /**
      * @var array
      */
     protected $attributes = [];
 
     /**
-     * Rule constructor.
+     * Constructor.
      *
      * @param string $name
      * @param string $rule
      * @param string $message
-     * @param Input  $input
+     * @param [type] $input
      * @param array  $attributes
      */
-    public function __construct(string $name, string $rule, string $message, Input $input, array $attributes = [])
+    public function __construct(string $name, string $rule, string $message, $input, array $attributes = [])
     {
         $this->name = trim($name);
         $this->rule = trim($rule);
@@ -61,6 +66,14 @@ class Rule
             'trim',
             $attributes
         );
+    }
+
+    /**
+     * @return string
+     */
+    public function isArray(): string
+    {
+        return $this->isArray;
     }
 
     /**

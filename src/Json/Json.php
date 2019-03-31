@@ -2,11 +2,11 @@
 
 namespace Chukdo\Json;
 
-use Chukdo\Xml\Xml;
-use Closure;
 use ArrayObject;
 use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
+use Chukdo\Xml\Xml;
+use Closure;
 
 /**
  * Manipulation des données.
@@ -72,8 +72,8 @@ class Json extends \ArrayObject
     public function isEmpty(): bool
     {
         return $this->count() == 0
-            ? true
-            : false;
+        ? true
+        : false;
     }
 
     /**
@@ -252,7 +252,7 @@ class Json extends \ArrayObject
             return $this->offsetSet(
                 $key,
                 $value
-                    ?: []
+                ?: []
             )->offsetGet($key);
         }
     }
@@ -260,15 +260,16 @@ class Json extends \ArrayObject
     /**
      * @param mixed $key
      * @param mixed $value
+     * @param bool  $static
      *
-     * @return Json
+     * @return self
      */
-    public function offsetSet($key, $value): self
+    public function offsetSet($key, $value, $static = true): self
     {
         if (Is::arr($value)) {
             parent::offsetSet(
                 $key,
-                new static($value)
+                $static ? new static($value) : new self($value)
             );
         } else {
             parent::offsetSet(
@@ -742,8 +743,8 @@ class Json extends \ArrayObject
         return json_encode(
             $this->toArray(),
             $prettyfy
-                ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-                : JSON_UNESCAPED_SLASHES
+            ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+            : JSON_UNESCAPED_SLASHES
         );
     }
 
@@ -775,7 +776,7 @@ class Json extends \ArrayObject
 
         if ($title) {
             $color = $color
-                ?: '#499cef';
+            ?: '#499cef';
             $html .= "
                 <thead style=\"color: #fff;background: $color;\">
                     <tr>
@@ -786,12 +787,12 @@ class Json extends \ArrayObject
 
         foreach ($this as $k => $v) {
             $v = $v instanceof Json
-                ? $v->toHtml(
-                    null,
-                    null,
-                    $widthFirstCol
-                )
-                : $v;
+            ? $v->toHtml(
+                null,
+                null,
+                $widthFirstCol
+            )
+            : $v;
 
             $html .= "
                 <tr>
@@ -887,8 +888,8 @@ class Json extends \ArrayObject
     public function __get(string $key)
     {
         return $this->offsetExists($key)
-            ? $this->offsetGet($key)
-            : null;
+        ? $this->offsetGet($key)
+        : null;
     }
 
     /**

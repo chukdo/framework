@@ -51,27 +51,28 @@ class JsonException extends Json
             ];
         }
 
-        $this->set(
+        $this->offsetSet(
             'Error',
             $e->getMessage()
-        )->set(
+        )->offsetSet(
             'Code',
             $e->getCode()
-        )->set(
+        )->offsetSet(
             'File',
             $e->getFile()
-        )->set(
+        )->offsetSet(
             'Line',
             $e->getLine()
-        )->set(
+        )->offsetSet(
             'Php',
             $this->getCode(
                 $e->getFile(),
                 $e->getLine()
             )
-        )->set(
+        )->offsetSet(
             'Trace',
-            $backTrace
+            $backTrace,
+            false
         );
 
         return $this;

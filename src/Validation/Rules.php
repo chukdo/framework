@@ -2,6 +2,7 @@
 
 namespace Chukdo\Validation;
 
+use Chukdo\Helper\Str;
 use Chukdo\Json\Arr;
 use Chukdo\Json\Input;
 use Chukdo\Json\Lang;
@@ -43,11 +44,17 @@ class Rules implements IteratorAggregate
         $this->messages = $messages;
 
         foreach ($rules as $name => $rulesPiped) {
+            $input = $inputs->get($name);
+
+            if (Str::contain($name, '*')) {
+                $input = $inputs->wildcard($name);
+            }
+
             $this->rules->merge(
                 $this->parseRules(
                     $name,
                     $rulesPiped,
-                    $inputs->wildcard($name)
+                    $input
                 )
             );
         }
@@ -56,18 +63,21 @@ class Rules implements IteratorAggregate
     /**
      * @param string $name
      * @param string $rulesPiped
-     * @param Input  $input
+     * @param $input
      *
      * @return Arr
      */
-    protected function parseRules(string $name, string $rulesPiped, Input $input): Arr
+    protected function parseRules(string $name, string $rulesPiped, $input): Arr
     {
         $parseRules = new Arr();
+        $rules = explode('|', $rulesPiped);
 
-        foreach (explode(
-            '|',
-            $rulesPiped
-        ) as $rule) {
+        /* Defini input par défaut comme un scalaire */
+        if (!in_array('array', $rules)) {
+            array_unshift($rules, 'scalar');
+        }
+
+        foreach ($rules as $rule) {
             $parseRules->append(
                 $this->parseRule(
                     $name,
@@ -83,11 +93,11 @@ class Rules implements IteratorAggregate
     /**
      * @param string $name
      * @param string $ruleColon
-     * @param Input  $input
+     * @param $input
      *
      * @return Rule
      */
-    protected function parseRule(string $name, string $ruleColon, Input $input): Rule
+    protected function parseRule(string $name, string $ruleColon, $input): Rule
     {
         list($rule, $param) = array_pad(
             explode(
@@ -100,11 +110,13 @@ class Rules implements IteratorAggregate
 
         $message = $this->messages->offsetGetFirstInList(
             [
-                $name,
                 $name.'.'.$rule,
+                $name,
+                $rule,
             ],
             sprintf(
-                'Validation message [%s] cannot be found',
+                'Validation message [%s:%s] cannot be found',
+                $rule,
                 $name
             )
         );

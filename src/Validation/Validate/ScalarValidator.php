@@ -15,14 +15,14 @@ use Chukdo\Contracts\Validation\Validate;
  *
  * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class Required implements Validate
+class ScalarValidator implements Validate
 {
     /**
      * @return string
      */
     public function name(): string
     {
-        return 'required';
+        return 'scalar';
     }
 
     /**
@@ -33,6 +33,6 @@ class Required implements Validate
      */
     public function validate($input, array $param = []): bool
     {
-        return $input !== null;
+        return is_scalar($input);
     }
 }
