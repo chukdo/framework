@@ -3,6 +3,7 @@
 namespace Chukdo\Validation\Validate;
 
 use Chukdo\Contracts\Validation\Validate;
+use Chukdo\Json\Input;
 
 /**
  * Validate handler.
@@ -33,6 +34,17 @@ class ArrayValidator implements Validate
      */
     public function validate($input, array $param = []): bool
     {
-        return is_iterable($input);
+        if ($input instanceof Input) {
+            $param = array_pad($param, 2, 0);
+            $min = $param[0];
+            $max = $param[1] ?: $param[0] ?: pow(10, 9);
+            $len = $input->count();
+
+            if ($len >= $min && $len <= $max) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

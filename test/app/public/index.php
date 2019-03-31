@@ -133,7 +133,7 @@ $json = new \Chukdo\Json\Json(
 
 $validator = new \Chukdo\Validation\Validator(
     Input::all(),
-    ['title' => 'required|array|string:3,6'],
+    ['title' => 'required|array:2,3|string:3,6'],
     Lang::offsetGet('validation')
 );
 

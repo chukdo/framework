@@ -25,10 +25,14 @@ class Input extends Json
      */
     public function __construct($data = null)
     {
-        parent::__construct(
-            $data
-                ?: $_REQUEST
-        );
+        $input = $data ?: $_REQUEST;
+
+        /* Trim all input */
+        array_walk_recursive($input, function (&$v, $k) {
+            $v = trim($v);
+        });
+
+        parent::__construct($input);
     }
 
     /**

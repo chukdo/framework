@@ -73,7 +73,7 @@ class Rules implements IteratorAggregate
         $rules = explode('|', $rulesPiped);
 
         /* Defini input par défaut comme un scalaire */
-        if (!in_array('array', $rules)) {
+        if (Str::notContain($rulesPiped, 'array')) {
             array_unshift($rules, 'scalar');
         }
 
@@ -99,15 +99,9 @@ class Rules implements IteratorAggregate
      */
     protected function parseRule(string $name, string $ruleColon, $input): Rule
     {
-        list($rule, $param) = array_pad(
-            explode(
-                ':',
-                $ruleColon
-            ),
-            2,
-            ''
-        );
+        list($rule, $param) = array_pad(explode(':', $ruleColon), 2, '');
 
+        $param = $param == '' ? [] : explode(',', $param);
         $message = $this->messages->offsetGetFirstInList(
             [
                 $name.'.'.$rule,
@@ -126,10 +120,7 @@ class Rules implements IteratorAggregate
             $rule,
             $message,
             $input,
-            explode(
-                ',',
-                $param
-            )
+            $param
         );
     }
 

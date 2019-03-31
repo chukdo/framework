@@ -33,6 +33,17 @@ class StringValidator implements Validate
      */
     public function validate($input, array $param = []): bool
     {
-        return true;
+        if (is_string($input)) {
+            $param = array_pad($param, 2, 0);
+            $min = $param[0];
+            $max = $param[1] ?: $param[0] ?: pow(10, 9);
+            $len = strlen($input);
+
+            if ($len >= $min && $len <= $max) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
