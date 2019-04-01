@@ -131,7 +131,6 @@ $json = new \Chukdo\Json\Json(
     ]
 );
 
-
 $validator = new \Chukdo\Validation\Validator(
     Input::all(),
     [

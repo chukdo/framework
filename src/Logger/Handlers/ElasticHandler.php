@@ -31,9 +31,9 @@ class ElasticHandler extends AbstractHandler
     /**
      * ElasticHandler constructor.
      *
-     * @param string $dsn
+     * @param string|null $dsn
      */
-    public function __construct( string $dsn )
+    public function __construct( ?string $dsn )
     {
         $this->dsn     = $dsn;
         $this->elastic = ClientBuilder::create()->setHosts(

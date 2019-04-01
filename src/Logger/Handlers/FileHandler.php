@@ -23,9 +23,9 @@ class FileHandler extends AbstractHandler
     /**
      * FileHandler constructor.
      *
-     * @param string $file
+     * @param string|null $file
      */
-    public function __construct( string $file )
+    public function __construct( ?string $file )
     {
         $this->file = $file;
 

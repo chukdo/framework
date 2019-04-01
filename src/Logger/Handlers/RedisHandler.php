@@ -30,10 +30,10 @@ class RedisHandler extends AbstractHandler
     /**
      * RedisHandler constructor.
      *
-     * @param RedisInterface $redis
+     * @param RedisInterface|null $redis
      * @param string|null $key
      */
-    public function __construct( RedisInterface $redis, string $key = null )
+    public function __construct( ?RedisInterface $redis, string $key = null )
     {
         $this->redis = $redis;
         $this->key   = $key
