@@ -33,7 +33,9 @@ class Input extends Json
         array_walk_recursive(
             $data,
             function( &$v, $k ) {
-                $v = trim($v);
+                if( is_scalar($v) ) {
+                    $v = trim($v);
+                }
             }
         );
 

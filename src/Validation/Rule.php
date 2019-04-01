@@ -60,7 +60,7 @@ class Rule
      */
     public function __construct( string $path, string $rule, Validator $validator )
     {
-        $this->path      = trim($path);
+        $this->path = trim($path);
         $this->validator = $validator;
 
         $this->setLabel($this->path);
@@ -165,14 +165,17 @@ class Rule
                     $this->setLabel($attrs[ 0 ]);
                     break;
                 case 'array':
+                    $min = isset($attrs[ 0 ])
+                        ? $attrs[ 0 ]
+                        : 0;
+                    $max = isset($attrs[ 1 ])
+                        ? $attrs[ 1 ]
+                        : ($min
+                            ?: 10000);
                     $this->setType(
                         true,
-                        isset($attrs[ 0 ])
-                            ? $attrs[ 0 ]
-                            : 0,
-                        isset($attrs[ 1 ])
-                            ? $attrs[ 0 ]
-                            : 10000
+                        $min,
+                        $max
                     );
                     break;
                 default:
@@ -255,7 +258,7 @@ class Rule
     {
         if( $this->type[ 'array' ] ) {
             if( $input instanceof Input ) {
-                $countInput = $input->count();
+                $countInput = count($input->toSimpleArray());
 
                 if( $countInput >= $this->type[ 'min' ] && $countInput <= $this->type[ 'max' ] ) {
                     return true;

@@ -475,7 +475,7 @@ class Json extends \ArrayObject
      */
     public function only( ...$offsets ): self
     {
-        $only = $this->newParentClass();
+        $only = $this->newParentClass([]);
 
         foreach( $offsets as $offsetList ) {
             foreach( (array) $offsetList as $offset ) {
@@ -700,14 +700,14 @@ class Json extends \ArrayObject
         $firstPath = $arr->getFirstAndRemove();
         $emptyPath = $arr->empty();
         $endPath   = $arr->join('.');
-        $json      = $this->newParentClass();
+        $json      = $this->newParentClass([]);
         $get       = $this->offsetGet($firstPath);
 
         if( $firstPath == '*' ) {
             foreach( $this as $key => $value ) {
                 if( is_subclass_of(
                     $value,
-                    'Json'
+                    '\Chukdo\Json\Json'
                 ) ) {
                     if( ($get = $value->wildcard($endPath))->count() ) {
                         $json->offsetSet(
@@ -719,7 +719,7 @@ class Json extends \ArrayObject
             }
         } else if( is_subclass_of(
                 $get,
-                'Json'
+                '\Chukdo\Json\Json'
             )
             && !$emptyPath ) {
             $json->offsetSet(
@@ -755,7 +755,7 @@ class Json extends \ArrayObject
 
             if( is_subclass_of(
                 $v,
-                'Json'
+                '\Chukdo\Json\Json'
             ) ) {
                 $mixed = array_merge(
                     $mixed,
@@ -817,7 +817,7 @@ class Json extends \ArrayObject
         foreach( $this as $k => $v ) {
             $v = is_subclass_of(
                 $v,
-                'Json'
+                '\Chukdo\Json\Json'
             )
                 ? $v->toHtml(
                     null,
