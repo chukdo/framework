@@ -4,5 +4,6 @@
   "string": "Le champs %s doit être une chaine de caractere valide",
   "required": "Le champs %s est requis",
   "title.required": "Le titre est obligatoire",
-  "title.string": "Le champs %s doit être une chaine de caractere comprise entre 3 et 6 caracteres"
+  "title.string": "Le champs %s doit être une chaine de caractere comprise entre 3 et 6 caracteres",
+  "code postal": "le code postal doit contenir 5 chiffres"
 }

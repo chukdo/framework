@@ -25,6 +25,11 @@ class Rule
     /**
      * @var string
      */
+    protected $label;
+
+    /**
+     * @var string
+     */
     protected $rule;
 
     /**
@@ -51,17 +56,19 @@ class Rule
      * Constructor.
      *
      * @param string $name
+     * @param string $label
      * @param string $rule
      * @param string $message
      * @param [type] $input
      * @param array  $attributes
      */
-    public function __construct(string $name, string $rule, string $message, $input, array $attributes = [])
+    public function __construct(string $name, string $label, string $rule, string $message, $input, array $attributes = [])
     {
-        $this->name = trim($name);
-        $this->rule = trim($rule);
-        $this->input = $input;
-        $this->message = $message;
+        $this->name       = trim($name);
+        $this->label      = trim($label);
+        $this->rule       = trim($rule);
+        $this->input      = $input;
+        $this->message    = $message;
         $this->attributes = $attributes;
     }
 
@@ -84,11 +91,19 @@ class Rule
     /**
      * @return string
      */
+    public function label(): string
+    {
+        return $this->label;
+    }
+
+    /**
+     * @return string
+     */
     public function message(): string
     {
         return sprintf(
             $this->message,
-            $this->name
+            $this->label()
         );
     }
 
@@ -109,10 +124,13 @@ class Rule
     }
 
     /**
+     *
+     * @param int $number
+     * @param int $default
      * @return array
      */
-    public function attributes(): array
+    public function attributes($number = 0, $default = 0): array
     {
-        return $this->attributes;
+        return array_pad($this->attributes, $number, $default);
     }
 }

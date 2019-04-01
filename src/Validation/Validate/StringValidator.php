@@ -2,6 +2,7 @@
 
 namespace Chukdo\Validation\Validate;
 
+use Chukdo\Validation\Rule;
 use Chukdo\Contracts\Validation\Validate;
 
 /**
@@ -27,14 +28,14 @@ class StringValidator implements Validate
 
     /**
      * @param $input
-     * @param array $param
+     * @param Rule $rule
      *
      * @return bool
      */
-    public function validate($input, array $param = []): bool
+    public function validate($input, Rule $rule): bool
     {
         if (is_string($input)) {
-            $param = array_pad($param, 2, 0);
+            $param = $rule->attributes(2, 0);
             $min = $param[0];
             $max = $param[1] ?: $param[0] ?: pow(10, 9);
             $len = strlen($input);

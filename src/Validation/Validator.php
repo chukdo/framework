@@ -145,7 +145,7 @@ class Validator
 
         $validate = $this->validate[$rule->rule()]->validate(
             $input,
-            $rule->attributes()
+            $rule
         );
 
         if ($validate === true) {

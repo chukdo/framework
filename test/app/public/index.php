@@ -2,7 +2,7 @@
 
 function dd($data)
 {
-    echo "Dump and Die\n".(php_sapi_name() == 'cli'
+    echo "Dump and Die\n" . (php_sapi_name() == 'cli'
         ? ''
         : '<pre>');
     var_dump($data);
@@ -24,7 +24,7 @@ define(
 );
 define(
     'TPL_PATH',
-    APP_PATH.'Views/'
+    APP_PATH . 'Views/'
 );
 define(
     'CHUKDO_PATH',
@@ -36,8 +36,8 @@ define(
 );
 
 /** Inclusion des loaders */
-require_once CHUKDO_PATH.'Bootstrap/Loader.php';
-require_once VENDOR_PATH.'autoload.php';
+require_once CHUKDO_PATH . 'Bootstrap/Loader.php';
+require_once VENDOR_PATH . 'autoload.php';
 
 /** boostrap framework */
 $loader = new \Chukdo\Bootstrap\Loader();
@@ -106,7 +106,7 @@ Facade::setClassAlias(
 /* Configuration */
 Lang::load(LANG_PATH);
 //dd(Lang::all());
-Conf::load(CONF_PATH.'Conf.json');
+Conf::load(CONF_PATH . 'Conf.json');
 //Conf::load(CONF_PATH.'conf_prod.json');
 
 /* App */
@@ -119,7 +119,7 @@ App::registerHandleExceptions();
 
 $json = new \Chukdo\Json\Json(
     [
-        'title' => 'Liste des voitures',
+        'title'    => 'Liste des voitures',
         'articles' => [
             'auto' => [
                 'bmw',
@@ -133,7 +133,11 @@ $json = new \Chukdo\Json\Json(
 
 $validator = new \Chukdo\Validation\Validator(
     Input::all(),
-    ['title' => 'required|array:2,3|string:3,6'],
+    [
+        'title'                => 'required|array:0,3',
+        'title.name'           => 'required|string:3,6',
+        'title.cp:code postal' => 'string:0,5',
+    ],
     Lang::offsetGet('validation')
 );
 

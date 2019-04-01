@@ -2,6 +2,7 @@
 
 namespace Chukdo\Validation\Validate;
 
+use Chukdo\Validation\Rule;
 use Chukdo\Contracts\Validation\Validate;
 
 /**
@@ -27,11 +28,11 @@ class ScalarValidator implements Validate
 
     /**
      * @param $input
-     * @param array $param
+     * @param Rule $rule
      *
      * @return bool
      */
-    public function validate($input, array $param = []): bool
+    public function validate($input, Rule $rule): bool
     {
         return is_scalar($input);
     }

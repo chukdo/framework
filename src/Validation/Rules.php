@@ -40,10 +40,16 @@ class Rules implements IteratorAggregate
      */
     public function __construct(Iterable $rules, Input $inputs, Lang $messages)
     {
-        $this->rules = new Arr();
+        $this->rules    = new Arr();
         $this->messages = $messages;
 
         foreach ($rules as $name => $rulesPiped) {
+            if (Str::contain($name, ':')) {
+                list($name, $label) = explode(':', $name);
+            } else {
+                $label = $name;
+            }
+
             $input = $inputs->get($name);
 
             if (Str::contain($name, '*')) {
@@ -53,6 +59,7 @@ class Rules implements IteratorAggregate
             $this->rules->merge(
                 $this->parseRules(
                     $name,
+                    $label,
                     $rulesPiped,
                     $input
                 )
@@ -62,15 +69,16 @@ class Rules implements IteratorAggregate
 
     /**
      * @param string $name
+     * @param string $label
      * @param string $rulesPiped
      * @param $input
      *
      * @return Arr
      */
-    protected function parseRules(string $name, string $rulesPiped, $input): Arr
+    protected function parseRules(string $name, string $label, string $rulesPiped, $input): Arr
     {
         $parseRules = new Arr();
-        $rules = explode('|', $rulesPiped);
+        $rules      = explode('|', $rulesPiped);
 
         /* Defini input par défaut comme un scalaire */
         if (Str::notContain($rulesPiped, 'array')) {
@@ -81,6 +89,7 @@ class Rules implements IteratorAggregate
             $parseRules->append(
                 $this->parseRule(
                     $name,
+                    $label,
                     $rule,
                     $input
                 )
@@ -92,31 +101,34 @@ class Rules implements IteratorAggregate
 
     /**
      * @param string $name
+     * @param string $label
      * @param string $ruleColon
      * @param $input
      *
      * @return Rule
      */
-    protected function parseRule(string $name, string $ruleColon, $input): Rule
+    protected function parseRule(string $name, string $label, string $ruleColon, $input): Rule
     {
         list($rule, $param) = array_pad(explode(':', $ruleColon), 2, '');
 
-        $param = $param == '' ? [] : explode(',', $param);
+        $param   = $param == '' ? [] : explode(',', $param);
         $message = $this->messages->offsetGetFirstInList(
             [
-                $name.'.'.$rule,
+                $label,
+                $name . '.' . $rule,
                 $name,
                 $rule,
             ],
             sprintf(
                 'Validation message [%s:%s] cannot be found',
                 $rule,
-                $name
+                $label
             )
         );
 
         return new Rule(
             $name,
+            $label,
             $rule,
             $message,
             $input,
