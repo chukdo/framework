@@ -40,9 +40,9 @@ class Rule
      */
     protected $type
         = [
-            false,
-            0,
-            10000
+            'array' => false,
+            'min'   => 0,
+            'max'   => 10000
         ];
 
     /**
@@ -153,9 +153,9 @@ class Rule
                         : ($min
                             ?: 10000);
                     $this->type = [
-                        true,
-                        $min,
-                        $max
+                        'array' => true,
+                        'min'   => $min,
+                        'max'   => $max
                     ];
                     break;
                 default:

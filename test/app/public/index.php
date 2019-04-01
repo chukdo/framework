@@ -136,8 +136,8 @@ $validator = new \Chukdo\Validation\Validator(
     Input::all(),
     [
         //'title'      => 'required|array:2,3',
-        'title.*.cp' => 'required|array:1,2|string:2,4',
-        //'x' => 'required|array|striptags|string:2,4',
+        'title.*.cp' => 'required|array:1,2|string:2,4|label:code postal',
+        'x' => 'required|array|striptags|string:2,4',
         //'title.name' => 'required|string:3,6',
         //'title.cp'   => 'required|string:5|label:code postal',
     ],
