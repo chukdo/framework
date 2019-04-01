@@ -2,10 +2,12 @@
 
 namespace Chukdo\Validation;
 
+use Chukdo\Contracts\Validation\Filter as FilterInterface;
 use Chukdo\Contracts\Validation\Validate as ValidateInterface;
 use Chukdo\Json\Input;
 use Chukdo\Json\Lang;
 use Chukdo\Json\Message;
+use Chukdo\Validation\Rule;
 
 /**
  * Validation de données.
@@ -23,22 +25,32 @@ class Validator
     /**
      * @var Input
      */
-    protected $validated;
-
-    /**
-     * @var Rules
-     */
-    protected $rules;
+    protected $inputs;
 
     /**
      * @var array
      */
-    protected $validate = [];
+    protected $rules;
+
+    /**
+     * @var Lang
+     */
+    protected $message;
 
     /**
      * @var Message
      */
     protected $error;
+
+    /**
+     * @var array
+     */
+    protected $validators = [];
+
+    /**
+     * @var array
+     */
+    protected $filters = [];
 
     /**
      * Validator constructor.
@@ -49,33 +61,35 @@ class Validator
      */
     public function __construct(Input $inputs, array $rules, Lang $messages)
     {
-        $this->error = new Message('error');
-        $this->rules = new Rules(
-            $rules,
-            $inputs,
-            $messages
-        );
-        $this->validated = new Input([]);
+        $this->error    = new Message('error');
+        $this->inputs   = $inputs;
+        $this->messages = $messages;
+
+        foreach ($rules as $path => $rule) {
+            $this->rules[] = new Rule($path, $rule, $this);
+        }
     }
 
     /**
-     * @param ValidateInterface $validate
-     *
-     * @return Validator
+     * @param \Chukdo\Contracts\Validation\Validate $validate
+     * @return self
      */
-    public function register(ValidateInterface $validate): self
+    public function registerValidator(ValidateInterface $validate): self
     {
-        $this->validate[$validate->name()] = $validate;
+        $this->validators[$validate->name()] = $validate;
 
         return $this;
     }
 
     /**
-     * @return Input
+     * @param \Chukdo\Contracts\Validation\Filter $filter
+     * @return self
      */
-    public function validated(): Input
+    public function registerFilter(FilterInterface $filter): self
     {
-        return $this->validated;
+        $this->filters[$filter->name()] = $filter;
+
+        return $this;
     }
 
     /**
@@ -94,75 +108,66 @@ class Validator
         $validate = true;
 
         foreach ($this->rules() as $rule) {
-            $validate .= $this->validateRule($rule);
+            $validate .= $rule->validate();
         }
 
         return $validate;
     }
 
     /**
-     * @param Rule $rule
-     *
-     * @return bool
+     * @param string $filter
+     * @return \Chukdo\Contracts\Validation\Filter|null
      */
-    public function validateRule(Rule $rule): bool
+    public function filter(string $filter): ?FilterInterface
     {
-        if (in_array($rule->rule(), ['array', 'scalar']) || !is_iterable($rule->input())) {
-            return $this->validateInput(
-                $rule,
-                $rule->input()
-            );
+        if (isset($this->filters[$filter])) {
+            return $this->filters[$filter];
         }
 
-        $validate = true;
-
-        foreach ($rule->input() as $input) {
-            $validate .= $this->validateInput(
-                $rule,
-                $input
-            );
-        }
-
-        return $validate;
+        return null;
     }
 
     /**
-     * @param Rule $rule
-     * @param $input
-     *
-     * @return bool
+     * @return array
      */
-    public function validateInput(Rule $rule, $input): bool
+    public function filters(): array
     {
-        if (!isset($this->validate[$rule->rule()])) {
-            throw new ValidationException(
-                sprintf(
-                    'Validation Rule [%s] does not exist',
-                    $rule->rule()
-                )
-            );
+        return $this->filters;
+    }
+
+    /**
+     * @param string $validator
+     * @return \Chukdo\Contracts\Validation\Validate|null
+     */
+    public function validator(string $validator): ?ValidateInterface
+    {
+        if (isset($this->validators[$validator])) {
+            return $this->validators[$validator];
         }
 
-        $validate = $this->validate[$rule->rule()]->validate(
-            $input,
-            $rule
-        );
+        return null;
+    }
 
-        if ($validate === true) {
-            $this->validated->offsetSet($rule->name(), $rule->input());
+    /**
+     * @return array
+     */
+    public function validators(string $validator = null): array
+    {
+        return $this->validators;
+    }
 
-            return true;
-        }
-
-        $this->error->offsetSet($rule->name(), $rule->message());
-
-        return false;
+    /**
+     * @return Input
+     */
+    public function inputs(): Input
+    {
+        return $this->inputs;
     }
 
     /**
      * @return Rules
      */
-    public function rules(): Rules
+    public function rules(): array
     {
         return $this->rules;
     }
@@ -173,5 +178,20 @@ class Validator
     public function errors(): Message
     {
         return $this->error;
+    }
+
+    /**
+     * @param Array $listName
+     * @return string
+     */
+    public function message(array $listName): string
+    {
+        return $this->messages->offsetGetFirstInList(
+            $listName,
+            sprintf(
+                'Validation message [%s] cannot be found',
+                implode(', ', $listName)
+            )
+        );
     }
 }

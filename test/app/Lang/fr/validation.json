@@ -3,7 +3,6 @@
   "scalar": "Le champs %s doit être unique",
   "string": "Le champs %s doit être une chaine de caractere valide",
   "required": "Le champs %s est requis",
-  "title.required": "Le titre est obligatoire",
-  "title.string": "Le champs %s doit être une chaine de caractere comprise entre 3 et 6 caracteres",
+  "title": "Le titre doit être une chaine de caractere",
   "code postal": "le code postal doit contenir 5 chiffres"
 }

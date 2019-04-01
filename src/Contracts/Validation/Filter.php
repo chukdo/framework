@@ -12,7 +12,7 @@ use Chukdo\Validation\Rule;
  * @since        08/01/2019
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-interface Validate
+interface Filter
 {
     /**
      * @return string
@@ -23,7 +23,7 @@ interface Validate
      * @param array $attributes
      * @return self
      */
-    public function attributes(array $attributes): Validate;
+    public function attributes(array $attributes): self;
 
     /**
      *
@@ -31,5 +31,5 @@ interface Validate
      * @param Rule $rule
      * @return bool
      */
-    public function validate($input, Rule $rule): bool;
+    public function filter($input, Rule $rule): bool;
 }

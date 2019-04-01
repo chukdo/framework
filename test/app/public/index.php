@@ -134,21 +134,20 @@ $json = new \Chukdo\Json\Json(
 $validator = new \Chukdo\Validation\Validator(
     Input::all(),
     [
-        'title'                => 'required|array:0,3',
-        'title.name'           => 'required|string:3,6',
-        'title.cp:code postal' => 'string:0,5',
+        'title'      => 'required|array:0,3',
+        'title.name' => 'required|string:3,6',
+        'title.cp'   => 'required|string:5|label:code postal',
     ],
     Lang::offsetGet('validation')
 );
 
-$validator->register(new \Chukdo\Validation\Validate\RequiredValidator());
-$validator->register(new \Chukdo\Validation\Validate\ArrayValidator());
-$validator->register(new \Chukdo\Validation\Validate\ScalarValidator());
-$validator->register(new \Chukdo\Validation\Validate\StringValidator());
+$validator->registerValidator(new \Chukdo\Validation\Validate\StringValidator());
 $validator->validate();
 
 if ($validator->fails()) {
     dd($validator->errors());
+} else {
+    dd('ok');
 }
 
 Response::header(
