@@ -130,25 +130,26 @@ $json = new \Chukdo\Json\Json(
         ],
     ]
 );
-
+//dd(Input::wildcard('title.*.cp'));
 $validator = new \Chukdo\Validation\Validator(
     Input::all(),
     [
         //'title'      => 'required|array:2,3',
-        'title.*.cp' => 'required|array:1,2|string:3',
+        'title.*.cp' => 'required|array:1,2|striptags',
         //'title.name' => 'required|string:3,6',
         //'title.cp'   => 'required|string:5|label:code postal',
     ],
     Lang::offsetGet('validation')
 );
-
+new \Chukdo\Validation\Validate\StriptagsFilter();dd('ok');
+$validator->registerFilter();
 $validator->registerValidator(new \Chukdo\Validation\Validate\StringValidate());
 $validator->validate();
 
 if ($validator->fails()) {
     dd($validator->errors());
 } else {
-    dd('ok');
+    dd($validator->inputs());
 }
 
 Response::header(

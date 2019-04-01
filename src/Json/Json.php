@@ -682,10 +682,11 @@ class Json extends \ArrayObject
 
     /**
      * @param string $path
+     * @param bool $scalarResultOnly
      *
      * @return Json
      */
-    public function wildcard( string $path ): self
+    public function wildcard( string $path, $scalarResultOnly = false ): self
     {
         $path      = rtrim(
             $path,
@@ -709,7 +710,10 @@ class Json extends \ArrayObject
                     $value,
                     '\Chukdo\Json\Json'
                 ) ) {
-                    if( ($get = $value->wildcard($endPath))->count() ) {
+                    if( ($get = $value->wildcard(
+                        $endPath,
+                        $scalarResultOnly
+                    ))->count() ) {
                         $json->offsetSet(
                             $key,
                             $get
@@ -726,7 +730,7 @@ class Json extends \ArrayObject
                 $firstPath,
                 $get->wildcard($endPath)
             );
-        } else if( $get && $emptyPath ) {
+        } else if( $get && $emptyPath && ((is_scalar($get) && $scalarResultOnly) || !$scalarResultOnly) ) {
             $json->offsetSet(
                 $firstPath,
                 $get

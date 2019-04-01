@@ -7,7 +7,6 @@ use Chukdo\Contracts\Validation\Validate as ValidateInterface;
 use Chukdo\Json\Input;
 use Chukdo\Json\Lang;
 use Chukdo\Json\Message;
-use Chukdo\Validation\Rule;
 
 /**
  * Validation de données.
@@ -28,9 +27,9 @@ class Validator
     protected $inputs;
 
     /**
-     * @var array
+     * @var Input
      */
-    protected $rules;
+    protected $validated;
 
     /**
      * @var Lang
@@ -41,6 +40,11 @@ class Validator
      * @var Message
      */
     protected $error;
+
+    /**
+     * @var array
+     */
+    protected $rules = [];
 
     /**
      * @var array
@@ -61,9 +65,10 @@ class Validator
      */
     public function __construct( Input $inputs, array $rules, Lang $messages )
     {
-        $this->error    = new Message('error');
-        $this->inputs   = $inputs;
-        $this->messages = $messages;
+        $this->error     = new Message('error');
+        $this->inputs    = $inputs->clone();
+        $this->messages  = $messages;
+        $this->validated = new Input();
 
         foreach( $rules as $path => $rule ) {
             $this->rules[] = new Rule(
@@ -87,9 +92,9 @@ class Validator
     }
 
     /**
-     * @param \Chukdo\Contracts\Validation\Filter $filter
+     * @param FilterInterface $filter
      *
-     * @return self
+     * @return Validator
      */
     public function registerFilter( FilterInterface $filter ): self
     {
@@ -162,6 +167,14 @@ class Validator
     public function validators(): array
     {
         return $this->validators;
+    }
+
+    /**
+     * @return Input
+     */
+    public function validated(): Input
+    {
+        return $this->validated;
     }
 
     /**

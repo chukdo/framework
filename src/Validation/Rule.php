@@ -4,7 +4,6 @@ namespace Chukdo\Validation;
 
 use Chukdo\Helper\Str;
 use Chukdo\Json\Input;
-use Chukdo\Json\Json;
 
 /**
  * Validation de regle.
@@ -112,7 +111,10 @@ class Rule
             $this->path,
             '*'
         )
-            ? $this->validator->inputs()->wildcard($this->path)
+            ? $this->validator->inputs()->wildcard(
+                $this->path,
+                true
+            )
             : $this->validator->inputs()->get($this->path);
     }
 
@@ -267,7 +269,7 @@ class Rule
 
             $this->error($this->message([ 'array' ]));
             return false;
-        } else if( is_iterable($input) ) {
+        } else if( $input instanceof Input ) {
             $this->error($this->message([ 'scalar' ]));
             return false;
         }
@@ -294,6 +296,14 @@ class Rule
         foreach( $this->validatorsAndFilters as $name => $filter ) {
             if( $filter = $this->validator->filter($name) ) {
                 unset($this->validatorsAndFilters[ $name ]);
+
+                if( $input instanceof Input ) {
+                    $input->filterRecursive(function($k, $v) use ($filter) {
+                        return $filter->filter($v);
+                    });
+                } else {
+
+                }
 
                 $filter->filter($input);
             }
