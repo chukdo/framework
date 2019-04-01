@@ -38,7 +38,12 @@ class Rule
     /**
      * @var array
      */
-    protected $type;
+    protected $type
+        = [
+            false,
+            0,
+            10000
+        ];
 
     /**
      * @var bool
@@ -59,38 +64,11 @@ class Rule
      */
     public function __construct( string $path, string $rule, Validator $validator )
     {
-        $this->path = trim($path);
+        $this->path      = trim($path);
         $this->validator = $validator;
+        $this->label     = $this->path;
 
-        $this->setLabel($this->path);
-        $this->setType(false);
         $this->parseRule($rule);
-    }
-
-    /**
-     * @param string $label
-     *
-     * @return void
-     */
-    protected function setLabel( string $label ): void
-    {
-        $this->label = $label;
-    }
-
-    /**
-     * @param bool $isArray
-     * @param int $min
-     * @param int $max
-     *
-     * @return void
-     */
-    protected function setType( bool $isArray, int $min = 0, int $max = 10000 ): void
-    {
-        $this->type = [
-            'array' => $isArray,
-            'min'   => $min,
-            'max'   => $max,
-        ];
     }
 
     /**
@@ -164,21 +142,21 @@ class Rule
                     $this->isRequired = true;
                     break;
                 case 'label':
-                    $this->setLabel($attrs[ 0 ]);
+                    $this->label = $attrs[ 0 ];
                     break;
                 case 'array':
-                    $min = isset($attrs[ 0 ])
+                    $min        = isset($attrs[ 0 ])
                         ? $attrs[ 0 ]
                         : 0;
-                    $max = isset($attrs[ 1 ])
+                    $max        = isset($attrs[ 1 ])
                         ? $attrs[ 1 ]
                         : ($min
                             ?: 10000);
-                    $this->setType(
+                    $this->type = [
                         true,
                         $min,
                         $max
-                    );
+                    ];
                     break;
                 default:
                     $this->setValidatorAndFilter(
@@ -231,7 +209,9 @@ class Rule
             return false;
         }
 
-        return true;
+        $this->validateFilters($input);
+
+        return $this->validateValidators($input);
     }
 
     /**
@@ -284,28 +264,68 @@ class Rule
      */
     protected function validateValidators( $input ): bool
     {
+        $validated = true;
+
+        foreach( $this->validatorsAndFilters as $name => $attrs ) {
+            if( $validate = $this->validator->validator($name) ) {
+                $validate->attributes($attrs);
+
+                if( $input instanceof Input ) {
+                    foreach( $input->toSimpleArray() as $k => $v ) {
+                        if( $validate->validate($v) ) {
+                            $this->validator->validated()->set(
+                                $k,
+                                $v
+                            );
+                        } else {
+                            $this->error($this->message([ $name ]));
+                            $validated .= false;
+                            break;
+                        }
+                    }
+                } else if( $validate->validate($input) ) {
+                    $this->validator->validated()->set(
+                        $this->path,
+                        $input
+                    );
+                } else {
+                    $this->error($this->message([ $name ]));
+                    $validated .= false;
+                }
+            }
+        }
+
+        return $validated;
     }
 
     /**
-     * @param mixed $input
-     *
-     * @return bool
+     * @param $input
      */
-    protected function validateFilters( $input ): bool
+    protected function validateFilters( $input ): void
     {
-        foreach( $this->validatorsAndFilters as $name => $filter ) {
+        foreach( $this->validatorsAndFilters as $name => $attrs ) {
             if( $filter = $this->validator->filter($name) ) {
+                $filter->attributes($attrs);
+
                 unset($this->validatorsAndFilters[ $name ]);
 
                 if( $input instanceof Input ) {
-                    $input->filterRecursive(function($k, $v) use ($filter) {
-                        return $filter->filter($v);
-                    });
+                    $input->filterRecursive(
+                        function( $k, $v ) use ( $filter ) {
+                            return $filter->filter($v);
+                        }
+                    );
+
+                    $this->validator->inputs()->mergeRecursive(
+                        $input,
+                        true
+                    );
                 } else {
-
+                    $this->validator->inputs()->set(
+                        $this->path,
+                        $filter->filter($input)
+                    );
                 }
-
-                $filter->filter($input);
             }
         }
     }

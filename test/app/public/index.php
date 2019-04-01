@@ -130,26 +130,28 @@ $json = new \Chukdo\Json\Json(
         ],
     ]
 );
-//dd(Input::wildcard('title.*.cp'));
+
+
 $validator = new \Chukdo\Validation\Validator(
     Input::all(),
     [
         //'title'      => 'required|array:2,3',
-        'title.*.cp' => 'required|array:1,2|striptags',
+        'title.*.cp' => 'required|array:1,2|string:2,4',
+        //'x' => 'required|array|striptags|string:2,4',
         //'title.name' => 'required|string:3,6',
         //'title.cp'   => 'required|string:5|label:code postal',
     ],
     Lang::offsetGet('validation')
 );
-new \Chukdo\Validation\Validate\StriptagsFilter();dd('ok');
-$validator->registerFilter();
+
+$validator->registerFilter(new \Chukdo\Validation\Filter\StriptagsFilter());
 $validator->registerValidator(new \Chukdo\Validation\Validate\StringValidate());
 $validator->validate();
 
 if ($validator->fails()) {
     dd($validator->errors());
 } else {
-    dd($validator->inputs());
+    dd($validator->validated());
 }
 
 Response::header(
@@ -163,6 +165,6 @@ View::render(
     $json
 );
 
-ExceptionLogger::emergency('coucou les loulous');
+//ExceptionLogger::emergency('coucou les loulous');
 //Response::file('azure://files-dev/566170fe8bc5d2cf3d000000/5948da9a28b8b.pdf')->send()->end();
 //Response::json($json)->send()->end();

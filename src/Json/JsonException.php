@@ -123,9 +123,7 @@ class JsonException extends Json
     public function toHtml( string $title = null, string $code = null, string $widthFirstCol = null ): string
     {
         return parent::toHtml(
-            ($title
-                ?: 'Error') . ' (' . ($code
-                ?: '500') . ')',
+            ($title && $code) ? $title . '(' . $code . ')' : null,
             'red',
             '45px'
         );

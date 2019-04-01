@@ -68,7 +68,7 @@ class Validator
         $this->error     = new Message('error');
         $this->inputs    = $inputs->clone();
         $this->messages  = $messages;
-        $this->validated = new Input();
+        $this->validated = new Input([]);
 
         foreach( $rules as $path => $rule ) {
             $this->rules[] = new Rule(

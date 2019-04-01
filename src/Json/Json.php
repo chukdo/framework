@@ -73,6 +73,20 @@ class Json extends \ArrayObject
     }
 
     /**
+     * @param $object
+     *
+     * @return bool
+     */
+    protected function instanceOfJson( $object ): bool
+    {
+        return $object instanceof Json
+            || is_subclass_of(
+                $object,
+                'Chukdo\Json\Json'
+            );
+    }
+
+    /**
      * @param mixed $key
      * @param mixed $value
      *
@@ -318,10 +332,7 @@ class Json extends \ArrayObject
             foreach( $merge as $k => $v ) {
                 /* Les deux sont iterables on boucle en recursif */
                 if( is_iterable($v)
-                    && is_subclass_of(
-                        $this->offsetGet($k),
-                        'Json'
-                    ) ) {
+                    && $this->instanceOfJson($this->offsetGet($k)) ) {
                     $this->offsetGet($k)->mergeRecursive(
                         $v,
                         $overwrite
@@ -421,10 +432,7 @@ class Json extends \ArrayObject
     public function filterRecursive( Closure $closure ): self
     {
         foreach( $this as $k => $v ) {
-            if( is_subclass_of(
-                $v,
-                'Json'
-            ) ) {
+            if( $this->instanceOfJson($v) ) {
                 $v->filterRecursive($closure);
             } else {
                 $this->offsetSet(
@@ -569,10 +577,7 @@ class Json extends \ArrayObject
         $endPath   = $arr->join('.');
         $get       = $this->offsetGet($firstPath);
 
-        if( is_subclass_of(
-            $get,
-            'Json'
-        ) ) {
+        if( $this->instanceOfJson($get) ) {
             return $get->get($endPath);
         }
 
@@ -621,10 +626,7 @@ class Json extends \ArrayObject
         $endPath   = $arr->join('.');
         $get       = $this->offsetGet($firstPath);
 
-        if( is_subclass_of(
-            $get,
-            'Json'
-        ) ) {
+        if( $this->instanceOfJson($get) ) {
             return $get->unset($endPath);
         }
 
@@ -706,10 +708,7 @@ class Json extends \ArrayObject
 
         if( $firstPath == '*' ) {
             foreach( $this as $key => $value ) {
-                if( is_subclass_of(
-                    $value,
-                    '\Chukdo\Json\Json'
-                ) ) {
+                if( $this->instanceOfJson($value) ) {
                     if( ($get = $value->wildcard(
                         $endPath,
                         $scalarResultOnly
@@ -721,14 +720,13 @@ class Json extends \ArrayObject
                     }
                 }
             }
-        } else if( is_subclass_of(
-                $get,
-                '\Chukdo\Json\Json'
-            )
-            && !$emptyPath ) {
+        } else if( $this->instanceOfJson($get) && !$emptyPath ) {
             $json->offsetSet(
                 $firstPath,
-                $get->wildcard($endPath)
+                $get->wildcard(
+                    $endPath,
+                    $scalarResultOnly
+                )
             );
         } else if( $get && $emptyPath && ((is_scalar($get) && $scalarResultOnly) || !$scalarResultOnly) ) {
             $json->offsetSet(
@@ -757,10 +755,7 @@ class Json extends \ArrayObject
                 '.'
             );
 
-            if( is_subclass_of(
-                $v,
-                '\Chukdo\Json\Json'
-            ) ) {
+            if( $this->instanceOfJson($v) ) {
                 $mixed = array_merge(
                     $mixed,
                     $v->toSimpleArray($k)
@@ -819,10 +814,7 @@ class Json extends \ArrayObject
         }
 
         foreach( $this as $k => $v ) {
-            $v = is_subclass_of(
-                $v,
-                '\Chukdo\Json\Json'
-            )
+            $v = $this->instanceOfJson($v)
                 ? $v->toHtml(
                     null,
                     null,

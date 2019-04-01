@@ -51,12 +51,6 @@ class App extends Service
             '\Chukdo\Bootstrap\App',
             $this
         );
-
-        $a = array(
-            1,
-            2,
-            3
-        );
     }
 
     public function registerHandleExceptions()
