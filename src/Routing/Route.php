@@ -30,12 +30,12 @@ class Route
     /**
      * Route constructor.
      *
-     * @param Router  $router
+     * @param Router $router
      * @param Closure $closure
      */
-    public function __construct(Router $router, Closure $closure)
+    public function __construct( Router $router, Closure $closure )
     {
-        $this->router = $router;
+        $this->router  = $router;
         $this->closure = $closure;
     }
 }

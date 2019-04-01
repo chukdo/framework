@@ -61,7 +61,7 @@ class Service implements ArrayAccess
      *
      * @return string
      */
-    protected function formatNameSpace(string $name): string
+    protected function formatNameSpace( string $name ): string
     {
         return trim(
             $name,
@@ -100,15 +100,15 @@ class Service implements ArrayAccess
      * Un tableau (class, args) qui sera instancié lors de l'appel,
      * si un argument commence par @ alors il considere cela comme une auto reference dans service.
      *
-     * @param string               $name
+     * @param string $name
      * @param Closure|string|array $closure
      *
      * @return bool
      */
-    public function bind(string $name, $closure): bool
+    public function bind( string $name, $closure ): bool
     {
-        if (is_string($closure) || $closure instanceof \Closure || is_array($closure)) {
-            $this->bindings[$this->formatNameSpace($name)] = $closure;
+        if( is_string($closure) || $closure instanceof \Closure || is_array($closure) ) {
+            $this->bindings[ $this->formatNameSpace($name) ] = $closure;
 
             return true;
         }
@@ -124,10 +124,10 @@ class Service implements ArrayAccess
      *
      * @return bool
      */
-    public function singleton(string $name, $closure): bool
+    public function singleton( string $name, $closure ): bool
     {
-        if (is_string($closure) || $closure instanceof \Closure || is_array($closure)) {
-            $this->singletons[$this->formatNameSpace($name)] = $closure;
+        if( is_string($closure) || $closure instanceof \Closure || is_array($closure) ) {
+            $this->singletons[ $this->formatNameSpace($name) ] = $closure;
 
             return true;
         }
@@ -143,10 +143,10 @@ class Service implements ArrayAccess
      *
      * @return bool
      */
-    public function instance(string $name, $instance): bool
+    public function instance( string $name, $instance ): bool
     {
-        if (is_object($instance)) {
-            $this->instances[$this->formatNameSpace($name)] = $instance;
+        if( is_object($instance) ) {
+            $this->instances[ $this->formatNameSpace($name) ] = $instance;
 
             return true;
         }
@@ -159,7 +159,7 @@ class Service implements ArrayAccess
      *
      * @return bool
      */
-    public function conf(array $conf): bool
+    public function conf( array $conf ): bool
     {
         $this->conf = $conf;
 
@@ -171,15 +171,15 @@ class Service implements ArrayAccess
      *
      * @return string|null
      */
-    public function getConf(string $key): ?string
+    public function getConf( string $key ): ?string
     {
-        $key = '/'.trim(
+        $key = '/' . trim(
                 $key,
                 '/'
             );
 
-        if (isset($this->conf[$key])) {
-            return $this->conf[$key];
+        if( isset($this->conf[ $key ]) ) {
+            return $this->conf[ $key ];
         }
 
         return null;
@@ -192,12 +192,12 @@ class Service implements ArrayAccess
      *
      * @return object|null
      */
-    public function getInstance(string $name)
+    public function getInstance( string $name )
     {
         $name = $this->formatNameSpace($name);
 
-        return isset($this->instances[$name])
-            ? $this->instances[$name]
+        return isset($this->instances[ $name ])
+            ? $this->instances[ $name ]
             : null;
     }
 
@@ -208,12 +208,12 @@ class Service implements ArrayAccess
      *
      * @return Closure|string|array|null
      */
-    public function getSingleton(string $name)
+    public function getSingleton( string $name )
     {
         $name = $this->formatNameSpace($name);
 
-        return isset($this->singletons[$name])
-            ? $this->singletons[$name]
+        return isset($this->singletons[ $name ])
+            ? $this->singletons[ $name ]
             : null;
     }
 
@@ -224,12 +224,12 @@ class Service implements ArrayAccess
      *
      * @return Closure|string|array|null
      */
-    public function getBind(string $name)
+    public function getBind( string $name )
     {
         $name = $this->formatNameSpace($name);
 
-        return isset($this->bindings[$name])
-            ? $this->bindings[$name]
+        return isset($this->bindings[ $name ])
+            ? $this->bindings[ $name ]
             : null;
     }
 
@@ -241,11 +241,11 @@ class Service implements ArrayAccess
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function make(string $name)
+    public function make( string $name )
     {
-        if ($instance = $this->getInstance($name)) {
+        if( $instance = $this->getInstance($name) ) {
             return $instance;
-        } elseif ($singleton = $this->getSingleton($name)) {
+        } else if( $singleton = $this->getSingleton($name) ) {
             $this->instance(
                 $name,
                 $closure = $this->getClosure($name)
@@ -265,28 +265,28 @@ class Service implements ArrayAccess
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    private function getClosure(string $name)
+    private function getClosure( string $name )
     {
         $bind = $this->getBind($name)
             ?: $this->getSingleton($name);
 
-        if ($bind) {
-            if ($bind instanceof Closure) {
+        if( $bind ) {
+            if( $bind instanceof Closure ) {
                 return $bind();
-            } elseif (is_string($bind)) {
+            } else if( is_string($bind) ) {
                 return $this->getClosure($bind);
-            } elseif (is_array($bind)) {
-                if (array_key_exists(
+            } else if( is_array($bind) ) {
+                if( array_key_exists(
                         'class',
                         $bind
                     )
                     && array_key_exists(
                         'args',
                         $bind
-                    )) {
+                    ) ) {
                     return $this->resolveService(
-                        $bind['class'],
-                        $bind['args']
+                        $bind[ 'class' ],
+                        $bind[ 'args' ]
                     );
                 }
             }
@@ -297,22 +297,22 @@ class Service implements ArrayAccess
 
     /**
      * @param string $class
-     * @param array  $args
+     * @param array $args
      *
      * @return object
      *
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    private function resolveService(string $class, array $args = [])
+    private function resolveService( string $class, array $args = [] )
     {
-        foreach ($args as $key => $arg) {
-            if (is_array($arg)) {
-                foreach ($arg as $k => $v) {
-                    $args[$key][$k] = $this->resolveServiceArg($v);
+        foreach( $args as $key => $arg ) {
+            if( is_array($arg) ) {
+                foreach( $arg as $k => $v ) {
+                    $args[ $key ][ $k ] = $this->resolveServiceArg($v);
                 }
             } else {
-                $args[$key] = $this->resolveServiceArg($arg);
+                $args[ $key ] = $this->resolveServiceArg($arg);
             }
         }
 
@@ -330,21 +330,21 @@ class Service implements ArrayAccess
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    private function resolveServiceArg(string $arg)
+    private function resolveServiceArg( string $arg )
     {
         $firstPart = substr(
             $arg,
             0,
             1
         );
-        $lastPart = substr(
+        $lastPart  = substr(
             $arg,
             1
         );
 
-        if ($firstPart == '@') {
+        if( $firstPart == '@' ) {
             return $this->make($lastPart);
-        } elseif ($firstPart == '#') {
+        } else if( $firstPart == '#' ) {
             return $this->getConf($lastPart);
         }
 
@@ -353,26 +353,26 @@ class Service implements ArrayAccess
 
     /**
      * @param string $class
-     * @param array  $args
+     * @param array $args
      *
      * @return object
      *
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    private function resolveClass(string $class, array $args = [])
+    private function resolveClass( string $class, array $args = [] )
     {
         $reflector = new ReflectionClass($class);
 
         /* C'est n'est pas une classe on genere une exception */
-        if (!$reflector->isInstantiable()) {
+        if( !$reflector->isInstantiable() ) {
             throw new ServiceException("[$class] is not a class");
         }
 
         $constructor = $reflector->getConstructor();
 
         /* pas de constructeur donc pas de parametres à gerer */
-        if (is_null($constructor)) {
+        if( is_null($constructor) ) {
             return new $class();
         }
 
@@ -391,12 +391,12 @@ class Service implements ArrayAccess
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    private function resolveArgs(ReflectionMethod $constructor): array
+    private function resolveArgs( ReflectionMethod $constructor ): array
     {
-        $args = [];
+        $args       = [];
         $parameters = $constructor->getParameters();
 
-        foreach ($parameters as $parameter) {
+        foreach( $parameters as $parameter ) {
             $args[] = $this->resolveArg($parameter);
         }
 
@@ -411,17 +411,17 @@ class Service implements ArrayAccess
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    private function resolveArg(ReflectionParameter $parameter)
+    private function resolveArg( ReflectionParameter $parameter )
     {
-        $name = $parameter->getName();
+        $name  = $parameter->getName();
         $class = $parameter->getClass();
 
         /* Le parametre est un objet on cherche à le resoudre  */
-        if ($cname = $parameter->getClass()) {
+        if( $cname = $parameter->getClass() ) {
             return $this->make($cname->name);
 
-        /* Le parametre a une valeur par defaut que l'on injecte */
-        } elseif ($parameter->isDefaultValueAvailable()) {
+            /* Le parametre a une valeur par defaut que l'on injecte */
+        } else if( $parameter->isDefaultValueAvailable() ) {
             return $parameter->getDefaultValue();
         }
 
@@ -434,13 +434,13 @@ class Service implements ArrayAccess
      *
      * @return bool
      */
-    public function offsetExists($key): bool
+    public function offsetExists( $key ): bool
     {
-        return isset($this->bindings[$key])
+        return isset($this->bindings[ $key ])
             ? true
-            : isset($this->instances[$key])
+            : isset($this->instances[ $key ])
                 ? true
-                : isset($this->singletons[$key])
+                : isset($this->singletons[ $key ])
                     ? true
                     : false;
     }
@@ -453,7 +453,7 @@ class Service implements ArrayAccess
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function offsetGet($key)
+    public function offsetGet( $key )
     {
         return $this->make($key);
     }
@@ -462,7 +462,7 @@ class Service implements ArrayAccess
      * @param mixed $key
      * @param mixed $value
      */
-    public function offsetSet($key, $value): void
+    public function offsetSet( $key, $value ): void
     {
         $this->bind(
             $key,
@@ -473,10 +473,10 @@ class Service implements ArrayAccess
     /**
      * @param mixed $key
      */
-    public function offsetUnset($key)
+    public function offsetUnset( $key )
     {
         unset(
-            $this->bindings[$key], $this->instances[$key], $this->singletons[$key]
+            $this->bindings[ $key ], $this->instances[ $key ], $this->singletons[ $key ]
         );
     }
 }

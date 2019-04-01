@@ -23,25 +23,30 @@ class Input extends Json
      *
      * @param null $data
      */
-    public function __construct($data = null)
+    public function __construct( $data = null )
     {
-        $input = $data ?: $_REQUEST;
+        $data = $data === null
+            ? $_REQUEST
+            : $data;
 
         /* Trim all input */
-        array_walk_recursive($input, function (&$v, $k) {
-            $v = trim($v);
-        });
+        array_walk_recursive(
+            $data,
+            function( &$v, $k ) {
+                $v = trim($v);
+            }
+        );
 
-        parent::__construct($input);
+        parent::__construct($data);
     }
 
     /**
      * @param iterable $rules
-     * @param Lang     $messages
+     * @param Lang $messages
      *
      * @return Validator
      */
-    public function validate(Iterable $rules, Lang $messages): Validator
+    public function validate( Iterable $rules, Lang $messages ): Validator
     {
         return new Validator(
             $this,
@@ -51,13 +56,13 @@ class Input extends Json
     }
 
     /**
-     * @param string      $name
+     * @param string $name
      * @param string|null $allowedMimeTypes
-     * @param int|null    $maxFileSize
+     * @param int|null $maxFileSize
      *
      * @return FileUploaded
      */
-    public function file(string $name, string $allowedMimeTypes = null, int $maxFileSize = null): FileUploaded
+    public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): FileUploaded
     {
         return new FileUploaded(
             $name,

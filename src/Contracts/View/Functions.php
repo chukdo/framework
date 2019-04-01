@@ -20,5 +20,5 @@ interface Functions
     /**
      * @param View $view
      */
-    public function register(View $view): void;
+    public function register( View $view ): void;
 }

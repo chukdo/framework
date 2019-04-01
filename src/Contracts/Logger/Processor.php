@@ -22,5 +22,5 @@ interface Processor
      *
      * @return array
      */
-    public function processRecord(array $record): array;
+    public function processRecord( array $record ): array;
 }

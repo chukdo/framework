@@ -31,12 +31,12 @@ class RedisHandler extends AbstractHandler
      * RedisHandler constructor.
      *
      * @param RedisInterface $redis
-     * @param string|null    $key
+     * @param string|null $key
      */
-    public function __construct(RedisInterface $redis, string $key = null)
+    public function __construct( RedisInterface $redis, string $key = null )
     {
         $this->redis = $redis;
-        $this->key = $key
+        $this->key   = $key
             ?: 'log';
 
         parent::__construct();
@@ -56,7 +56,7 @@ class RedisHandler extends AbstractHandler
      *
      * @return bool
      */
-    public function write($record): bool
+    public function write( $record ): bool
     {
         try {
             $this->redis->rpush(
@@ -65,7 +65,7 @@ class RedisHandler extends AbstractHandler
             );
 
             return true;
-        } catch (\Exception $e) {
+        } catch( \Exception $e ) {
             return false;
         }
     }

@@ -131,17 +131,20 @@ $json = new \Chukdo\Json\Json(
     ]
 );
 
+dd(Input::wildcard('title.*.cp'));
+
 $validator = new \Chukdo\Validation\Validator(
     Input::all(),
     [
-        'title'      => 'required|array:0,3',
+        'title'      => 'required|array:2,3',
+        'title.*.cp' => 'required|array|string:3',
         'title.name' => 'required|string:3,6',
         'title.cp'   => 'required|string:5|label:code postal',
     ],
     Lang::offsetGet('validation')
 );
 
-$validator->registerValidator(new \Chukdo\Validation\Validate\StringValidator());
+$validator->registerValidator(new \Chukdo\Validation\Validate\StringValidate());
 $validator->validate();
 
 if ($validator->fails()) {

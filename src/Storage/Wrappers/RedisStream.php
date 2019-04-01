@@ -26,12 +26,12 @@ class RedisStream extends AbstractStream
     public function initStream(): RedisInterface
     {
         $scheme = $this->getScheme();
-        $host = (int) $this->getHost();
+        $host   = (int) $this->getHost();
 
         try {
             $stream = ServiceLocator::getInstance()->getResource($scheme);
             $stream->select($host);
-        } catch (\Exception $e) {
+        } catch( \Exception $e ) {
             throw new StreamException(
                 sprintf(
                     '[%s] is not a registred resource',
@@ -42,7 +42,7 @@ class RedisStream extends AbstractStream
             );
         }
 
-        if (!($stream instanceof RedisInterface)) {
+        if( !($stream instanceof RedisInterface) ) {
             throw new StreamException(
                 sprintf(
                     'service [%s] is not a redis interface',
@@ -63,7 +63,7 @@ class RedisStream extends AbstractStream
      */
     protected function getStream(): RedisInterface
     {
-        if ($this->stream instanceof RedisInterface) {
+        if( $this->stream instanceof RedisInterface ) {
             return $this->stream;
         }
 
@@ -92,9 +92,9 @@ class RedisStream extends AbstractStream
      *
      * @throws StreamException
      */
-    public function streamGetRange(int $offset, int $length): ?string
+    public function streamGetRange( int $offset, int $length ): ?string
     {
-        if ($length > 0) {
+        if( $length > 0 ) {
             return $this->getStream()->getRange(
                 $this->getPath(),
                 $offset,
@@ -108,14 +108,14 @@ class RedisStream extends AbstractStream
     /**
      * Ecris une portion de contenu en commencant à l'offset défini.
      *
-     * @param int    $offset
+     * @param int $offset
      * @param string $content
      *
      * @return bool
      *
      * @throws StreamException
      */
-    public function streamSetRange(int $offset, string $content): bool
+    public function streamSetRange( int $offset, string $content ): bool
     {
         return (bool) $this->getStream()->setRange(
             $this->getPath(),
@@ -133,7 +133,7 @@ class RedisStream extends AbstractStream
      *
      * @throws StreamException
      */
-    public function streamSet(?string $content): bool
+    public function streamSet( ?string $content ): bool
     {
         return (bool) $this->getStream()->set(
             $this->getPath(),
@@ -150,7 +150,7 @@ class RedisStream extends AbstractStream
      *
      * @throws StreamException
      */
-    public function streamAppend(string $content): bool
+    public function streamAppend( string $content ): bool
     {
         return (bool) $this->getStream()->append(
             $this->getPath(),
@@ -203,12 +203,12 @@ class RedisStream extends AbstractStream
      *
      * @throws StreamException
      */
-    public function streamRename(string $path): bool
+    public function streamRename( string $path ): bool
     {
-        if ((bool) $this->getStream()->rename(
+        if( (bool) $this->getStream()->rename(
             $this->getPath(),
             $path
-        )) {
+        ) ) {
             return true;
         }
 
@@ -222,7 +222,7 @@ class RedisStream extends AbstractStream
      *
      * @return bool
      */
-    public function streamSetDir(bool $recursive): bool
+    public function streamSetDir( bool $recursive ): bool
     {
         return true;
     }
@@ -259,10 +259,10 @@ class RedisStream extends AbstractStream
     public function streamListDir(): array
     {
         $path = $this->getPath();
-        $list = $this->getStream()->keys($path.'/*');
+        $list = $this->getStream()->keys($path . '/*');
 
-        foreach ($list as $k => $v) {
-            $list[$k] = trim(
+        foreach( $list as $k => $v ) {
+            $list[ $k ] = trim(
                 str_replace(
                     $path,
                     '',
@@ -286,7 +286,7 @@ class RedisStream extends AbstractStream
      *
      * @throws StreamException
      */
-    public function streamAccessTime($time = false): int
+    public function streamAccessTime( $time = false ): int
     {
         return (int) $this->streamInfo(
             $this->getPath(),
@@ -306,7 +306,7 @@ class RedisStream extends AbstractStream
      *
      * @throws StreamException
      */
-    public function streamCreatedTime($time = false): int
+    public function streamCreatedTime( $time = false ): int
     {
         return (int) $this->streamInfo(
             $this->getPath(),
@@ -326,7 +326,7 @@ class RedisStream extends AbstractStream
      *
      * @throws StreamException
      */
-    public function streamModifiedTime($time = false): int
+    public function streamModifiedTime( $time = false ): int
     {
         return (int) $this->streamInfo(
             $this->getPath(),
@@ -342,17 +342,17 @@ class RedisStream extends AbstractStream
      *
      * @param string $path
      * @param string $name
-     * @param null   $value
+     * @param null $value
      *
      * @return mixed
      *
      * @throws StreamException
      */
-    protected function streamInfo(string $path, string $name, $value = null)
+    protected function streamInfo( string $path, string $name, $value = null )
     {
-        $path = 'info::'.$path;
+        $path = 'info::' . $path;
 
-        if ($value !== null) {
+        if( $value !== null ) {
             $this->getStream()->hset(
                 $path,
                 $name,

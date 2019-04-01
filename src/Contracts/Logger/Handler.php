@@ -20,26 +20,26 @@ interface Handler
      *
      * @return bool
      */
-    public function isHandling(array $record): bool;
+    public function isHandling( array $record ): bool;
 
     /**
      * @param array $record
      *
      * @return bool
      */
-    public function handle(array $record): bool;
+    public function handle( array $record ): bool;
 
     /**
      * @param Processor $processor
      *
      * @return Handler
      */
-    public function pushProcessor(Processor $processor): Handler;
+    public function pushProcessor( Processor $processor ): Handler;
 
     /**
      * @param Formatter $formatter
      *
      * @return Handler
      */
-    public function setFormatter(Formatter $formatter): Handler;
+    public function setFormatter( Formatter $formatter ): Handler;
 }

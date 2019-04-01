@@ -30,7 +30,7 @@ class Arr implements \Iterator
      *
      * @param array $arr
      */
-    public function __construct(array $arr = [])
+    public function __construct( array $arr = [] )
     {
         $this->arr = array_values($arr);
     }
@@ -40,7 +40,7 @@ class Arr implements \Iterator
      */
     public function current()
     {
-        return $this->arr[$this->offset];
+        return $this->arr[ $this->offset ];
     }
 
     /**
@@ -66,7 +66,7 @@ class Arr implements \Iterator
      */
     public function valid(): bool
     {
-        return isset($this->arr[$this->offset]);
+        return isset($this->arr[ $this->offset ]);
     }
 
     /**
@@ -90,9 +90,9 @@ class Arr implements \Iterator
      *
      * @return Arr
      */
-    public function merge(Iterable $merge): self
+    public function merge( Iterable $merge ): self
     {
-        foreach ($merge as $append) {
+        foreach( $merge as $append ) {
             $this->append($append);
         }
 
@@ -104,7 +104,7 @@ class Arr implements \Iterator
      *
      * @return Arr
      */
-    public function append($append): self
+    public function append( $append ): self
     {
         $this->arr[] = $append;
 
@@ -116,7 +116,7 @@ class Arr implements \Iterator
      *
      * @return string
      */
-    public function join(string $glue): string
+    public function join( string $glue ): string
     {
         return implode(
             $glue,
@@ -151,8 +151,8 @@ class Arr implements \Iterator
      */
     public function getNext()
     {
-        if (isset($this->arr[$this->offset])) {
-            return $this->arr[$this->offset++];
+        if( isset($this->arr[ $this->offset ]) ) {
+            return $this->arr[ $this->offset++ ];
         }
 
         return null;
@@ -184,10 +184,10 @@ class Arr implements \Iterator
     public function getNextAndRemove()
     {
         $offset = $this->offset;
-        $next = $this->getNext();
+        $next   = $this->getNext();
 
-        if ($next !== null) {
-            unset($this->arr[$offset]);
+        if( $next !== null ) {
+            unset($this->arr[ $offset ]);
 
             return $next;
         }

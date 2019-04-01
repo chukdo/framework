@@ -46,7 +46,7 @@ class Facade
      *
      * @param App $app
      */
-    public static function setFacadeApplication(App $app): void
+    public static function setFacadeApplication( App $app ): void
     {
         static::$app = $app;
     }
@@ -69,23 +69,23 @@ class Facade
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    public static function getInstance(string $name)
+    public static function getInstance( string $name )
     {
-        if (!isset(static::$facades[$name])) {
-            static::$facades[$name] = static::$app->make(
+        if( !isset(static::$facades[ $name ]) ) {
+            static::$facades[ $name ] = static::$app->make(
                 $name,
                 true
             );
         }
 
-        return static::$facades[$name];
+        return static::$facades[ $name ];
     }
 
     /**
      * @param string $name
      * @param string $alias
      */
-    public static function setClassAlias(string $name, string $alias): void
+    public static function setClassAlias( string $name, string $alias ): void
     {
         class_alias(
             $name,
@@ -107,7 +107,7 @@ class Facade
 
     /**
      * @param string $method
-     * @param array  $args
+     * @param array $args
      *
      * @return mixed
      *
@@ -115,19 +115,19 @@ class Facade
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    public static function __callStatic(string $method, array $args = [])
+    public static function __callStatic( string $method, array $args = [] )
     {
-        $name = static::name();
+        $name     = static::name();
         $instance = static::getInstance($name);
 
-        if (!method_exists(
-            $instance,
-            $method
-        )
+        if( !method_exists(
+                $instance,
+                $method
+            )
             && !method_exists(
                 $instance,
                 '__call'
-            )) {
+            ) ) {
             $class = get_called_class();
 
             throw new FacadeException("[$class] does not implement [$method] method.");

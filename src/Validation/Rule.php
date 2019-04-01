@@ -3,8 +3,8 @@
 namespace Chukdo\Validation;
 
 use Chukdo\Helper\Str;
+use Chukdo\Json\Input;
 use Chukdo\Json\Json;
-use Chukdo\Validation\Validator;
 
 /**
  * Validation de regle.
@@ -37,7 +37,7 @@ class Rule
     protected $label;
 
     /**
-     * @var Json
+     * @var array
      */
     protected $type;
 
@@ -58,7 +58,7 @@ class Rule
      * @param string $rule
      * @param Validator $validator
      */
-    public function __construct(string $path, string $rule, Validator $validator)
+    public function __construct( string $path, string $rule, Validator $validator )
     {
         $this->path      = trim($path);
         $this->validator = $validator;
@@ -69,114 +69,11 @@ class Rule
     }
 
     /**
-     * @return bool
-     */
-    public function isRequired(): bool
-    {
-        return $this->isRequired;
-    }
-
-    /**
-     * @return Json
-     */
-    public function type(): Json
-    {
-        return $this->type;
-    }
-
-    /**
-     * @return string
-     */
-    public function path(): string
-    {
-        return $this->path;
-    }
-
-    /**
-     * @return string
-     */
-    public function label(): string
-    {
-        return $this->label;
-    }
-
-    /**
-     * @param string $name
-     * @return mixed
-     */
-    public function input(string $name)
-    {
-        if (Str::contain($name, '*')) {
-            $input = $this->validator->inputs()->wildcard($name);
-        } else {
-            $input = $this->validator->inputs()->get($name);
-        }
-
-        return $input;
-    }
-
-    /**
-     * @return bool
-     */
-    public function validate(): bool
-    {
-        $input = $this->input($this->path());
-
-        if ($this->isRequired() && $input === null) {
-            $this->validator->errors()->offsetSet($this->path(), $this->validator->message(['required']));
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param string $rule
-     * @return void
-     */
-    protected function parseRule(string $rule): void
-    {
-        $rules = explode('|', $rule);
-
-        foreach ($rules as $rule) {
-            $parsed = $this->parseAttribute($rule);
-            $rule   = $parsed->rule;
-            $attrs  = $parsed->attr;
-
-            switch ($rule) {
-                case 'required':
-                    $this->isRequired = true;
-                    break;
-                case 'label':
-                    $this->setLabel($attrs->offsetGet(0));
-                    break;
-                case 'array':
-                    $this->setType(true, $attrs->offsetGet(0, 0), $attrs->offsetGet(1, 10000));
-                    break;
-                default:
-                    $this->setValidatorAndFilter($rule, $attrs);
-            }
-        }
-    }
-
-    /**
-     * @param string $rule
-     * @param \Chukdo\Json\Json $attr
-     * @return void
-     */
-    protected function setValidatorAndFilter(string $rule, Json $attr): void
-    {
-        $this->validatorsAndFilters[] = [
-            'name' => $rule,
-            'attr' => $attr,
-        ];
-    }
-
-    /**
      * @param string $label
+     *
      * @return void
      */
-    protected function setLabel(string $label): void
+    protected function setLabel( string $label ): void
     {
         $this->label = $label;
     }
@@ -185,28 +82,218 @@ class Rule
      * @param bool $isArray
      * @param int $min
      * @param int $max
+     *
      * @return void
      */
-    protected function setType(bool $isArray, int $min = 0, int $max = 10000): void
+    protected function setType( bool $isArray, int $min = 0, int $max = 10000 ): void
     {
-        $this->type = new Json([
+        $this->type = [
             'array' => $isArray,
             'min'   => $min,
             'max'   => $max,
-        ]);
+        ];
     }
 
     /**
      * @param string $rule
-     * @return \Chukdo\Json\Json
+     * @param array $attr
      */
-    protected function parseAttribute(string $rule): Json
+    protected function setValidatorAndFilter( string $rule, array $attr ): void
     {
-        list($rule, $attributes) = array_pad(explode(':', $rule), 2, '');
+        $this->validatorsAndFilters[ $rule ] = $attr;
+    }
 
-        return new Json([
+    /**
+     * @return mixed
+     */
+    protected function input()
+    {
+        return Str::contain(
+            $this->path,
+            '*'
+        )
+            ? $this->validator->inputs()->wildcard($this->path)
+            : $this->validator->inputs()->get($this->path);
+    }
+
+    /**
+     * @param string $message
+     *
+     * @return void
+     */
+    protected function error( string $message ): void
+    {
+        $this->validator->errors()->offsetSet(
+            $this->path,
+            $message
+        );
+    }
+
+    /**
+     * @param array $listName
+     *
+     * @return string
+     */
+    protected function message( array $listName ): string
+    {
+        return sprintf(
+            $this->validator->message($listName),
+            $this->label
+        );
+    }
+
+    /**
+     * @param string $rule
+     */
+    protected function parseRule( string $rule ): void
+    {
+        $rules = explode(
+            '|',
+            $rule
+        );
+
+        foreach( $rules as $rule ) {
+            $parsed = $this->parseAttribute($rule);
+            $rule   = $parsed[ 'rule' ];
+            $attrs  = $parsed[ 'attr' ];
+
+            switch( $rule ) {
+                case 'required':
+                    $this->isRequired = true;
+                    break;
+                case 'label':
+                    $this->setLabel($attrs[ 0 ]);
+                    break;
+                case 'array':
+                    $this->setType(
+                        true,
+                        isset($attrs[ 0 ])
+                            ? $attrs[ 0 ]
+                            : 0,
+                        isset($attrs[ 1 ])
+                            ? $attrs[ 0 ]
+                            : 10000
+                    );
+                    break;
+                default:
+                    $this->setValidatorAndFilter(
+                        $rule,
+                        $attrs
+                    );
+            }
+        }
+    }
+
+    /**
+     * @param string $rule
+     *
+     * @return array
+     */
+    protected function parseAttribute( string $rule ): array
+    {
+        list($rule, $attributes) = array_pad(
+            explode(
+                ':',
+                $rule
+            ),
+            2,
+            ''
+        );
+
+        return [
             'rule' => $rule,
-            'attr' => explode(',', $attributes),
-        ]);
+            'attr' => strlen($attributes) == 0
+                ? []
+                : explode(
+                    ',',
+                    $attributes
+                ),
+        ];
+    }
+
+    /**
+     * @return bool
+     */
+    public function validate(): bool
+    {
+        $input = $this->input();
+
+        if( !$this->validateRequired($input) ) {
+            return false;
+        }
+
+        if( !$this->validateType($input) ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param mixed $input
+     *
+     * @return bool
+     */
+    protected function validateRequired( $input ): bool
+    {
+        if( $input === null ) {
+            if( $this->isRequired ) {
+                $this->error($this->message([ 'required' ]));
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param mixed $input
+     *
+     * @return bool
+     */
+    protected function validateType( $input ): bool
+    {
+        if( $this->type[ 'array' ] ) {
+            if( $input instanceof Input ) {
+                $countInput = $input->count();
+
+                if( $countInput >= $this->type[ 'min' ] && $countInput <= $this->type[ 'max' ] ) {
+                    return true;
+                }
+            }
+
+            $this->error($this->message([ 'array' ]));
+            return false;
+        } else if( is_iterable($input) ) {
+            $this->error($this->message([ 'scalar' ]));
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param mixed $input
+     *
+     * @return bool
+     */
+    protected function validateValidators( $input ): bool
+    {
+    }
+
+    /**
+     * @param mixed $input
+     *
+     * @return bool
+     */
+    protected function validateFilters( $input ): bool
+    {
+        foreach( $this->validatorsAndFilters as $name => $filter ) {
+            if( $filter = $this->validator->filter($name) ) {
+                unset($this->validatorsAndFilters[ $name ]);
+
+                $filter->filter($input);
+            }
+        }
     }
 }

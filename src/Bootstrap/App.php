@@ -52,7 +52,11 @@ class App extends Service
             $this
         );
 
-        $a = array(1, 2, 3);
+        $a = array(
+            1,
+            2,
+            3
+        );
     }
 
     public function registerHandleExceptions()
@@ -73,9 +77,9 @@ class App extends Service
      *
      * @return string
      */
-    public function env(string $env = null): string
+    public function env( string $env = null ): string
     {
-        if ($env != null) {
+        if( $env != null ) {
             $this->env = $env;
         }
 
@@ -87,9 +91,9 @@ class App extends Service
      *
      * @return string
      */
-    public function channel(string $channel = null): string
+    public function channel( string $channel = null ): string
     {
-        if ($channel != null) {
+        if( $channel != null ) {
             $this->channel = $channel;
         }
 
@@ -104,7 +108,7 @@ class App extends Service
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function getConf(string $key): ?string
+    public function getConf( string $key ): ?string
     {
         return $this->make('Chukdo\Json\Conf')->offsetGet($key);
     }
@@ -113,9 +117,9 @@ class App extends Service
      * @param string $name
      * @param string $alias
      */
-    public function setAlias(string $name, string $alias): void
+    public function setAlias( string $name, string $alias ): void
     {
-        self::$aliases[$name] = $alias;
+        self::$aliases[ $name ] = $alias;
     }
 
     /**
@@ -123,23 +127,23 @@ class App extends Service
      *
      * @return string
      */
-    public function getAlias(string $name): string
+    public function getAlias( string $name ): string
     {
-        return isset(self::$aliases[$name])
-        ? self::$aliases[$name]
-        : $name;
+        return isset(self::$aliases[ $name ])
+            ? self::$aliases[ $name ]
+            : $name;
     }
 
     /**
      * @param string $name
-     * @param bool   $bindInstance
+     * @param bool $bindInstance
      *
      * @return mixed|object|null
      *
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function make(string $name, bool $bindInstance = false)
+    public function make( string $name, bool $bindInstance = false )
     {
         $alias = $this->getAlias($name);
         $bindObject = parent::make($alias);
@@ -149,7 +153,7 @@ class App extends Service
             $bindObject
         );
 
-        if ($bindInstance == true) {
+        if( $bindInstance == true ) {
             $this->instance(
                 $name,
                 $bindObject
@@ -170,7 +174,7 @@ class App extends Service
     /**
      * @param string $name
      */
-    public function register(string $name): void
+    public function register( string $name ): void
     {
         $instance = new $name($this);
         $instance->register();
@@ -181,37 +185,37 @@ class App extends Service
      *
      * @param Closure $closure
      */
-    public function resolvingAny(Closure $closure): void
+    public function resolvingAny( Closure $closure ): void
     {
-        $this->resolving['__ANY__'] = $closure;
+        $this->resolving[ '__ANY__' ] = $closure;
     }
 
     /**
      * Ecoute la resolution d'un objet.
      *
-     * @param string  $name
+     * @param string $name
      * @param Closure $closure
      */
-    public function resolving(string $name, Closure $closure): void
+    public function resolving( string $name, Closure $closure ): void
     {
-        $this->resolving[$name] = $closure;
+        $this->resolving[ $name ] = $closure;
     }
 
     /**
      * @param string $name
      * @param $bindObject
      */
-    protected function resolve(string $name, $bindObject)
+    protected function resolve( string $name, $bindObject )
     {
-        if (isset($this->resolving['__ANY__'])) {
-            $this->resolving['__ANY__'](
+        if( isset($this->resolving[ '__ANY__' ]) ) {
+            $this->resolving[ '__ANY__' ](
                 $bindObject,
                 $name
             );
         }
 
-        if (isset($this->resolving[$name])) {
-            $this->resolving[$name](
+        if( isset($this->resolving[ $name ]) ) {
+            $this->resolving[ $name ](
                 $bindObject,
                 $name
             );

@@ -49,12 +49,12 @@ abstract class AbstractHandler implements HandlerInterface
      *
      * @return bool
      */
-    abstract protected function write($record): bool;
+    abstract protected function write( $record ): bool;
 
     /**
      * @param $levels
      */
-    public function setLevels($levels): void
+    public function setLevels( $levels ): void
     {
         $this->levels = (array) $levels;
     }
@@ -64,10 +64,10 @@ abstract class AbstractHandler implements HandlerInterface
      *
      * @return bool
      */
-    public function isHandling(array $record): bool
+    public function isHandling( array $record ): bool
     {
         return in_array(
-            $record['level'],
+            $record[ 'level' ],
             $this->levels
         );
     }
@@ -77,12 +77,12 @@ abstract class AbstractHandler implements HandlerInterface
      *
      * @return bool
      */
-    public function handle(array $record): bool
+    public function handle( array $record ): bool
     {
-        if ($this->isHandling($record)) {
+        if( $this->isHandling($record) ) {
             $record = $this->processRecord($record);
 
-            if (!$this->formatter) {
+            if( !$this->formatter ) {
                 $this->setFormatter(new JsonStringFormatter());
             }
 
@@ -97,9 +97,9 @@ abstract class AbstractHandler implements HandlerInterface
      *
      * @return array
      */
-    public function processRecord(array $record): array
+    public function processRecord( array $record ): array
     {
-        foreach ($this->processors as $processor) {
+        foreach( $this->processors as $processor ) {
             $record = $processor->processRecord($record);
         }
 
@@ -111,7 +111,7 @@ abstract class AbstractHandler implements HandlerInterface
      *
      * @return HandlerInterface
      */
-    public function pushProcessor(ProcessorInterface $processor): HandlerInterface
+    public function pushProcessor( ProcessorInterface $processor ): HandlerInterface
     {
         array_push(
             $this->processors,
@@ -126,7 +126,7 @@ abstract class AbstractHandler implements HandlerInterface
      *
      * @return HandlerInterface
      */
-    public function setFormatter(FormatterInterface $formatter): HandlerInterface
+    public function setFormatter( FormatterInterface $formatter ): HandlerInterface
     {
         $this->formatter = $formatter;
 

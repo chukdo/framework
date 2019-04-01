@@ -45,47 +45,47 @@ class Header
      * @param array $status
      */
     public $rfc2616
-    = [
-        100 => 'HTTP/1.1 100 Continue',
-        101 => 'HTTP/1.1 101 Switching Protocols',
-        200 => 'HTTP/1.1 200 OK',
-        201 => 'HTTP/1.1 201 Created',
-        202 => 'HTTP/1.1 202 Accepted',
-        203 => 'HTTP/1.1 203 Non-Authoritative Information',
-        204 => 'HTTP/1.1 204 No Content',
-        205 => 'HTTP/1.1 205 Reset Content',
-        206 => 'HTTP/1.1 206 Partial Content',
-        300 => 'HTTP/1.1 300 Multiple Choices',
-        301 => 'HTTP/1.1 301 Moved Permanently',
-        302 => 'HTTP/1.1 302 Found',
-        303 => 'HTTP/1.1 303 See Other',
-        304 => 'HTTP/1.1 304 Not Modified',
-        305 => 'HTTP/1.1 305 Use Proxy',
-        307 => 'HTTP/1.1 307 Temporary Redirect',
-        400 => 'HTTP/1.1 400 Bad Request',
-        401 => 'HTTP/1.1 401 Unauthorized',
-        402 => 'HTTP/1.1 402 Payment Required',
-        403 => 'HTTP/1.1 403 Forbidden',
-        404 => 'HTTP/1.1 404 Not Found',
-        405 => 'HTTP/1.1 405 Method Not Allowed',
-        406 => 'HTTP/1.1 406 Not Acceptable',
-        407 => 'HTTP/1.1 407 Proxy Authentication Required',
-        408 => 'HTTP/1.1 408 Request Time-out',
-        409 => 'HTTP/1.1 409 Conflict',
-        410 => 'HTTP/1.1 410 Gone',
-        411 => 'HTTP/1.1 411 Length Required',
-        412 => 'HTTP/1.1 412 Precondition Failed',
-        413 => 'HTTP/1.1 413 Request Entity Too Large',
-        414 => 'HTTP/1.1 414 Request-URI Too Large',
-        415 => 'HTTP/1.1 415 Unsupported Media Type',
-        416 => 'HTTP/1.1 416 Requested range not satisfiable',
-        417 => 'HTTP/1.1 417 Expectation Failed',
-        500 => 'HTTP/1.1 500 Internal Server Error',
-        501 => 'HTTP/1.1 501 Not Implemented',
-        502 => 'HTTP/1.1 502 Bad Gateway',
-        503 => 'HTTP/1.1 503 Service Unavailable',
-        504 => 'HTTP/1.1 504 Gateway Time-out',
-    ];
+        = [
+            100 => 'HTTP/1.1 100 Continue',
+            101 => 'HTTP/1.1 101 Switching Protocols',
+            200 => 'HTTP/1.1 200 OK',
+            201 => 'HTTP/1.1 201 Created',
+            202 => 'HTTP/1.1 202 Accepted',
+            203 => 'HTTP/1.1 203 Non-Authoritative Information',
+            204 => 'HTTP/1.1 204 No Content',
+            205 => 'HTTP/1.1 205 Reset Content',
+            206 => 'HTTP/1.1 206 Partial Content',
+            300 => 'HTTP/1.1 300 Multiple Choices',
+            301 => 'HTTP/1.1 301 Moved Permanently',
+            302 => 'HTTP/1.1 302 Found',
+            303 => 'HTTP/1.1 303 See Other',
+            304 => 'HTTP/1.1 304 Not Modified',
+            305 => 'HTTP/1.1 305 Use Proxy',
+            307 => 'HTTP/1.1 307 Temporary Redirect',
+            400 => 'HTTP/1.1 400 Bad Request',
+            401 => 'HTTP/1.1 401 Unauthorized',
+            402 => 'HTTP/1.1 402 Payment Required',
+            403 => 'HTTP/1.1 403 Forbidden',
+            404 => 'HTTP/1.1 404 Not Found',
+            405 => 'HTTP/1.1 405 Method Not Allowed',
+            406 => 'HTTP/1.1 406 Not Acceptable',
+            407 => 'HTTP/1.1 407 Proxy Authentication Required',
+            408 => 'HTTP/1.1 408 Request Time-out',
+            409 => 'HTTP/1.1 409 Conflict',
+            410 => 'HTTP/1.1 410 Gone',
+            411 => 'HTTP/1.1 411 Length Required',
+            412 => 'HTTP/1.1 412 Precondition Failed',
+            413 => 'HTTP/1.1 413 Request Entity Too Large',
+            414 => 'HTTP/1.1 414 Request-URI Too Large',
+            415 => 'HTTP/1.1 415 Unsupported Media Type',
+            416 => 'HTTP/1.1 416 Requested range not satisfiable',
+            417 => 'HTTP/1.1 417 Expectation Failed',
+            500 => 'HTTP/1.1 500 Internal Server Error',
+            501 => 'HTTP/1.1 501 Not Implemented',
+            502 => 'HTTP/1.1 502 Bad Gateway',
+            503 => 'HTTP/1.1 503 Service Unavailable',
+            504 => 'HTTP/1.1 504 Gateway Time-out',
+        ];
 
     /**
      * Header constructor.
@@ -101,10 +101,10 @@ class Header
      *
      * @return Header
      */
-    public function setStatus(int $status): self
+    public function setStatus( int $status ): self
     {
-        if (isset($this->rfc2616[$status])) {
-            $this->setHttp($this->rfc2616[$status]);
+        if( isset($this->rfc2616[ $status ]) ) {
+            $this->setHttp($this->rfc2616[ $status ]);
         }
 
         return $this;
@@ -130,7 +130,7 @@ class Header
      *
      * @return Header
      */
-    public function setHttp(string $value): self
+    public function setHttp( string $value ): self
     {
         $this->http = $value;
 
@@ -151,7 +151,7 @@ class Header
      *
      * @return Header
      */
-    public function setHeader(string $name, string $value): self
+    public function setHeader( string $name, string $value ): self
     {
         $this->header->offsetSet(
             $this->normalize($name),
@@ -166,9 +166,9 @@ class Header
      *
      * @return Header
      */
-    public function setHeaders(iterable $headers): self
+    public function setHeaders( iterable $headers ): self
     {
-        foreach ($headers as $k => $v) {
+        foreach( $headers as $k => $v ) {
             $this->setHeader(
                 $k,
                 $v
@@ -183,7 +183,7 @@ class Header
      *
      * @return string|null
      */
-    public function getHeader(string $name): ?string
+    public function getHeader( string $name ): ?string
     {
         return $this->header->offsetGet($this->normalize($name));
     }
@@ -201,7 +201,7 @@ class Header
      *
      * @return string|null
      */
-    public function unsetHeader(string $name): ?string
+    public function unsetHeader( string $name ): ?string
     {
         return $this->header->offsetUnset($this->normalize($name));
     }
@@ -221,15 +221,15 @@ class Header
      *
      * @return Header
      */
-    public function setCookies(iterable $cookies): self
+    public function setCookies( iterable $cookies ): self
     {
-        foreach ($cookies as $k => $v) {
+        foreach( $cookies as $k => $v ) {
             $this->setCookie(
-                $v['name'],
-                $v['value'],
-                $v['expires'],
-                $v['path'],
-                $v['domain']
+                $v[ 'name' ],
+                $v[ 'value' ],
+                $v[ 'expires' ],
+                $v[ 'path' ],
+                $v[ 'domain' ]
             );
         }
 
@@ -239,37 +239,33 @@ class Header
     /**
      * Ajoute un cookie.
      *
-     * @param string $name    nom du cookie
-     * @param string $value   valeur associée
+     * @param string $name nom du cookie
+     * @param string $value valeur associée
      * @param string $expires date d'expiration en timestamp
-     * @param string $path    le chemin auquel s'applique le cookie '/' all par defaut
-     * @param string $domain  le domaine auquel s'applique le cookie '.google.com' pour tout google
+     * @param string $path le chemin auquel s'applique le cookie '/' all par defaut
+     * @param string $domain le domaine auquel s'applique le cookie '.google.com' pour tout google
      *
      * @return Header
      */
     public function setCookie(
-        string $name,
-        string $value = null,
-        string $expires = null,
-        string $path = null,
-        string $domain = null
+        string $name, string $value = null, string $expires = null, string $path = null, string $domain = null
     ): self {
-        $value = rawurlencode($value);
-        $cookie = 'Set-Cookie: '.$name.'='.$value;
+        $value  = rawurlencode($value);
+        $cookie = 'Set-Cookie: ' . $name . '=' . $value;
 
-        if ($expires) {
+        if( $expires ) {
             $expires = gmdate(
                 DATE_RFC850,
                 $expires
             );
-            $cookie .= "; expires=$expires";
+            $cookie  .= "; expires=$expires";
         }
 
-        $cookie .= '; path='.($path
-            ?: '/');
+        $cookie .= '; path=' . ($path
+                ?: '/');
 
-        if ($domain) {
-            $cookie .= '; domain='.$domain;
+        if( $domain ) {
+            $cookie .= '; domain=' . $domain;
         }
 
         $this->cookie->offsetSet(
@@ -285,9 +281,9 @@ class Header
      *
      * @return Json|null
      */
-    public function getCookie(string $name): ?Json
+    public function getCookie( string $name ): ?Json
     {
-        if ($cookie = $this->cookie->offsetGet($name)) {
+        if( $cookie = $this->cookie->offsetGet($name) ) {
             return Str::match(
                 '/([^=]+)=([^;]+)(?:; expires=([^;]+))?(?:; path=([^;]+))?(?:; domain=([^;]+))?/i',
                 $cookie
@@ -304,7 +300,7 @@ class Header
     {
         $cookies = new Json();
 
-        foreach ($this->cookie as $name => $cookie) {
+        foreach( $this->cookie as $name => $cookie ) {
             $cookies->append($this->getCookie($name));
         }
 
@@ -316,7 +312,7 @@ class Header
      *
      * @return string|null
      */
-    public function unsetCookie(string $name): ?string
+    public function unsetCookie( string $name ): ?string
     {
         return $this->cookie->offsetUnset($name);
     }
@@ -332,25 +328,25 @@ class Header
     }
 
     /**
-     * @param int         $max        age maximum autorisé du cache en seconde
-     * @param bool        $revalidate oblige le client à verifier le cache sur le serveur systematiquement
-     * @param string|null $control    ex. public, no_cache. laisser vide la plupart du temps
+     * @param int $max age maximum autorisé du cache en seconde
+     * @param bool $revalidate oblige le client à verifier le cache sur le serveur systematiquement
+     * @param string|null $control ex. public, no_cache. laisser vide la plupart du temps
      *
      * @return Header
      */
-    public function setCacheControl(int $max = 3600, bool $revalidate = false, string $control = null): self
+    public function setCacheControl( int $max = 3600, bool $revalidate = false, string $control = null ): self
     {
         $cache = [];
 
-        if ($control !== false) {
+        if( $control !== false ) {
             $cache[] = $control;
         }
 
-        if ($max !== false) {
+        if( $max !== false ) {
             $cache[] = "max-age=$max";
         }
 
-        if ($revalidate !== false) {
+        if( $revalidate !== false ) {
             $cache[] = 'must-revalidate';
             $cache[] = 'proxy-revalidate';
         }
@@ -373,25 +369,25 @@ class Header
     {
         $cache = new Json(
             [
-                'max' => 0,
+                'max'        => 0,
                 'revalidate' => false,
-                'control' => null,
+                'control'    => null,
             ]
         );
 
-        foreach (explode(
+        foreach( explode(
             ', ',
             $this->getHeader('Cache-Control')
-        ) as $value) {
-            if ($value == 'must-revalidate') {
+        ) as $value ) {
+            if( $value == 'must-revalidate' ) {
                 $cache->offsetSet(
                     'revalidate',
                     true
                 );
-            } elseif (($age = Str::match(
-                '/max-age=([0-9]+)/',
-                $value
-            )) !== false) {
+            } else if( ($age = Str::match(
+                    '/max-age=([0-9]+)/',
+                    $value
+                )) !== false ) {
                 $cache->offsetSet(
                     'max',
                     $age
@@ -412,7 +408,7 @@ class Header
      *
      * @return Header
      */
-    public function setAuthorization(string $auth): self
+    public function setAuthorization( string $auth ): self
     {
         $this->setStatus(401)->setHeader(
             'Cache-Control',
@@ -422,7 +418,7 @@ class Header
             'no-cache'
         )->setHeader(
             'WWW-Authenticate',
-            'Basic realm="'.urlencode($auth).'"'
+            'Basic realm="' . urlencode($auth) . '"'
         );
 
         return $this;
@@ -433,7 +429,7 @@ class Header
      */
     public function getAuthorization(): ?string
     {
-        if (($auth = $this->getHeader('WWW-Authenticate')) !== false) {
+        if( ($auth = $this->getHeader('WWW-Authenticate')) !== false ) {
             return Str::match(
                 '/Basic realm="([^"]+)"/',
                 $auth
@@ -445,11 +441,11 @@ class Header
 
     /**
      * @param string $url
-     * @param int    $status
+     * @param int $status
      *
      * @return Header
      */
-    public function setLocation(string $url, int $status = 302): self
+    public function setLocation( string $url, int $status = 302 ): self
     {
         $this->setStatus($status)->setHeader(
             'Location',
@@ -466,35 +462,35 @@ class Header
      *
      * @return Header
      */
-    public function setXFrameOptions(string $origin = null): self
+    public function setXFrameOptions( string $origin = null ): self
     {
-        if ($origin == '*') {
+        if( $origin == '*' ) {
             return $this;
         }
 
-        if (isset($_SERVER['HTTP_REFERER'])) {
-            $allow = false;
-            $uri = new Url($_SERVER['HTTP_REFERER']);
+        if( isset($_SERVER[ 'HTTP_REFERER' ]) ) {
+            $allow   = false;
+            $uri     = new Url($_SERVER[ 'HTTP_REFERER' ]);
             $origins = explode(
                 ' ',
                 $origin
             );
 
-            foreach ($origins as $origin) {
-                if ($origin
+            foreach( $origins as $origin ) {
+                if( $origin
                     && substr(
                         $uri->getHost(),
                         -strlen($origin)
-                    ) == $origin) {
+                    ) == $origin ) {
                     $allow = true;
                     break;
                 }
             }
 
-            if ($allow) {
+            if( $allow ) {
                 $this->setHeader(
                     'X-Frame-Options',
-                    $uri->getScheme().'://'.$uri->getHost()
+                    $uri->getScheme() . '://' . $uri->getHost()
                 );
 
                 return $this;
@@ -518,41 +514,40 @@ class Header
      *
      * @return Header
      */
-    public function setAllowAllOrigin(string $origin = null, string $method = null, string $allow = null): self
+    public function setAllowAllOrigin( string $origin = null, string $method = null, string $allow = null ): self
     {
-        if (isset($_SERVER['HTTP_ORIGIN'])) {
-            $uri = trim(
-                $_SERVER['HTTP_ORIGIN'],
+        if( isset($_SERVER[ 'HTTP_ORIGIN' ]) ) {
+            $uri     = trim(
+                $_SERVER[ 'HTTP_ORIGIN' ],
                 '/'
             );
             $origins = explode(
                 ' ',
                 $origin
             );
-            $method = $method
-            ?: 'GET, POST, PUT, DELETE, OPTIONS';
-            $allow = $allow
-            ?: 'Content-Type, Content-Range, Content-Disposition, Content-Description, '.
-            'Accept, Access-Control-Allow-Headers, Authorization, X-Requested-With';
+            $method  = $method
+                ?: 'GET, POST, PUT, DELETE, OPTIONS';
+            $allow   = $allow
+                ?: 'Content-Type, Content-Range, Content-Disposition, Content-Description, ' . 'Accept, Access-Control-Allow-Headers, Authorization, X-Requested-With';
 
-            foreach ($origins as $origin) {
-                if ($origin
+            foreach( $origins as $origin ) {
+                if( $origin
                     && substr(
                         $uri,
                         -strlen($origin)
-                    ) == $origin) {
+                    ) == $origin ) {
                     $allow = true;
                     break;
                 }
             }
 
-            if ($allow || $origin == '*') {
+            if( $allow || $origin == '*' ) {
                 $this->setHeader(
                     'Access-Control-Allow-Origin',
-                    $_SERVER['HTTP_ORIGIN']
+                    $_SERVER[ 'HTTP_ORIGIN' ]
                 )->setHeader(
                     'X-Origin',
-                    $_SERVER['HTTP_ORIGIN']
+                    $_SERVER[ 'HTTP_ORIGIN' ]
                 )->setHeader(
                     'Access-Control-Allow-Methods',
                     $method
@@ -580,19 +575,19 @@ class Header
      */
     public function send(): string
     {
-        $http = $this->getHttp()."\r\n";
+        $http    = $this->getHttp() . "\r\n";
         $headers = '';
         $cookies = '';
 
-        foreach ($this->getHeaders() as $name => $header) {
+        foreach( $this->getHeaders() as $name => $header ) {
             $headers .= "$name: $header\r\n";
         }
 
-        foreach ($this->getCookies() as $name => $cookie) {
-            $cookies .= $cookie."\r\n";
+        foreach( $this->getCookies() as $name => $cookie ) {
+            $cookies .= $cookie . "\r\n";
         }
 
-        return $http.$headers.$cookies."\r\n";
+        return $http . $headers . $cookies . "\r\n";
     }
 
     /**
@@ -600,7 +595,7 @@ class Header
      *
      * @return string
      */
-    public function normalize(string $name): string
+    public function normalize( string $name ): string
     {
         return str_replace(
             ' ',
@@ -631,7 +626,7 @@ class Header
      *
      * @return bool
      */
-    public function __isset($key)
+    public function __isset( $key )
     {
         return $this->header->offsetExists($this->normalize($key));
     }
@@ -642,7 +637,7 @@ class Header
      *
      * @return Header
      */
-    public function __set($key, $value)
+    public function __set( $key, $value )
     {
         return $this->setHeader(
             $key,
@@ -655,7 +650,7 @@ class Header
      *
      * @return string
      */
-    public function __get($key)
+    public function __get( $key )
     {
         return $this->getHeader($key);
     }
@@ -665,7 +660,7 @@ class Header
      *
      * @return bool
      */
-    public function __unset($key)
+    public function __unset( $key )
     {
         return (bool) $this->header->offsetUnset($key);
     }
@@ -676,10 +671,10 @@ class Header
      *
      * @return Header|false|string|null
      */
-    public function __call($name, $params = [])
+    public function __call( $name, $params = [] )
     {
-        $value = array_shift($params);
-        $match = new Json(
+        $value  = array_shift($params);
+        $match  = new Json(
             Str::match(
                 '/^(set|get|unset)([a-z]+)/i',
                 strtolower($name)
@@ -690,51 +685,51 @@ class Header
 
         /** Entetes HTTP autorisés */
         $method = [
-            'accept' => 'Accept',
-            'acceptcharset' => 'Accept-Charset',
-            'acceptencoding' => 'Accept-Encoding',
-            'acceptlanguage' => 'Accept-Language',
-            'acceptranges' => 'Accept-Ranges',
-            'authorization' => 'Authorization',
-            'cachecontrol' => 'Cache-Control',
-            'connection' => 'Connection',
-            'contentlength' => 'Content-Length',
-            'contenttype' => 'Content-Type',
-            'contentencoding' => 'Content-Encoding',
+            'accept'             => 'Accept',
+            'acceptcharset'      => 'Accept-Charset',
+            'acceptencoding'     => 'Accept-Encoding',
+            'acceptlanguage'     => 'Accept-Language',
+            'acceptranges'       => 'Accept-Ranges',
+            'authorization'      => 'Authorization',
+            'cachecontrol'       => 'Cache-Control',
+            'connection'         => 'Connection',
+            'contentlength'      => 'Content-Length',
+            'contenttype'        => 'Content-Type',
+            'contentencoding'    => 'Content-Encoding',
             'contentdisposition' => 'Content-disposition',
-            'date' => 'Date',
+            'date'               => 'Date',
             // Date RFC850
-            'except' => 'Expect',
-            'from' => 'From',
-            'host' => 'Host',
-            'ifmatch' => 'If-Match',
-            'ifmodifiedsince' => 'If-Modified-Since',
+            'except'             => 'Expect',
+            'from'               => 'From',
+            'host'               => 'Host',
+            'ifmatch'            => 'If-Match',
+            'ifmodifiedsince'    => 'If-Modified-Since',
             // Date RFC850
-            'ifnonematch' => 'If-None-Match',
-            'ifrange' => 'If-Range',
-            'ifunmodifiedsince' => 'If-Unmodified-Since',
+            'ifnonematch'        => 'If-None-Match',
+            'ifrange'            => 'If-Range',
+            'ifunmodifiedsince'  => 'If-Unmodified-Since',
             // Date RFC850
-            'maxforwards' => 'Max-Forwards',
-            'pragma' => 'Pragma',
+            'maxforwards'        => 'Max-Forwards',
+            'pragma'             => 'Pragma',
             'proxyauthorization' => 'Proxy-Authorization',
-            'range' => 'Range',
-            'referer' => 'Referer',
-            'useragent' => 'User-Agent',
-            'age' => 'Age',
-            'allow' => 'Allow',
-            'contentmd5' => 'Content-MD5',
-            'contentrange' => 'Content-Range',
-            'etag' => 'ETag',
-            'expires' => 'Expires',
+            'range'              => 'Range',
+            'referer'            => 'Referer',
+            'useragent'          => 'User-Agent',
+            'age'                => 'Age',
+            'allow'              => 'Allow',
+            'contentmd5'         => 'Content-MD5',
+            'contentrange'       => 'Content-Range',
+            'etag'               => 'ETag',
+            'expires'            => 'Expires',
             // Date RFC850
-            'lastmodified' => 'Last-Modified',
+            'lastmodified'       => 'Last-Modified',
             // Date RFC850
-            'location' => 'Location',
-            'retryafter' => 'Retry-After',
-            'server' => 'Server',
-            'transferencoding' => 'Transfer-Encoding',
-            'vary' => 'Vary',
-            'wwwauthenticate' => 'WWW-Authenticate',
+            'location'           => 'Location',
+            'retryafter'         => 'Retry-After',
+            'server'             => 'Server',
+            'transferencoding'   => 'Transfer-Encoding',
+            'vary'               => 'Vary',
+            'wwwauthenticate'    => 'WWW-Authenticate',
         ];
 
         /** Entetes utilisant des dates au format RFC850 */
@@ -747,15 +742,15 @@ class Header
         ];
 
         /* La methode existe */
-        if (isset($method[$header])) {
-            $key = $method[$header];
+        if( isset($method[ $header ]) ) {
+            $key = $method[ $header ];
 
             /* Gestion des timestamp */
-            if (in_array(
+            if( in_array(
                 $header,
                 $date
-            )) {
-                switch ($action) {
+            ) ) {
+                switch( $action ) {
                     case 'set':
                         return $this->setHeader(
                             $key,
@@ -770,12 +765,12 @@ class Header
                         return date(
                             'U',
                             mktime(
-                                $d['hour'],
-                                $d['minute'],
-                                $d['second'],
-                                $d['month'],
-                                $d['day'],
-                                $d['year']
+                                $d[ 'hour' ],
+                                $d[ 'minute' ],
+                                $d[ 'second' ],
+                                $d[ 'month' ],
+                                $d[ 'day' ],
+                                $d[ 'year' ]
                             )
                         );
                     case 'unset':
@@ -784,7 +779,7 @@ class Header
 
                 /* Gestion des methodes Set || Get */
             } else {
-                switch ($action) {
+                switch( $action ) {
                     case 'set':
                         return $this->setHeader(
                             $key,

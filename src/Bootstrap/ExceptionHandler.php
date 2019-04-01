@@ -31,7 +31,7 @@ class ExceptionHandler implements Handler
      *
      * @param App $app
      */
-    public function __construct(App $app)
+    public function __construct( App $app )
     {
         $this->app = $app;
     }
@@ -42,10 +42,10 @@ class ExceptionHandler implements Handler
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function report(Exception $e): void
+    public function report( Exception $e ): void
     {
         $this->app->make('ExceptionLogger')->emergency(
-            '#'.$e->getCode().' '.$e->getMessage().' '.$e->getFile().'('.$e->getLine().')'
+            '#' . $e->getCode() . ' ' . $e->getMessage() . ' ' . $e->getFile() . '(' . $e->getLine() . ')'
         );
     }
 
@@ -55,10 +55,10 @@ class ExceptionHandler implements Handler
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function render(Exception $e): void
+    public function render( Exception $e ): void
     {
         $response = $this->app->make('Chukdo\Http\Response');
-        $message = new JsonException();
+        $message  = new JsonException();
 
         $message->set(
             'Error',
@@ -66,22 +66,22 @@ class ExceptionHandler implements Handler
         );
 
         /* Dev mode */
-        if ($this->app->env() == 0) {
+        if( $this->app->env() == 0 ) {
             $message->loadException($e);
         }
 
-        switch (Str::extension(Http::server('SCRIPT_URL'))) {
+        switch( Str::extension(Http::server('SCRIPT_URL')) ) {
             case 'xml':
-                $content = $message->toXml()->toXmlString();
+                $content     = $message->toXml()->toXmlString();
                 $contentType = Http::mimeContentType('xml');
                 break;
             case 'json':
-                $content = $message->toJson(true);
+                $content     = $message->toJson(true);
                 $contentType = Http::mimeContentType('json');
                 break;
             case 'html':
             default:
-                $content = $message->toHtml(
+                $content     = $message->toHtml(
                     get_class($e),
                     500
                 );
@@ -93,14 +93,14 @@ class ExceptionHandler implements Handler
 
         $response->status(500)->header(
             'Content-Type',
-            $contentType.'; charset=utf-8'
+            $contentType . '; charset=utf-8'
         )->content($content)->send()->end();
     }
 
     /**
      * @param Exception $e
      */
-    public function renderForConsole(Exception $e): void
+    public function renderForConsole( Exception $e ): void
     {
         $message = new JsonException();
         $message->loadException($e)->toConsole(get_class($e));

@@ -27,47 +27,47 @@ class Event
      *
      * @param string $event evenement sur lequel ecouter
      */
-    public function flush(string $event): void
+    public function flush( string $event ): void
     {
-        if (isset($this->listeners[$event])) {
-            $this->listeners[$event] = [];
+        if( isset($this->listeners[ $event ]) ) {
+            $this->listeners[ $event ] = [];
         }
     }
 
     /**
      * Ecouteur.
      *
-     * @param string $event    evenement sur lequel ecouter
-     * @param mixed  $listener ecouteur (closure)
+     * @param string $event evenement sur lequel ecouter
+     * @param mixed $listener ecouteur (closure)
      */
-    public function listen(string $event, $listener): void
+    public function listen( string $event, $listener ): void
     {
-        if (!isset($this->listeners[$event])) {
-            $this->listeners[$event] = [];
+        if( !isset($this->listeners[ $event ]) ) {
+            $this->listeners[ $event ] = [];
         }
 
-        $this->listeners[$event][] = $listener;
+        $this->listeners[ $event ][] = $listener;
     }
 
     /**
      * Trigger
      * Declenche les triggers en cascade (dans l'ordre des ajouts).
      *
-     * @param string       $event   evenement sur lequel declencher le trigger
+     * @param string $event evenement sur lequel declencher le trigger
      * @param string|array $payload parametres a passer
      */
-    public function fire(string $event, $payload = []): void
+    public function fire( string $event, $payload = [] ): void
     {
-        if (!is_array($payload)) {
-            $payload = [$payload];
+        if( !is_array($payload) ) {
+            $payload = [ $payload ];
         }
 
-        foreach ($this->getListeners($event) as $listener) {
+        foreach( $this->getListeners($event) as $listener ) {
             /* Stop la propagation si une reponse = false */
-            if (call_user_func_array(
-                $listener,
-                $payload
-            ) === false) {
+            if( call_user_func_array(
+                    $listener,
+                    $payload
+                ) === false ) {
                 return;
             }
         }
@@ -80,10 +80,10 @@ class Event
      *
      * @return array
      */
-    public function getListeners(string $event): array
+    public function getListeners( string $event ): array
     {
-        if (isset($this->listeners[$event])) {
-            return $this->listeners[$event];
+        if( isset($this->listeners[ $event ]) ) {
+            return $this->listeners[ $event ];
         }
 
         return [];

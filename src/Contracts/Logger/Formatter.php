@@ -22,5 +22,5 @@ interface Formatter
      *
      * @return mixed
      */
-    public function formatRecord(array $record);
+    public function formatRecord( array $record );
 }

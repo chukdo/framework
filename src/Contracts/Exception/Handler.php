@@ -20,15 +20,15 @@ interface Handler
     /**
      * @param Exception $e
      */
-    public function report(Exception $e): void;
+    public function report( Exception $e ): void;
 
     /**
      * @param Exception $e
      */
-    public function render(Exception $e): void;
+    public function render( Exception $e ): void;
 
     /**
      * @param Exception $e
      */
-    public function renderForConsole(Exception $e): void;
+    public function renderForConsole( Exception $e ): void;
 }

@@ -53,10 +53,10 @@ class View
     /**
      * View constructor.
      *
-     * @param string|null   $folder
+     * @param string|null $folder
      * @param Response|null $response
      */
-    public function __construct(string $folder = null, Response $response = null)
+    public function __construct( string $folder = null, Response $response = null )
     {
         $this->setDefaultFolder($folder);
         $this->setResponseHandler($response);
@@ -65,7 +65,7 @@ class View
     /**
      * @param Response|null $response
      */
-    public function setResponseHandler(Response $response = null)
+    public function setResponseHandler( Response $response = null )
     {
         $this->response = $response;
     }
@@ -81,7 +81,7 @@ class View
     /**
      * @param string|null $folder
      */
-    public function setDefaultFolder(string $folder = null): void
+    public function setDefaultFolder( string $folder = null ): void
     {
         $this->defaultFolder = rtrim(
             $folder,
@@ -95,9 +95,9 @@ class View
      *
      * @return View
      */
-    public function addFolder(string $name, string $folder): self
+    public function addFolder( string $name, string $folder ): self
     {
-        $this->folders[$name] = rtrim(
+        $this->folders[ $name ] = rtrim(
             $folder,
             '/'
         );
@@ -110,9 +110,9 @@ class View
      *
      * @return bool
      */
-    public function exists(string $template): bool
+    public function exists( string $template ): bool
     {
-        return $this->path($template)['exists'];
+        return $this->path($template)[ 'exists' ];
     }
 
     /**
@@ -120,7 +120,7 @@ class View
      *
      * @return array|null
      */
-    public function path(string $template): ?array
+    public function path( string $template ): ?array
     {
         list($folder, $name) = Str::split(
             $template,
@@ -130,25 +130,25 @@ class View
 
         $r = [
             'folder' => null,
-            'name' => null,
-            'file' => null,
+            'name'   => null,
+            'file'   => null,
             'exists' => false,
         ];
 
-        if ($name) {
-            $r['folder'] = $folder;
-            $r['name'] = $name;
+        if( $name ) {
+            $r[ 'folder' ] = $folder;
+            $r[ 'name' ]   = $name;
 
-            if (isset($this->folders[$folder])) {
-                $r['file'] = $this->folders[$folder].'/'.$name.'.html';
-                $r['exists'] = file_exists($r['file']);
+            if( isset($this->folders[ $folder ]) ) {
+                $r[ 'file' ]   = $this->folders[ $folder ] . '/' . $name . '.html';
+                $r[ 'exists' ] = file_exists($r[ 'file' ]);
             }
         } else {
-            $r['name'] = $folder;
+            $r[ 'name' ] = $folder;
 
-            if ($this->defaultFolder) {
-                $r['file'] = $this->defaultFolder.'/'.$folder.'.html';
-                $r['exists'] = file_exists($r['file']);
+            if( $this->defaultFolder ) {
+                $r[ 'file' ]   = $this->defaultFolder . '/' . $folder . '.html';
+                $r[ 'exists' ] = file_exists($r[ 'file' ]);
             }
         }
 
@@ -156,18 +156,18 @@ class View
     }
 
     /**
-     * @param iterable          $data
+     * @param iterable $data
      * @param array|string|null $templates
      *
      * @return View
      */
-    public function addData(Iterable $data, $templates = null): self
+    public function addData( Iterable $data, $templates = null ): self
     {
-        if ($templates == null) {
+        if( $templates == null ) {
             $this->sharedData = $data;
         } else {
-            foreach ((array) $templates as $template) {
-                $this->sharedTemplateData[$template] = $data;
+            foreach( (array) $templates as $template ) {
+                $this->sharedTemplateData[ $template ] = $data;
             }
         }
 
@@ -179,12 +179,12 @@ class View
      *
      * @return iterable|null
      */
-    public function getData(string $template = null): ?iterable
+    public function getData( string $template = null ): ?iterable
     {
-        if ($template == null) {
+        if( $template == null ) {
             return $this->sharedData;
-        } elseif (isset($this->sharedTemplateData[$template])) {
-            return $this->sharedTemplateData[$template];
+        } else if( isset($this->sharedTemplateData[ $template ]) ) {
+            return $this->sharedTemplateData[ $template ];
         } else {
             return null;
         }
@@ -193,20 +193,20 @@ class View
     /**
      * @param Functions $functions
      */
-    public function loadFunction(Functions $functions): void
+    public function loadFunction( Functions $functions ): void
     {
         $functions->register($this);
     }
 
     /**
-     * @param string  $name
+     * @param string $name
      * @param Closure $closure
      *
      * @return View
      */
-    public function registerFunction(string $name, Closure $closure): self
+    public function registerFunction( string $name, Closure $closure ): self
     {
-        $this->functions[$name] = $closure;
+        $this->functions[ $name ] = $closure;
 
         return $this;
     }
@@ -224,9 +224,9 @@ class View
      *
      * @return bool
      */
-    public function isRegisteredFunction(string $function): bool
+    public function isRegisteredFunction( string $function ): bool
     {
-        return isset($this->functions[$function]);
+        return isset($this->functions[ $function ]);
     }
 
     /**
@@ -234,10 +234,10 @@ class View
      *
      * @return Closure
      */
-    public function callRegisteredFunction(string $function): Closure
+    public function callRegisteredFunction( string $function ): Closure
     {
-        if ($this->isRegisteredFunction($function)) {
-            return $this->functions[$function];
+        if( $this->isRegisteredFunction($function) ) {
+            return $this->functions[ $function ];
         }
 
         throw new ViewException(
@@ -249,12 +249,12 @@ class View
     }
 
     /**
-     * @param string        $template
+     * @param string $template
      * @param iterable|null $data
      *
      * @return Template
      */
-    public function make(string $template, iterable $data = null): Template
+    public function make( string $template, iterable $data = null ): Template
     {
         return new Template(
             $template,
@@ -264,10 +264,10 @@ class View
     }
 
     /**
-     * @param string        $template
+     * @param string $template
      * @param iterable|null $data
      */
-    public function render(string $template, iterable $data = null)
+    public function render( string $template, iterable $data = null )
     {
         $this->make(
             $template,

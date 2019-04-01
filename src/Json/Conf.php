@@ -22,11 +22,11 @@ class Conf extends Json
      *
      * @return bool
      */
-    public function load(string $file): bool
+    public function load( string $file ): bool
     {
         $storage = new Storage();
 
-        if ($storage->exists($file)) {
+        if( $storage->exists($file) ) {
             $load = new Json($storage->get($file));
             $this->merge(
                 $load->toSimpleArray(),

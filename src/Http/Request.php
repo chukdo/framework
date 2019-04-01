@@ -56,12 +56,12 @@ class Request
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    public function __construct(App $app)
+    public function __construct( App $app )
     {
-        $this->app = $app;
+        $this->app    = $app;
         $this->inputs = $app->make('Chukdo\Json\Input');
         $this->header = new Header();
-        $this->url = new Url(Http::server('SCRIPT_URI'));
+        $this->url    = new Url(Http::server('SCRIPT_URI'));
         $this->method = Http::request('httpverb')
             ?: Http::server('REQUEST_METHOD');
 
@@ -80,12 +80,12 @@ class Request
             )
         );
 
-        foreach ($_SERVER as $key => $value) {
-            if ($name = Str::match(
+        foreach( $_SERVER as $key => $value ) {
+            if( $name = Str::match(
                 '/^HTTP_(.*)/',
                 $key
-            )) {
-                switch ($name) {
+            ) ) {
+                switch( $name ) {
                     case 'HOST':
                     case 'COOKIE':
                         break;
@@ -111,7 +111,7 @@ class Request
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    public function validate(Iterable $rules): Validator
+    public function validate( Iterable $rules ): Validator
     {
         return $this->inputs->validate(
             $rules,
@@ -120,13 +120,13 @@ class Request
     }
 
     /**
-     * @param string      $name
+     * @param string $name
      * @param string|null $allowedMimeTypes
-     * @param int|null    $maxFileSize
+     * @param int|null $maxFileSize
      *
      * @return FileUploaded
      */
-    public function file(string $name, string $allowedMimeTypes = null, int $maxFileSize = null): FileUploaded
+    public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): FileUploaded
     {
         return $this->inputs->file(
             $name,
@@ -148,7 +148,7 @@ class Request
      *
      * @return mixed|null
      */
-    public function input(string $name)
+    public function input( string $name )
     {
         return $this->inputs->get($name);
     }
@@ -158,7 +158,7 @@ class Request
      *
      * @return Json
      */
-    public function only(...$offsets): Json
+    public function only( ...$offsets ): Json
     {
         return $this->inputs->only($offsets);
     }
@@ -168,7 +168,7 @@ class Request
      *
      * @return Json
      */
-    public function except(...$offsets): Json
+    public function except( ...$offsets ): Json
     {
         return $this->inputs->except($offsets);
     }
@@ -178,7 +178,7 @@ class Request
      *
      * @return bool
      */
-    public function filled(string $path): bool
+    public function filled( string $path ): bool
     {
         return $this->inputs->filled($path);
     }
@@ -188,7 +188,7 @@ class Request
      *
      * @return bool
      */
-    public function exists(string $path): bool
+    public function exists( string $path ): bool
     {
         return $this->inputs->exists($path);
     }
@@ -198,7 +198,7 @@ class Request
      *
      * @return Json
      */
-    public function wildcard(string $path): Json
+    public function wildcard( string $path ): Json
     {
         return $this->inputs->wildcard($path);
     }

@@ -37,14 +37,14 @@ class Template
      * Template constructor.
      *
      * @param string $template
-     * @param Json   $data
-     * @param View   $view
+     * @param Json $data
+     * @param View $view
      */
-    public function __construct(string $template, Json $data, View $view)
+    public function __construct( string $template, Json $data, View $view )
     {
         $path = $view->path($template);
 
-        if (!$path['exists']) {
+        if( !$path[ 'exists' ] ) {
             throw new ViewException(
                 sprintf(
                     'Template file [%s] does not exist',
@@ -55,7 +55,7 @@ class Template
 
         $this->data($view->getData())->data($view->getData($template))->data($data);
 
-        $this->file = $path['file'];
+        $this->file = $path[ 'file' ];
         $this->view = $view;
     }
 
@@ -64,9 +64,9 @@ class Template
      *
      * @return Template
      */
-    public function data(Iterable $data = null): self
+    public function data( Iterable $data = null ): self
     {
-        if (!$this->data) {
+        if( !$this->data ) {
             $this->data = new Json();
         }
 
@@ -84,13 +84,13 @@ class Template
      *
      * @return mixed
      */
-    public function v($data, string $functions = null)
+    public function v( $data, string $functions = null )
     {
-        if ($functions) {
-            foreach (Str::split(
+        if( $functions ) {
+            foreach( Str::split(
                 $functions,
                 '|'
-            ) as $function) {
+            ) as $function ) {
                 $data = $this->$function($data);
             }
         }
@@ -99,12 +99,12 @@ class Template
     }
 
     /**
-     * @param string      $key
+     * @param string $key
      * @param string|null $functions
      *
      * @return Json|mixed|null
      */
-    public function j(string $key, string $functions = null)
+    public function j( string $key, string $functions = null )
     {
         return $this->v(
             $this->data->get($key),
@@ -113,12 +113,12 @@ class Template
     }
 
     /**
-     * @param string      $key
+     * @param string $key
      * @param string|null $functions
      *
      * @return mixed
      */
-    public function w(string $key, string $functions = null)
+    public function w( string $key, string $functions = null )
     {
         return $this->v(
             $this->data->wildcard($key),
@@ -138,14 +138,14 @@ class Template
     }
 
     /**
-     * @param string     $name
+     * @param string $name
      * @param array|null $arguments
      *
      * @return mixed
      */
-    public function __call(string $name, array $arguments)
+    public function __call( string $name, array $arguments )
     {
-        if (is_callable($name)) {
+        if( is_callable($name) ) {
             return call_user_func_array(
                 $name,
                 $arguments
@@ -160,7 +160,7 @@ class Template
 
     public function render()
     {
-        if ($responseHandler = $this->view->getResponseHandler()) {
+        if( $responseHandler = $this->view->getResponseHandler() ) {
             $responseHandler->header(
                 'Content-Type',
                 'text/html; charset=utf-8'

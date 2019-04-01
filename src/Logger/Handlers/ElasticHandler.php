@@ -33,9 +33,9 @@ class ElasticHandler extends AbstractHandler
      *
      * @param string $dsn
      */
-    public function __construct(string $dsn)
+    public function __construct( string $dsn )
     {
-        $this->dsn = $dsn;
+        $this->dsn     = $dsn;
         $this->elastic = ClientBuilder::create()->setHosts(
             explode(
                 ',',
@@ -50,7 +50,7 @@ class ElasticHandler extends AbstractHandler
 
     public function __destruct()
     {
-        $this->dsn = null;
+        $this->dsn     = null;
         $this->elastic = null;
     }
 
@@ -59,44 +59,44 @@ class ElasticHandler extends AbstractHandler
      *
      * @return bool
      */
-    public function write($record): bool
+    public function write( $record ): bool
     {
-        $this->init($record['channel']);
+        $this->init($record[ 'channel' ]);
 
         $write = $this->elastic->index(
             [
-                'index' => $record['channel'],
-                'type' => 'search',
-                'id' => uniqid(
+                'index' => $record[ 'channel' ],
+                'type'  => 'search',
+                'id'    => uniqid(
                     '',
                     true
                 ),
-                'body' => $record,
+                'body'  => $record,
             ]
         );
 
-        return !isset($write['error']);
+        return !isset($write[ 'error' ]);
     }
 
     /**
      * @param string $channel
      */
-    protected function init(string $channel): void
+    protected function init( string $channel ): void
     {
-        if (!$this->elastic->indices()->exists(
+        if( !$this->elastic->indices()->exists(
             [
                 'index' => $channel,
             ]
-        )) {
+        ) ) {
             $this->elastic->indices()->create(
                 [
                     'index' => $channel,
-                    'body' => [
+                    'body'  => [
                         'mappings' => [
                             'search' => [
                                 'properties' => [
                                     'date' => [
-                                        'type' => 'date',
+                                        'type'   => 'date',
                                         'format' => 'epoch_second',
                                     ],
                                 ],

@@ -35,7 +35,7 @@ class Validator
     /**
      * @var Lang
      */
-    protected $message;
+    protected $messages;
 
     /**
      * @var Message
@@ -57,37 +57,43 @@ class Validator
      *
      * @param Input $inputs
      * @param array $rules
-     * @param Lang  $messages
+     * @param Lang $messages
      */
-    public function __construct(Input $inputs, array $rules, Lang $messages)
+    public function __construct( Input $inputs, array $rules, Lang $messages )
     {
         $this->error    = new Message('error');
         $this->inputs   = $inputs;
         $this->messages = $messages;
 
-        foreach ($rules as $path => $rule) {
-            $this->rules[] = new Rule($path, $rule, $this);
+        foreach( $rules as $path => $rule ) {
+            $this->rules[] = new Rule(
+                $path,
+                $rule,
+                $this
+            );
         }
     }
 
     /**
-     * @param \Chukdo\Contracts\Validation\Validate $validate
-     * @return self
+     * @param ValidateInterface $validate
+     *
+     * @return Validator
      */
-    public function registerValidator(ValidateInterface $validate): self
+    public function registerValidator( ValidateInterface $validate ): self
     {
-        $this->validators[$validate->name()] = $validate;
+        $this->validators[ $validate->name() ] = $validate;
 
         return $this;
     }
 
     /**
      * @param \Chukdo\Contracts\Validation\Filter $filter
+     *
      * @return self
      */
-    public function registerFilter(FilterInterface $filter): self
+    public function registerFilter( FilterInterface $filter ): self
     {
-        $this->filters[$filter->name()] = $filter;
+        $this->filters[ $filter->name() ] = $filter;
 
         return $this;
     }
@@ -107,7 +113,7 @@ class Validator
     {
         $validate = true;
 
-        foreach ($this->rules() as $rule) {
+        foreach( $this->rules() as $rule ) {
             $validate .= $rule->validate();
         }
 
@@ -116,12 +122,13 @@ class Validator
 
     /**
      * @param string $filter
-     * @return \Chukdo\Contracts\Validation\Filter|null
+     *
+     * @return FilterInterface|null
      */
-    public function filter(string $filter): ?FilterInterface
+    public function filter( string $filter ): ?FilterInterface
     {
-        if (isset($this->filters[$filter])) {
-            return $this->filters[$filter];
+        if( isset($this->filters[ $filter ]) ) {
+            return $this->filters[ $filter ];
         }
 
         return null;
@@ -137,12 +144,13 @@ class Validator
 
     /**
      * @param string $validator
-     * @return \Chukdo\Contracts\Validation\Validate|null
+     *
+     * @return ValidateInterface|null
      */
-    public function validator(string $validator): ?ValidateInterface
+    public function validator( string $validator ): ?ValidateInterface
     {
-        if (isset($this->validators[$validator])) {
-            return $this->validators[$validator];
+        if( isset($this->validators[ $validator ]) ) {
+            return $this->validators[ $validator ];
         }
 
         return null;
@@ -151,7 +159,7 @@ class Validator
     /**
      * @return array
      */
-    public function validators(string $validator = null): array
+    public function validators(): array
     {
         return $this->validators;
     }
@@ -165,7 +173,7 @@ class Validator
     }
 
     /**
-     * @return Rules
+     * @return array
      */
     public function rules(): array
     {
@@ -181,16 +189,20 @@ class Validator
     }
 
     /**
-     * @param Array $listName
+     * @param array $listName
+     *
      * @return string
      */
-    public function message(array $listName): string
+    public function message( array $listName ): string
     {
         return $this->messages->offsetGetFirstInList(
             $listName,
             sprintf(
                 'Validation message [%s] cannot be found',
-                implode(', ', $listName)
+                implode(
+                    ', ',
+                    $listName
+                )
             )
         );
     }

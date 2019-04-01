@@ -23,10 +23,10 @@ class Basic implements FunctionsInterface
     /**
      * @param View $view
      */
-    public function register(View $view): void
+    public function register( View $view ): void
     {
-        foreach (get_class_methods($this) as $method) {
-            if ($method != 'register') {
+        foreach( get_class_methods($this) as $method ) {
+            if( $method != 'register' ) {
                 $view->registerFunction(
                     $method,
                     Closure::fromCallable(
@@ -46,7 +46,7 @@ class Basic implements FunctionsInterface
      *
      * @return bool
      */
-    public function contain(string $data, string $search): bool
+    public function contain( string $data, string $search ): bool
     {
         return Str::contain(
             $data,
@@ -59,7 +59,7 @@ class Basic implements FunctionsInterface
      *
      * @return string
      */
-    public function removeSpecialChars(string $data): string
+    public function removeSpecialChars( string $data ): string
     {
         return Str::removeSpecialChars($data);
     }

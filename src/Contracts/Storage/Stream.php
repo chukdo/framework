@@ -29,7 +29,7 @@ interface Stream
      *
      * @return bool
      */
-    public function streamSet(string $content): bool;
+    public function streamSet( string $content ): bool;
 
     /**
      * Ajoute du contenu à la fin du fichier.
@@ -38,7 +38,7 @@ interface Stream
      *
      * @return bool
      */
-    public function streamAppend(string $content): bool;
+    public function streamAppend( string $content ): bool;
 
     /**
      * Retourne une portion du fichier du fichier.
@@ -48,17 +48,17 @@ interface Stream
      *
      * @return string|null
      */
-    public function streamGetRange(int $offset, int $length): ?string;
+    public function streamGetRange( int $offset, int $length ): ?string;
 
     /**
      * Ecris une portion du fichier en commencant à l'offet défini.
      *
-     * @param int    $offset
+     * @param int $offset
      * @param string $content
      *
      * @return bool
      */
-    public function streamSetRange(int $offset, string $content): bool;
+    public function streamSetRange( int $offset, string $content ): bool;
 
     /**
      * Retourne si le fichier existe.
@@ -88,7 +88,7 @@ interface Stream
      *
      * @return bool
      */
-    public function streamRename(string $newkey): bool;
+    public function streamRename( string $newkey ): bool;
 
     /**
      * Defini ou retourne la derniere date d'acces au fichier.
@@ -97,7 +97,7 @@ interface Stream
      *
      * @return int
      */
-    public function streamAccessTime($time = null): int;
+    public function streamAccessTime( $time = null ): int;
 
     /**
      * Defini ou retourne la date de creation du fichier.
@@ -106,7 +106,7 @@ interface Stream
      *
      * @return int
      */
-    public function streamCreatedTime($time = false): int;
+    public function streamCreatedTime( $time = false ): int;
 
     /**
      * Defini ou retourne la derniere date de modification au fichier.
@@ -115,7 +115,7 @@ interface Stream
      *
      * @return int
      */
-    public function streamModifiedTime($time = false): int;
+    public function streamModifiedTime( $time = false ): int;
 
     /**
      * Libere le flux.
@@ -129,7 +129,7 @@ interface Stream
      *
      * @return bool
      */
-    public function streamSetDir(bool $recursive): bool;
+    public function streamSetDir( bool $recursive ): bool;
 
     /**
      * Supprime un dossier.

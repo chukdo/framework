@@ -26,9 +26,9 @@ final class Stream
      * @param string $name
      * @param string $class
      */
-    public static function register(string $name, string $class): void
+    public static function register( string $name, string $class ): void
     {
-        if (self::exists($name)) {
+        if( self::exists($name) ) {
             stream_wrapper_unregister($name);
         }
         stream_wrapper_register(
@@ -42,7 +42,7 @@ final class Stream
      *
      * @return bool
      */
-    public static function exists(string $name): bool
+    public static function exists( string $name ): bool
     {
         return (bool) in_array(
             $name,

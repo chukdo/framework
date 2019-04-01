@@ -23,15 +23,15 @@ class JsonStringFormatter implements FormatterInterface
      *
      * @return mixed
      */
-    public function formatRecord(array $record)
+    public function formatRecord( array $record )
     {
         $json = new Json(
             [
-                'date' => date(
+                'date'    => date(
                     'd/m/Y H:i:s',
-                    $record['time']
+                    $record[ 'time' ]
                 ),
-                'name' => $record['channel'].'.'.$record['levelname'],
+                'name'    => $record[ 'channel' ] . '.' . $record[ 'levelname' ],
                 'message' => str_replace(
                     [
                         "\r\n",
@@ -39,11 +39,11 @@ class JsonStringFormatter implements FormatterInterface
                         "\n",
                     ],
                     ' ',
-                    $record['message']
+                    $record[ 'message' ]
                 ),
-                'extra' => $record['extra'],
-                'time' => $record['time'],
-                'level' => $record['level'],
+                'extra'   => $record[ 'extra' ],
+                'time'    => $record[ 'time' ],
+                'level'   => $record[ 'level' ],
             ]
         );
 

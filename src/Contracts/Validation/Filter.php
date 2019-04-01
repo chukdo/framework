@@ -2,8 +2,6 @@
 
 namespace Chukdo\Contracts\Validation;
 
-use Chukdo\Validation\Rule;
-
 /**
  * Interface des regles de validation.
  *
@@ -21,15 +19,16 @@ interface Filter
 
     /**
      * @param array $attributes
+     *
      * @return self
      */
-    public function attributes(array $attributes): self;
+    public function attributes( array $attributes ): Filter;
 
     /**
      *
      * @param $input
-     * @param Rule $rule
-     * @return bool
+     *
+     * @return mixed
      */
-    public function filter($input, Rule $rule): bool;
+    public function filter( $input );
 }

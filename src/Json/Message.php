@@ -25,7 +25,7 @@ class Message extends Json
      *
      * @param string $name
      */
-    public function __construct(string $name)
+    public function __construct( string $name )
     {
         $this->name = $name;
 
@@ -39,7 +39,7 @@ class Message extends Json
      *
      * @return string
      */
-    public function toHtml(string $title = null, string $color = null, string $widthFirstCol = null): string
+    public function toHtml( string $title = null, string $color = null, string $widthFirstCol = null ): string
     {
         return parent::toHtml($this->name);
     }
@@ -50,7 +50,7 @@ class Message extends Json
     public function toArray(): array
     {
         return [
-            'result' => $this->name,
+            'result'   => $this->name,
             'messages' => $this->getArrayCopy(),
         ];
     }
