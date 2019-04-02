@@ -11,7 +11,8 @@ namespace Chukdo\Facades;
  */
 class Response extends Facade
 {
-    public static function name(): string {
+    public static function name(): string
+    {
         return \Chukdo\Http\Response::class;
     }
 }

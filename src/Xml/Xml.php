@@ -32,7 +32,8 @@ class Xml extends Node
      * @param string $name
      * @param string $uri
      */
-    public function __construct( string $name = 'xml', string $uri = '' ) {
+    public function __construct( string $name = 'xml', string $uri = '' )
+    {
         $this->xml                     = new DOMDocument('1.0', 'UTF-8');
         $this->xml->formatOutput       = false;
         $this->xml->preserveWhiteSpace = false;
@@ -49,7 +50,8 @@ class Xml extends Node
      * @return Xml
      * @throws XmlException
      */
-    public static function loadFromFile( string $file, bool $html = false ): Xml {
+    public static function loadFromFile( string $file, bool $html = false ): Xml
+    {
         try {
             $xml = new Xml();
             $html === false
@@ -68,7 +70,8 @@ class Xml extends Node
     /**
      * @return DOMDocument
      */
-    public function doc() {
+    public function doc()
+    {
         return $this->xml;
     }
 
@@ -79,7 +82,8 @@ class Xml extends Node
      * @return Node
      * @throws NodeException
      */
-    public function wrap( string $name, string $value = '', string $uri = 'urn:void' ): Node {
+    public function wrap( string $name, string $value = '', string $uri = 'urn:void' ): Node
+    {
         $childs = $this->childs();
         $node   = $this->set($name,
             $value,
@@ -97,7 +101,8 @@ class Xml extends Node
      * @param bool   $html
      * @return bool
      */
-    public function saveToFile( string $file, bool $html = false ): bool {
+    public function saveToFile( string $file, bool $html = false ): bool
+    {
         $dir = dirname($file);
 
         if( !is_dir($dir) ) {
@@ -118,7 +123,8 @@ class Xml extends Node
     /**
      * @return string
      */
-    public function __toString(): string {
+    public function __toString(): string
+    {
         return $this->doc()
             ->saveXML();
     }
@@ -126,7 +132,8 @@ class Xml extends Node
     /**
      * @return array
      */
-    public function __sleep(): array {
+    public function __sleep(): array
+    {
         $this->buffer = $this->saveToString();
 
         return [ 'buffer' ];
@@ -136,7 +143,8 @@ class Xml extends Node
      * @param bool $html
      * @return string
      */
-    public function saveToString( bool $html = false ): string {
+    public function saveToString( bool $html = false ): string
+    {
         return $html
             ? $this->doc()
                 ->saveHTML()
@@ -148,7 +156,8 @@ class Xml extends Node
      * @throws NodeException
      * @throws XmlException
      */
-    public function __wakeup(): void {
+    public function __wakeup(): void
+    {
         $xml          = xml::loadFromString($this->buffer);
         $this->xml    = $xml->doc();
         $this->__node = $xml->element();
@@ -160,7 +169,8 @@ class Xml extends Node
      * @return Xml
      * @throws XmlException
      */
-    public static function loadFromString( string $string, bool $html = false ): Xml {
+    public static function loadFromString( string $string, bool $html = false ): Xml
+    {
         try {
             $xml = new Xml();
             $html

@@ -49,7 +49,8 @@ class Redis implements RedisInterface
      * @param int|null    $timeout
      * @throws RedisException
      */
-    public function __construct( string $dsn = null, int $timeout = null ) {
+    public function __construct( string $dsn = null, int $timeout = null )
+    {
         $dsn  = parse_url($dsn
             ?: 'redis://127.0.0.1:6379');
         $host = $dsn[ 'host' ];
@@ -83,7 +84,8 @@ class Redis implements RedisInterface
      * @return mixed
      * @throws RedisException
      */
-    public function __call( string $name, array $args ) {
+    public function __call( string $name, array $args )
+    {
         array_unshift($args,
             str_replace('_',
                 ' ',
@@ -95,11 +97,22 @@ class Redis implements RedisInterface
     }
 
     /**
+     * Défini le type de commande SCAN lors d'une itération Redis
+     * Ex. SCAN SSCAN HSCAN.
+     * @param string $type
+     */
+    public function setTypeIterator( string $type ): void
+    {
+        $this->type = strtoupper($type);
+    }
+
+    /**
      * Ecriture d'une commande basé sur le protocol unifié de Redis.
      * @param string $c command
      * @throws RedisException
      */
-    public function write( string $c ): void {
+    public function write( string $c ): void
+    {
         for( $written = 0 ; $written < mb_strlen($c) ; $written += $fwrite ) {
             $fwrite = fwrite($this->sock,
                 mb_substr($c,
@@ -116,7 +129,8 @@ class Redis implements RedisInterface
      * @param array $args arguments
      * @return string
      */
-    public function command( array $args ): string {
+    public function command( array $args ): string
+    {
         $c = '*' . count($args) . "\r\n";
 
         foreach( $args as $arg ) {
@@ -131,7 +145,8 @@ class Redis implements RedisInterface
      * @throws RedisException
      * @return mixed
      */
-    public function read() {
+    public function read()
+    {
         $get   = stream_get_line($this->sock,
             512,
             "\r\n");
@@ -220,20 +235,12 @@ class Redis implements RedisInterface
     }
 
     /**
-     * Défini le type de commande SCAN lors d'une itération Redis
-     * Ex. SCAN SSCAN HSCAN.
-     * @param string $type
-     */
-    public function setTypeIterator( string $type ): void {
-        $this->type = strtoupper($type);
-    }
-
-    /**
      * Arguments à ajouter à la commande SCAN lors d'une itération Redis
      * Ex. scan 0 MATCH *11*.
      * @param array $args
      */
-    public function setArgsIterator( array $args ): void {
+    public function setArgsIterator( array $args ): void
+    {
         $this->args = $args;
     }
 
@@ -242,7 +249,8 @@ class Redis implements RedisInterface
      * @return int|mixed
      * @throws RedisException
      */
-    public function count() {
+    public function count()
+    {
         $this->write($this->command([ 'dbsize' ]));
 
         return $this->read();
@@ -252,7 +260,8 @@ class Redis implements RedisInterface
      * Initialise l'iteration.
      * @throws RedisException
      */
-    public function rewind() {
+    public function rewind()
+    {
         /* Reset */
         $this->stack   = [];
         $this->pointer = 0;
@@ -273,7 +282,8 @@ class Redis implements RedisInterface
      * @return mixed
      * @throws RedisException
      */
-    protected function getIterator( int $pointer ) {
+    protected function getIterator( int $pointer )
+    {
         $this->write($this->command(array_merge([
             $this->type,
             $pointer,
@@ -287,7 +297,8 @@ class Redis implements RedisInterface
      * @return bool|mixed
      * @throws RedisException
      */
-    public function current() {
+    public function current()
+    {
         $current = false;
 
         if( isset($this->stack[ 0 ]) ) {
@@ -330,7 +341,8 @@ class Redis implements RedisInterface
      * @return mixed
      * @throws RedisException
      */
-    public function get( string $key ) {
+    public function get( string $key )
+    {
         return $this->__call('GET',
             [ $key ]);
     }
@@ -339,7 +351,8 @@ class Redis implements RedisInterface
      * Retourne la cle de l'element courant.
      * @return string
      */
-    public function key() {
+    public function key()
+    {
         return isset($this->stack[ 0 ])
             ? $this->stack[ 0 ]
             : '';
@@ -349,7 +362,8 @@ class Redis implements RedisInterface
      * Pointe sur l'element suivant.
      * @throws RedisException
      */
-    public function next() {
+    public function next()
+    {
         if( !empty($this->stack) ) {
             array_shift($this->stack);
         }
@@ -369,7 +383,8 @@ class Redis implements RedisInterface
      * apres l'appel de rewind() ou next().
      * @return bool
      */
-    public function valid(): bool {
+    public function valid(): bool
+    {
         return $this->pointer === 0 && empty($this->stack)
             ? false
             : true;
@@ -378,7 +393,8 @@ class Redis implements RedisInterface
     /**
      * Détruit la connexion au serveur Redis.
      */
-    public function __destruct() {
+    public function __destruct()
+    {
         $this->sock = '';
     }
 
@@ -388,7 +404,8 @@ class Redis implements RedisInterface
      * @return array
      * @throws RedisException
      */
-    public function pipe( array $commands ): array {
+    public function pipe( array $commands ): array
+    {
         $s = [];
         $c = '';
         $i = 0;
@@ -416,7 +433,8 @@ class Redis implements RedisInterface
      * @return array|bool|mixed
      * @throws RedisException
      */
-    public function info( string $key = null ) {
+    public function info( string $key = null )
+    {
         $info  = [];
         $items = explode("\r\n",
             $this->__call('info',
@@ -445,7 +463,8 @@ class Redis implements RedisInterface
      * @return mixed
      * @throws RedisException
      */
-    public function exists( string $key ) {
+    public function exists( string $key )
+    {
         return $this->__call('EXISTS',
             [ $key ]);
     }
@@ -456,7 +475,8 @@ class Redis implements RedisInterface
      * @return mixed
      * @throws RedisException
      */
-    public function set( string $key, $value ) {
+    public function set( string $key, $value )
+    {
         return $this->__call('SET',
             [
                 $key,
@@ -469,7 +489,8 @@ class Redis implements RedisInterface
      * @return bool
      * @throws RedisException
      */
-    public function del( string $key ) {
+    public function del( string $key )
+    {
         return (bool) $this->__call('DEL',
             [ $key ]);
     }
@@ -479,7 +500,8 @@ class Redis implements RedisInterface
      * @return mixed
      * @throws RedisException
      */
-    public function __isset( string $key ) {
+    public function __isset( string $key )
+    {
         return $this->__call('EXISTS',
             [ $key ]);
     }
@@ -489,7 +511,8 @@ class Redis implements RedisInterface
      * @return mixed
      * @throws RedisException
      */
-    public function __get( string $key ) {
+    public function __get( string $key )
+    {
         return $this->__call('GET',
             [ $key ]);
     }
@@ -500,7 +523,8 @@ class Redis implements RedisInterface
      * @return mixed
      * @throws RedisException
      */
-    public function __set( string $key, $value ) {
+    public function __set( string $key, $value )
+    {
         return $this->__call('SET',
             [
                 $key,
@@ -513,7 +537,8 @@ class Redis implements RedisInterface
      * @return mixed
      * @throws RedisException
      */
-    public function __unset( string $key ) {
+    public function __unset( string $key )
+    {
         return $this->__call('DEL',
             [ $key ]);
     }

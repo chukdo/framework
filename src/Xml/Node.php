@@ -42,14 +42,16 @@ class Node implements IteratorAggregate
      * Node constructor.
      * @param DOMElement $node
      */
-    public function __construct( DOMElement $node ) {
+    public function __construct( DOMElement $node )
+    {
         $this->setElement($node);
     }
 
     /**
      * @param DOMElement $node
      */
-    protected function setElement( DOMElement $node ): void {
+    protected function setElement( DOMElement $node ): void
+    {
         $this->node = $node;
     }
 
@@ -57,7 +59,8 @@ class Node implements IteratorAggregate
      * @return Nodes|Traversable
      * @throws NodeException
      */
-    public function getIterator() {
+    public function getIterator()
+    {
         return $this->childs();
     }
 
@@ -67,7 +70,8 @@ class Node implements IteratorAggregate
      * @return Nodes
      * @throws NodeException
      */
-    public function childs( string $name = '' ): Nodes {
+    public function childs( string $name = '' ): Nodes
+    {
         $nodes = new Nodes();
 
         foreach( $this->elements(XML_ELEMENT_NODE) as $child ) {
@@ -83,7 +87,8 @@ class Node implements IteratorAggregate
      * @return Nodes
      * @throws NodeException
      */
-    protected function elements(): Nodes {
+    protected function elements(): Nodes
+    {
         $args  = func_get_args();
         $nodes = new Nodes();
         $count = count($args);
@@ -103,7 +108,8 @@ class Node implements IteratorAggregate
      * @return DOMElement
      * @throws NodeException
      */
-    protected function element(): DOMElement {
+    protected function element(): DOMElement
+    {
         if( $this->node instanceof DOMElement ) {
             return $this->node;
         }
@@ -115,7 +121,8 @@ class Node implements IteratorAggregate
      * @return string
      * @throws NodeException
      */
-    public function name(): String {
+    public function name(): String
+    {
         return $this->element()->localName;
     }
 
@@ -124,7 +131,8 @@ class Node implements IteratorAggregate
      * @return Nodes
      * @throws NodeException
      */
-    public function getNodesByTagName( string $name ): Nodes {
+    public function getNodesByTagName( string $name ): Nodes
+    {
         $nodes = new Nodes();
 
         foreach( $this->element()
@@ -144,7 +152,8 @@ class Node implements IteratorAggregate
      * @return Node|null
      * @throws NodeException
      */
-    public function get( string $name, int $indice = 0, bool $create = true ): ?Node {
+    public function get( string $name, int $indice = 0, bool $create = true ): ?Node
+    {
         $index = 0;
         $node  = null;
 
@@ -182,7 +191,8 @@ class Node implements IteratorAggregate
      * @return Node
      * @throws NodeException
      */
-    public function set( string $name, string $value = '', string $uri = 'urn:void' ): Node {
+    public function set( string $name, string $value = '', string $uri = 'urn:void' ): Node
+    {
         $uri  = preg_match('/:/',
             $name)
             ? $uri
@@ -199,7 +209,8 @@ class Node implements IteratorAggregate
      * @return DOMNode
      * @throws NodeException
      */
-    protected function appendNode( DOMNode $node ): DOMNode {
+    protected function appendNode( DOMNode $node ): DOMNode
+    {
         return $this->element()
             ->appendChild($node);
     }
@@ -211,7 +222,8 @@ class Node implements IteratorAggregate
      * @return Node
      * @throws NodeException
      */
-    public function setValue( string $value, bool $append = true, bool $raw = false ): self {
+    public function setValue( string $value, bool $append = true, bool $raw = false ): self
+    {
         /* Suppression de contenu du noeud */
         if( $append === false ) {
             $this->unsetValue();
@@ -248,7 +260,8 @@ class Node implements IteratorAggregate
      * @return string
      * @throws NodeException
      */
-    public function unsetValue(): string {
+    public function unsetValue(): string
+    {
         $str = '';
 
         foreach( $this->elements(XML_TEXT_NODE,
@@ -268,7 +281,8 @@ class Node implements IteratorAggregate
      * @return Node
      * @throws NodeException
      */
-    public function after( string $name, string $value = '', string $uri = 'urn:void' ): Node {
+    public function after( string $name, string $value = '', string $uri = 'urn:void' ): Node
+    {
         if( ($ref = $this->element()->nextSibling) !== null ) {
             $uri    = preg_match('/:/',
                 $name)
@@ -294,7 +308,8 @@ class Node implements IteratorAggregate
      * @return Node|null
      * @throws NodeException
      */
-    public function parent(): ?Node {
+    public function parent(): ?Node
+    {
         if( ($node = $this->element()->parentNode) instanceof DOMElement ) {
             return new Node($node);
         }
@@ -308,7 +323,8 @@ class Node implements IteratorAggregate
      * @return string
      * @throws NodeException
      */
-    public function values(): string {
+    public function values(): string
+    {
         $str = '';
 
         foreach( $this->element()->childNodes as $child ) {
@@ -330,7 +346,8 @@ class Node implements IteratorAggregate
      * @return Node
      * @throws NodeException
      */
-    public function unsetAttrs(): self {
+    public function unsetAttrs(): self
+    {
         $attributes = $this->attrs();
 
         foreach( $attributes as $name => $value ) {
@@ -344,7 +361,8 @@ class Node implements IteratorAggregate
      * @return Nodes
      * @throws NodeException
      */
-    public function attrs(): Nodes {
+    public function attrs(): Nodes
+    {
         $nodes = new Nodes();
 
         foreach( $this->element()->attributes as $child ) {
@@ -360,7 +378,8 @@ class Node implements IteratorAggregate
      * @return string
      * @throws NodeException
      */
-    public function unsetAttr( string $name ): string {
+    public function unsetAttr( string $name ): string
+    {
         $attr = $this->attr($name);
         $this->element()
             ->removeAttribute($name);
@@ -374,7 +393,8 @@ class Node implements IteratorAggregate
      * @return string
      * @throws NodeException
      */
-    public function attr( string $name ): string {
+    public function attr( string $name ): string
+    {
         return (string) $this->element()
             ->getAttribute($name);
     }
@@ -383,7 +403,8 @@ class Node implements IteratorAggregate
      * @return Node
      * @throws NodeException
      */
-    public function unsetDataAttrs(): self {
+    public function unsetDataAttrs(): self
+    {
         $attributes = $this->dataAttrs();
 
         foreach( $attributes as $name => $value ) {
@@ -397,7 +418,8 @@ class Node implements IteratorAggregate
      * @return Nodes
      * @throws NodeException
      */
-    public function dataAttrs(): Nodes {
+    public function dataAttrs(): Nodes
+    {
         $nodes = new Nodes();
 
         foreach( $this->element()->attributes as $child ) {
@@ -416,7 +438,8 @@ class Node implements IteratorAggregate
      * @return string
      * @throws NodeException
      */
-    public function comment(): String {
+    public function comment(): String
+    {
         $str = '';
 
         foreach( $this->elements(XML_COMMENT_NODE) as $child ) {
@@ -431,7 +454,8 @@ class Node implements IteratorAggregate
      * @return Node
      * @throws NodeException
      */
-    public function setComment( string $comment ): self {
+    public function setComment( string $comment ): self
+    {
         $this->unsetComment();
         $this->element()
             ->insertBefore(new DOMComment($comment),
@@ -444,7 +468,8 @@ class Node implements IteratorAggregate
      * @return string
      * @throws NodeException
      */
-    public function unsetComment(): string {
+    public function unsetComment(): string
+    {
         $str = '';
 
         foreach( $this->elements(XML_COMMENT_NODE) as $child ) {
@@ -462,7 +487,8 @@ class Node implements IteratorAggregate
      * @return Node
      * @throws NodeException
      */
-    public function rename( string $name, bool $attr = true ): self {
+    public function rename( string $name, bool $attr = true ): self
+    {
         $node   = $this->parent()
             ->set($name);
         $append = [];
@@ -487,7 +513,8 @@ class Node implements IteratorAggregate
      * @return Node
      * @throws NodeException
      */
-    public function setAttrs( array $attributes ): self {
+    public function setAttrs( array $attributes ): self
+    {
         foreach( $attributes as $name => $value ) {
             $this->setAttr($name,
                 $value);
@@ -497,25 +524,12 @@ class Node implements IteratorAggregate
     }
 
     /**
-     * @param string $name
-     * @param string $value
-     * @return Node
-     * @throws NodeException
-     */
-    public function setAttr( string $name, string $value ): self {
-        $this->element()
-            ->setAttribute($name,
-                $value);
-
-        return $this;
-    }
-
-    /**
      * @param Node $node
      * @return Node
      * @throws NodeException
      */
-    public function replace( Node $node ): self {
+    public function replace( Node $node ): self
+    {
         $this->parent()
             ->element()
             ->replaceChild($node->element(),
@@ -526,10 +540,26 @@ class Node implements IteratorAggregate
     }
 
     /**
+     * @param string $name
+     * @param string $value
      * @return Node
      * @throws NodeException
      */
-    public function clone(): Node {
+    public function setAttr( string $name, string $value ): self
+    {
+        $this->element()
+            ->setAttribute($name,
+                $value);
+
+        return $this;
+    }
+
+    /**
+     * @return Node
+     * @throws NodeException
+     */
+    public function clone(): Node
+    {
         $clone  = $this->element()
             ->cloneNode(true);
         $parent = $this->parent()
@@ -551,7 +581,8 @@ class Node implements IteratorAggregate
      * @return Node|null
      * @throws NodeException
      */
-    public function next( $name = '' ): ?Node {
+    public function next( $name = '' ): ?Node
+    {
         $node  = $this->element();
         $names = explode(' ',
             $name);
@@ -573,7 +604,8 @@ class Node implements IteratorAggregate
      * @return Node
      * @throws NodeException
      */
-    public function unwrap(): Node {
+    public function unwrap(): Node
+    {
         $ref    = $this->element();
         $parent = $this->parent()
             ->element();
@@ -598,7 +630,8 @@ class Node implements IteratorAggregate
      * @return Node
      * @throws NodeException
      */
-    public function unset( string $name = '' ): self {
+    public function unset( string $name = '' ): self
+    {
         if( $name == '' ) {
             $this->element()->parentNode->removeChild($this->element());
         }
@@ -624,7 +657,8 @@ class Node implements IteratorAggregate
      * @throws NodeException
      * @throws XmlException
      */
-    public function wrap( string $name, string $value = '', string $uri = 'urn:void' ): Node {
+    public function wrap( string $name, string $value = '', string $uri = 'urn:void' ): Node
+    {
         $node = $this->before($name,
             $value,
             $uri);
@@ -641,7 +675,8 @@ class Node implements IteratorAggregate
      * @return Node
      * @throws NodeException
      */
-    public function before( string $name, string $value = '', string $uri = 'urn:void' ): Node {
+    public function before( string $name, string $value = '', string $uri = 'urn:void' ): Node
+    {
         $uri    = preg_match('/:/',
             $name)
             ? $uri
@@ -665,7 +700,8 @@ class Node implements IteratorAggregate
      * @throws NodeException
      * @throws XmlException
      */
-    public function import( $import, bool $parent = false ): self {
+    public function import( $import, bool $parent = false ): self
+    {
         $node = false;
 
         /* import depuis un objet xml */
@@ -758,7 +794,8 @@ class Node implements IteratorAggregate
      * @return DOMDocument
      * @throws NodeException
      */
-    protected function doc() {
+    protected function doc()
+    {
         if( $doc = $this->element()->ownerDocument ) {
             return $doc;
         }
@@ -775,7 +812,8 @@ class Node implements IteratorAggregate
      * @return Node
      * @throws NodeException
      */
-    public function wrapIn( string $name, string $value = '', string $uri = 'urn:void' ): Node {
+    public function wrapIn( string $name, string $value = '', string $uri = 'urn:void' ): Node
+    {
         $node  = $this->set($name,
             $value,
             $uri);
@@ -795,7 +833,8 @@ class Node implements IteratorAggregate
      * @return Node|null
      * @throws NodeException
      */
-    public function first(): ?Node {
+    public function first(): ?Node
+    {
         return $this->childs()
             ->get(0);
     }
@@ -804,7 +843,8 @@ class Node implements IteratorAggregate
      * @return Node
      * @throws NodeException
      */
-    public function last(): ?Node {
+    public function last(): ?Node
+    {
         $childs = (array) $this->childs();
 
         if( count($childs) > 0 ) {
@@ -819,7 +859,8 @@ class Node implements IteratorAggregate
      * @return Node|null
      * @throws NodeException
      */
-    public function prev( string $name = '' ): ?Node {
+    public function prev( string $name = '' ): ?Node
+    {
         $node  = $this->element();
         $names = explode(' ',
             $name);
@@ -840,7 +881,8 @@ class Node implements IteratorAggregate
     /**
      * @return bool
      */
-    public function hasChild(): bool {
+    public function hasChild(): bool
+    {
         try {
             return count($this->elements(XML_ELEMENT_NODE)) > 0;
         } catch( Exception $e ) {
@@ -852,7 +894,8 @@ class Node implements IteratorAggregate
      * @return int
      * @throws NodeException
      */
-    public function count(): int {
+    public function count(): int
+    {
         return $this->elements(XML_ELEMENT_NODE)
             ->count();
     }
@@ -862,7 +905,8 @@ class Node implements IteratorAggregate
      * @return bool
      * @throws NodeException
      */
-    public function hasAttr( string $name ): bool {
+    public function hasAttr( string $name ): bool
+    {
         return $this->element()
             ->hasAttribute($name);
     }
@@ -873,7 +917,8 @@ class Node implements IteratorAggregate
      * @return bool
      * @throws NodeException
      */
-    public function hasStyle( string $name, string $value = '' ): bool {
+    public function hasStyle( string $name, string $value = '' ): bool
+    {
         if( preg_match('/' . $name . '\s?:\s?' . $value . '/i',
             $this->element()
                 ->getAttribute('style')) ) {
@@ -889,7 +934,8 @@ class Node implements IteratorAggregate
      * @return Node
      * @throws NodeException
      */
-    public function setStyle( string $name, string $value ): Node {
+    public function setStyle( string $name, string $value ): Node
+    {
         $this->unsetStyle($name);
         $this->setAttr('style',
             trim(trim($this->element()
@@ -905,7 +951,8 @@ class Node implements IteratorAggregate
      * @return Node
      * @throws NodeException
      */
-    public function unsetStyle( string $name ): self {
+    public function unsetStyle( string $name ): self
+    {
         $this->setAttr('style',
             preg_replace('/' . $name . ':.*?;/i',
                 '',
@@ -920,7 +967,8 @@ class Node implements IteratorAggregate
      * @return bool
      * @throws NodeException
      */
-    public function hasClass( string $name ): bool {
+    public function hasClass( string $name ): bool
+    {
         $names = explode(' ',
             $name);
         $class = explode(' ',
@@ -942,7 +990,8 @@ class Node implements IteratorAggregate
      * @return Node
      * @throws NodeException
      */
-    public function setClass( string $name ): self {
+    public function setClass( string $name ): self
+    {
         $this->unsetClass($name);
         $this->setAttr('class',
             trim($this->element()
@@ -956,7 +1005,8 @@ class Node implements IteratorAggregate
      * @return Node
      * @throws NodeException
      */
-    public function unsetClass( string $name ): self {
+    public function unsetClass( string $name ): self
+    {
         $names = explode(' ',
             $name);
         $class = explode(' ',
@@ -985,7 +1035,8 @@ class Node implements IteratorAggregate
      * @return Node
      * @throws NodeException
      */
-    public function dropClass( array $classes, string $path = './*' ): self {
+    public function dropClass( array $classes, string $path = './*' ): self
+    {
         $query = $path . "[contains(@class,'" . implode("') or contains(@class,'",
                 $classes) . "')]";
 
@@ -1005,7 +1056,8 @@ class Node implements IteratorAggregate
      * @return Nodes
      * @throws NodeException
      */
-    public function query( string $query ): Nodes {
+    public function query( string $query ): Nodes
+    {
         if( !($this->xpath instanceof DOMXPath) ) {
             $this->xpath = new DOMXPath($this->doc());
         }
@@ -1047,7 +1099,8 @@ class Node implements IteratorAggregate
      * @return string
      * @throws NodeException
      */
-    public function toXmlString( bool $html = false, bool $core = false ): string {
+    public function toXmlString( bool $html = false, bool $core = false ): string
+    {
         if( ($doc = $this->doc()) && !$core ) {
             return $html
                 ? $doc->saveHTML($this->element())
@@ -1096,7 +1149,8 @@ class Node implements IteratorAggregate
      * @return string
      * @throws Exception
      */
-    public function __toString(): string {
+    public function __toString(): string
+    {
         return $this->value();
     }
 
@@ -1104,7 +1158,8 @@ class Node implements IteratorAggregate
      * @return string
      * @throws NodeException
      */
-    public function value(): string {
+    public function value(): string
+    {
         $str = '';
 
         foreach( $this->element()->childNodes as $child ) {
@@ -1121,7 +1176,8 @@ class Node implements IteratorAggregate
     /**
      * @return Node
      */
-    public function toXml(): self {
+    public function toXml(): self
+    {
         return $this;
     }
 
@@ -1129,7 +1185,8 @@ class Node implements IteratorAggregate
      * @return string
      * @throws Exception
      */
-    public function toJson(): string {
+    public function toJson(): string
+    {
         return json_encode($this->toArray(),
             JSON_PRETTY_PRINT);
     }
@@ -1140,7 +1197,8 @@ class Node implements IteratorAggregate
      * @return array
      * @throws NodeException
      */
-    public function toArray( string $default = 'item', $value = null ): array {
+    public function toArray( string $default = 'item', $value = null ): array
+    {
         $value = $value !== null
             ? $value
             : $this;
@@ -1189,7 +1247,8 @@ class Node implements IteratorAggregate
      * @param string $name
      * @throws NodeException
      */
-    public function __get( string $name ) {
+    public function __get( string $name )
+    {
         throw new NodeException("Method $name does not exist");
     }
 
@@ -1198,7 +1257,8 @@ class Node implements IteratorAggregate
      * @param        $value
      * @throws NodeException
      */
-    public function __set( string $name, $value ) {
+    public function __set( string $name, $value )
+    {
         throw new NodeException("Method $name does not exist");
     }
 
@@ -1208,7 +1268,8 @@ class Node implements IteratorAggregate
      * @return mixed
      * @throws Exception
      */
-    public function __call( string $name, $params = [] ) {
+    public function __call( string $name, $params = [] )
+    {
         throw new NodeException("Method $name does not exist");
     }
 }

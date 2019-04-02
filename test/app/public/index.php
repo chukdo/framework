@@ -131,25 +131,32 @@ $json = new \Chukdo\Json\Json(
     ]
 );
 
+Input::set('tel', '+33 6.26.14.83.29');
+
 $validator = new \Chukdo\Validation\Validator(
     Input::all(),
     [
+        'tel' => 'required|&phone|phone'
         //'title'      => 'required|array:2,3',
         //'title.*.cp' => 'required|array:1,2|string:2|striptags|label:code postal',
-        //'x' => 'required|array|striptags|string:2',
-        'dossier' => 'required|file:sheet'
+        //'x' => 'required|array|&striptags|string:2',
+        //'dossier' => 'required|file:sheet',
+        //'prix' => 'required|&float|float'
         //'title.name' => 'required|string:3,6',
         //'title.cp'   => 'required|string:5|label:code postal',
     ],
     Lang::offsetGet('validation')
 );
 
+
+$validator->registerFilter(new \Chukdo\Validation\Filter\PhoneFilter());
 $validator->registerFilter(new \Chukdo\Validation\Filter\StriptagsFilter());
 $validator->registerValidator(new \Chukdo\Validation\Validate\fileValidate());
+$validator->registerValidator(new \Chukdo\Validation\Validate\PhoneValidate());
 $validator->registerValidator(new \Chukdo\Validation\Validate\StringValidate());
 $validator->validate();
 
-echo '<html><body><form method="POST" action="/index.php" enctype="multipart/form-data"><input type="file" name="dossier"><input type="submit"></form></body>';
+//echo '<html><body><form method="POST" action="/index.php" enctype="multipart/form-data"><input type="file" name="dossier"><input type="submit"></form></body>';
 
 if ($validator->fails()) {
     dd($validator->errors());

@@ -28,7 +28,8 @@ class ElasticHandler extends AbstractHandler
      * ElasticHandler constructor.
      * @param string|null $dsn
      */
-    public function __construct( ?string $dsn ) {
+    public function __construct( ?string $dsn )
+    {
         $this->dsn     = $dsn;
         $this->elastic = ClientBuilder::create()
             ->setHosts(explode(',',
@@ -40,7 +41,8 @@ class ElasticHandler extends AbstractHandler
         parent::__construct();
     }
 
-    public function __destruct() {
+    public function __destruct()
+    {
         $this->dsn     = null;
         $this->elastic = null;
     }
@@ -49,7 +51,8 @@ class ElasticHandler extends AbstractHandler
      * @param array $record
      * @return bool
      */
-    public function write( $record ): bool {
+    public function write( $record ): bool
+    {
         $this->init($record[ 'channel' ]);
 
         $write = $this->elastic->index([
@@ -66,7 +69,8 @@ class ElasticHandler extends AbstractHandler
     /**
      * @param string $channel
      */
-    protected function init( string $channel ): void {
+    protected function init( string $channel ): void
+    {
         if( !$this->elastic->indices()
             ->exists([
                 'index' => $channel,

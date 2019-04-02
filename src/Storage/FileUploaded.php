@@ -39,7 +39,8 @@ class FileUploaded
      * @param string|null $allowedMimeTypes
      * @param int|null    $maxFileSize
      */
-    public function __construct( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ) {
+    public function __construct( string $name, string $allowedMimeTypes = null, int $maxFileSize = null )
+    {
         $uploadedFiles = $this->normalizeUploadedFiles();
 
         if( isset($uploadedFiles[ $name ]) ) {
@@ -56,29 +57,10 @@ class FileUploaded
     }
 
     /**
-     * @param int|null $maxFileSize
-     * @return FileUploaded
-     */
-    public function setMaxFileSize( int $maxFileSize = null ): self {
-        $this->maxFileSize = $maxFileSize;
-
-        return $this;
-    }
-
-    /**
-     * @param string|null $allowedMimeTypes
-     * @return FileUploaded
-     */
-    public function setAllowedMimeTypes( string $allowedMimeTypes = null ): self {
-        $this->allowedMimeTypes = $allowedMimeTypes;
-
-        return $this;
-    }
-
-    /**
      * @return array
      */
-    private static function normalizeUploadedFiles(): array {
+    private static function normalizeUploadedFiles(): array
+    {
         $uploadedFiles = [];
 
         foreach( $_FILES as $name => $file ) {
@@ -98,10 +80,33 @@ class FileUploaded
     }
 
     /**
+     * @param int|null $maxFileSize
+     * @return FileUploaded
+     */
+    public function setMaxFileSize( int $maxFileSize = null ): self
+    {
+        $this->maxFileSize = $maxFileSize;
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $allowedMimeTypes
+     * @return FileUploaded
+     */
+    public function setAllowedMimeTypes( string $allowedMimeTypes = null ): self
+    {
+        $this->allowedMimeTypes = $allowedMimeTypes;
+
+        return $this;
+    }
+
+    /**
      * @param array $array
      * @return array
      */
-    private static function __normalizeUploadedFiles( array $array ): array {
+    private static function __normalizeUploadedFiles( array $array ): array
+    {
         $uploadedFiles = [];
 
         foreach( $array as $k => $v ) {
@@ -121,21 +126,24 @@ class FileUploaded
     /**
      * @return string
      */
-    public function name(): string {
+    public function name(): string
+    {
         return (string) $this->uploadedFile[ 'name' ];
     }
 
     /**
      * @return string
      */
-    public function extension(): string {
+    public function extension(): string
+    {
         return Str::extension($this->uploadedFile[ 'name' ]);
     }
 
     /**
      * @return string
      */
-    public function error(): string {
+    public function error(): string
+    {
         return (string) $this->uploadedFile[ 'error' ];
     }
 
@@ -143,7 +151,8 @@ class FileUploaded
      * @param $path
      * @return bool
      */
-    public function store( $path ): bool {
+    public function store( $path ): bool
+    {
         if( $this->isValid() ) {
             if( move_uploaded_file($this->path(), $path) ) {
                 return true;
@@ -162,14 +171,24 @@ class FileUploaded
     /**
      * @return bool
      */
-    public function isValid(): bool {
+    public function isValid(): bool
+    {
         return $this->isValidSize() && $this->isValidMimeType();
+    }
+
+    /**
+     * @return string
+     */
+    public function path(): string
+    {
+        return (string) $this->uploadedFile[ 'tmp_name' ];
     }
 
     /**
      * @return bool
      */
-    public function isValidSize(): bool {
+    public function isValidSize(): bool
+    {
         if( $this->maxFileSize ) {
             return $this->size() < $this->maxFileSize;
         }
@@ -178,16 +197,10 @@ class FileUploaded
     }
 
     /**
-     * @return int
-     */
-    public function size(): int {
-        return (int) $this->uploadedFile[ 'size' ];
-    }
-
-    /**
      * @return bool
      */
-    public function isValidMimeType(): bool {
+    public function isValidMimeType(): bool
+    {
         if( $this->allowedMimeTypes ) {
             foreach( str::split($this->allowedMimeTypes, ',') as $allowedMimeType ) {
                 if( preg_match("#$allowedMimeType#i", $this->mimeType()) ) {
@@ -202,16 +215,18 @@ class FileUploaded
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function mimeType(): string {
-        return (string) $this->uploadedFile[ 'type' ];
+    public function size(): int
+    {
+        return (int) $this->uploadedFile[ 'size' ];
     }
 
     /**
      * @return string
      */
-    public function path(): string {
-        return (string) $this->uploadedFile[ 'tmp_name' ];
+    public function mimeType(): string
+    {
+        return (string) $this->uploadedFile[ 'type' ];
     }
 }

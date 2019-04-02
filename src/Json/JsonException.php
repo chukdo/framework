@@ -18,7 +18,8 @@ class JsonException extends Json
      * @param Throwable $e
      * @return JsonException
      */
-    public function loadException( Throwable $e ): self {
+    public function loadException( Throwable $e ): self
+    {
         $backTrace = [];
 
         if( $previous = $e->getPrevious() ) {
@@ -64,7 +65,8 @@ class JsonException extends Json
      * @param int    $line
      * @return string
      */
-    protected function getCode( string $file, int $line ): string {
+    protected function getCode( string $file, int $line ): string
+    {
         $code = '';
         $spl  = new SplFileObject($file);
 
@@ -94,7 +96,8 @@ class JsonException extends Json
      * @param string|null $widthFirstCol
      * @return string
      */
-    public function toHtml( string $title = null, string $code = null, string $widthFirstCol = null ): string {
+    public function toHtml( string $title = null, string $code = null, string $widthFirstCol = null ): string
+    {
         return parent::toHtml(($title && $code)
             ? $title . '(' . $code . ')'
             : null,
@@ -105,7 +108,8 @@ class JsonException extends Json
     /**
      * @param string|null $title
      */
-    public function toConsole( string $title = null ): void {
+    public function toConsole( string $title = null ): void
+    {
         $table = new \cli\Table();
         $table->setHeaders([
             '%R' . strtoupper($title

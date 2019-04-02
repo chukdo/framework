@@ -29,14 +29,16 @@ class Facade
      * Attache APP (extension de service) à la facade pour la resolution des injections de dependance.
      * @param App $app
      */
-    public static function setFacadeApplication( App $app ): void {
+    public static function setFacadeApplication( App $app ): void
+    {
         static::$app = $app;
     }
 
     /**
      * @return App
      */
-    public static function getFacadeApplication(): App {
+    public static function getFacadeApplication(): App
+    {
         return static::$app;
     }
 
@@ -44,7 +46,8 @@ class Facade
      * @param string $name
      * @param string $alias
      */
-    public static function setClassAlias( string $name, string $alias ): void {
+    public static function setClassAlias( string $name, string $alias ): void
+    {
         class_alias($name,
             $alias);
     }
@@ -55,7 +58,8 @@ class Facade
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    public static function object() {
+    public static function object()
+    {
         return static::getInstance(static::name());
     }
 
@@ -66,7 +70,8 @@ class Facade
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    public static function getInstance( string $name ) {
+    public static function getInstance( string $name )
+    {
         if( !isset(static::$facades[ $name ]) ) {
             static::$facades[ $name ] = static::$app->make($name,
                 true);
@@ -79,7 +84,8 @@ class Facade
      * @return string
      * @throws FacadeException
      */
-    public static function name(): string {
+    public static function name(): string
+    {
         throw new FacadeException("Facade does not implement 'Name' method.");
     }
 
@@ -91,7 +97,8 @@ class Facade
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    public static function __callStatic( string $method, array $args = [] ) {
+    public static function __callStatic( string $method, array $args = [] )
+    {
         $name     = static::name();
         $instance = static::getInstance($name);
 

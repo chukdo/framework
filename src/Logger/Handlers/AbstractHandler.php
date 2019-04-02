@@ -35,14 +35,16 @@ abstract class AbstractHandler implements HandlerInterface
     /**
      * Constructeur.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->setLevels(array_keys(Logger::getLevels()));
     }
 
     /**
      * @param $levels
      */
-    public function setLevels( $levels ): void {
+    public function setLevels( $levels ): void
+    {
         $this->levels = (array) $levels;
     }
 
@@ -50,7 +52,8 @@ abstract class AbstractHandler implements HandlerInterface
      * @param array $record
      * @return bool
      */
-    public function handle( array $record ): bool {
+    public function handle( array $record ): bool
+    {
         if( $this->isHandling($record) ) {
             $record = $this->processRecord($record);
 
@@ -68,7 +71,8 @@ abstract class AbstractHandler implements HandlerInterface
      * @param array $record
      * @return bool
      */
-    public function isHandling( array $record ): bool {
+    public function isHandling( array $record ): bool
+    {
         return in_array($record[ 'level' ],
             $this->levels);
     }
@@ -77,7 +81,8 @@ abstract class AbstractHandler implements HandlerInterface
      * @param array $record
      * @return array
      */
-    public function processRecord( array $record ): array {
+    public function processRecord( array $record ): array
+    {
         foreach( $this->processors as $processor ) {
             $record = $processor->processRecord($record);
         }
@@ -89,7 +94,8 @@ abstract class AbstractHandler implements HandlerInterface
      * @param FormatterInterface $formatter
      * @return HandlerInterface
      */
-    public function setFormatter( FormatterInterface $formatter ): HandlerInterface {
+    public function setFormatter( FormatterInterface $formatter ): HandlerInterface
+    {
         $this->formatter = $formatter;
 
         return $this;
@@ -105,7 +111,8 @@ abstract class AbstractHandler implements HandlerInterface
      * @param ProcessorInterface $processor
      * @return HandlerInterface
      */
-    public function pushProcessor( ProcessorInterface $processor ): HandlerInterface {
+    public function pushProcessor( ProcessorInterface $processor ): HandlerInterface
+    {
         array_push($this->processors,
             $processor);
 

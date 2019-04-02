@@ -17,7 +17,8 @@ final class To
      * @param        $value
      * @return array|bool|float|int|string
      */
-    public static function type( string $type, $value ) {
+    public static function type( string $type, $value )
+    {
         switch( $type ) {
             case 'boolean':
                 return (bool) $value;
@@ -42,7 +43,8 @@ final class To
      * @param string|null $prefix
      * @return string
      */
-    public static function qualifiedName( string $name, $prefix = null ): string {
+    public static function qualifiedName( string $name, $prefix = null ): string
+    {
         $qname = str_replace(' ',
             '_',
             Str::allText($name));
@@ -62,7 +64,8 @@ final class To
      * @param string|null $suffix
      * @return string
      */
-    public static function fileName( string $name, string $prefix = null, string $suffix = null ): string {
+    public static function fileName( string $name, string $prefix = null, string $suffix = null ): string
+    {
         if( strlen($name) > 0 ) {
             return preg_replace('/_{2,}/',
                 '_',
@@ -78,7 +81,8 @@ final class To
      * @param string $value
      * @return string
      */
-    public static function utf8( string $value ): string {
+    public static function utf8( string $value ): string
+    {
         $value = (string) $value;
 
         if( $value !== false ) {
@@ -96,7 +100,8 @@ final class To
      * @param $value
      * @return int
      */
-    public static function int( $value ): int {
+    public static function int( $value ): int
+    {
         return (int) self::scalar($value);
     }
 
@@ -104,7 +109,8 @@ final class To
      * @param $value
      * @return mixed
      */
-    public static function scalar( $value ) {
+    public static function scalar( $value )
+    {
         $scalar = '';
 
         if( Is::scalar($value) ) {
@@ -130,7 +136,8 @@ final class To
      * @param $value
      * @return float
      */
-    public static function float( $value ): float {
+    public static function float( $value ): float
+    {
         $value = str_replace(' ',
             '',
             self::scalar($value));
@@ -155,7 +162,8 @@ final class To
      * @return \DateTime
      * @throws \Exception
      */
-    public static function date( string $value, string $format = null ): \DateTime {
+    public static function date( string $value, string $format = null ): \DateTime
+    {
         $date = \DateTime::createFromFormat($format
             ?: 'd/m/Y',
             $value);
@@ -171,7 +179,8 @@ final class To
      * @param $value
      * @return string
      */
-    public static function json( $value ): string {
+    public static function json( $value ): string
+    {
         if( is_scalar($value) ) {
             return $value;
         }
@@ -189,7 +198,8 @@ final class To
      * @param $value
      * @return array
      */
-    public static function arr( $value ): array {
+    public static function arr( $value ): array
+    {
         $array = [];
 
         if( is_array($value) ) {
@@ -235,7 +245,8 @@ final class To
      * @throws \Chukdo\Xml\NodeException
      * @throws \Chukdo\Xml\XmlException
      */
-    public static function xml( $value ): \Chukdo\Xml\Xml {
+    public static function xml( $value ): \Chukdo\Xml\Xml
+    {
         if( $value instanceof \Chukdo\Xml\Xml ) {
             return $value;
         }

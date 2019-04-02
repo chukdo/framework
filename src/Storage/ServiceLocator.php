@@ -29,7 +29,8 @@ class ServiceLocator extends Singleton
      * @param         $scheme
      * @param Closure $closure
      */
-    public function setService( $scheme, Closure $closure ): void {
+    public function setService( $scheme, Closure $closure ): void
+    {
         $this->resources[ $scheme ] = $closure;
     }
 
@@ -39,7 +40,8 @@ class ServiceLocator extends Singleton
      * @return object
      * @throws ServiceLocatorException
      */
-    public function getResource( string $scheme ) {
+    public function getResource( string $scheme )
+    {
         if( $cache = $this->getCacheResource($scheme) ) {
             return $cache;
         }
@@ -58,7 +60,8 @@ class ServiceLocator extends Singleton
      * @param string $scheme
      * @return mixed
      */
-    public function getCacheResource( string $scheme ) {
+    public function getCacheResource( string $scheme )
+    {
         return isset($this->cache[ $scheme ])
             ? $this->cache[ $scheme ]
             : null;
@@ -70,7 +73,8 @@ class ServiceLocator extends Singleton
      * @return closure
      * @throws ServiceLocatorException
      */
-    public function getService( $scheme ): Closure {
+    public function getService( $scheme ): Closure
+    {
         if( !isset($this->resources[ $scheme ]) ) {
             throw new ServiceLocatorException(sprintf('[%s] is not a registered service',
                 $scheme));
@@ -84,7 +88,8 @@ class ServiceLocator extends Singleton
      * @param string $scheme
      * @param        $resource
      */
-    public function cacheResource( string $scheme, $resource ): void {
+    public function cacheResource( string $scheme, $resource ): void
+    {
         $this->cache[ $scheme ] = $resource;
     }
 
@@ -93,7 +98,8 @@ class ServiceLocator extends Singleton
      * @param string $scheme
      * @return bool true si le cache a été detruit false si le cache n'existait pas
      */
-    public function unsetCacheResource( string $scheme ): bool {
+    public function unsetCacheResource( string $scheme ): bool
+    {
         if( isset($this->cache[ $scheme ]) ) {
             unset($this->cache[ $scheme ]);
 

@@ -26,7 +26,8 @@ class ExceptionHandler implements Handler
      * ExceptionHandler constructor.
      * @param App $app
      */
-    public function __construct( App $app ) {
+    public function __construct( App $app )
+    {
         $this->app = $app;
     }
 
@@ -35,7 +36,8 @@ class ExceptionHandler implements Handler
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function report( Exception $e ): void {
+    public function report( Exception $e ): void
+    {
         $this->app->make('ExceptionLogger')
             ->emergency('#' . $e->getCode() . ' ' . $e->getMessage() . ' ' . $e->getFile() . '(' . $e->getLine() . ')');
     }
@@ -45,7 +47,8 @@ class ExceptionHandler implements Handler
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function render( Exception $e ): void {
+    public function render( Exception $e ): void
+    {
         $response = $this->app->make('Chukdo\Http\Response');
         $message  = new JsonException();
 
@@ -88,7 +91,8 @@ class ExceptionHandler implements Handler
     /**
      * @param Exception $e
      */
-    public function renderForConsole( Exception $e ): void {
+    public function renderForConsole( Exception $e ): void
+    {
         $message = new JsonException();
         $message->loadException($e)
             ->toConsole(get_class($e));

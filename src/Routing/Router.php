@@ -41,7 +41,8 @@ class Router
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    public function __construct( App $app ) {
+    public function __construct( App $app )
+    {
         $this->app     = $app;
         $this->request = $app->make('Chukdo\Http\Request');
     }
@@ -51,7 +52,8 @@ class Router
      * @param string $regex
      * @return Router
      */
-    public function pattern( string $key, string $regex ): self {
+    public function pattern( string $key, string $regex ): self
+    {
         $this->pattern[ $key ] = $regex;
     }
 
@@ -60,7 +62,8 @@ class Router
      * @param Closure $closure
      * @return Route
      */
-    public function get( string $uri, Closure $closure ): Route {
+    public function get( string $uri, Closure $closure ): Route
+    {
         return $this->stack('GET',
             $uri,
             $closure);
@@ -72,7 +75,8 @@ class Router
      * @param Closure $closure
      * @return Route
      */
-    public function stack( string $method, string $uri, Closure $closure ): Route {
+    public function stack( string $method, string $uri, Closure $closure ): Route
+    {
         $route                                 = new Route($this, $closure);
         $this->stack[ $method . '://' . $uri ] = $route;
 
@@ -84,7 +88,8 @@ class Router
      * @param Closure $closure
      * @return Route
      */
-    public function post( string $uri, Closure $closure ): Route {
+    public function post( string $uri, Closure $closure ): Route
+    {
         return $this->stack('POST',
             $uri,
             $closure);
@@ -95,7 +100,8 @@ class Router
      * @param Closure $closure
      * @return Route
      */
-    public function put( string $uri, Closure $closure ): Route {
+    public function put( string $uri, Closure $closure ): Route
+    {
         return $this->stack('PUT',
             $uri,
             $closure);
@@ -106,7 +112,8 @@ class Router
      * @param Closure $closure
      * @return Route
      */
-    public function delete( string $uri, Closure $closure ): Route {
+    public function delete( string $uri, Closure $closure ): Route
+    {
         return $this->stack('DELETE',
             $uri,
             $closure);
@@ -117,7 +124,8 @@ class Router
      * @param Closure $closure
      * @return Route
      */
-    public function any( string $uri, Closure $closure ): Route {
+    public function any( string $uri, Closure $closure ): Route
+    {
         return $this->stack('ALL',
             $uri,
             $closure);
@@ -128,7 +136,8 @@ class Router
      * @param Closure $closure
      * @return Route
      */
-    public function console( string $uri, Closure $closure ): Route {
+    public function console( string $uri, Closure $closure ): Route
+    {
         return $this->stack('CLI',
             $uri,
             $closure);

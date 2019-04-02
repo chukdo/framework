@@ -18,7 +18,8 @@ final class Is
      * @param $value
      * @return bool
      */
-    public static function json( $value ): bool {
+    public static function json( $value ): bool
+    {
         $json = json_decode($value);
 
         return $json && $value != $json;
@@ -28,7 +29,8 @@ final class Is
      * @param $value
      * @return bool
      */
-    public static function arr( $value ): bool {
+    public static function arr( $value ): bool
+    {
         return is_array($value) || $value instanceof \ArrayObject || $value instanceof Arr;
     }
 
@@ -38,7 +40,8 @@ final class Is
      * @param string $property
      * @return bool
      */
-    public static function object( $value, string $method = '', string $property = '' ): bool {
+    public static function object( $value, string $method = '', string $property = '' ): bool
+    {
         if( is_object($value) ) {
             if( $method != false ) {
                 return method_exists($value,
@@ -59,7 +62,8 @@ final class Is
      * @param string $name
      * @return bool
      */
-    public static function qualifiedName( string $name ): bool {
+    public static function qualifiedName( string $name ): bool
+    {
         $letter     = " [^\d\W] ";
         $digit      = " \d ";
         $ncnamechar = " $letter | $digit | \. | - | _ ";
@@ -76,7 +80,8 @@ final class Is
      * @param int $max
      * @return bool
      */
-    public static function between( int $value, int $min = 0, int $max = 0 ): bool {
+    public static function between( int $value, int $min = 0, int $max = 0 ): bool
+    {
         $min = (int) $min;
         $max = (int) $max;
 
@@ -99,7 +104,8 @@ final class Is
      * @param $value
      * @return bool
      */
-    public static function int( $value ): bool {
+    public static function int( $value ): bool
+    {
         return filter_var($value,
                 FILTER_VALIDATE_INT) !== false;
     }
@@ -108,7 +114,8 @@ final class Is
      * @param $value
      * @return bool
      */
-    public static function float( $value ): bool {
+    public static function float( $value ): bool
+    {
         return filter_var($value,
                 FILTER_VALIDATE_FLOAT) !== false;
     }
@@ -117,7 +124,8 @@ final class Is
      * @param string $value
      * @return bool
      */
-    public static function alpha( string $value ): bool {
+    public static function alpha( string $value ): bool
+    {
         return filter_var($value,
                 FILTER_VALIDATE_REGEXP,
                 [
@@ -131,7 +139,8 @@ final class Is
      * @param string $value
      * @return bool
      */
-    public static function alnum( string $value ): bool {
+    public static function alnum( string $value ): bool
+    {
         return filter_var($value,
                 FILTER_VALIDATE_REGEXP,
                 [
@@ -146,7 +155,8 @@ final class Is
      * @param string|null $format
      * @return bool
      */
-    public static function date( $value, string $format = null ): bool {
+    public static function date( $value, string $format = null ): bool
+    {
         $format    = $format
             ?: 'd/m/Y';
         $checkDate = \DateTime::createFromFormat($format,
@@ -159,7 +169,8 @@ final class Is
      * @param $value
      * @return bool
      */
-    public static function string( $value ): bool {
+    public static function string( $value ): bool
+    {
         return is_string($value);
     }
 
@@ -167,7 +178,8 @@ final class Is
      * @param string $value
      * @return bool
      */
-    public static function html( string $value ): bool {
+    public static function html( string $value ): bool
+    {
         return strlen(strip_tags($value)) != strlen($value);
     }
 
@@ -175,7 +187,8 @@ final class Is
      * @param string $value
      * @return bool
      */
-    public static function url( string $value ): bool {
+    public static function url( string $value ): bool
+    {
         return filter_var($value,
                 FILTER_VALIDATE_URL) !== false;
     }
@@ -184,7 +197,8 @@ final class Is
      * @param string $value
      * @return bool
      */
-    public static function email( string $value ): bool {
+    public static function email( string $value ): bool
+    {
         return filter_var($value,
                 FILTER_VALIDATE_EMAIL) !== false;
     }
@@ -193,7 +207,8 @@ final class Is
      * @param $value
      * @return bool
      */
-    public static function zipcode( $value ): bool {
+    public static function zipcode( $value ): bool
+    {
         return filter_var($value,
                 FILTER_VALIDATE_REGEXP,
                 [
@@ -207,7 +222,8 @@ final class Is
      * @param $value
      * @return bool
      */
-    public static function name( $value ): bool {
+    public static function name( $value ): bool
+    {
         return filter_var($value,
                 FILTER_VALIDATE_REGEXP,
                 [
@@ -221,7 +237,8 @@ final class Is
      * @param string $value
      * @return bool
      */
-    public static function fileName( string $value ): bool {
+    public static function fileName( string $value ): bool
+    {
         return filter_var($value,
                 FILTER_VALIDATE_REGEXP,
                 [
@@ -235,7 +252,8 @@ final class Is
      * @param string $value
      * @return bool
      */
-    public static function phone( string $value ): bool {
+    public static function phone( string $value ): bool
+    {
         return filter_var($value,
                 FILTER_VALIDATE_REGEXP,
                 [
@@ -249,7 +267,8 @@ final class Is
      * @param string $value
      * @return bool
      */
-    public static function mongoId( string $value ): bool {
+    public static function mongoId( string $value ): bool
+    {
         return filter_var($value,
                 FILTER_VALIDATE_REGEXP,
                 [
@@ -263,7 +282,8 @@ final class Is
      * @param $value
      * @return bool
      */
-    public function empty( $value ): bool {
+    public function empty( $value ): bool
+    {
         if( self::scalar($value) ) {
             $value = trim($value);
 
@@ -286,7 +306,8 @@ final class Is
      * @param $value
      * @return bool
      */
-    public static function scalar( $value ): bool {
+    public static function scalar( $value ): bool
+    {
         return is_scalar($value);
     }
 
@@ -294,7 +315,8 @@ final class Is
      * @param $value
      * @return bool
      */
-    public static function traversable( $value ): bool {
+    public static function traversable( $value ): bool
+    {
         return is_array($value) || $value instanceof \Traversable;
     }
 }

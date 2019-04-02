@@ -16,7 +16,8 @@ final class Crypto
      * @param int|null $duration
      * @return string
      */
-    public static function encodeCsrf( int $duration = null ): string {
+    public static function encodeCsrf( int $duration = null ): string
+    {
         return self::encrypt(json_encode([
             'time'     => time(),
             'duration' => (int) $duration
@@ -30,7 +31,8 @@ final class Crypto
      * @param string $salt
      * @return string
      */
-    public static function encrypt( string $data, string $salt ): string {
+    public static function encrypt( string $data, string $salt ): string
+    {
         $encrypted = openssl_encrypt($data,
             'bf-ecb',
             $salt,
@@ -44,7 +46,8 @@ final class Crypto
      * @param string $token
      * @return bool
      */
-    public static function decodeCsrf( string $token ): bool {
+    public static function decodeCsrf( string $token ): bool
+    {
         /* URI Decode */
         if( strpos($token,
                 '%') !== false ) {
@@ -70,7 +73,8 @@ final class Crypto
      * @param string $salt
      * @return string
      */
-    public static function decrypt( string $data, string $salt ): string {
+    public static function decrypt( string $data, string $salt ): string
+    {
         $data      = base64_decode($data);
         $decrypted = openssl_decrypt($data,
             'bf-ecb',
@@ -84,7 +88,8 @@ final class Crypto
      * @param int|null $length
      * @return string
      */
-    public static function password( int $length = null ): string {
+    public static function password( int $length = null ): string
+    {
         $chars    = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?';
         $password = substr(str_shuffle($chars),
             0,
@@ -100,7 +105,8 @@ final class Crypto
      * @return string
      * @throws \Exception
      */
-    public static function generateCode( int $length, bool $readable = true ): string {
+    public static function generateCode( int $length, bool $readable = true ): string
+    {
         $token        = '';
         $codeAlphabet = $readable
             ? 'abcdefghjkmnpqrstuvwxyz123456789'
@@ -121,7 +127,8 @@ final class Crypto
      * @param int    $hashlevel nombre de sous repertoire pour le stockage du fichier
      * @return string chemin complet du fichier à stocker
      */
-    public static function hash( string $name, int $hashlevel = 2 ): string {
+    public static function hash( string $name, int $hashlevel = 2 ): string
+    {
         $file = crc32($name);
         $path = '';
         $hash = str_split(hash('crc32',

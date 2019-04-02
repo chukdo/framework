@@ -24,7 +24,8 @@ class HandleExceptions
      * HandleExceptions constructor.
      * @param App $app
      */
-    public function __construct( App $app ) {
+    public function __construct( App $app )
+    {
         $this->app = $app;
 
         error_reporting(-1);
@@ -51,7 +52,8 @@ class HandleExceptions
      * @param int    $line
      * @throws ErrorException
      */
-    public function handleError( int $level, string $message, string $file = '', int $line = 0 ): void {
+    public function handleError( int $level, string $message, string $file = '', int $line = 0 ): void
+    {
         if( error_reporting() & $level ) {
             throw new ErrorException($message, 0, $level, $file, $line);
         }
@@ -61,7 +63,8 @@ class HandleExceptions
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function handleShutdown(): void {
+    public function handleShutdown(): void
+    {
         if( !is_null($error = error_get_last()) && $this->isFatal($error[ 'type' ]) ) {
             $this->handleException($this->fatalExceptionFromError($error));
         }
@@ -71,7 +74,8 @@ class HandleExceptions
      * @param int $type
      * @return bool
      */
-    protected function isFatal( int $type ): bool {
+    protected function isFatal( int $type ): bool
+    {
         return in_array($type,
             [
                 E_COMPILE_ERROR,
@@ -86,7 +90,8 @@ class HandleExceptions
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function handleException( Throwable $e ) {
+    public function handleException( Throwable $e )
+    {
         if( !$e instanceof Exception ) {
             $e = new AppException($e->getMessage(), $e->getCode(), $e);
         }
@@ -107,19 +112,21 @@ class HandleExceptions
     }
 
     /**
+     * @param array $error
+     * @return ErrorException
+     */
+    protected function fatalExceptionFromError( array $error ): ErrorException
+    {
+        return new ErrorException($error[ 'message' ], 0, $error[ 'type' ], $error[ 'file' ], $error[ 'line' ]);
+    }
+
+    /**
      * @return mixed|object|null
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    protected function getExceptionHandler() {
+    protected function getExceptionHandler()
+    {
         return $this->app->make('Chukdo\Bootstrap\ExceptionHandler');
-    }
-
-    /**
-     * @param array $error
-     * @return ErrorException
-     */
-    protected function fatalExceptionFromError( array $error ): ErrorException {
-        return new ErrorException($error[ 'message' ], 0, $error[ 'type' ], $error[ 'file' ], $error[ 'line' ]);
     }
 }

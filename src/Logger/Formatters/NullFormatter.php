@@ -17,7 +17,8 @@ class NullFormatter implements FormatterInterface
      * @param array $record
      * @return mixed
      */
-    public function formatRecord( array $record ) {
+    public function formatRecord( array $record )
+    {
         return $record;
     }
 }

@@ -11,7 +11,8 @@ namespace Chukdo\Facades;
  */
 class ExceptionLogger extends Facade
 {
-    public static function name(): string {
+    public static function name(): string
+    {
         return 'ExceptionLogger';
     }
 }

@@ -20,7 +20,8 @@ abstract class ServiceProvider
      * ServiceProvider constructor.
      * @param App $app
      */
-    public function __construct( App $app ) {
+    public function __construct( App $app )
+    {
         $this->app = $app;
     }
 
@@ -28,7 +29,8 @@ abstract class ServiceProvider
      * @param string $name
      * @param string $alias
      */
-    public function setClassAlias( string $name, string $alias ): void {
+    public function setClassAlias( string $name, string $alias ): void
+    {
         class_alias($name,
             $alias);
     }

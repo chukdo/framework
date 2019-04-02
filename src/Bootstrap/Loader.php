@@ -27,13 +27,15 @@ class Loader
      * Constructeur
      * Initialise l'objet.
      */
-    public function __construct() {
+    public function __construct()
+    {
     }
 
     /**
      * Register loader with SPL autoloader stack.
      */
-    public function register(): void {
+    public function register(): void
+    {
         spl_autoload_register([
             $this,
             'loadClass',
@@ -43,7 +45,8 @@ class Loader
     /**
      * Unregisters this instance as an autoloader.
      */
-    public function unregister(): void {
+    public function unregister(): void
+    {
         spl_autoload_unregister([
             $this,
             'loadClass',
@@ -54,7 +57,8 @@ class Loader
      * Registers a set namespaces.
      * @param array $namespaces array($namespace => $paths)
      */
-    public function registerNameSpaces( array $namespaces ): void {
+    public function registerNameSpaces( array $namespaces ): void
+    {
         foreach( $namespaces as $ns => $paths ) {
             $this->registerNameSpace($ns,
                 $paths);
@@ -68,7 +72,8 @@ class Loader
      * @param array|string $paths   The base directories
      * @param bool         $prepend Whether to prepend the directories
      */
-    public function registerNameSpace( string $ns, $paths, bool $prepend = false ): void {
+    public function registerNameSpace( string $ns, $paths, bool $prepend = false ): void
+    {
         /** normalize namespace */
         $ns = trim($ns,
             '\\');
@@ -100,7 +105,8 @@ class Loader
      * @param string $nsclass the fully-qualified class name
      * @return bool true on success, or false on failure
      */
-    public function loadClass( string $nsclass ): bool {
+    public function loadClass( string $nsclass ): bool
+    {
         $ns      = explode('\\',
             $nsclass);
         $class   = [];
@@ -127,7 +133,8 @@ class Loader
      * @param string $class class name
      * @return bool boolean false if no file can be loaded, or true if the file that was loaded
      */
-    protected function loadFile( string $ns, string $class ): bool {
+    protected function loadFile( string $ns, string $class ): bool
+    {
         if( !isset($this->namespaces[ $ns ]) ) {
             return false;
         }
@@ -152,7 +159,8 @@ class Loader
      * @param string $file the file to require
      * @return bool true if the file exists, false if not
      */
-    protected function requireFile( string $file ): bool {
+    protected function requireFile( string $file ): bool
+    {
         if( file_exists($file) ) {
             require $file;
 

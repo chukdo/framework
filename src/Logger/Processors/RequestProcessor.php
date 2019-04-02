@@ -19,7 +19,8 @@ class RequestProcessor implements ProcessorInterface
      * @param array $record
      * @return array
      */
-    public function processRecord( array $record ): array {
+    public function processRecord( array $record ): array
+    {
         $browser = Http::getUserAgent(Http::server('HTTP_USER_AGENT'));
 
         $record[ 'extra' ][ 'request' ] = [

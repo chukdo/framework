@@ -20,7 +20,8 @@ class Singleton
     /**
      * Constructeur verouillé pour ne pas etre instancié depuis l'exterieur de la classe.
      */
-    private function __construct() {
+    private function __construct()
+    {
     }
 
     /**
@@ -29,7 +30,8 @@ class Singleton
      * @param array  $args
      * @return mixed
      */
-    public static function __callStatic( $name, $args ) {
+    public static function __callStatic( $name, $args )
+    {
         return call_user_func_array([
             self::getInstance(),
             trim($name,
@@ -43,7 +45,8 @@ class Singleton
      * si elle n'existe pas encore puis la retourne.
      * @return object Singleton $this
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if( is_null(self::$singletonInstance) ) {
             self::$singletonInstance = new static();
         }
@@ -54,6 +57,7 @@ class Singleton
     /**
      * Bloque le clonage de l'objet.
      */
-    private function __clone() {
+    private function __clone()
+    {
     }
 }

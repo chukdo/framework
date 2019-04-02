@@ -1,9 +1,12 @@
 {
-  "file": "Le fichier doit etre un fichier valide",
+  "file": "Le fichier %s doit etre un fichier valide",
   "array": "Le champs %s doit être un tableau",
   "scalar": "Le champs %s doit être unique",
   "string": "Le champs %s doit être une chaine de caractere valide",
   "required": "Le champs %s est requis",
-  "title": "Le titre doit être une chaine de caractere",
-  "code postal": "le code postal doit contenir 5 chiffres"
+  "email": "Le champs %s doit être un email valide",
+  "url": "Le champs %s doit être une url valide",
+  "int": "Le champs %s doit être un numéro entier valide",
+  "float": "Le champs %s doit être un numéro entier ou un chiffre à virgule valide",
+  "phone": "Le champs %s doit être un numéro de téléphone valide"
 }

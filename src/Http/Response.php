@@ -39,7 +39,8 @@ class Response
     /**
      * Response constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->header = new Header();
         $this->header->setStatus(200)
             ->setDate(time())
@@ -54,7 +55,8 @@ class Response
      * @param int $status
      * @return Response
      */
-    public function status( int $status ): self {
+    public function status( int $status ): self
+    {
         $this->header->setStatus($status);
 
         return $this;
@@ -65,7 +67,8 @@ class Response
      * @param string $header
      * @return Response
      */
-    public function header( string $name, string $header ): self {
+    public function header( string $name, string $header ): self
+    {
         $this->header->setHeader($name,
             $header);
 
@@ -76,7 +79,8 @@ class Response
      * @param iterable $headers
      * @return Response
      */
-    public function headers( iterable $headers ): self {
+    public function headers( iterable $headers ): self
+    {
         $this->header->setHeaders($headers);
 
         return $this;
@@ -87,7 +91,8 @@ class Response
      * @param string $cookie
      * @return Response
      */
-    public function cookie( string $name, string $cookie ): self {
+    public function cookie( string $name, string $cookie ): self
+    {
         $this->header->setCookie($name,
             $cookie);
 
@@ -98,7 +103,8 @@ class Response
      * @param iterable $cookies
      * @return Response
      */
-    public function cookies( iterable $cookies ): self {
+    public function cookies( iterable $cookies ): self
+    {
         $this->header->setCookies($cookies);
 
         return $this;
@@ -110,7 +116,8 @@ class Response
      * @param string|null $type
      * @return Response
      */
-    public function download( string $file, string $name = null, string $type = null ): self {
+    public function download( string $file, string $name = null, string $type = null ): self
+    {
         $name = $name
             ?: basename($file);
         $type = $type
@@ -131,7 +138,8 @@ class Response
      * @param string|null $type
      * @return Response
      */
-    public function file( string $file, string $name = null, string $type = null ): self {
+    public function file( string $file, string $name = null, string $type = null ): self
+    {
         $name = $name
             ?: basename($file);
         $type = $type
@@ -150,7 +158,8 @@ class Response
      * @param string $content
      * @return Response
      */
-    public function html( string $content ): self {
+    public function html( string $content ): self
+    {
         $this->header->setHeader('Content-Type',
             'text/html; charset=utf-8');
 
@@ -163,7 +172,8 @@ class Response
      * @param string $content
      * @return Response
      */
-    public function content( string $content ): self {
+    public function content( string $content ): self
+    {
         $this->content = $content;
 
         return $this;
@@ -173,7 +183,8 @@ class Response
      * @param $content
      * @return Response
      */
-    public function text( $content ): self {
+    public function text( $content ): self
+    {
         $this->header->setHeader('Content-Type',
             'text/plain; charset=utf-8');
 
@@ -186,7 +197,8 @@ class Response
      * @param $content
      * @return Response
      */
-    public function json( $content ): self {
+    public function json( $content ): self
+    {
         $this->header->setHeader('Content-Type',
             'application/json; charset=utf-8');
 
@@ -200,7 +212,8 @@ class Response
      * @param bool $html
      * @return Response
      */
-    public function xml( $content, bool $html = false ): self {
+    public function xml( $content, bool $html = false ): self
+    {
         $this->header->setHeader('Content-Type',
             'text/xml; charset=utf-8');
 
@@ -216,7 +229,8 @@ class Response
      * @param int    $code
      * @return Response
      */
-    public function redirect( string $url, int $code = 307 ): self {
+    public function redirect( string $url, int $code = 307 ): self
+    {
         $this->header->setLocation($url,
             $code);
         $this->send();
@@ -227,7 +241,8 @@ class Response
     /**
      * @return Response
      */
-    public function send(): self {
+    public function send(): self
+    {
         $hasContent = $this->content != null;
         $hasFile    = $this->file != null;
 
@@ -251,7 +266,8 @@ class Response
     /**
      * @return Response
      */
-    protected function sendContentResponse(): self {
+    protected function sendContentResponse(): self
+    {
         $content = $this->content;
 
         if( Str::contain(Http::server('HTTP_ACCEPT_ENCODING'),
@@ -293,26 +309,8 @@ class Response
     /**
      * @return Response
      */
-    protected function sendHeaderResponse(): self {
-        if( headers_sent() ) {
-            return $this;
-        }
-
-        header_remove();
-
-        foreach( explode("\n",
-            $this->header->send()) as $header ) {
-            header($header,
-                true);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Response
-     */
-    protected function sendDownloadResponse(): self {
+    protected function sendDownloadResponse(): self
+    {
         if( $this->header->getHeader('Transfer-Encoding') == 'chunked' ) {
             $this->sendHeaderResponse();
 
@@ -341,14 +339,36 @@ class Response
         return $this;
     }
 
-    public function end() {
+    /**
+     * @return Response
+     */
+    protected function sendHeaderResponse(): self
+    {
+        if( headers_sent() ) {
+            return $this;
+        }
+
+        header_remove();
+
+        foreach( explode("\n",
+            $this->header->send()) as $header ) {
+            header($header,
+                true);
+        }
+
+        return $this;
+    }
+
+    public function end()
+    {
         exit;
     }
 
     /**
      * @return Response
      */
-    public function deleteFileAfterSend(): self {
+    public function deleteFileAfterSend(): self
+    {
         $this->deleteFileAfterSend = true;
 
         return $this;

@@ -15,14 +15,16 @@ final class Image
     /**
      * Constructeur privé, empeche l'intanciation de la classe statique.
      */
-    private function __construct() {
+    private function __construct()
+    {
     }
 
     /**
      * @param string $file
      * @return array|null
      */
-    public static function loadImageFromFile( string $file ): ?array {
+    public static function loadImageFromFile( string $file ): ?array
+    {
         if( $string = file_get_contents($file) ) {
             return self::loadImageFromString($string);
         }
@@ -35,7 +37,8 @@ final class Image
      * @param string $string
      * @return array|null
      */
-    public static function loadImageFromString( string $string ): ?array {
+    public static function loadImageFromString( string $string ): ?array
+    {
         $image = imagecreatefromstring($string);
 
         if( $image !== false ) {
@@ -59,7 +62,8 @@ final class Image
      * @param string $base64
      * @return array|null
      */
-    public static function loadImageFromBase64( string $base64 ): ?array {
+    public static function loadImageFromBase64( string $base64 ): ?array
+    {
         $pattern = '/^data:image\/[a-z]{3,4};base64,/';
 
         if( $string = base64_decode(preg_replace($pattern,
@@ -76,7 +80,8 @@ final class Image
      * @param int   $quality
      * @return string|null
      */
-    public static function convertToJpg( array $image, int $quality ): ?string {
+    public static function convertToJpg( array $image, int $quality ): ?string
+    {
         return self::convert($image,
             IMAGETYPE_JPEG,
             $quality);
@@ -89,7 +94,8 @@ final class Image
      * @param int|null $quality (0 à 100)
      * @return string si l'operation reussi false sinon
      */
-    public static function convert( array $image, int $format, int $quality = null ): ?string {
+    public static function convert( array $image, int $format, int $quality = null ): ?string
+    {
         if( $image ) {
             $w   = $image[ 'w' ];
             $h   = $image[ 'h' ];
@@ -127,7 +133,8 @@ final class Image
      * @param int|null $quality (0 à 100)
      * @return string
      */
-    public static function getImage( $image, int $format, int $quality = null ): string {
+    public static function getImage( $image, int $format, int $quality = null ): string
+    {
         ob_start();
 
         switch( $format ) {
@@ -165,7 +172,8 @@ final class Image
      * @param int   $quality
      * @return string|null
      */
-    public static function convertToPng( array $image, $quality ) {
+    public static function convertToPng( array $image, $quality )
+    {
         return self::convert($image,
             IMAGETYPE_PNG,
             $quality);
@@ -175,7 +183,8 @@ final class Image
      * @param array $image [w, h, t, i] (self::loadImage*)
      * @return string|null
      */
-    public static function convertToGif( array $image ) {
+    public static function convertToGif( array $image )
+    {
         return self::convert($image,
             IMAGETYPE_GIF);
     }
@@ -187,7 +196,8 @@ final class Image
      * @param int|null $dh    hauteur
      * @return string|null
      */
-    public static function resize( array $image, int $dw = 0, int $dh = null ): ?string {
+    public static function resize( array $image, int $dw = 0, int $dh = null ): ?string
+    {
         $sw = $image[ 'w' ];
         $sh = $image[ 'h' ];
         $h  = 0;
@@ -242,7 +252,8 @@ final class Image
      * @param int|null $sh    source hauteur
      * @return string si l'operation reussi false si le resize n'est pas nécessaire
      */
-    public static function resampleImage( array $image, int $sx, int $sy, int $dw, int $dh, int $sw = 0, int $sh = null ): ?string {
+    public static function resampleImage( array $image, int $sx, int $sy, int $dw, int $dh, int $sw = 0, int $sh = null ): ?string
+    {
         $type = $image[ 't' ];
         $src  = $image[ 'i' ];
         $dst  = imagecreatetruecolor($dw,
@@ -304,7 +315,8 @@ final class Image
      * @param int   $dh    hauteur
      * @return string|null
      */
-    public static function crop( array $image, int $dx, int $dy, int $dw, int $dh ): ?string {
+    public static function crop( array $image, int $dx, int $dy, int $dw, int $dh ): ?string
+    {
         $sw = $image[ 'w' ];
         $sh = $image[ 'h' ];
 

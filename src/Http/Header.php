@@ -78,7 +78,8 @@ class Header
     /**
      * Header constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->header = new Json();
         $this->cookie = new Json();
     }
@@ -86,7 +87,8 @@ class Header
     /**
      * @return int|null
      */
-    public function getStatus(): ?int {
+    public function getStatus(): ?int
+    {
         return Str::match('/([0-9]{3})/',
             $this->getHttp());
     }
@@ -94,7 +96,8 @@ class Header
     /**
      * @return string
      */
-    public function getHttp(): string {
+    public function getHttp(): string
+    {
         return $this->http;
     }
 
@@ -105,7 +108,8 @@ class Header
      * @param string $value
      * @return Header
      */
-    public function setHttp( string $value ): self {
+    public function setHttp( string $value ): self
+    {
         $this->http = $value;
 
         return $this;
@@ -115,7 +119,8 @@ class Header
      * @param iterable $headers
      * @return Header
      */
-    public function setHeaders( iterable $headers ): self {
+    public function setHeaders( iterable $headers ): self
+    {
         foreach( $headers as $k => $v ) {
             $this->setHeader($k,
                 $v);
@@ -127,7 +132,8 @@ class Header
     /**
      * @return Header
      */
-    public function unsetHeaders(): self {
+    public function unsetHeaders(): self
+    {
         $this->header = new Json();
 
         return $this;
@@ -137,7 +143,8 @@ class Header
      * @param iterable $cookies
      * @return Header
      */
-    public function setCookies( iterable $cookies ): self {
+    public function setCookies( iterable $cookies ): self
+    {
         foreach( $cookies as $k => $v ) {
             $this->setCookie($v[ 'name' ],
                 $v[ 'value' ],
@@ -153,14 +160,16 @@ class Header
      * @param string $name
      * @return string|null
      */
-    public function unsetCookie( string $name ): ?string {
+    public function unsetCookie( string $name ): ?string
+    {
         return $this->cookie->offsetUnset($name);
     }
 
     /**
      * @return Header
      */
-    public function unsetCookies(): self {
+    public function unsetCookies(): self
+    {
         $this->cookie = new Json();
 
         return $this;
@@ -172,7 +181,8 @@ class Header
      * @param string|null $control    ex. public, no_cache. laisser vide la plupart du temps
      * @return Header
      */
-    public function setCacheControl( int $max = 3600, bool $revalidate = false, string $control = null ): self {
+    public function setCacheControl( int $max = 3600, bool $revalidate = false, string $control = null ): self
+    {
         $cache = [];
 
         if( $control !== false ) {
@@ -198,7 +208,8 @@ class Header
     /**
      * @return Json
      */
-    public function getCacheControl(): Json {
+    public function getCacheControl(): Json
+    {
         $cache = new Json([
             'max'        => 0,
             'revalidate' => false,
@@ -229,7 +240,8 @@ class Header
      * @param string $name
      * @return string|null
      */
-    public function getHeader( string $name ): ?string {
+    public function getHeader( string $name ): ?string
+    {
         return $this->header->offsetGet($this->normalize($name));
     }
 
@@ -238,7 +250,8 @@ class Header
      * @param string $value
      * @return Header
      */
-    public function setHeader( string $name, string $value ): self {
+    public function setHeader( string $name, string $value ): self
+    {
         $this->header->offsetSet($this->normalize($name),
             trim($value));
 
@@ -249,7 +262,8 @@ class Header
      * @param string $name
      * @return string
      */
-    public function normalize( string $name ): string {
+    public function normalize( string $name ): string
+    {
         return str_replace(' ',
             '-',
             ucwords(str_replace([
@@ -264,7 +278,8 @@ class Header
      * @param string $auth
      * @return Header
      */
-    public function setAuthorization( string $auth ): self {
+    public function setAuthorization( string $auth ): self
+    {
         $this->setStatus(401)
             ->setHeader('Cache-Control',
                 'no-store, no-cache, must-revalidate')
@@ -280,7 +295,8 @@ class Header
      * @param int $status
      * @return Header
      */
-    public function setStatus( int $status ): self {
+    public function setStatus( int $status ): self
+    {
         if( isset($this->rfc2616[ $status ]) ) {
             $this->setHttp($this->rfc2616[ $status ]);
         }
@@ -291,7 +307,8 @@ class Header
     /**
      * @return string|null
      */
-    public function getAuthorization(): ?string {
+    public function getAuthorization(): ?string
+    {
         if( ($auth = $this->getHeader('WWW-Authenticate')) !== false ) {
             return Str::match('/Basic realm="([^"]+)"/',
                 $auth);
@@ -305,7 +322,8 @@ class Header
      * @param int    $status
      * @return Header
      */
-    public function setLocation( string $url, int $status = 302 ): self {
+    public function setLocation( string $url, int $status = 302 ): self
+    {
         $this->setStatus($status)
             ->setHeader('Location',
                 $url);
@@ -318,7 +336,8 @@ class Header
      * @param string|null $origin
      * @return Header
      */
-    public function setXFrameOptions( string $origin = null ): self {
+    public function setXFrameOptions( string $origin = null ): self
+    {
         if( $origin == '*' ) {
             return $this;
         }
@@ -359,7 +378,8 @@ class Header
      * @param string|null $allow
      * @return Header
      */
-    public function setAllowAllOrigin( string $origin = null, string $method = null, string $allow = null ): self {
+    public function setAllowAllOrigin( string $origin = null, string $method = null, string $allow = null ): self
+    {
         if( isset($_SERVER[ 'HTTP_ORIGIN' ]) ) {
             $uri     = trim($_SERVER[ 'HTTP_ORIGIN' ],
                 '/');
@@ -404,14 +424,16 @@ class Header
     /**
      * @return string
      */
-    public function __toString() {
+    public function __toString()
+    {
         return $this->send();
     }
 
     /**
      * @return string
      */
-    public function send(): string {
+    public function send(): string
+    {
         $http    = $this->getHttp() . "\r\n";
         $headers = '';
         $cookies = '';
@@ -430,14 +452,16 @@ class Header
     /**
      * @return Json
      */
-    public function getHeaders(): Json {
+    public function getHeaders(): Json
+    {
         return $this->header;
     }
 
     /**
      * @return Json
      */
-    public function getCookies(): Json {
+    public function getCookies(): Json
+    {
         $cookies = new Json();
 
         foreach( $this->cookie as $name => $cookie ) {
@@ -451,7 +475,8 @@ class Header
      * @param string $name
      * @return Json|null
      */
-    public function getCookie( string $name ): ?Json {
+    public function getCookie( string $name ): ?Json
+    {
         if( $cookie = $this->cookie->offsetGet($name) ) {
             return Str::match('/([^=]+)=([^;]+)(?:; expires=([^;]+))?(?:; path=([^;]+))?(?:; domain=([^;]+))?/i',
                 $cookie);
@@ -469,7 +494,8 @@ class Header
      * @param string $domain  le domaine auquel s'applique le cookie '.google.com' pour tout google
      * @return Header
      */
-    public function setCookie( string $name, string $value = null, string $expires = null, string $path = null, string $domain = null ): self {
+    public function setCookie( string $name, string $value = null, string $expires = null, string $path = null, string $domain = null ): self
+    {
         $value  = rawurlencode($value);
         $cookie = 'Set-Cookie: ' . $name . '=' . $value;
 
@@ -496,7 +522,8 @@ class Header
      * @param $key
      * @return bool
      */
-    public function __isset( $key ) {
+    public function __isset( $key )
+    {
         return $this->header->offsetExists($this->normalize($key));
     }
 
@@ -504,7 +531,8 @@ class Header
      * @param $key
      * @return string
      */
-    public function __get( $key ) {
+    public function __get( $key )
+    {
         return $this->getHeader($key);
     }
 
@@ -513,7 +541,8 @@ class Header
      * @param $value
      * @return Header
      */
-    public function __set( $key, $value ) {
+    public function __set( $key, $value )
+    {
         return $this->setHeader($key,
             $value);
     }
@@ -522,7 +551,8 @@ class Header
      * @param $key
      * @return bool
      */
-    public function __unset( $key ) {
+    public function __unset( $key )
+    {
         return (bool) $this->header->offsetUnset($key);
     }
 
@@ -531,7 +561,8 @@ class Header
      * @param array $params
      * @return Header|false|string|null
      */
-    public function __call( $name, $params = [] ) {
+    public function __call( $name, $params = [] )
+    {
         $value  = array_shift($params);
         $match  = new Json(Str::match('/^(set|get|unset)([a-z]+)/i',
             strtolower($name)));
@@ -644,7 +675,8 @@ class Header
      * @param string $name
      * @return string|null
      */
-    public function unsetHeader( string $name ): ?string {
+    public function unsetHeader( string $name ): ?string
+    {
         return $this->header->offsetUnset($this->normalize($name));
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Chukdo\Validation;
 
+use Chukdo\Contracts\Validation\Filter as FilterInterface;
+use Chukdo\Contracts\Validation\Validate as ValidateInterface;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Input;
 
@@ -56,7 +58,12 @@ class Rule
     /**
      * @var array
      */
-    protected $validatorsAndFilters = [];
+    protected $validators = [];
+
+    /**
+     * @var array
+     */
+    protected $filters = [];
 
     /**
      * Constructor.
@@ -64,7 +71,8 @@ class Rule
      * @param string    $rule
      * @param Validator $validator
      */
-    public function __construct( string $path, string $rule, Validator $validator ) {
+    public function __construct( string $path, string $rule, Validator $validator )
+    {
         $this->path      = trim($path);
         $this->validator = $validator;
         $this->label     = $this->path;
@@ -75,7 +83,8 @@ class Rule
     /**
      * @param string $rule
      */
-    protected function parseRule( string $rule ): void {
+    protected function parseRule( string $rule ): void
+    {
         $rules = explode('|',
             $rule);
 
@@ -109,8 +118,12 @@ class Rule
                     ];
                     break;
                 default:
-                    $this->setValidatorAndFilter($rule,
-                        $attrs);
+                    if( substr($rule, 0, 1) == '&' ) {
+                        $this->filters[ $rule ] = $attrs;
+                    }
+                    else {
+                        $this->validators[ $rule ] = $attrs;
+                    }
             }
         }
     }
@@ -119,7 +132,8 @@ class Rule
      * @param string $rule
      * @return array
      */
-    protected function parseAttribute( string $rule ): array {
+    protected function parseAttribute( string $rule ): array
+    {
         list($rule, $attributes) = array_pad(explode(':',
             $rule),
             2,
@@ -135,58 +149,26 @@ class Rule
     }
 
     /**
-     * @param string $rule
-     * @param array  $attr
+     * @return bool
      */
-    protected function setValidatorAndFilter( string $rule, array $attr ): void {
-        $this->validatorsAndFilters[ $rule ] = $attr;
+    public function validate(): bool
+    {
+        if( $this->validateRequired() ) {
+            if( $this->validateType() ) {
+                $this->validateFilters();
+                return $this->validateValidators();
+            }
+        }
+
+        return false;
     }
 
     /**
      * @return bool
      */
-    public function validate(): bool {
-        $input = $this->input();
-
-        if( !$this->validateRequired($input) ) {
-            return false;
-        }
-
-        if( !$this->validateType($input) ) {
-            return false;
-        }
-
-        $this->validateFilters($input);
-
-        return $this->validateValidators($input);
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function input() {
-        $input = Str::contain($this->path,
-            '*')
-            ? $this->validator->inputs()
-                ->wildcard($this->path,
-                    true)
-            : $this->validator->inputs()
-                ->get($this->path);
-
-        /* Recherche dans file */
-        if ($input === null) {
-            $input = $this->validator->inputs()->file($this->path);
-        }
-
-        return $input;
-    }
-
-    /**
-     * @param mixed $input
-     * @return bool
-     */
-    protected function validateRequired( $input ): bool {
-        if( $input === null ) {
+    protected function validateRequired(): bool
+    {
+        if( $this->input() === null ) {
             if( $this->isRequired ) {
                 $this->error($this->message([ 'required' ]));
                 return false;
@@ -197,40 +179,12 @@ class Rule
     }
 
     /**
-     * @param string      $message
-     * @param string|null $path
-     */
-    protected function error( string $message, string $path = null ): void {
-        if( $path ) {
-            if( !Str::contain($this->path,
-                '*') ) {
-                $path = $this->path . '.' . $path;
-            }
-
-        }
-        else {
-            $path = $this->path;
-        }
-
-        $this->validator->errors()
-            ->offsetSet($path,
-                $message);
-    }
-
-    /**
-     * @param array $listName
-     * @return string
-     */
-    protected function message( array $listName ): string {
-        return sprintf($this->validator->message($listName),
-            $this->label);
-    }
-
-    /**
-     * @param mixed $input
      * @return bool
      */
-    protected function validateType( $input ): bool {
+    protected function validateType(): bool
+    {
+        $input = $this->input();
+
         if( $this->type[ 'array' ] ) {
             if( $input instanceof Input ) {
                 $countInput = count($input->toSimpleArray());
@@ -252,79 +206,166 @@ class Rule
     }
 
     /**
-     * @param $input
+     *
      */
-    protected function validateFilters( $input ): void {
-        foreach( $this->validatorsAndFilters as $name => $attrs ) {
+    protected function validateFilters(): void
+    {
+        foreach( $this->filters as $name => $attrs ) {
             if( $filter = $this->validator->filter($name) ) {
                 $filter->attributes($attrs);
-
-                unset($this->validatorsAndFilters[ $name ]);
-
-                if( $input instanceof Input ) {
-                    $input->filterRecursive(function( $k, $v ) use ( $filter ) {
-                        return $filter->filter($v);
-                    });
-
-                    $this->validator->inputs()
-                        ->mergeRecursive($input,
-                            true);
-                }
-                else {
-                    $this->validator->inputs()
-                        ->set($this->path,
-                            $filter->filter($input));
-                }
+                $this->validateFilter($filter);
+            }
+            else {
+                throw new ValidationException(sprintf('Filter Rule [%s] does not exist', $name));
             }
         }
     }
 
     /**
-     * @param mixed $input
      * @return bool
      */
-    protected function validateValidators( $input ): bool {
+    protected function validateValidators(): bool
+    {
         $validated = true;
 
-        foreach( $this->validatorsAndFilters as $name => $attrs ) {
+        foreach( $this->validators as $name => $attrs ) {
             if( $validate = $this->validator->validator($name) ) {
                 $validate->attributes($attrs);
+                $validated .= $this->validateValidator($validate, $name);
+            }
+            else {
+                throw new ValidationException(sprintf('Validation Rule [%s] does not exist', $name));
+            }
+        }
 
-                if( $input instanceof Input ) {
-                    foreach( $input->toSimpleArray() as $k => $v ) {
-                        if( $validate->validate($v) ) {
-                            $this->validator->validated()
-                                ->set($k,
-                                    $v);
-                        }
-                        elseif( $this->isForm ) {
-                            $this->error($this->message([ $name ]),
-                                $k);
-                            $validated .= false;
-                        }
-                        else {
-                            $this->error($this->message([ $name ]));
-                            $validated .= false;
-                            break;
-                        }
-                    }
-                }
-                elseif( $validate->validate($input) ) {
-                    $this->validator->validated()
-                        ->set($this->path,
-                            $input);
-                }
-                else {
-                    $this->error($this->message([ $name ]));
-                    $validated .= false;
-                }
-            } else {
-                throw new ValidationException(
-                    sprintf(
-                        'Validation Rule [%s] does not exist',
-                        $name
-                    )
-                );
+        return $validated;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function input()
+    {
+        $input = Str::contain($this->path,
+            '*')
+            ? $this->validator->inputs()
+                ->wildcard($this->path,
+                    true)
+            : $this->validator->inputs()
+                ->get($this->path);
+
+        /* Recherche dans file */
+        if( $input === null ) {
+            $input = $this->validator->inputs()
+                ->file($this->path);
+        }
+
+        return $input;
+    }
+
+    /**
+     * @param string      $message
+     * @param string|null $path
+     */
+    protected function error( string $message, string $path = null ): void
+    {
+        if( $path ) {
+            if( !Str::contain($this->path,
+                '*') ) {
+                $path = $this->path . '.' . $path;
+            }
+
+        }
+        else {
+            $path = $this->path;
+        }
+
+        $this->validator->errors()
+            ->offsetSet($path,
+                $message);
+    }
+
+    /**
+     * @param array $listName
+     * @return string
+     */
+    protected function message( array $listName ): string
+    {
+        return sprintf($this->validator->message($listName),
+            $this->label);
+    }
+
+    /**
+     * @param FilterInterface $filter
+     */
+    protected function validateFilter( FilterInterface $filter ): void
+    {
+        $input = $this->input();
+
+        if( $input instanceof Input ) {
+            $input->filterRecursive(function( $k, $v ) use ( $filter ) {
+                return $filter->filter($v);
+            });
+
+            $this->validator->inputs()
+                ->mergeRecursive($input,
+                    true);
+        }
+        else {
+            $this->validator->inputs()
+                ->set($this->path,
+                    $filter->filter($input));
+        }
+    }
+
+    /**
+     * @param ValidateInterface $validate
+     * @param string            $name
+     * @return bool
+     */
+    protected function validateValidator( ValidateInterface $validate, string $name ): bool
+    {
+        $validated = true;
+        $input     = $this->input();
+
+        if( $input instanceof Input ) {
+            $validated .= $this->validateInputs($validate, $name);
+        }
+        elseif( $validate->validate($input) ) {
+            $this->validator->validated()
+                ->set($this->path, $input);
+        }
+        else {
+            $this->error($this->message([ $name ]));
+            $validated .= false;
+        }
+
+        return $validated;
+    }
+
+    /**
+     * @param ValidateInterface $validate
+     * @param string            $name
+     * @return bool
+     */
+    protected function validateInputs( ValidateInterface $validate, string $name ): bool
+    {
+        $validated = true;
+        $input     = $this->input();
+
+        foreach( $input->toSimpleArray() as $k => $v ) {
+            if( $validate->validate($v) ) {
+                $this->validator->validated()
+                    ->set($k, $v);
+            }
+            elseif( $this->isForm ) {
+                $this->error($this->message([ $name ]), $k);
+                $validated .= false;
+            }
+            else {
+                $this->error($this->message([ $name ]));
+                $validated .= false;
+                break;
             }
         }
 

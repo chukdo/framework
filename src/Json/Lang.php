@@ -18,7 +18,8 @@ class Lang extends Json
      * @param string $dir
      * @return bool
      */
-    public function load( string $dir ): bool {
+    public function load( string $dir ): bool
+    {
         $storage = new Storage();
         $files   = $storage->files($dir,
             '/\.json$/');
@@ -40,7 +41,8 @@ class Lang extends Json
      * @param string $file
      * @return bool
      */
-    protected function loadFile( string $file ): bool {
+    protected function loadFile( string $file ): bool
+    {
         $storage = new Storage();
         $name    = basename($file,
             '.json');

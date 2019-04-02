@@ -9,7 +9,8 @@ namespace Chukdo\Facades;
  */
 class Redis extends Facade
 {
-    public static function name(): string {
+    public static function name(): string
+    {
         return \Chukdo\Db\Redis::class;
     }
 }

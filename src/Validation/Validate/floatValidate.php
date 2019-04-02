@@ -11,7 +11,7 @@ use Chukdo\Contracts\Validation\Validate as ValidateInterface;
  * @since     08/01/2019
  * @author    Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class StringValidate implements ValidateInterface
+class FloatValidate implements ValidateInterface
 {
     /**
      * @var int
@@ -28,7 +28,7 @@ class StringValidate implements ValidateInterface
      */
     public function name(): string
     {
-        return 'string';
+        return 'int';
     }
 
     /**
@@ -54,10 +54,8 @@ class StringValidate implements ValidateInterface
      */
     public function validate( $input ): bool
     {
-        if( is_string($input) ) {
-            $len = strlen($input);
-
-            if( $len >= $this->min && $len <= $this->max ) {
+        if( is_float($input) ) {
+            if( $input >= $this->min && $input <= $this->max ) {
                 return true;
             }
         }

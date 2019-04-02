@@ -18,7 +18,8 @@ class Storage
      * @param int    $visibility
      * @return bool
      */
-    public function makeDirectory( string $directory, int $visibility = 0777 ): bool {
+    public function makeDirectory( string $directory, int $visibility = 0777 ): bool
+    {
         return mkdir($directory,
             $visibility,
             true);
@@ -28,7 +29,8 @@ class Storage
      * @param string $directory
      * @return bool
      */
-    public function deleteDirectory( string $directory ): bool {
+    public function deleteDirectory( string $directory ): bool
+    {
         $dir = opendir($directory);
 
         while( ($file = readdir($dir)) !== false ) {
@@ -53,7 +55,8 @@ class Storage
      * @param string $file
      * @return bool
      */
-    public function delete( string $file ): bool {
+    public function delete( string $file ): bool
+    {
         return unlink($file);
     }
 
@@ -61,7 +64,8 @@ class Storage
      * @param string $directory
      * @return array
      */
-    public function directories( string $directory ): array {
+    public function directories( string $directory ): array
+    {
         $list = [];
         $dir  = opendir($directory);
 
@@ -85,7 +89,8 @@ class Storage
      * @param string $directory
      * @return array
      */
-    public function allDirectories( string $directory ): array {
+    public function allDirectories( string $directory ): array
+    {
         $list = [];
         $dir  = opendir($directory);
 
@@ -109,7 +114,8 @@ class Storage
      * @param string $file
      * @return bool
      */
-    public function exists( string $file ): bool {
+    public function exists( string $file ): bool
+    {
         return file_exists($file);
     }
 
@@ -117,7 +123,8 @@ class Storage
      * @param string $file
      * @return int
      */
-    public function size( string $file ): int {
+    public function size( string $file ): int
+    {
         return filesize($file);
     }
 
@@ -126,7 +133,8 @@ class Storage
      * @param string $newFile
      * @return bool
      */
-    public function copy( string $oldFile, string $newFile ): bool {
+    public function copy( string $oldFile, string $newFile ): bool
+    {
         return $this->put($newFile,
             $this->get($oldFile));
     }
@@ -136,7 +144,8 @@ class Storage
      * @param string $content
      * @return bool
      */
-    public function put( string $file, string $content ): bool {
+    public function put( string $file, string $content ): bool
+    {
         return (bool) file_put_contents($file,
             $content);
     }
@@ -145,7 +154,8 @@ class Storage
      * @param string $file
      * @return string
      */
-    public function get( string $file ): string {
+    public function get( string $file ): string
+    {
         return file_get_contents($file);
     }
 
@@ -154,7 +164,8 @@ class Storage
      * @param string $newFile
      * @return bool
      */
-    public function move( string $oldFile, string $newFile ): bool {
+    public function move( string $oldFile, string $newFile ): bool
+    {
         $r = $this->put($newFile,
             $this->get($oldFile));
 
@@ -168,7 +179,8 @@ class Storage
      * @param string|null $match
      * @return array
      */
-    public function files( string $directory, string $match = null ): array {
+    public function files( string $directory, string $match = null ): array
+    {
         $list = [];
         $dir  = opendir($directory);
 
@@ -194,7 +206,8 @@ class Storage
      * @param string|null $match
      * @return array
      */
-    public function allFiles( string $directory, string $match = null ): array {
+    public function allFiles( string $directory, string $match = null ): array
+    {
         $list = [];
         $dir  = opendir($directory);
 

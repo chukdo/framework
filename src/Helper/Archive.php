@@ -15,14 +15,16 @@ final class Archive
     /**
      * Constructeur privé, empeche l'intanciation de la classe statique.
      */
-    private function __construct() {
+    private function __construct()
+    {
     }
 
     /**
      * @param string $data
      * @return string
      */
-    public static function ungzipString( string $data ): string {
+    public static function ungzipString( string $data ): string
+    {
         $flags       = ord(substr($data,
             3,
             1));
@@ -67,7 +69,8 @@ final class Archive
      * @param string $data
      * @return string
      */
-    public static function unzipString( string $data ): string {
+    public static function unzipString( string $data ): string
+    {
         $head = unpack('Vsig/vver/vflag/vmeth/vmodt/vmodd/Vcrc/Vcsize/Vsize/vnamelen/vexlen',
             substr($data,
                 0,
@@ -85,7 +88,8 @@ final class Archive
      * @param bool $root
      * @return array
      */
-    public static function unzipFile( $file, $path, $root = false ): array {
+    public static function unzipFile( $file, $path, $root = false ): array
+    {
         $path     = rtrim($path,
                 '/') . '/';
         $ret      = [];

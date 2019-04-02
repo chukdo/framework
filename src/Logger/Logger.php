@@ -66,7 +66,8 @@ class Logger implements LoggerInterface
      * @param array  $handlers   liste des gestionnaires
      * @param array  $processors liste des processus
      */
-    public function __construct( $name, array $handlers = [], array $processors = [] ) {
+    public function __construct( $name, array $handlers = [], array $processors = [] )
+    {
         $this->name = $name;
 
         foreach( $handlers as $handler ) {
@@ -83,7 +84,8 @@ class Logger implements LoggerInterface
      * @param HandlerInterface $handler
      * @return $this
      */
-    public function pushHandler( HandlerInterface $handler ): self {
+    public function pushHandler( HandlerInterface $handler ): self
+    {
         array_push($this->handlers,
             $handler);
 
@@ -95,7 +97,8 @@ class Logger implements LoggerInterface
      * @param ProcessorInterface $processor
      * @return $this
      */
-    public function pushProcessor( ProcessorInterface $processor ): self {
+    public function pushProcessor( ProcessorInterface $processor ): self
+    {
         array_push($this->processors,
             $processor);
 
@@ -106,7 +109,8 @@ class Logger implements LoggerInterface
      * Retourne la liste des niveaux de la RFC 5424.
      * @return array
      */
-    public static function getLevels(): array {
+    public static function getLevels(): array
+    {
         return self::$levels;
     }
 
@@ -116,7 +120,8 @@ class Logger implements LoggerInterface
      * @return bool
      * @throws LoggerException
      */
-    public function alert( string $message, array $context = [] ): bool {
+    public function alert( string $message, array $context = [] ): bool
+    {
         return $this->log(self::ALERT,
             $message,
             $context);
@@ -129,7 +134,8 @@ class Logger implements LoggerInterface
      * @return bool
      * @throws LoggerException
      */
-    public function log( int $level, string $message, array $context = [] ): bool {
+    public function log( int $level, string $message, array $context = [] ): bool
+    {
         if( empty($this->handlers) ) {
             throw new LoggerException('You tried to log record from an empty handler stack.');
         }
@@ -157,7 +163,8 @@ class Logger implements LoggerInterface
      * @param array  $context
      * @return string
      */
-    public function interpolate( string $message, array $context = [] ): string {
+    public function interpolate( string $message, array $context = [] ): string
+    {
         $replace = [];
 
         foreach( $context as $key => $val ) {
@@ -177,14 +184,16 @@ class Logger implements LoggerInterface
      * @param int $level
      * @return string
      */
-    public static function getLevel( int $level ): string {
+    public static function getLevel( int $level ): string
+    {
         return self::$levels[ $level ];
     }
 
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
@@ -192,7 +201,8 @@ class Logger implements LoggerInterface
      * @param string $name
      * @return Logger
      */
-    public function setName( string $name ): self {
+    public function setName( string $name ): self
+    {
         $this->name = ucfirst(strtolower($name));
 
         return $this;
@@ -203,7 +213,8 @@ class Logger implements LoggerInterface
      * @param array $record
      * @return bool true si un gestionnaire à traiter l'enregistrement false sinon
      */
-    public function handleRecord( array $record ): bool {
+    public function handleRecord( array $record ): bool
+    {
         $handle = 0;
 
         foreach( $this->handlers as $handler ) {
@@ -218,7 +229,8 @@ class Logger implements LoggerInterface
      * @param array $record
      * @return array
      */
-    public function processRecord( array $record ): array {
+    public function processRecord( array $record ): array
+    {
         foreach( $this->processors as $processor ) {
             $record = $processor->processRecord($record);
         }
@@ -232,7 +244,8 @@ class Logger implements LoggerInterface
      * @return bool
      * @throws LoggerException
      */
-    public function critical( string $message, array $context = [] ): bool {
+    public function critical( string $message, array $context = [] ): bool
+    {
         return $this->log(self::CRITICAL,
             $message,
             $context);
@@ -244,7 +257,8 @@ class Logger implements LoggerInterface
      * @return bool
      * @throws LoggerException
      */
-    public function emergency( string $message, array $context = [] ): bool {
+    public function emergency( string $message, array $context = [] ): bool
+    {
         return $this->log(self::EMERGENCY,
             $message,
             $context);
@@ -256,7 +270,8 @@ class Logger implements LoggerInterface
      * @return bool
      * @throws LoggerException
      */
-    public function error( string $message, array $context = [] ): bool {
+    public function error( string $message, array $context = [] ): bool
+    {
         return $this->log(self::ERROR,
             $message,
             $context);
@@ -268,7 +283,8 @@ class Logger implements LoggerInterface
      * @return bool
      * @throws LoggerException
      */
-    public function warning( string $message, array $context = [] ): bool {
+    public function warning( string $message, array $context = [] ): bool
+    {
         return $this->log(self::WARNING,
             $message,
             $context);
@@ -280,7 +296,8 @@ class Logger implements LoggerInterface
      * @return bool
      * @throws LoggerException
      */
-    public function notice( string $message, array $context = [] ): bool {
+    public function notice( string $message, array $context = [] ): bool
+    {
         return $this->log(self::NOTICE,
             $message,
             $context);
@@ -292,7 +309,8 @@ class Logger implements LoggerInterface
      * @return bool
      * @throws LoggerException
      */
-    public function info( string $message, array $context = [] ): bool {
+    public function info( string $message, array $context = [] ): bool
+    {
         return $this->log(self::INFO,
             $message,
             $context);
@@ -304,7 +322,8 @@ class Logger implements LoggerInterface
      * @return bool
      * @throws LoggerException
      */
-    public function debug( string $message, array $context = [] ): bool {
+    public function debug( string $message, array $context = [] ): bool
+    {
         return $this->log(self::DEBUG,
             $message,
             $context);

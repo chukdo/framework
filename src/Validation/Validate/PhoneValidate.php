@@ -3,6 +3,7 @@
 namespace Chukdo\Validation\Validate;
 
 use Chukdo\Contracts\Validation\Validate as ValidateInterface;
+use Chukdo\Helper\Str;
 
 /**
  * Validate handler.
@@ -11,24 +12,14 @@ use Chukdo\Contracts\Validation\Validate as ValidateInterface;
  * @since     08/01/2019
  * @author    Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class StringValidate implements ValidateInterface
+class PhoneValidate implements ValidateInterface
 {
-    /**
-     * @var int
-     */
-    protected $min = 0;
-
-    /**
-     * @var int
-     */
-    protected $max = 10000000;
-
     /**
      * @return string
      */
     public function name(): string
     {
-        return 'string';
+        return 'phone';
     }
 
     /**
@@ -37,14 +28,6 @@ class StringValidate implements ValidateInterface
      */
     public function attributes( array $attributes ): ValidateInterface
     {
-        $attributes = array_pad($attributes,
-            2,
-            0);
-        $this->min  = $attributes[ 0 ];
-        $this->max  = $attributes[ 1 ]
-            ?: $attributes[ 0 ]
-                ?: 10000000;
-
         return $this;
     }
 
@@ -54,12 +37,8 @@ class StringValidate implements ValidateInterface
      */
     public function validate( $input ): bool
     {
-        if( is_string($input) ) {
-            $len = strlen($input);
-
-            if( $len >= $this->min && $len <= $this->max ) {
-                return true;
-            }
+        if( Str::match('/^[0-9]{8,16}$/', $input) ) {
+            return true;
         }
 
         return false;

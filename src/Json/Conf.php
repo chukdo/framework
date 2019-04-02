@@ -17,7 +17,8 @@ class Conf extends Json
      * @param string $file
      * @return bool
      */
-    public function load( string $file ): bool {
+    public function load( string $file ): bool
+    {
         $storage = new Storage();
 
         if( $storage->exists($file) ) {

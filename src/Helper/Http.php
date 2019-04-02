@@ -14,14 +14,16 @@ final class Http
     /**
      * Http constructor.
      */
-    private function __construct() {
+    private function __construct()
+    {
     }
 
     /**
      * @param string $name
      * @return string
      */
-    public static function mimeContentType( string $name ): string {
+    public static function mimeContentType( string $name ): string
+    {
         $mimeTypes = [
             'txt'  => 'text/plain',
             'htm'  => 'text/html',
@@ -74,7 +76,8 @@ final class Http
      * @param string|null $ua
      * @return array
      */
-    public static function getUserAgent( string $ua = null ): array {
+    public static function getUserAgent( string $ua = null ): array
+    {
         $browser = [
             'platform' => null,
             'browser'  => null,
@@ -155,7 +158,8 @@ final class Http
     /**
      * @return array
      */
-    public static function argv(): array {
+    public static function argv(): array
+    {
         return isset($_SERVER[ 'argv' ])
             ? $_SERVER[ 'argv' ]
             : [];
@@ -166,7 +170,8 @@ final class Http
      * @param string|null $default
      * @return string|null
      */
-    public static function server( $name, string $default = null ): ?string {
+    public static function server( $name, string $default = null ): ?string
+    {
         return isset($_SERVER[ $name ])
             ? $_SERVER[ $name ]
             : $default;
@@ -177,7 +182,8 @@ final class Http
      * @param string|null $default
      * @return string|null
      */
-    public static function request( $name, string $default = null ): ?string {
+    public static function request( $name, string $default = null ): ?string
+    {
         return isset($_REQUEST[ $name ])
             ? $_REQUEST[ $name ]
             : $default;

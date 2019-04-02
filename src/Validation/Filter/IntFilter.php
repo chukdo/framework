@@ -3,6 +3,7 @@
 namespace Chukdo\Validation\Filter;
 
 use Chukdo\Contracts\Validation\Filter as FilterInterface;
+use Chukdo\Helper\Str;
 
 /**
  * Validate handler.
@@ -11,14 +12,14 @@ use Chukdo\Contracts\Validation\Filter as FilterInterface;
  * @since     08/01/2019
  * @author    Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class StriptagsFilter implements FilterInterface
+class IntFilter implements FilterInterface
 {
     /**
      * @return string
      */
     public function name(): string
     {
-        return '&striptags';
+        return '&int';
     }
 
     /**
@@ -36,6 +37,10 @@ class StriptagsFilter implements FilterInterface
      */
     public function filter( $input )
     {
-        return strip_tags($input);
+        if( Str::match('/^[0-9]+$/', $input) ) {
+            return (int) $input;
+        }
+
+        return $input;
     }
 }

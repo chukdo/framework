@@ -18,7 +18,8 @@ class JsonStringFormatter implements FormatterInterface
      * @param array $record
      * @return mixed
      */
-    public function formatRecord( array $record ) {
+    public function formatRecord( array $record )
+    {
         $json = new Json([
             'date'    => date('d/m/Y H:i:s',
                 $record[ 'time' ]),

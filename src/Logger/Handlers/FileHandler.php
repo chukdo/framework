@@ -20,7 +20,8 @@ class FileHandler extends AbstractHandler
      * FileHandler constructor.
      * @param string|null $file
      */
-    public function __construct( ?string $file ) {
+    public function __construct( ?string $file )
+    {
         $this->file = $file;
 
         parent::__construct();
@@ -29,7 +30,8 @@ class FileHandler extends AbstractHandler
     /**
      * Destructeur.
      */
-    public function __destruct() {
+    public function __destruct()
+    {
         $this->file = null;
     }
 
@@ -37,7 +39,8 @@ class FileHandler extends AbstractHandler
      * @param string $record
      * @return bool
      */
-    public function write( $record ): bool {
+    public function write( $record ): bool
+    {
         $fp = fopen($this->file,
             'a');
         $r  = fwrite($fp,

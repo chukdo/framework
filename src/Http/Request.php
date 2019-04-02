@@ -50,7 +50,8 @@ class Request
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    public function __construct( App $app ) {
+    public function __construct( App $app )
+    {
         $this->app    = $app;
         $this->inputs = $app->make('Chukdo\Json\Input');
         $this->header = new Header();
@@ -90,7 +91,8 @@ class Request
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    public function validate( Iterable $rules ): Validator {
+    public function validate( Iterable $rules ): Validator
+    {
         return $this->inputs->validate($rules,
             $this->app->make('Chukdo\Json\Lang')
                 ->offsetGet('validation'));
@@ -102,7 +104,8 @@ class Request
      * @param int|null    $maxFileSize
      * @return FileUploaded
      */
-    public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): FileUploaded {
+    public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): FileUploaded
+    {
         return $this->inputs->file($name,
             $allowedMimeTypes,
             $maxFileSize);
@@ -111,7 +114,8 @@ class Request
     /**
      * @return Input
      */
-    public function inputs(): Input {
+    public function inputs(): Input
+    {
         return $this->inputs;
     }
 
@@ -119,7 +123,8 @@ class Request
      * @param string $name
      * @return mixed|null
      */
-    public function input( string $name ) {
+    public function input( string $name )
+    {
         return $this->inputs->get($name);
     }
 
@@ -127,7 +132,8 @@ class Request
      * @param mixed ...$offsets
      * @return Json
      */
-    public function only( ...$offsets ): Json {
+    public function only( ...$offsets ): Json
+    {
         return $this->inputs->only($offsets);
     }
 
@@ -135,7 +141,8 @@ class Request
      * @param mixed ...$offsets
      * @return Json
      */
-    public function except( ...$offsets ): Json {
+    public function except( ...$offsets ): Json
+    {
         return $this->inputs->except($offsets);
     }
 
@@ -143,7 +150,8 @@ class Request
      * @param string $path
      * @return bool
      */
-    public function filled( string $path ): bool {
+    public function filled( string $path ): bool
+    {
         return $this->inputs->filled($path);
     }
 
@@ -151,7 +159,8 @@ class Request
      * @param string $path
      * @return bool
      */
-    public function exists( string $path ): bool {
+    public function exists( string $path ): bool
+    {
         return $this->inputs->exists($path);
     }
 
@@ -159,28 +168,32 @@ class Request
      * @param string $path
      * @return Json
      */
-    public function wildcard( string $path ): Json {
+    public function wildcard( string $path ): Json
+    {
         return $this->inputs->wildcard($path);
     }
 
     /**
      * @return Header
      */
-    public function header(): Header {
+    public function header(): Header
+    {
         return $this->header;
     }
 
     /**
      * @return Url
      */
-    public function url(): Url {
+    public function url(): Url
+    {
         return $this->url;
     }
 
     /**
      * @return string|null
      */
-    public function from(): ?string {
+    public function from(): ?string
+    {
         return parse_url(Http::server('HTTP_ORIGIN')
             ?: Http::server('HTTP_REFERER')
                 ?: Http::server('REMOTE_ADDR'),
@@ -190,28 +203,32 @@ class Request
     /**
      * @return bool
      */
-    public function ajax(): bool {
+    public function ajax(): bool
+    {
         return $this->header->getHeader('X-Requested-with') === 'XMLHttpRequest';
     }
 
     /**
      * @return string|null
      */
-    public function method(): ?string {
+    public function method(): ?string
+    {
         return $this->method;
     }
 
     /**
      * @return array
      */
-    public function userAgent(): array {
+    public function userAgent(): array
+    {
         return Http::getUserAgent(Http::server('HTTP_USER_AGENT'));
     }
 
     /**
      * @return bool
      */
-    public function secured(): bool {
+    public function secured(): bool
+    {
         return Http::server('HTTPS') || Http::server('SERVER_PORT') == '443'
                || Http::server('REQUEST_SCHEME') == 'https';
     }

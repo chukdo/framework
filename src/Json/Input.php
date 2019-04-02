@@ -18,7 +18,8 @@ class Input extends Json
      * Input constructor.
      * @param null $data
      */
-    public function __construct( $data = null ) {
+    public function __construct( $data = null )
+    {
         $data = $data === null
             ? $_REQUEST
             : $data;
@@ -39,7 +40,8 @@ class Input extends Json
      * @param Lang     $messages
      * @return Validator
      */
-    public function validate( Iterable $rules, Lang $messages ): Validator {
+    public function validate( Iterable $rules, Lang $messages ): Validator
+    {
         return new Validator($this, (array) $rules, $messages);
     }
 
@@ -49,7 +51,8 @@ class Input extends Json
      * @param int|null    $maxFileSize
      * @return FileUploaded|null
      */
-    public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): ?FileUploaded {
+    public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): ?FileUploaded
+    {
         try {
             return new FileUploaded($name, $allowedMimeTypes, $maxFileSize);
         } catch( \Throwable $e ) {

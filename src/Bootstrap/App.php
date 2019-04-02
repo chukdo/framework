@@ -37,18 +37,21 @@ class App extends Service
      * Constructeur
      * Initialise l'objet.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->instance('\Chukdo\Bootstrap\App', $this);
     }
 
-    public function registerHandleExceptions() {
+    public function registerHandleExceptions()
+    {
         new HandleExceptions($this);
     }
 
     /**
      * @return bool
      */
-    public function runningInConsole(): bool {
+    public function runningInConsole(): bool
+    {
         return php_sapi_name() == 'cli';
     }
 
@@ -56,7 +59,8 @@ class App extends Service
      * @param string|null $env
      * @return string
      */
-    public function env( string $env = null ): string {
+    public function env( string $env = null ): string
+    {
         if( $env != null ) {
             $this->env = $env;
         }
@@ -68,7 +72,8 @@ class App extends Service
      * @param string|null $channel
      * @return string
      */
-    public function channel( string $channel = null ): string {
+    public function channel( string $channel = null ): string
+    {
         if( $channel != null ) {
             $this->channel = $channel;
         }
@@ -82,7 +87,8 @@ class App extends Service
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function getConf( string $key ): ?string {
+    public function getConf( string $key ): ?string
+    {
         return $this->make('Chukdo\Json\Conf')
             ->offsetGet($key);
     }
@@ -94,7 +100,8 @@ class App extends Service
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function make( string $name, bool $bindInstance = false ) {
+    public function make( string $name, bool $bindInstance = false )
+    {
         $alias      = $this->getAlias($name);
         $bindObject = parent::make($alias);
 
@@ -111,7 +118,8 @@ class App extends Service
      * @param string $name
      * @return string
      */
-    public function getAlias( string $name ): string {
+    public function getAlias( string $name ): string
+    {
         return isset(self::$aliases[ $name ])
             ? self::$aliases[ $name ]
             : $name;
@@ -121,7 +129,8 @@ class App extends Service
      * @param string $name
      * @param        $bindObject
      */
-    protected function resolve( string $name, $bindObject ) {
+    protected function resolve( string $name, $bindObject )
+    {
         if( isset($this->resolving[ '__ANY__' ]) ) {
             $this->resolving[ '__ANY__' ]($bindObject, $name);
         }
@@ -135,21 +144,24 @@ class App extends Service
      * @param string $name
      * @param string $alias
      */
-    public function setAlias( string $name, string $alias ): void {
+    public function setAlias( string $name, string $alias ): void
+    {
         self::$aliases[ $name ] = $alias;
     }
 
     /**
      * @return App
      */
-    public function getApp(): App {
+    public function getApp(): App
+    {
         return $this;
     }
 
     /**
      * @param string $name
      */
-    public function register( string $name ): void {
+    public function register( string $name ): void
+    {
         $instance = new $name($this);
         $instance->register();
     }
@@ -158,7 +170,8 @@ class App extends Service
      * Ecoute la resolution de tous les objets.
      * @param Closure $closure
      */
-    public function resolvingAny( Closure $closure ): void {
+    public function resolvingAny( Closure $closure ): void
+    {
         $this->resolving[ '__ANY__' ] = $closure;
     }
 
@@ -167,7 +180,8 @@ class App extends Service
      * @param string  $name
      * @param Closure $closure
      */
-    public function resolving( string $name, Closure $closure ): void {
+    public function resolving( string $name, Closure $closure ): void
+    {
         $this->resolving[ $name ] = $closure;
     }
 }

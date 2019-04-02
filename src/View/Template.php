@@ -35,7 +35,8 @@ class Template
      * @param Json   $data
      * @param View   $view
      */
-    public function __construct( string $template, Json $data, View $view ) {
+    public function __construct( string $template, Json $data, View $view )
+    {
         $path = $view->path($template);
 
         if( !$path[ 'exists' ] ) {
@@ -55,7 +56,8 @@ class Template
      * @param iterable|null $data
      * @return Template
      */
-    public function data( Iterable $data = null ): self {
+    public function data( Iterable $data = null ): self
+    {
         if( !$this->data ) {
             $this->data = new Json();
         }
@@ -71,7 +73,8 @@ class Template
      * @param string|null $functions
      * @return Json|mixed|null
      */
-    public function j( string $key, string $functions = null ) {
+    public function j( string $key, string $functions = null )
+    {
         return $this->v($this->data->get($key),
             $functions);
     }
@@ -81,7 +84,8 @@ class Template
      * @param string|null $functions
      * @return mixed
      */
-    public function v( $data, string $functions = null ) {
+    public function v( $data, string $functions = null )
+    {
         if( $functions ) {
             foreach( Str::split($functions,
                 '|') as $function ) {
@@ -97,7 +101,8 @@ class Template
      * @param string|null $functions
      * @return mixed
      */
-    public function w( string $key, string $functions = null ) {
+    public function w( string $key, string $functions = null )
+    {
         return $this->v($this->data->wildcard($key),
             $functions);
     }
@@ -107,7 +112,8 @@ class Template
      * @param array|null $arguments
      * @return mixed
      */
-    public function __call( string $name, array $arguments ) {
+    public function __call( string $name, array $arguments )
+    {
         if( is_callable($name) ) {
             return call_user_func_array($name,
                 $arguments);
@@ -117,7 +123,8 @@ class Template
             $arguments);
     }
 
-    public function render() {
+    public function render()
+    {
         if( $responseHandler = $this->view->getResponseHandler() ) {
             $responseHandler->header('Content-Type',
                 'text/html; charset=utf-8')
@@ -132,7 +139,8 @@ class Template
     /**
      * @return string
      */
-    public function __toString(): string {
+    public function __toString(): string
+    {
         ob_start();
         include $this->file;
 

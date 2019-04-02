@@ -19,7 +19,8 @@ class Basic implements FunctionsInterface
     /**
      * @param View $view
      */
-    public function register( View $view ): void {
+    public function register( View $view ): void
+    {
         foreach( get_class_methods($this) as $method ) {
             if( $method != 'register' ) {
                 $view->registerFunction($method,
@@ -36,7 +37,8 @@ class Basic implements FunctionsInterface
      * @param string $search
      * @return bool
      */
-    public function contain( string $data, string $search ): bool {
+    public function contain( string $data, string $search ): bool
+    {
         return Str::contain($data,
             $search);
     }
@@ -45,7 +47,8 @@ class Basic implements FunctionsInterface
      * @param string $data
      * @return string
      */
-    public function removeSpecialChars( string $data ): string {
+    public function removeSpecialChars( string $data ): string
+    {
         return Str::removeSpecialChars($data);
     }
 }
