@@ -274,7 +274,6 @@ class Rule
                 '*') ) {
                 $path = $this->path . '.' . $path;
             }
-
         }
         else {
             $path = $this->path;

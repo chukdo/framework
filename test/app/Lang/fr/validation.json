@@ -8,5 +8,6 @@
   "url": "Le champs %s doit être une url valide",
   "int": "Le champs %s doit être un numéro entier valide",
   "float": "Le champs %s doit être un numéro entier ou un chiffre à virgule valide",
-  "phone": "Le champs %s doit être un numéro de téléphone valide"
+  "phone": "Le champs %s doit être un numéro de téléphone valide",
+  "zipcode": "Le champs %s doit être un code postal valide"
 }
