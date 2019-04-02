@@ -148,8 +148,6 @@ class Rule
     public function validate(): bool {
         $input = $this->input();
 
-        // check if input = file >
-
         if( !$this->validateRequired($input) ) {
             return false;
         }
@@ -167,13 +165,20 @@ class Rule
      * @return mixed
      */
     protected function input() {
-        return Str::contain($this->path,
+        $input = Str::contain($this->path,
             '*')
             ? $this->validator->inputs()
                 ->wildcard($this->path,
                     true)
             : $this->validator->inputs()
                 ->get($this->path);
+
+        /* Recherche dans file */
+        if ($input === null) {
+            $input = $this->validator->inputs()->file($this->path);
+        }
+
+        return $input;
     }
 
     /**
@@ -313,6 +318,13 @@ class Rule
                     $this->error($this->message([ $name ]));
                     $validated .= false;
                 }
+            } else {
+                throw new ValidationException(
+                    sprintf(
+                        'Validation Rule [%s] does not exist',
+                        $name
+                    )
+                );
             }
         }
 

@@ -43,16 +43,36 @@ class FileUploaded
         $uploadedFiles = $this->normalizeUploadedFiles();
 
         if( isset($uploadedFiles[ $name ]) ) {
-            $this->name             = $name;
-            $this->maxFileSize      = $maxFileSize;
-            $this->allowedMimeTypes = $allowedMimeTypes;
-            $this->uploadedFile     = $uploadedFiles[ $name ];
+            $this->name         = $name;
+            $this->uploadedFile = $uploadedFiles[ $name ];
+
+            $this->setMaxFileSize($maxFileSize);
+            $this->setAllowedMimeTypes($allowedMimeTypes);
 
         }
         else {
-            throw new FileUploadedException(sprintf('Uploaded file [%s] does not exist',
-                $name));
+            throw new FileUploadedException(sprintf('Uploaded file [%s] does not exist', $name));
         }
+    }
+
+    /**
+     * @param int|null $maxFileSize
+     * @return FileUploaded
+     */
+    public function setMaxFileSize( int $maxFileSize = null ): self {
+        $this->maxFileSize = $maxFileSize;
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $allowedMimeTypes
+     * @return FileUploaded
+     */
+    public function setAllowedMimeTypes( string $allowedMimeTypes = null ): self {
+        $this->allowedMimeTypes = $allowedMimeTypes;
+
+        return $this;
     }
 
     /**

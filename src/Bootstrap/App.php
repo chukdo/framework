@@ -38,8 +38,7 @@ class App extends Service
      * Initialise l'objet.
      */
     public function __construct() {
-        $this->instance('\Chukdo\Bootstrap\App',
-            $this);
+        $this->instance('\Chukdo\Bootstrap\App', $this);
     }
 
     public function registerHandleExceptions() {
@@ -99,12 +98,10 @@ class App extends Service
         $alias      = $this->getAlias($name);
         $bindObject = parent::make($alias);
 
-        $this->resolve($alias,
-            $bindObject);
+        $this->resolve($alias, $bindObject);
 
         if( $bindInstance == true ) {
-            $this->instance($name,
-                $bindObject);
+            $this->instance($name, $bindObject);
         }
 
         return $bindObject;
@@ -126,13 +123,11 @@ class App extends Service
      */
     protected function resolve( string $name, $bindObject ) {
         if( isset($this->resolving[ '__ANY__' ]) ) {
-            $this->resolving[ '__ANY__' ]($bindObject,
-                $name);
+            $this->resolving[ '__ANY__' ]($bindObject, $name);
         }
 
         if( isset($this->resolving[ $name ]) ) {
-            $this->resolving[ $name ]($bindObject,
-                $name);
+            $this->resolving[ $name ]($bindObject, $name);
         }
     }
 

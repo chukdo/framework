@@ -1,4 +1,5 @@
 {
+  "file": "Le fichier doit etre un fichier valide",
   "array": "Le champs %s doit être un tableau",
   "scalar": "Le champs %s doit être unique",
   "string": "Le champs %s doit être une chaine de caractere valide",
