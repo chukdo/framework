@@ -56,16 +56,6 @@ class Service implements ArrayAccess
     }
 
     /**
-     * @param string $name
-     *
-     * @return string
-     */
-    protected function formatNameSpace( string $name ): string {
-        return trim($name,
-            '\\');
-    }
-
-    /**
      * @return array
      */
     public function listBindings(): array {
@@ -87,28 +77,6 @@ class Service implements ArrayAccess
     }
 
     /**
-     * Enregistre une closure en tant service
-     * La closure peut être une string qui s'auto reference dans service
-     * Une closure qui sera retourné lors de l'appel
-     * Un tableau (class, args) qui sera instancié lors de l'appel,
-     * si un argument commence par @ alors il considere cela comme une auto reference dans service.
-     *
-     * @param string               $name
-     * @param Closure|string|array $closure
-     *
-     * @return bool
-     */
-    public function bind( string $name, $closure ): bool {
-        if( is_string($closure) || $closure instanceof \Closure || is_array($closure) ) {
-            $this->bindings[ $this->formatNameSpace($name) ] = $closure;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Enregistre une closure en tant service partagé (singleton).
      *
      * @param string $name
@@ -127,21 +95,13 @@ class Service implements ArrayAccess
     }
 
     /**
-     * Enregistre un objet en tant que service.
-     *
      * @param string $name
-     * @param object $instance
      *
-     * @return bool
+     * @return string
      */
-    public function instance( string $name, $instance ): bool {
-        if( is_object($instance) ) {
-            $this->instances[ $this->formatNameSpace($name) ] = $instance;
-
-            return true;
-        }
-
-        return false;
+    protected function formatNameSpace( string $name ): string {
+        return trim($name,
+            '\\');
     }
 
     /**
@@ -156,19 +116,52 @@ class Service implements ArrayAccess
     }
 
     /**
-     * @param string $key
+     * @param mixed $key
      *
-     * @return string|null
+     * @return bool
      */
-    public function getConf( string $key ): ?string {
-        $key = '/' . trim($key,
-                '/');
+    public function offsetExists( $key ): bool {
+        return isset($this->bindings[ $key ])
+            ? true
+            : isset($this->instances[ $key ])
+                ? true
+                : isset($this->singletons[ $key ])
+                    ? true
+                    : false;
+    }
 
-        if( isset($this->conf[ $key ]) ) {
-            return $this->conf[ $key ];
+    /**
+     * @param mixed $key
+     *
+     * @return mixed|object|null
+     *
+     * @throws ServiceException
+     * @throws \ReflectionException
+     */
+    public function offsetGet( $key ) {
+        return $this->make($key);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return mixed|object|null
+     *
+     * @throws ServiceException
+     * @throws \ReflectionException
+     */
+    public function make( string $name ) {
+        if( $instance = $this->getInstance($name) ) {
+            return $instance;
+        }
+        elseif( $singleton = $this->getSingleton($name) ) {
+            $this->instance($name,
+                $closure = $this->getClosure($name));
+
+            return $closure;
         }
 
-        return null;
+        return $this->getClosure($name);
     }
 
     /**
@@ -202,40 +195,21 @@ class Service implements ArrayAccess
     }
 
     /**
-     * Retourne une liaison existe.
+     * Enregistre un objet en tant que service.
      *
      * @param string $name
+     * @param object $instance
      *
-     * @return Closure|string|array|null
+     * @return bool
      */
-    public function getBind( string $name ) {
-        $name = $this->formatNameSpace($name);
+    public function instance( string $name, $instance ): bool {
+        if( is_object($instance) ) {
+            $this->instances[ $this->formatNameSpace($name) ] = $instance;
 
-        return isset($this->bindings[ $name ])
-            ? $this->bindings[ $name ]
-            : null;
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return mixed|object|null
-     *
-     * @throws ServiceException
-     * @throws \ReflectionException
-     */
-    public function make( string $name ) {
-        if( $instance = $this->getInstance($name) ) {
-            return $instance;
-        }
-        elseif( $singleton = $this->getSingleton($name) ) {
-            $this->instance($name,
-                $closure = $this->getClosure($name));
-
-            return $closure;
+            return true;
         }
 
-        return $this->getClosure($name);
+        return false;
     }
 
     /**
@@ -269,6 +243,21 @@ class Service implements ArrayAccess
         }
 
         return $this->resolveClass($name);
+    }
+
+    /**
+     * Retourne une liaison existe.
+     *
+     * @param string $name
+     *
+     * @return Closure|string|array|null
+     */
+    public function getBind( string $name ) {
+        $name = $this->formatNameSpace($name);
+
+        return isset($this->bindings[ $name ])
+            ? $this->bindings[ $name ]
+            : null;
     }
 
     /**
@@ -319,6 +308,22 @@ class Service implements ArrayAccess
         }
 
         return $arg;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return string|null
+     */
+    public function getConf( string $key ): ?string {
+        $key = '/' . trim($key,
+                '/');
+
+        if( isset($this->conf[ $key ]) ) {
+            return $this->conf[ $key ];
+        }
+
+        return null;
     }
 
     /**
@@ -399,38 +404,33 @@ class Service implements ArrayAccess
 
     /**
      * @param mixed $key
-     *
-     * @return bool
-     */
-    public function offsetExists( $key ): bool {
-        return isset($this->bindings[ $key ])
-            ? true
-            : isset($this->instances[ $key ])
-                ? true
-                : isset($this->singletons[ $key ])
-                    ? true
-                    : false;
-    }
-
-    /**
-     * @param mixed $key
-     *
-     * @return mixed|object|null
-     *
-     * @throws ServiceException
-     * @throws \ReflectionException
-     */
-    public function offsetGet( $key ) {
-        return $this->make($key);
-    }
-
-    /**
-     * @param mixed $key
      * @param mixed $value
      */
     public function offsetSet( $key, $value ): void {
         $this->bind($key,
             $value);
+    }
+
+    /**
+     * Enregistre une closure en tant service
+     * La closure peut être une string qui s'auto reference dans service
+     * Une closure qui sera retourné lors de l'appel
+     * Un tableau (class, args) qui sera instancié lors de l'appel,
+     * si un argument commence par @ alors il considere cela comme une auto reference dans service.
+     *
+     * @param string               $name
+     * @param Closure|string|array $closure
+     *
+     * @return bool
+     */
+    public function bind( string $name, $closure ): bool {
+        if( is_string($closure) || $closure instanceof \Closure || is_array($closure) ) {
+            $this->bindings[ $this->formatNameSpace($name) ] = $closure;
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

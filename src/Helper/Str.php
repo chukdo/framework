@@ -38,6 +38,19 @@ final class Str
     }
 
     /**
+     * Verifie si une chaine de caractere ne contient pas une autre chaine de caractere.
+     *
+     * @param string $haystack La chaîne dans laquelle on doit chercher
+     * @param string $needle   valeur recherché
+     *
+     * @return bool
+     */
+    public static function notContain( string $haystack, string $needle ): bool {
+        return !self::contain($haystack,
+            $needle);
+    }
+
+    /**
      * Verifie si une chaine de caractere contient une autre chaine de caractere.
      *
      * @param string $haystack La chaîne dans laquelle on doit chercher
@@ -50,19 +63,6 @@ final class Str
             $needle) === false
             ? false
             : true;
-    }
-
-    /**
-     * Verifie si une chaine de caractere ne contient pas une autre chaine de caractere.
-     *
-     * @param string $haystack La chaîne dans laquelle on doit chercher
-     * @param string $needle   valeur recherché
-     *
-     * @return bool
-     */
-    public static function notContain( string $haystack, string $needle ): bool {
-        return !self::contain($haystack,
-            $needle);
     }
 
     /**
@@ -141,19 +141,6 @@ final class Str
 
                 return new Json($match);
         }
-    }
-
-    /**
-     * @param        $pattern
-     * @param        $replacement
-     * @param string $value
-     *
-     * @return string
-     */
-    public static function replace( $pattern, $replacement, string $value ): string {
-        return preg_replace($pattern,
-            $replacement,
-            $value);
     }
 
     /**
@@ -240,7 +227,7 @@ final class Str
      */
     public static function uid( string $prefix = null ): string {
         return $prefix . md5(uniqid(rand(),
-                    true));
+                true));
     }
 
     /**
@@ -250,8 +237,37 @@ final class Str
      */
     public static function stripSpaceBetweenTag( string $value ): string {
         return self::trim(preg_replace('/>[\s|\t|\r|\n]+</',
-                '><',
-                $value));
+            '><',
+            $value));
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function trim( string $value ): string {
+        $value = self::replace('/\n|\r|\t/',
+            ' ',
+            $value);
+        $value = self::replace('/\s{2,}/',
+            ' ',
+            $value);
+
+        return trim($value);
+    }
+
+    /**
+     * @param        $pattern
+     * @param        $replacement
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function replace( $pattern, $replacement, string $value ): string {
+        return preg_replace($pattern,
+            $replacement,
+            $value);
     }
 
     /**
@@ -272,36 +288,6 @@ final class Str
 
     /**
      * @param string $value
-     * @param string $tag
-     * @param string $replacement
-     *
-     * @return string
-     */
-    public static function stripTag( string $value, string $tag = null, string $replacement = null ): string {
-        return self::replace('/<\/?\s*' . $tag . '[^>]*>/',
-            $replacement
-                ?: ' ',
-            $value);
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return string
-     */
-    public static function trim( string $value ): string {
-        $value = self::replace('/\n|\r|\t/',
-            ' ',
-            $value);
-        $value = self::replace('/\s{2,}/',
-            ' ',
-            $value);
-
-        return trim($value);
-    }
-
-    /**
-     * @param string $value
      *
      * @return string
      */
@@ -318,21 +304,8 @@ final class Str
      */
     public static function allText( string $value ): string {
         $text = trim(strtolower(self::replace('/[^[:alnum:]]/u',
-                ' ',
-                self::removeSpecialChars(self::stripTag($value)))));
-
-        return $text;
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return string
-     */
-    public static function allSentence( string $value ): string {
-        $text = trim(strtolower(self::replace('/[^[:alnum:]_;:\., ]/u',
-                ' ',
-                self::removeSpecialChars(self::stripTag($value)))));
+            ' ',
+            self::removeSpecialChars(self::stripTag($value)))));
 
         return $text;
     }
@@ -366,6 +339,33 @@ final class Str
                 'oe',
             ],
             self::trim($value));
+    }
+
+    /**
+     * @param string $value
+     * @param string $tag
+     * @param string $replacement
+     *
+     * @return string
+     */
+    public static function stripTag( string $value, string $tag = null, string $replacement = null ): string {
+        return self::replace('/<\/?\s*' . $tag . '[^>]*>/',
+            $replacement
+                ?: ' ',
+            $value);
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function allSentence( string $value ): string {
+        $text = trim(strtolower(self::replace('/[^[:alnum:]_;:\., ]/u',
+            ' ',
+            self::removeSpecialChars(self::stripTag($value)))));
+
+        return $text;
     }
 
     /**

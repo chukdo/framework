@@ -56,6 +56,15 @@ class Storage
     }
 
     /**
+     * @param string $file
+     *
+     * @return bool
+     */
+    public function delete( string $file ): bool {
+        return unlink($file);
+    }
+
+    /**
      * @param string $directory
      *
      * @return array
@@ -125,6 +134,17 @@ class Storage
     }
 
     /**
+     * @param string $oldFile
+     * @param string $newFile
+     *
+     * @return bool
+     */
+    public function copy( string $oldFile, string $newFile ): bool {
+        return $this->put($newFile,
+            $this->get($oldFile));
+    }
+
+    /**
      * @param string $file
      * @param string $content
      *
@@ -150,17 +170,6 @@ class Storage
      *
      * @return bool
      */
-    public function copy( string $oldFile, string $newFile ): bool {
-        return $this->put($newFile,
-            $this->get($oldFile));
-    }
-
-    /**
-     * @param string $oldFile
-     * @param string $newFile
-     *
-     * @return bool
-     */
     public function move( string $oldFile, string $newFile ): bool {
         $r = $this->put($newFile,
             $this->get($oldFile));
@@ -168,15 +177,6 @@ class Storage
         $this->delete($oldFile);
 
         return $r;
-    }
-
-    /**
-     * @param string $file
-     *
-     * @return bool
-     */
-    public function delete( string $file ): bool {
-        return unlink($file);
     }
 
     /**

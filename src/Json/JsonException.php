@@ -115,32 +115,32 @@ class JsonException extends Json
     public function toConsole( string $title = null ): void {
         $table = new \cli\Table();
         $table->setHeaders([
-                '%R' . strtoupper($title
-                    ?: 'Exception') . '%n',
-            ]);
+            '%R' . strtoupper($title
+                ?: 'Exception') . '%n',
+        ]);
         $table->setRenderer(new \cli\table\Ascii([ 80 ]));
         $table->display();
 
         $table = new \cli\Table();
         $table->setHeaders([
-                '%YCode%n',
-                '%YMessage%n',
-                '%YFile%n',
-                '%YLine%n',
-            ]);
+            '%YCode%n',
+            '%YMessage%n',
+            '%YFile%n',
+            '%YLine%n',
+        ]);
         $table->addRow([
-                $this->get('Code'),
-                $this->get('Message'),
-                $this->get('File'),
-                $this->get('Line'),
-            ]);
+            $this->get('Code'),
+            $this->get('Message'),
+            $this->get('File'),
+            $this->get('Line'),
+        ]);
 
         $table->setRenderer(new \cli\table\Ascii([
-                    5,
-                    30,
-                    40,
-                    5,
-                ]));
+            5,
+            30,
+            40,
+            5,
+        ]));
         $table->display();
 
         $backTrace = $this->get('Trace');
@@ -148,24 +148,24 @@ class JsonException extends Json
         if( $backTrace instanceof Json ) {
             $table = new \cli\Table();
             $table->setHeaders([
-                    '%YFile%n',
-                    '%YLine%n',
-                    '%YCall%n',
-                ]);
+                '%YFile%n',
+                '%YLine%n',
+                '%YCall%n',
+            ]);
 
             foreach( $backTrace as $trace ) {
                 $table->addRow([
-                        $trace->get('File'),
-                        $trace->get('Line'),
-                        $trace->get('Call'),
-                    ]);
+                    $trace->get('File'),
+                    $trace->get('Line'),
+                    $trace->get('Call'),
+                ]);
             }
 
             $table->setRenderer(new \cli\table\Ascii([
-                        40,
-                        5,
-                        35,
-                    ]));
+                40,
+                5,
+                35,
+            ]));
             $table->display();
         }
     }

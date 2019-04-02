@@ -25,20 +25,20 @@ class JsonStringFormatter implements FormatterInterface
      */
     public function formatRecord( array $record ) {
         $json = new Json([
-                'date'    => date('d/m/Y H:i:s',
-                    $record[ 'time' ]),
-                'name'    => $record[ 'channel' ] . '.' . $record[ 'levelname' ],
-                'message' => str_replace([
-                    "\r\n",
-                    "\r",
-                    "\n",
-                ],
-                    ' ',
-                    $record[ 'message' ]),
-                'extra'   => $record[ 'extra' ],
-                'time'    => $record[ 'time' ],
-                'level'   => $record[ 'level' ],
-            ]);
+            'date'    => date('d/m/Y H:i:s',
+                $record[ 'time' ]),
+            'name'    => $record[ 'channel' ] . '.' . $record[ 'levelname' ],
+            'message' => str_replace([
+                "\r\n",
+                "\r",
+                "\n",
+            ],
+                ' ',
+                $record[ 'message' ]),
+            'extra'   => $record[ 'extra' ],
+            'time'    => $record[ 'time' ],
+            'level'   => $record[ 'level' ],
+        ]);
 
         return $json->toJson();
     }

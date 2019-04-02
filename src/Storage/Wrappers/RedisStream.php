@@ -19,6 +19,33 @@ class RedisStream extends AbstractStream
     protected $stream;
 
     /**
+     * Retourne le contenu du fichier.
+     *
+     * @return mixed
+     *
+     * @throws StreamException
+     */
+    public function streamGet() {
+        return $this->getStream()
+            ->get($this->getPath());
+    }
+
+    /**
+     * Lit les informations sur une ressource de fichier.
+     *
+     * @return RedisInterface
+     *
+     * @throws StreamException
+     */
+    protected function getStream(): RedisInterface {
+        if( $this->stream instanceof RedisInterface ) {
+            return $this->stream;
+        }
+
+        return $this->stream = $this->initStream();
+    }
+
+    /**
      * @return RedisInterface
      *
      * @throws StreamException
@@ -38,37 +65,10 @@ class RedisStream extends AbstractStream
 
         if( !($stream instanceof RedisInterface) ) {
             throw new StreamException(sprintf('service [%s] is not a redis interface',
-                    $scheme));
+                $scheme));
         }
 
         return $stream;
-    }
-
-    /**
-     * Lit les informations sur une ressource de fichier.
-     *
-     * @return RedisInterface
-     *
-     * @throws StreamException
-     */
-    protected function getStream(): RedisInterface {
-        if( $this->stream instanceof RedisInterface ) {
-            return $this->stream;
-        }
-
-        return $this->stream = $this->initStream();
-    }
-
-    /**
-     * Retourne le contenu du fichier.
-     *
-     * @return mixed
-     *
-     * @throws StreamException
-     */
-    public function streamGet() {
-        return $this->getStream()
-            ->get($this->getPath());
     }
 
     /**
@@ -268,6 +268,34 @@ class RedisStream extends AbstractStream
     }
 
     /**
+     * Defini des meta données d'information sur le fichier.
+     *
+     * @param string $path
+     * @param string $name
+     * @param null   $value
+     *
+     * @return mixed
+     *
+     * @throws StreamException
+     */
+    protected function streamInfo( string $path, string $name, $value = null ) {
+        $path = 'info::' . $path;
+
+        if( $value !== null ) {
+            $this->getStream()
+                ->hset($path,
+                    $name,
+                    $value);
+
+            return $value;
+        }
+
+        return $this->getStream()
+            ->hget($path,
+                $name);
+    }
+
+    /**
      * Defini ou retourne la date de creation du fichier.
      *
      * @param bool $time
@@ -299,34 +327,6 @@ class RedisStream extends AbstractStream
             $time
                 ? time()
                 : null);
-    }
-
-    /**
-     * Defini des meta données d'information sur le fichier.
-     *
-     * @param string $path
-     * @param string $name
-     * @param null   $value
-     *
-     * @return mixed
-     *
-     * @throws StreamException
-     */
-    protected function streamInfo( string $path, string $name, $value = null ) {
-        $path = 'info::' . $path;
-
-        if( $value !== null ) {
-            $this->getStream()
-                ->hset($path,
-                    $name,
-                    $value);
-
-            return $value;
-        }
-
-        return $this->getStream()
-            ->hget($path,
-                $name);
     }
 
     /**

@@ -32,15 +32,6 @@ class Facade
     protected static $facades = [];
 
     /**
-     * @return string
-     *
-     * @throws FacadeException
-     */
-    public static function name(): string {
-        throw new FacadeException("Facade does not implement 'Name' method.");
-    }
-
-    /**
      * Attache APP (extension de service) à la facade pour la resolution des injections de dependance.
      *
      * @param App $app
@@ -54,6 +45,26 @@ class Facade
      */
     public static function getFacadeApplication(): App {
         return static::$app;
+    }
+
+    /**
+     * @param string $name
+     * @param string $alias
+     */
+    public static function setClassAlias( string $name, string $alias ): void {
+        class_alias($name,
+            $alias);
+    }
+
+    /**
+     * @return mixed
+     *
+     * @throws FacadeException
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
+     */
+    public static function object() {
+        return static::getInstance(static::name());
     }
 
     /**
@@ -76,23 +87,12 @@ class Facade
     }
 
     /**
-     * @param string $name
-     * @param string $alias
-     */
-    public static function setClassAlias( string $name, string $alias ): void {
-        class_alias($name,
-            $alias);
-    }
-
-    /**
-     * @return mixed
+     * @return string
      *
      * @throws FacadeException
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
      */
-    public static function object() {
-        return static::getInstance(static::name());
+    public static function name(): string {
+        throw new FacadeException("Facade does not implement 'Name' method.");
     }
 
     /**

@@ -117,6 +117,13 @@ class Validator
     }
 
     /**
+     * @return array
+     */
+    public function rules(): array {
+        return $this->rules;
+    }
+
+    /**
      * @param string $filter
      *
      * @return FilterInterface|null
@@ -168,13 +175,6 @@ class Validator
      */
     public function inputs(): Input {
         return $this->inputs;
-    }
-
-    /**
-     * @return array
-     */
-    public function rules(): array {
-        return $this->rules;
     }
 
     /**

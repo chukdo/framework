@@ -29,8 +29,8 @@ final class Archive
      */
     public static function ungzipString( string $data ): string {
         $flags       = ord(substr($data,
-                3,
-                1));
+            3,
+            1));
         $headerlen   = 10;
         $extralen    = 0;
         $filenamelen = 0;
@@ -64,7 +64,7 @@ final class Archive
         }
 
         return gzinflate(substr($data,
-                $headerlen));
+            $headerlen));
     }
 
     /**
@@ -80,8 +80,8 @@ final class Archive
                 0,
                 30));
         $raw  = gzinflate(substr($data,
-                30 + $head[ 'namelen' ] + $head[ 'exlen' ],
-                $head[ 'csize' ]));
+            30 + $head[ 'namelen' ] + $head[ 'exlen' ],
+            $head[ 'csize' ]));
 
         return $raw;
     }

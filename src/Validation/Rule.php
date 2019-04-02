@@ -76,58 +76,6 @@ class Rule
 
     /**
      * @param string $rule
-     * @param array  $attr
-     */
-    protected function setValidatorAndFilter( string $rule, array $attr ): void {
-        $this->validatorsAndFilters[ $rule ] = $attr;
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function input() {
-        return Str::contain($this->path,
-            '*')
-            ? $this->validator->inputs()
-                ->wildcard($this->path,
-                    true)
-            : $this->validator->inputs()
-                ->get($this->path);
-    }
-
-    /**
-     * @param string      $message
-     * @param string|null $path
-     */
-    protected function error( string $message, string $path = null ): void {
-        if( $path ) {
-            if( !Str::contain($this->path,
-                '*') ) {
-                $path = $this->path . '.' . $path;
-            }
-
-        }
-        else {
-            $path = $this->path;
-        }
-
-        $this->validator->errors()
-            ->offsetSet($path,
-                $message);
-    }
-
-    /**
-     * @param array $listName
-     *
-     * @return string
-     */
-    protected function message( array $listName ): string {
-        return sprintf($this->validator->message($listName),
-            $this->label);
-    }
-
-    /**
-     * @param string $rule
      */
     protected function parseRule( string $rule ): void {
         $rules = explode('|',
@@ -190,6 +138,14 @@ class Rule
     }
 
     /**
+     * @param string $rule
+     * @param array  $attr
+     */
+    protected function setValidatorAndFilter( string $rule, array $attr ): void {
+        $this->validatorsAndFilters[ $rule ] = $attr;
+    }
+
+    /**
      * @return bool
      */
     public function validate(): bool {
@@ -209,6 +165,19 @@ class Rule
     }
 
     /**
+     * @return mixed
+     */
+    protected function input() {
+        return Str::contain($this->path,
+            '*')
+            ? $this->validator->inputs()
+                ->wildcard($this->path,
+                    true)
+            : $this->validator->inputs()
+                ->get($this->path);
+    }
+
+    /**
      * @param mixed $input
      *
      * @return bool
@@ -222,6 +191,37 @@ class Rule
         }
 
         return true;
+    }
+
+    /**
+     * @param string      $message
+     * @param string|null $path
+     */
+    protected function error( string $message, string $path = null ): void {
+        if( $path ) {
+            if( !Str::contain($this->path,
+                '*') ) {
+                $path = $this->path . '.' . $path;
+            }
+
+        }
+        else {
+            $path = $this->path;
+        }
+
+        $this->validator->errors()
+            ->offsetSet($path,
+                $message);
+    }
+
+    /**
+     * @param array $listName
+     *
+     * @return string
+     */
+    protected function message( array $listName ): string {
+        return sprintf($this->validator->message($listName),
+            $this->label);
     }
 
     /**
@@ -248,6 +248,34 @@ class Rule
         }
 
         return true;
+    }
+
+    /**
+     * @param $input
+     */
+    protected function validateFilters( $input ): void {
+        foreach( $this->validatorsAndFilters as $name => $attrs ) {
+            if( $filter = $this->validator->filter($name) ) {
+                $filter->attributes($attrs);
+
+                unset($this->validatorsAndFilters[ $name ]);
+
+                if( $input instanceof Input ) {
+                    $input->filterRecursive(function( $k, $v ) use ( $filter ) {
+                        return $filter->filter($v);
+                    });
+
+                    $this->validator->inputs()
+                        ->mergeRecursive($input,
+                            true);
+                }
+                else {
+                    $this->validator->inputs()
+                        ->set($this->path,
+                            $filter->filter($input));
+                }
+            }
+        }
     }
 
     /**
@@ -294,33 +322,5 @@ class Rule
         }
 
         return $validated;
-    }
-
-    /**
-     * @param $input
-     */
-    protected function validateFilters( $input ): void {
-        foreach( $this->validatorsAndFilters as $name => $attrs ) {
-            if( $filter = $this->validator->filter($name) ) {
-                $filter->attributes($attrs);
-
-                unset($this->validatorsAndFilters[ $name ]);
-
-                if( $input instanceof Input ) {
-                    $input->filterRecursive(function( $k, $v ) use ( $filter ) {
-                        return $filter->filter($v);
-                    });
-
-                    $this->validator->inputs()
-                        ->mergeRecursive($input,
-                            true);
-                }
-                else {
-                    $this->validator->inputs()
-                        ->set($this->path,
-                            $filter->filter($input));
-                }
-            }
-        }
     }
 }

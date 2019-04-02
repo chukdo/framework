@@ -29,6 +29,23 @@ class Singleton
     }
 
     /**
+     * invoque des méthodes inaccessibles dans un contexte statique.
+     *
+     * @param string $name
+     * @param array  $args
+     *
+     * @return mixed
+     */
+    public static function __callStatic( $name, $args ) {
+        return call_user_func_array([
+            self::getInstance(),
+            trim($name,
+                '_'),
+        ],
+            $args);
+    }
+
+    /**
      * Méthode qui crée l'unique instance de la classe
      * si elle n'existe pas encore puis la retourne.
      *
@@ -46,22 +63,5 @@ class Singleton
      * Bloque le clonage de l'objet.
      */
     private function __clone() {
-    }
-
-    /**
-     * invoque des méthodes inaccessibles dans un contexte statique.
-     *
-     * @param string $name
-     * @param array  $args
-     *
-     * @return mixed
-     */
-    public static function __callStatic( $name, $args ) {
-        return call_user_func_array([
-            self::getInstance(),
-            trim($name,
-                '_'),
-        ],
-            $args);
     }
 }

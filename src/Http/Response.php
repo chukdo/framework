@@ -162,8 +162,11 @@ class Response
      *
      * @return Response
      */
-    public function content( string $content ): self {
-        $this->content = $content;
+    public function html( string $content ): self {
+        $this->header->setHeader('Content-Type',
+            'text/html; charset=utf-8');
+
+        $this->content($content);
 
         return $this;
     }
@@ -173,11 +176,8 @@ class Response
      *
      * @return Response
      */
-    public function html( string $content ): self {
-        $this->header->setHeader('Content-Type',
-            'text/html; charset=utf-8');
-
-        $this->content($content);
+    public function content( string $content ): self {
+        $this->content = $content;
 
         return $this;
     }
@@ -241,19 +241,6 @@ class Response
         return $this;
     }
 
-    public function end() {
-        exit;
-    }
-
-    /**
-     * @return Response
-     */
-    public function deleteFileAfterSend(): self {
-        $this->deleteFileAfterSend = true;
-
-        return $this;
-    }
-
     /**
      * @return Response
      */
@@ -273,25 +260,6 @@ class Response
 
         if( $this->deleteFileAfterSend ) {
             unlink($this->file);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Response
-     */
-    protected function sendHeaderResponse(): self {
-        if( headers_sent() ) {
-            return $this;
-        }
-
-        header_remove();
-
-        foreach( explode("\n",
-            $this->header->send()) as $header ) {
-            header($header,
-                true);
         }
 
         return $this;
@@ -342,6 +310,25 @@ class Response
     /**
      * @return Response
      */
+    protected function sendHeaderResponse(): self {
+        if( headers_sent() ) {
+            return $this;
+        }
+
+        header_remove();
+
+        foreach( explode("\n",
+            $this->header->send()) as $header ) {
+            header($header,
+                true);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Response
+     */
     protected function sendDownloadResponse(): self {
         if( $this->header->getHeader('Transfer-Encoding') == 'chunked' ) {
             $this->sendHeaderResponse();
@@ -367,6 +354,19 @@ class Response
             $this->sendHeaderResponse();
             readfile($this->file);
         }
+
+        return $this;
+    }
+
+    public function end() {
+        exit;
+    }
+
+    /**
+     * @return Response
+     */
+    public function deleteFileAfterSend(): self {
+        $this->deleteFileAfterSend = true;
 
         return $this;
     }

@@ -22,64 +22,6 @@ class AzureStream extends AbstractStream
     private $streamLenght = 0;
 
     /**
-     * @return BlobRestProxy
-     *
-     * @throws StreamException
-     */
-    public function initStream(): BlobRestProxy {
-        $scheme = $this->getScheme();
-
-        try {
-            $stream = ServiceLocator::getInstance()
-                ->getResource($scheme);
-        } catch( \Exception $e ) {
-            throw new StreamException(sprintf('[%s] is not a registred resource',
-                $scheme), $e->getCode(), $e);
-        }
-
-        if( !($stream instanceof BlobRestProxy) ) {
-            throw new StreamException(sprintf('service [%s] is not a azure BlobRestProxy instance',
-                    $scheme));
-        }
-
-        return $stream;
-    }
-
-    /**
-     * Lit les informations sur une ressource de fichier.
-     *
-     * @return BlobRestProxy
-     *
-     * @throws StreamException
-     */
-    protected function getStream(): BlobRestProxy {
-        if( $this->stream instanceof BlobRestProxy ) {
-            return $this->stream;
-        }
-
-        return $this->stream = $this->initStream();
-    }
-
-    /**
-     * Retourne le contenu du fichier.
-     *
-     * @return mixed
-     *
-     * @throws StreamException
-     */
-    public function streamGet() {
-        if( $this->streamContent == null ) {
-            $this->streamContent = stream_get_contents($this->getStream()
-                ->getBlob($this->getHost(),
-                    $this->getPath())
-                ->getContentStream());
-            $this->streamLenght  = strlen($this->streamContent);
-        }
-
-        return $this->streamContent;
-    }
-
-    /**
      * Retourne une portion du contenu du fichier.
      *
      * @param int $offset
@@ -102,6 +44,64 @@ class AzureStream extends AbstractStream
                 $offset,
                 $length);
         }
+    }
+
+    /**
+     * Retourne le contenu du fichier.
+     *
+     * @return mixed
+     *
+     * @throws StreamException
+     */
+    public function streamGet() {
+        if( $this->streamContent == null ) {
+            $this->streamContent = stream_get_contents($this->getStream()
+                ->getBlob($this->getHost(),
+                    $this->getPath())
+                ->getContentStream());
+            $this->streamLenght  = strlen($this->streamContent);
+        }
+
+        return $this->streamContent;
+    }
+
+    /**
+     * Lit les informations sur une ressource de fichier.
+     *
+     * @return BlobRestProxy
+     *
+     * @throws StreamException
+     */
+    protected function getStream(): BlobRestProxy {
+        if( $this->stream instanceof BlobRestProxy ) {
+            return $this->stream;
+        }
+
+        return $this->stream = $this->initStream();
+    }
+
+    /**
+     * @return BlobRestProxy
+     *
+     * @throws StreamException
+     */
+    public function initStream(): BlobRestProxy {
+        $scheme = $this->getScheme();
+
+        try {
+            $stream = ServiceLocator::getInstance()
+                ->getResource($scheme);
+        } catch( \Exception $e ) {
+            throw new StreamException(sprintf('[%s] is not a registred resource',
+                $scheme), $e->getCode(), $e);
+        }
+
+        if( !($stream instanceof BlobRestProxy) ) {
+            throw new StreamException(sprintf('service [%s] is not a azure BlobRestProxy instance',
+                $scheme));
+        }
+
+        return $stream;
     }
 
     /**

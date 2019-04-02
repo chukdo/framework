@@ -37,7 +37,7 @@ class ElasticHandler extends AbstractHandler
         $this->dsn     = $dsn;
         $this->elastic = ClientBuilder::create()
             ->setHosts(explode(',',
-                    $dsn))
+                $dsn))
             ->build();
 
         $this->setFormatter(new NullFormatter());
@@ -59,12 +59,12 @@ class ElasticHandler extends AbstractHandler
         $this->init($record[ 'channel' ]);
 
         $write = $this->elastic->index([
-                'index' => $record[ 'channel' ],
-                'type'  => 'search',
-                'id'    => uniqid('',
-                    true),
-                'body'  => $record,
-            ]);
+            'index' => $record[ 'channel' ],
+            'type'  => 'search',
+            'id'    => uniqid('',
+                true),
+            'body'  => $record,
+        ]);
 
         return !isset($write[ 'error' ]);
     }
@@ -75,24 +75,24 @@ class ElasticHandler extends AbstractHandler
     protected function init( string $channel ): void {
         if( !$this->elastic->indices()
             ->exists([
-                    'index' => $channel,
-                ]) ) {
+                'index' => $channel,
+            ]) ) {
             $this->elastic->indices()
                 ->create([
-                        'index' => $channel,
-                        'body'  => [
-                            'mappings' => [
-                                'search' => [
-                                    'properties' => [
-                                        'date' => [
-                                            'type'   => 'date',
-                                            'format' => 'epoch_second',
-                                        ],
+                    'index' => $channel,
+                    'body'  => [
+                        'mappings' => [
+                            'search' => [
+                                'properties' => [
+                                    'date' => [
+                                        'type'   => 'date',
+                                        'format' => 'epoch_second',
                                     ],
                                 ],
                             ],
                         ],
-                    ]);
+                    ],
+                ]);
         }
     }
 }

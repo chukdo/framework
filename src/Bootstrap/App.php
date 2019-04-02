@@ -18,19 +18,17 @@ use Closure;
 class App extends Service
 {
     /**
-     * Tableau des ecouteurs de resolution.
-     *
-     * @var array
-     */
-    protected $resolving = [];
-
-    /**
      * Tableau des alias.
      *
      * @var array
      */
     protected static $aliases = [];
-
+    /**
+     * Tableau des ecouteurs de resolution.
+     *
+     * @var array
+     */
+    protected $resolving = [];
     /**
      * @var string
      */
@@ -102,25 +100,6 @@ class App extends Service
 
     /**
      * @param string $name
-     * @param string $alias
-     */
-    public function setAlias( string $name, string $alias ): void {
-        self::$aliases[ $name ] = $alias;
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return string
-     */
-    public function getAlias( string $name ): string {
-        return isset(self::$aliases[ $name ])
-            ? self::$aliases[ $name ]
-            : $name;
-    }
-
-    /**
-     * @param string $name
      * @param bool   $bindInstance
      *
      * @return mixed|object|null
@@ -141,6 +120,41 @@ class App extends Service
         }
 
         return $bindObject;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    public function getAlias( string $name ): string {
+        return isset(self::$aliases[ $name ])
+            ? self::$aliases[ $name ]
+            : $name;
+    }
+
+    /**
+     * @param string $name
+     * @param        $bindObject
+     */
+    protected function resolve( string $name, $bindObject ) {
+        if( isset($this->resolving[ '__ANY__' ]) ) {
+            $this->resolving[ '__ANY__' ]($bindObject,
+                $name);
+        }
+
+        if( isset($this->resolving[ $name ]) ) {
+            $this->resolving[ $name ]($bindObject,
+                $name);
+        }
+    }
+
+    /**
+     * @param string $name
+     * @param string $alias
+     */
+    public function setAlias( string $name, string $alias ): void {
+        self::$aliases[ $name ] = $alias;
     }
 
     /**
@@ -175,21 +189,5 @@ class App extends Service
      */
     public function resolving( string $name, Closure $closure ): void {
         $this->resolving[ $name ] = $closure;
-    }
-
-    /**
-     * @param string $name
-     * @param        $bindObject
-     */
-    protected function resolve( string $name, $bindObject ) {
-        if( isset($this->resolving[ '__ANY__' ]) ) {
-            $this->resolving[ '__ANY__' ]($bindObject,
-                $name);
-        }
-
-        if( isset($this->resolving[ $name ]) ) {
-            $this->resolving[ $name ]($bindObject,
-                $name);
-        }
     }
 }

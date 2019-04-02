@@ -19,27 +19,6 @@ use Chukdo\Json\Json;
 class Header
 {
     /**
-     * Entete HTTP.
-     *
-     * @param string $http
-     */
-    protected $http = '';
-
-    /**
-     * Entetes.
-     *
-     * @param Json $header
-     */
-    protected $header;
-
-    /**
-     * Cookie.
-     *
-     * @param Json $cookie
-     */
-    protected $cookie;
-
-    /**
      * Status RFC 2616.
      *
      * @param array $status
@@ -85,6 +64,24 @@ class Header
         503 => 'HTTP/1.1 503 Service Unavailable',
         504 => 'HTTP/1.1 504 Gateway Time-out',
     ];
+    /**
+     * Entete HTTP.
+     *
+     * @param string $http
+     */
+    protected $http = '';
+    /**
+     * Entetes.
+     *
+     * @param Json $header
+     */
+    protected $header;
+    /**
+     * Cookie.
+     *
+     * @param Json $cookie
+     */
+    protected $cookie;
 
     /**
      * Header constructor.
@@ -95,24 +92,18 @@ class Header
     }
 
     /**
-     * @param int $status
-     *
-     * @return Header
-     */
-    public function setStatus( int $status ): self {
-        if( isset($this->rfc2616[ $status ]) ) {
-            $this->setHttp($this->rfc2616[ $status ]);
-        }
-
-        return $this;
-    }
-
-    /**
      * @return int|null
      */
     public function getStatus(): ?int {
         return Str::match('/([0-9]{3})/',
             $this->getHttp());
+    }
+
+    /**
+     * @return string
+     */
+    public function getHttp(): string {
+        return $this->http;
     }
 
     /**
@@ -131,26 +122,6 @@ class Header
     }
 
     /**
-     * @return string
-     */
-    public function getHttp(): string {
-        return $this->http;
-    }
-
-    /**
-     * @param string $name
-     * @param string $value
-     *
-     * @return Header
-     */
-    public function setHeader( string $name, string $value ): self {
-        $this->header->offsetSet($this->normalize($name),
-            trim($value));
-
-        return $this;
-    }
-
-    /**
      * @param iterable $headers
      *
      * @return Header
@@ -162,31 +133,6 @@ class Header
         }
 
         return $this;
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return string|null
-     */
-    public function getHeader( string $name ): ?string {
-        return $this->header->offsetGet($this->normalize($name));
-    }
-
-    /**
-     * @return Json
-     */
-    public function getHeaders(): Json {
-        return $this->header;
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return string|null
-     */
-    public function unsetHeader( string $name ): ?string {
-        return $this->header->offsetUnset($this->normalize($name));
     }
 
     /**
@@ -213,67 +159,6 @@ class Header
         }
 
         return $this;
-    }
-
-    /**
-     * Ajoute un cookie.
-     *
-     * @param string $name    nom du cookie
-     * @param string $value   valeur associée
-     * @param string $expires date d'expiration en timestamp
-     * @param string $path    le chemin auquel s'applique le cookie '/' all par defaut
-     * @param string $domain  le domaine auquel s'applique le cookie '.google.com' pour tout google
-     *
-     * @return Header
-     */
-    public function setCookie( string $name, string $value = null, string $expires = null, string $path = null, string $domain = null ): self {
-        $value  = rawurlencode($value);
-        $cookie = 'Set-Cookie: ' . $name . '=' . $value;
-
-        if( $expires ) {
-            $expires = gmdate(DATE_RFC850,
-                $expires);
-            $cookie  .= "; expires=$expires";
-        }
-
-        $cookie .= '; path=' . ($path
-                ?: '/');
-
-        if( $domain ) {
-            $cookie .= '; domain=' . $domain;
-        }
-
-        $this->cookie->offsetSet($name,
-            $cookie);
-
-        return $this;
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return Json|null
-     */
-    public function getCookie( string $name ): ?Json {
-        if( $cookie = $this->cookie->offsetGet($name) ) {
-            return Str::match('/([^=]+)=([^;]+)(?:; expires=([^;]+))?(?:; path=([^;]+))?(?:; domain=([^;]+))?/i',
-                $cookie);
-        }
-
-        return null;
-    }
-
-    /**
-     * @return Json
-     */
-    public function getCookies(): Json {
-        $cookies = new Json();
-
-        foreach( $this->cookie as $name => $cookie ) {
-            $cookies->append($this->getCookie($name));
-        }
-
-        return $cookies;
     }
 
     /**
@@ -329,10 +214,10 @@ class Header
      */
     public function getCacheControl(): Json {
         $cache = new Json([
-                'max'        => 0,
-                'revalidate' => false,
-                'control'    => null,
-            ]);
+            'max'        => 0,
+            'revalidate' => false,
+            'control'    => null,
+        ]);
 
         foreach( explode(', ',
             $this->getHeader('Cache-Control')) as $value ) {
@@ -355,6 +240,44 @@ class Header
     }
 
     /**
+     * @param string $name
+     *
+     * @return string|null
+     */
+    public function getHeader( string $name ): ?string {
+        return $this->header->offsetGet($this->normalize($name));
+    }
+
+    /**
+     * @param string $name
+     * @param string $value
+     *
+     * @return Header
+     */
+    public function setHeader( string $name, string $value ): self {
+        $this->header->offsetSet($this->normalize($name),
+            trim($value));
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    public function normalize( string $name ): string {
+        return str_replace(' ',
+            '-',
+            ucwords(str_replace([
+                '-',
+                '_',
+            ],
+                ' ',
+                strtolower($name))));
+    }
+
+    /**
      * @param string $auth
      *
      * @return Header
@@ -367,6 +290,19 @@ class Header
                 'no-cache')
             ->setHeader('WWW-Authenticate',
                 'Basic realm="' . urlencode($auth) . '"');
+
+        return $this;
+    }
+
+    /**
+     * @param int $status
+     *
+     * @return Header
+     */
+    public function setStatus( int $status ): self {
+        if( isset($this->rfc2616[ $status ]) ) {
+            $this->setHttp($this->rfc2616[ $status ]);
+        }
 
         return $this;
     }
@@ -492,6 +428,13 @@ class Header
     /**
      * @return string
      */
+    public function __toString() {
+        return $this->send();
+    }
+
+    /**
+     * @return string
+     */
     public function send(): string {
         $http    = $this->getHttp() . "\r\n";
         $headers = '';
@@ -509,26 +452,71 @@ class Header
     }
 
     /**
-     * @param string $name
-     *
-     * @return string
+     * @return Json
      */
-    public function normalize( string $name ): string {
-        return str_replace(' ',
-            '-',
-            ucwords(str_replace([
-                    '-',
-                    '_',
-                ],
-                    ' ',
-                    strtolower($name))));
+    public function getHeaders(): Json {
+        return $this->header;
     }
 
     /**
-     * @return string
+     * @return Json
      */
-    public function __toString() {
-        return $this->send();
+    public function getCookies(): Json {
+        $cookies = new Json();
+
+        foreach( $this->cookie as $name => $cookie ) {
+            $cookies->append($this->getCookie($name));
+        }
+
+        return $cookies;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Json|null
+     */
+    public function getCookie( string $name ): ?Json {
+        if( $cookie = $this->cookie->offsetGet($name) ) {
+            return Str::match('/([^=]+)=([^;]+)(?:; expires=([^;]+))?(?:; path=([^;]+))?(?:; domain=([^;]+))?/i',
+                $cookie);
+        }
+
+        return null;
+    }
+
+    /**
+     * Ajoute un cookie.
+     *
+     * @param string $name    nom du cookie
+     * @param string $value   valeur associée
+     * @param string $expires date d'expiration en timestamp
+     * @param string $path    le chemin auquel s'applique le cookie '/' all par defaut
+     * @param string $domain  le domaine auquel s'applique le cookie '.google.com' pour tout google
+     *
+     * @return Header
+     */
+    public function setCookie( string $name, string $value = null, string $expires = null, string $path = null, string $domain = null ): self {
+        $value  = rawurlencode($value);
+        $cookie = 'Set-Cookie: ' . $name . '=' . $value;
+
+        if( $expires ) {
+            $expires = gmdate(DATE_RFC850,
+                $expires);
+            $cookie  .= "; expires=$expires";
+        }
+
+        $cookie .= '; path=' . ($path
+                ?: '/');
+
+        if( $domain ) {
+            $cookie .= '; domain=' . $domain;
+        }
+
+        $this->cookie->offsetSet($name,
+            $cookie);
+
+        return $this;
     }
 
     /**
@@ -542,6 +530,15 @@ class Header
 
     /**
      * @param $key
+     *
+     * @return string
+     */
+    public function __get( $key ) {
+        return $this->getHeader($key);
+    }
+
+    /**
+     * @param $key
      * @param $value
      *
      * @return Header
@@ -549,15 +546,6 @@ class Header
     public function __set( $key, $value ) {
         return $this->setHeader($key,
             $value);
-    }
-
-    /**
-     * @param $key
-     *
-     * @return string
-     */
-    public function __get( $key ) {
-        return $this->getHeader($key);
     }
 
     /**
@@ -682,5 +670,14 @@ class Header
         }
 
         throw new HttpException("Method \Chukdo\Http\Header::$name doesn't exists");
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string|null
+     */
+    public function unsetHeader( string $name ): ?string {
+        return $this->header->offsetUnset($this->normalize($name));
     }
 }

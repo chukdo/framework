@@ -75,6 +75,20 @@ class Router
     }
 
     /**
+     * @param string  $method
+     * @param string  $uri
+     * @param Closure $closure
+     *
+     * @return Route
+     */
+    public function stack( string $method, string $uri, Closure $closure ): Route {
+        $route                                 = new Route($this, $closure);
+        $this->stack[ $method . '://' . $uri ] = $route;
+
+        return $route;
+    }
+
+    /**
      * @param string  $uri
      * @param Closure $closure
      *
@@ -132,19 +146,5 @@ class Router
         return $this->stack('CLI',
             $uri,
             $closure);
-    }
-
-    /**
-     * @param string  $method
-     * @param string  $uri
-     * @param Closure $closure
-     *
-     * @return Route
-     */
-    public function stack( string $method, string $uri, Closure $closure ): Route {
-        $route                                 = new Route($this, $closure);
-        $this->stack[ $method . '://' . $uri ] = $route;
-
-        return $route;
     }
 }

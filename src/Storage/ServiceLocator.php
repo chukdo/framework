@@ -39,24 +39,6 @@ class ServiceLocator extends Singleton
     }
 
     /**
-     * Retourne un service de l'annuaire.
-     *
-     * @param string $scheme
-     *
-     * @return closure
-     *
-     * @throws ServiceLocatorException
-     */
-    public function getService( $scheme ): Closure {
-        if( !isset($this->resources[ $scheme ]) ) {
-            throw new ServiceLocatorException(sprintf('[%s] is not a registered service',
-                    $scheme));
-        }
-
-        return $this->resources[ $scheme ];
-    }
-
-    /**
      * Retourne une ressource à l'annuaire.
      *
      * @param string $scheme
@@ -80,16 +62,6 @@ class ServiceLocator extends Singleton
     }
 
     /**
-     * Cache une ressource.
-     *
-     * @param string $scheme
-     * @param        $resource
-     */
-    public function cacheResource( string $scheme, $resource ): void {
-        $this->cache[ $scheme ] = $resource;
-    }
-
-    /**
      * Retourne une ressource en cache.
      *
      * @param string $scheme
@@ -100,6 +72,34 @@ class ServiceLocator extends Singleton
         return isset($this->cache[ $scheme ])
             ? $this->cache[ $scheme ]
             : null;
+    }
+
+    /**
+     * Retourne un service de l'annuaire.
+     *
+     * @param string $scheme
+     *
+     * @return closure
+     *
+     * @throws ServiceLocatorException
+     */
+    public function getService( $scheme ): Closure {
+        if( !isset($this->resources[ $scheme ]) ) {
+            throw new ServiceLocatorException(sprintf('[%s] is not a registered service',
+                $scheme));
+        }
+
+        return $this->resources[ $scheme ];
+    }
+
+    /**
+     * Cache une ressource.
+     *
+     * @param string $scheme
+     * @param        $resource
+     */
+    public function cacheResource( string $scheme, $resource ): void {
+        $this->cache[ $scheme ] = $resource;
     }
 
     /**

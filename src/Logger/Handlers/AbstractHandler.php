@@ -44,27 +44,10 @@ abstract class AbstractHandler implements HandlerInterface
     }
 
     /**
-     * @param $record
-     *
-     * @return bool
-     */
-    abstract protected function write( $record ): bool;
-
-    /**
      * @param $levels
      */
     public function setLevels( $levels ): void {
         $this->levels = (array) $levels;
-    }
-
-    /**
-     * @param array $record
-     *
-     * @return bool
-     */
-    public function isHandling( array $record ): bool {
-        return in_array($record[ 'level' ],
-            $this->levels);
     }
 
     /**
@@ -89,6 +72,16 @@ abstract class AbstractHandler implements HandlerInterface
     /**
      * @param array $record
      *
+     * @return bool
+     */
+    public function isHandling( array $record ): bool {
+        return in_array($record[ 'level' ],
+            $this->levels);
+    }
+
+    /**
+     * @param array $record
+     *
      * @return array
      */
     public function processRecord( array $record ): array {
@@ -100,6 +93,24 @@ abstract class AbstractHandler implements HandlerInterface
     }
 
     /**
+     * @param FormatterInterface $formatter
+     *
+     * @return HandlerInterface
+     */
+    public function setFormatter( FormatterInterface $formatter ): HandlerInterface {
+        $this->formatter = $formatter;
+
+        return $this;
+    }
+
+    /**
+     * @param $record
+     *
+     * @return bool
+     */
+    abstract protected function write( $record ): bool;
+
+    /**
      * @param ProcessorInterface $processor
      *
      * @return HandlerInterface
@@ -107,17 +118,6 @@ abstract class AbstractHandler implements HandlerInterface
     public function pushProcessor( ProcessorInterface $processor ): HandlerInterface {
         array_push($this->processors,
             $processor);
-
-        return $this;
-    }
-
-    /**
-     * @param FormatterInterface $formatter
-     *
-     * @return HandlerInterface
-     */
-    public function setFormatter( FormatterInterface $formatter ): HandlerInterface {
-        $this->formatter = $formatter;
 
         return $this;
     }

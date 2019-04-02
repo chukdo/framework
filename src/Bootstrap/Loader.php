@@ -41,9 +41,9 @@ class Loader
      */
     public function register(): void {
         spl_autoload_register([
-                $this,
-                'loadClass',
-            ]);
+            $this,
+            'loadClass',
+        ]);
     }
 
     /**
@@ -51,9 +51,21 @@ class Loader
      */
     public function unregister(): void {
         spl_autoload_unregister([
-                $this,
-                'loadClass',
-            ]);
+            $this,
+            'loadClass',
+        ]);
+    }
+
+    /**
+     * Registers a set namespaces.
+     *
+     * @param array $namespaces array($namespace => $paths)
+     */
+    public function registerNameSpaces( array $namespaces ): void {
+        foreach( $namespaces as $ns => $paths ) {
+            $this->registerNameSpace($ns,
+                $paths);
+        }
     }
 
     /**
@@ -88,18 +100,6 @@ class Loader
                 array_push($this->namespaces[ $ns ],
                     $path);
             }
-        }
-    }
-
-    /**
-     * Registers a set namespaces.
-     *
-     * @param array $namespaces array($namespace => $paths)
-     */
-    public function registerNameSpaces( array $namespaces ): void {
-        foreach( $namespaces as $ns => $paths ) {
-            $this->registerNameSpace($ns,
-                $paths);
         }
     }
 

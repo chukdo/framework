@@ -28,9 +28,9 @@ class Basic implements FunctionsInterface
             if( $method != 'register' ) {
                 $view->registerFunction($method,
                     Closure::fromCallable([
-                            $this,
-                            $method,
-                        ]));
+                        $this,
+                        $method,
+                    ]));
             }
         }
     }

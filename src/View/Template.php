@@ -45,7 +45,7 @@ class Template
 
         if( !$path[ 'exists' ] ) {
             throw new ViewException(sprintf('Template file [%s] does not exist',
-                    $template));
+                $template));
         }
 
         $this->data($view->getData())
@@ -73,6 +73,17 @@ class Template
     }
 
     /**
+     * @param string      $key
+     * @param string|null $functions
+     *
+     * @return Json|mixed|null
+     */
+    public function j( string $key, string $functions = null ) {
+        return $this->v($this->data->get($key),
+            $functions);
+    }
+
+    /**
      * @param             $data
      * @param string|null $functions
      *
@@ -93,32 +104,11 @@ class Template
      * @param string      $key
      * @param string|null $functions
      *
-     * @return Json|mixed|null
-     */
-    public function j( string $key, string $functions = null ) {
-        return $this->v($this->data->get($key),
-            $functions);
-    }
-
-    /**
-     * @param string      $key
-     * @param string|null $functions
-     *
      * @return mixed
      */
     public function w( string $key, string $functions = null ) {
         return $this->v($this->data->wildcard($key),
             $functions);
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString(): string {
-        ob_start();
-        include $this->file;
-
-        return ob_get_clean();
     }
 
     /**
@@ -147,5 +137,15 @@ class Template
         else {
             echo $this->__toString();
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString(): string {
+        ob_start();
+        include $this->file;
+
+        return ob_get_clean();
     }
 }

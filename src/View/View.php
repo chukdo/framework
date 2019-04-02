@@ -62,6 +62,14 @@ class View
     }
 
     /**
+     * @param string|null $folder
+     */
+    public function setDefaultFolder( string $folder = null ): void {
+        $this->defaultFolder = rtrim($folder,
+            '/');
+    }
+
+    /**
      * @param Response|null $response
      */
     public function setResponseHandler( Response $response = null ) {
@@ -73,14 +81,6 @@ class View
      */
     public function getResponseHandler(): ?Response {
         return $this->response;
-    }
-
-    /**
-     * @param string|null $folder
-     */
-    public function setDefaultFolder( string $folder = null ): void {
-        $this->defaultFolder = rtrim($folder,
-            '/');
     }
 
     /**
@@ -208,15 +208,6 @@ class View
     /**
      * @param string $function
      *
-     * @return bool
-     */
-    public function isRegisteredFunction( string $function ): bool {
-        return isset($this->functions[ $function ]);
-    }
-
-    /**
-     * @param string $function
-     *
      * @return Closure
      */
     public function callRegisteredFunction( string $function ): Closure {
@@ -225,17 +216,16 @@ class View
         }
 
         throw new ViewException(sprintf('Method [%s] is not a template registered function',
-                $function));
+            $function));
     }
 
     /**
-     * @param string        $template
-     * @param iterable|null $data
+     * @param string $function
      *
-     * @return Template
+     * @return bool
      */
-    public function make( string $template, iterable $data = null ): Template {
-        return new Template($template, $data, $this);
+    public function isRegisteredFunction( string $function ): bool {
+        return isset($this->functions[ $function ]);
     }
 
     /**
@@ -246,5 +236,15 @@ class View
         $this->make($template,
             $data)
             ->render();
+    }
+
+    /**
+     * @param string        $template
+     * @param iterable|null $data
+     *
+     * @return Template
+     */
+    public function make( string $template, iterable $data = null ): Template {
+        return new Template($template, $data, $this);
     }
 }

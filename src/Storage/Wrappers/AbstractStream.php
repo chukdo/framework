@@ -50,138 +50,6 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     abstract public function initStream();
 
     /**
-     * @param string $url
-     */
-    private function setUrl( string $url ): void {
-        $this->url = new Url($url);
-    }
-
-    /**
-     * @return Url|null
-     */
-    private function getUrl(): ?Url {
-        return $this->url;
-    }
-
-    /**
-     * Retourne le scheme du fichier.
-     *
-     * @return string|null
-     */
-    protected function getScheme(): ?string {
-        return $this->getUrl()
-            ->getScheme();
-    }
-
-    /**
-     * Retourne le host du fichier.
-     *
-     * @return string|null
-     */
-    protected function getHost(): ?string {
-        return $this->getUrl()
-            ->getHost();
-    }
-
-    /**
-     * Retourne le chemin du fichier.
-     *
-     * @return string|null
-     */
-    protected function getPath(): ?string {
-        return trim($this->getUrl()
-            ->getPath(),
-            '/');
-    }
-
-    /**
-     * Defini le mode d'ecriture ou de lecture du fichier.
-     *
-     * @param string $mode
-     */
-    protected function setMode( string $mode ): void {
-        /* On ne tient pas compte du flag B(inary) */
-        $this->mode = str_replace('b',
-            '',
-            $mode);
-    }
-
-    /**
-     * Retourne le mode d'ecriture ou de lecture du fichier.
-     *
-     * @return string|null
-     */
-    protected function getMode(): ?string {
-        return $this->mode;
-    }
-
-    /**
-     * Retourne la position du pointeur du fichier.
-     *
-     * @return int
-     */
-    protected function getTell(): int {
-        return $this->tell;
-    }
-
-    /**
-     * Defini la position du pointeur du fichier.
-     *
-     * @param int $tell
-     */
-    protected function setTell( int $tell ): void {
-        $this->tell = $tell;
-    }
-
-    /**
-     * deplace la position du pointeur du fichier.
-     *
-     * @param int $tell
-     */
-    protected function appendTell( int $tell ): void {
-        $this->tell += $tell;
-    }
-
-    /**
-     * Retourne si on a atteint la fin du fichier.
-     *
-     * @return bool
-     */
-    protected function getEof(): bool {
-        return $this->eof;
-    }
-
-    /**
-     * Defini la fin du fichier.
-     *
-     * @return bool
-     */
-    protected function setEof(): bool {
-        return $this->eof = true;
-    }
-
-    /**
-     * Lit les informations sur une ressource de fichier.
-     *
-     * @return array|null
-     */
-    public function stream_stat(): ?array {
-        if( $size = $this->streamSize() ) {
-            return [
-                'size'  => $size,
-                'mode'  => $this->streamIsDir()
-                    ? 16895
-                    : 33279,
-                'ctime' => $this->streamCreatedTime(),
-                'atime' => $this->streamAccessTime(),
-                'mtime' => $this->streamModifiedTime(),
-            ];
-        }
-
-        return null;
-    }
-
-    /**
      * Place le pointeur de flux à une position.
      *
      * @param int $offset
@@ -206,12 +74,39 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     }
 
     /**
+     * deplace la position du pointeur du fichier.
+     *
+     * @param int $tell
+     */
+    protected function appendTell( int $tell ): void {
+        $this->tell += $tell;
+    }
+
+    /**
      * Lit la position courante dans un flux.
      *
      * @return int
      */
     public function stream_tell(): int {
         return $this->getTell();
+    }
+
+    /**
+     * Retourne la position du pointeur du fichier.
+     *
+     * @return int
+     */
+    protected function getTell(): int {
+        return $this->tell;
+    }
+
+    /**
+     * Defini la position du pointeur du fichier.
+     *
+     * @param int $tell
+     */
+    protected function setTell( int $tell ): void {
+        $this->tell = $tell;
     }
 
     /**
@@ -259,16 +154,16 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
             case 'x':
             case 'c':
                 throw new StreamException(sprintf('[%s] has writeonly mode [%s]',
-                        $this->getUrl()
-                            ->getPath(),
-                        $this->getMode()));
+                    $this->getUrl()
+                        ->getPath(),
+                    $this->getMode()));
                 break;
         }
 
         $read = $this->streamGetRange($this->getTell(),
             $count);
         $this->appendTell(min(strlen($read),
-                $count));
+            $count));
 
         if( $this->getTell() >= $this->streamSize() ) {
             $this->setEof();
@@ -277,6 +172,27 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
         $this->streamAccessTime(true);
 
         return $read;
+    }
+
+    /**
+     * Retourne le mode d'ecriture ou de lecture du fichier.
+     *
+     * @return string|null
+     */
+    protected function getMode(): ?string {
+        return $this->mode;
+    }
+
+    /**
+     * Defini le mode d'ecriture ou de lecture du fichier.
+     *
+     * @param string $mode
+     */
+    protected function setMode( string $mode ): void {
+        /* On ne tient pas compte du flag B(inary) */
+        $this->mode = str_replace('b',
+            '',
+            $mode);
     }
 
     /**
@@ -346,8 +262,8 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
             case 'r+':
                 if( !$exits ) {
                     throw new StreamException(sprintf("File [%s] doesn't exists",
-                            $this->getUrl()
-                                ->getPath()));
+                        $this->getUrl()
+                            ->getPath()));
                 }
                 break;
             case 'w':
@@ -367,8 +283,8 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
             case 'x+':
                 if( $exits ) {
                     throw new StreamException(sprintf('Mode X not allow [%s] file exists',
-                            $this->getUrl()
-                                ->getPath()));
+                        $this->getUrl()
+                            ->getPath()));
                 }
 
                 $this->streamSet(null);
@@ -389,10 +305,35 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     }
 
     /**
+     * @param string $url
+     */
+    private function setUrl( string $url ): void {
+        $this->url = new Url($url);
+    }
+
+    /**
      * @return bool
      */
     public function stream_eof(): bool {
         return $this->getEof();
+    }
+
+    /**
+     * Retourne si on a atteint la fin du fichier.
+     *
+     * @return bool
+     */
+    protected function getEof(): bool {
+        return $this->eof;
+    }
+
+    /**
+     * Defini la fin du fichier.
+     *
+     * @return bool
+     */
+    protected function setEof(): bool {
+        return $this->eof = true;
     }
 
     /**
@@ -410,8 +351,8 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
         switch( $this->getMode() ) {
             case 'r':
                 throw new StreamException(sprintf('[%s] is in readonly mode',
-                        $this->getUrl()
-                            ->getPath()));
+                    $this->getUrl()
+                        ->getPath()));
                 break;
             case 'r+':
             case 'c':
@@ -448,6 +389,27 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
         $this->setUrl($path);
 
         return $this->stream_stat();
+    }
+
+    /**
+     * Lit les informations sur une ressource de fichier.
+     *
+     * @return array|null
+     */
+    public function stream_stat(): ?array {
+        if( $size = $this->streamSize() ) {
+            return [
+                'size'  => $size,
+                'mode'  => $this->streamIsDir()
+                    ? 16895
+                    : 33279,
+                'ctime' => $this->streamCreatedTime(),
+                'atime' => $this->streamAccessTime(),
+                'mtime' => $this->streamModifiedTime(),
+            ];
+        }
+
+        return null;
     }
 
     /**
@@ -505,6 +467,16 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
         }
 
         return false;
+    }
+
+    /**
+     * Retourne le host du fichier.
+     *
+     * @return string|null
+     */
+    protected function getHost(): ?string {
+        return $this->getUrl()
+            ->getHost();
     }
 
     /**
@@ -594,5 +566,33 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
         $this->setUrl($path);
 
         return $this->streamDeleteDir();
+    }
+
+    /**
+     * Retourne le scheme du fichier.
+     *
+     * @return string|null
+     */
+    protected function getScheme(): ?string {
+        return $this->getUrl()
+            ->getScheme();
+    }
+
+    /**
+     * @return Url|null
+     */
+    private function getUrl(): ?Url {
+        return $this->url;
+    }
+
+    /**
+     * Retourne le chemin du fichier.
+     *
+     * @return string|null
+     */
+    protected function getPath(): ?string {
+        return trim($this->getUrl()
+            ->getPath(),
+            '/');
     }
 }

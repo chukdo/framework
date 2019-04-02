@@ -52,10 +52,6 @@ class Arr implements \Iterator
         ++$this->offset;
     }
 
-    public function rewind(): void {
-        $this->offset = 0;
-    }
-
     /**
      * @return bool
      */
@@ -134,21 +130,14 @@ class Arr implements \Iterator
     /**
      * @return mixed|null
      */
-    public function getNext() {
-        if( isset($this->arr[ $this->offset ]) ) {
-            return $this->arr[ $this->offset++ ];
-        }
-
-        return null;
-    }
-
-    /**
-     * @return mixed|null
-     */
     public function getFirstAndRemove() {
         $this->rewind();
 
         return array_shift($this->arr);
+    }
+
+    public function rewind(): void {
+        $this->offset = 0;
     }
 
     /**
@@ -171,6 +160,17 @@ class Arr implements \Iterator
             unset($this->arr[ $offset ]);
 
             return $next;
+        }
+
+        return null;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getNext() {
+        if( isset($this->arr[ $this->offset ]) ) {
+            return $this->arr[ $this->offset++ ];
         }
 
         return null;

@@ -23,11 +23,27 @@ final class Crypto
      */
     public static function encodeCsrf( int $duration = null ): string {
         return self::encrypt(json_encode([
-                'time'     => time(),
-                'duration' => (int) $duration
-                    ?: 60,
-            ]),
+            'time'     => time(),
+            'duration' => (int) $duration
+                ?: 60,
+        ]),
             '[A"[6cnTDT{J[6s\'');
+    }
+
+    /**
+     * @param string $data
+     * @param string $salt
+     *
+     * @return string
+     */
+    public static function encrypt( string $data, string $salt ): string {
+        $encrypted = openssl_encrypt($data,
+            'bf-ecb',
+            $salt,
+            true);
+        $result    = base64_encode($encrypted);
+
+        return $result;
     }
 
     /**
@@ -54,6 +70,22 @@ final class Crypto
         }
 
         return false;
+    }
+
+    /**
+     * @param string $data
+     * @param string $salt
+     *
+     * @return string
+     */
+    public static function decrypt( string $data, string $salt ): string {
+        $data      = base64_decode($data);
+        $decrypted = openssl_decrypt($data,
+            'bf-ecb',
+            $salt,
+            true);
+
+        return $decrypted;
     }
 
     /**
@@ -92,38 +124,6 @@ final class Crypto
         }
 
         return $token;
-    }
-
-    /**
-     * @param string $data
-     * @param string $salt
-     *
-     * @return string
-     */
-    public static function encrypt( string $data, string $salt ): string {
-        $encrypted = openssl_encrypt($data,
-            'bf-ecb',
-            $salt,
-            true);
-        $result    = base64_encode($encrypted);
-
-        return $result;
-    }
-
-    /**
-     * @param string $data
-     * @param string $salt
-     *
-     * @return string
-     */
-    public static function decrypt( string $data, string $salt ): string {
-        $data      = base64_decode($data);
-        $decrypted = openssl_decrypt($data,
-            'bf-ecb',
-            $salt,
-            true);
-
-        return $decrypted;
     }
 
     /**

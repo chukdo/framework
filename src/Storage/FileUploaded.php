@@ -61,104 +61,6 @@ class FileUploaded
     }
 
     /**
-     * @return string
-     */
-    public function name(): string {
-        return (string) $this->uploadedFile[ 'name' ];
-    }
-
-    /**
-     * @return string
-     */
-    public function path(): string {
-        return (string) $this->uploadedFile[ 'tmp_name' ];
-    }
-
-    /**
-     * @return int
-     */
-    public function size(): int {
-        return (int) $this->uploadedFile[ 'size' ];
-    }
-
-    /**
-     * @return string
-     */
-    public function extension(): string {
-        return Str::extension($this->uploadedFile[ 'name' ]);
-    }
-
-    /**
-     * @return string
-     */
-    public function mimeType(): string {
-        return (string) $this->uploadedFile[ 'type' ];
-    }
-
-    /**
-     * @return string
-     */
-    public function error(): string {
-        return (string) $this->uploadedFile[ 'error' ];
-    }
-
-    /**
-     * @return bool
-     */
-    public function isValid(): bool {
-        return $this->isValidSize() && $this->isValidMimeType();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isValidSize(): bool {
-        if( $this->maxFileSize ) {
-            return $this->size() < $this->maxFileSize;
-        }
-
-        return true;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isValidMimeType(): bool {
-        if( $this->allowedMimeTypes ) {
-            foreach( str::split($this->allowedMimeTypes, ',') as $allowedMimeType ) {
-                if( preg_match("#$allowedMimeType#i", $this->mimeType()) ) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param $path
-     *
-     * @return bool
-     */
-    public function store( $path ): bool {
-        if( $this->isValid() ) {
-            if( move_uploaded_file($this->path(), $path) ) {
-                return true;
-            }
-            else {
-                throw new FileUploadedException(sprintf('Can\'t store uploaded file [%s] to [%s]',
-                    $this->name,
-                    $path));
-            }
-        }
-
-        throw new FileUploadedException(sprintf('Uploaded file [%s] is not valid',
-            $this->name));
-    }
-
-    /**
      * @return array
      */
     private static function normalizeUploadedFiles(): array {
@@ -200,5 +102,103 @@ class FileUploaded
         }
 
         return $uploadedFiles;
+    }
+
+    /**
+     * @return string
+     */
+    public function name(): string {
+        return (string) $this->uploadedFile[ 'name' ];
+    }
+
+    /**
+     * @return string
+     */
+    public function extension(): string {
+        return Str::extension($this->uploadedFile[ 'name' ]);
+    }
+
+    /**
+     * @return string
+     */
+    public function error(): string {
+        return (string) $this->uploadedFile[ 'error' ];
+    }
+
+    /**
+     * @param $path
+     *
+     * @return bool
+     */
+    public function store( $path ): bool {
+        if( $this->isValid() ) {
+            if( move_uploaded_file($this->path(), $path) ) {
+                return true;
+            }
+            else {
+                throw new FileUploadedException(sprintf('Can\'t store uploaded file [%s] to [%s]',
+                    $this->name,
+                    $path));
+            }
+        }
+
+        throw new FileUploadedException(sprintf('Uploaded file [%s] is not valid',
+            $this->name));
+    }
+
+    /**
+     * @return bool
+     */
+    public function isValid(): bool {
+        return $this->isValidSize() && $this->isValidMimeType();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isValidSize(): bool {
+        if( $this->maxFileSize ) {
+            return $this->size() < $this->maxFileSize;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return int
+     */
+    public function size(): int {
+        return (int) $this->uploadedFile[ 'size' ];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isValidMimeType(): bool {
+        if( $this->allowedMimeTypes ) {
+            foreach( str::split($this->allowedMimeTypes, ',') as $allowedMimeType ) {
+                if( preg_match("#$allowedMimeType#i", $this->mimeType()) ) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return string
+     */
+    public function mimeType(): string {
+        return (string) $this->uploadedFile[ 'type' ];
+    }
+
+    /**
+     * @return string
+     */
+    public function path(): string {
+        return (string) $this->uploadedFile[ 'tmp_name' ];
     }
 }

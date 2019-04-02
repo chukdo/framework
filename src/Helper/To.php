@@ -112,6 +112,33 @@ final class To
     /**
      * @param $value
      *
+     * @return mixed
+     */
+    public static function scalar( $value ) {
+        $scalar = '';
+
+        if( Is::scalar($value) ) {
+            $scalar = $value;
+        }
+        elseif( Is::object($value,
+            '__toString') ) {
+            $scalar = $value->__toString();
+        }
+        elseif( Is::traversable($value) ) {
+            foreach( $value as $v ) {
+                $scalar .= self::scalar($v) . ' ';
+            }
+        }
+        else {
+            $scalar = (string) $value;
+        }
+
+        return $scalar;
+    }
+
+    /**
+     * @param $value
+     *
      * @return float
      */
     public static function float( $value ): float {
@@ -156,28 +183,20 @@ final class To
     /**
      * @param $value
      *
-     * @return mixed
+     * @return string
      */
-    public static function scalar( $value ) {
-        $scalar = '';
-
-        if( Is::scalar($value) ) {
-            $scalar = $value;
+    public static function json( $value ): string {
+        if( is_scalar($value) ) {
+            return $value;
         }
         elseif( Is::object($value,
-            '__toString') ) {
-            $scalar = $value->__toString();
-        }
-        elseif( Is::traversable($value) ) {
-            foreach( $value as $v ) {
-                $scalar .= self::scalar($v) . ' ';
-            }
+            'toJson') ) {
+            return $value->toJson();
         }
         else {
-            $scalar = (string) $value;
+            return json_encode(self::arr($value),
+                JSON_PRETTY_PRINT);
         }
-
-        return $scalar;
     }
 
     /**
@@ -223,25 +242,6 @@ final class To
         }
 
         return $array;
-    }
-
-    /**
-     * @param $value
-     *
-     * @return string
-     */
-    public static function json( $value ): string {
-        if( is_scalar($value) ) {
-            return $value;
-        }
-        elseif( Is::object($value,
-            'toJson') ) {
-            return $value->toJson();
-        }
-        else {
-            return json_encode(self::arr($value),
-                JSON_PRETTY_PRINT);
-        }
     }
 
     /**

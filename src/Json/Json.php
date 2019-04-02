@@ -45,36 +45,6 @@ class Json extends \ArrayObject
     }
 
     /**
-     * @param mixed ...$params
-     *
-     * @return mixed
-     */
-    protected function newParentClass( ... $params ) {
-        try {
-            $rc = new \ReflectionClass(get_called_class());
-            $rc->newInstanceArgs($params);
-
-            return call_user_func_array([
-                $rc,
-                'newInstance',
-            ],
-                $params);
-        } catch( \Throwable $e ) {
-        }
-    }
-
-    /**
-     * @param $object
-     *
-     * @return bool
-     */
-    protected function instanceOfJson( $object ): bool {
-        return $object instanceof Json
-               || is_subclass_of($object,
-                'Chukdo\Json\Json');
-    }
-
-    /**
      * @param mixed $key
      * @param mixed $value
      *
@@ -91,6 +61,25 @@ class Json extends \ArrayObject
         }
 
         return $this;
+    }
+
+    /**
+     * @param mixed ...$params
+     *
+     * @return mixed
+     */
+    protected function newParentClass( ... $params ) {
+        try {
+            $rc = new \ReflectionClass(get_called_class());
+            $rc->newInstanceArgs($params);
+
+            return call_user_func_array([
+                $rc,
+                'newInstance',
+            ],
+                $params);
+        } catch( \Throwable $e ) {
+        }
     }
 
     /**
@@ -313,6 +302,17 @@ class Json extends \ArrayObject
     }
 
     /**
+     * @param $object
+     *
+     * @return bool
+     */
+    protected function instanceOfJson( $object ): bool {
+        return $object instanceof Json
+               || is_subclass_of($object,
+                'Chukdo\Json\Json');
+    }
+
+    /**
      * @param iterable $data
      *
      * @return Json
@@ -442,6 +442,32 @@ class Json extends \ArrayObject
 
     /**
      * @param string $path
+     * @param null   $default
+     *
+     * @return Json|mixed|null
+     */
+    public function get( string $path, $default = null ) {
+        if( Str::notContain($path,
+            '.') ) {
+            return $this->offsetGet($path,
+                $default);
+        }
+
+        $arr       = new Arr(Str::split($path,
+            '.'));
+        $firstPath = $arr->getFirstAndRemove();
+        $endPath   = $arr->join('.');
+        $get       = $this->offsetGet($firstPath);
+
+        if( $this->instanceOfJson($get) ) {
+            return $get->get($endPath);
+        }
+
+        return $default;
+    }
+
+    /**
+     * @param string $path
      * @param        $value
      *
      * @return Json
@@ -479,32 +505,6 @@ class Json extends \ArrayObject
                     ?: [])
                 ->offsetGet($key);
         }
-    }
-
-    /**
-     * @param string $path
-     * @param null   $default
-     *
-     * @return Json|mixed|null
-     */
-    public function get( string $path, $default = null ) {
-        if( Str::notContain($path,
-            '.') ) {
-            return $this->offsetGet($path,
-                $default);
-        }
-
-        $arr       = new Arr(Str::split($path,
-            '.'));
-        $firstPath = $arr->getFirstAndRemove();
-        $endPath   = $arr->join('.');
-        $get       = $this->offsetGet($firstPath);
-
-        if( $this->instanceOfJson($get) ) {
-            return $get->get($endPath);
-        }
-
-        return $default;
     }
 
     /**

@@ -23,39 +23,6 @@ final class Is
      *
      * @return bool
      */
-    public function empty( $value ): bool {
-        if( self::scalar($value) ) {
-            $value = trim($value);
-
-            if( $value === '' || $value === null ) {
-                return true;
-            }
-        }
-        elseif( self::traversable($value) ) {
-            foreach( $value as $v ) {
-                return false;
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param $value
-     *
-     * @return bool
-     */
-    public static function scalar( $value ): bool {
-        return is_scalar($value);
-    }
-
-    /**
-     * @param $value
-     *
-     * @return bool
-     */
     public static function json( $value ): bool {
         $json = json_decode($value);
 
@@ -69,15 +36,6 @@ final class Is
      */
     public static function arr( $value ): bool {
         return is_array($value) || $value instanceof \ArrayObject || $value instanceof Arr;
-    }
-
-    /**
-     * @param $value
-     *
-     * @return bool
-     */
-    public static function traversable( $value ): bool {
-        return is_array($value) || $value instanceof \Traversable;
     }
 
     /**
@@ -322,5 +280,47 @@ final class Is
                         'regexp' => '/^[0-9abcdef]{22,26}$/iu',
                     ],
                 ]) !== false;
+    }
+
+    /**
+     * @param $value
+     *
+     * @return bool
+     */
+    public function empty( $value ): bool {
+        if( self::scalar($value) ) {
+            $value = trim($value);
+
+            if( $value === '' || $value === null ) {
+                return true;
+            }
+        }
+        elseif( self::traversable($value) ) {
+            foreach( $value as $v ) {
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $value
+     *
+     * @return bool
+     */
+    public static function scalar( $value ): bool {
+        return is_scalar($value);
+    }
+
+    /**
+     * @param $value
+     *
+     * @return bool
+     */
+    public static function traversable( $value ): bool {
+        return is_array($value) || $value instanceof \Traversable;
     }
 }

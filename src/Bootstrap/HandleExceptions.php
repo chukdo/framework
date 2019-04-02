@@ -34,17 +34,17 @@ class HandleExceptions
 
         error_reporting(-1);
         set_error_handler([
-                $this,
-                'handleError',
-            ]);
+            $this,
+            'handleError',
+        ]);
         set_exception_handler([
-                $this,
-                'handleException',
-            ]);
+            $this,
+            'handleException',
+        ]);
         register_shutdown_function([
-                $this,
-                'handleShutdown',
-            ]);
+            $this,
+            'handleShutdown',
+        ]);
         ini_set('display_errors',
             'Off');
     }
@@ -61,6 +61,31 @@ class HandleExceptions
         if( error_reporting() & $level ) {
             throw new ErrorException($message, 0, $level, $file, $line);
         }
+    }
+
+    /**
+     * @throws ServiceException
+     * @throws \ReflectionException
+     */
+    public function handleShutdown(): void {
+        if( !is_null($error = error_get_last()) && $this->isFatal($error[ 'type' ]) ) {
+            $this->handleException($this->fatalExceptionFromError($error));
+        }
+    }
+
+    /**
+     * @param int $type
+     *
+     * @return bool
+     */
+    protected function isFatal( int $type ): bool {
+        return in_array($type,
+            [
+                E_COMPILE_ERROR,
+                E_CORE_ERROR,
+                E_ERROR,
+                E_PARSE,
+            ]);
     }
 
     /**
@@ -90,13 +115,13 @@ class HandleExceptions
     }
 
     /**
+     * @return mixed|object|null
+     *
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function handleShutdown(): void {
-        if( !is_null($error = error_get_last()) && $this->isFatal($error[ 'type' ]) ) {
-            $this->handleException($this->fatalExceptionFromError($error));
-        }
+    protected function getExceptionHandler() {
+        return $this->app->make('Chukdo\Bootstrap\ExceptionHandler');
     }
 
     /**
@@ -106,30 +131,5 @@ class HandleExceptions
      */
     protected function fatalExceptionFromError( array $error ): ErrorException {
         return new ErrorException($error[ 'message' ], 0, $error[ 'type' ], $error[ 'file' ], $error[ 'line' ]);
-    }
-
-    /**
-     * @param int $type
-     *
-     * @return bool
-     */
-    protected function isFatal( int $type ): bool {
-        return in_array($type,
-            [
-                E_COMPILE_ERROR,
-                E_CORE_ERROR,
-                E_ERROR,
-                E_PARSE,
-            ]);
-    }
-
-    /**
-     * @return mixed|object|null
-     *
-     * @throws ServiceException
-     * @throws \ReflectionException
-     */
-    protected function getExceptionHandler() {
-        return $this->app->make('Chukdo\Bootstrap\ExceptionHandler');
     }
 }

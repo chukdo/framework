@@ -42,212 +42,6 @@ class Url
     }
 
     /**
-     * @param string $scheme
-     *
-     * @return Url
-     */
-    public function setScheme( string $scheme ): Url {
-        $this->url[ 'scheme' ] = $scheme;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getScheme(): string {
-        return $this->url[ 'scheme' ];
-    }
-
-    /**
-     * @param string $user
-     *
-     * @return Url
-     */
-    public function setUser( string $user ): Url {
-        $this->url[ 'user' ] = $user;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUser(): string {
-        return $this->url[ 'user' ];
-    }
-
-    /**
-     * @param string $pass
-     *
-     * @return Url
-     */
-    public function setPass( string $pass ): Url {
-        $this->url[ 'pass' ] = $pass;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPass(): string {
-        return $this->url[ 'pass' ];
-    }
-
-    /**
-     * @param string $host
-     *
-     * @return Url
-     */
-    public function setHost( string $host ): Url {
-        $this->url[ 'host' ] = $host;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getHost(): string {
-        return $this->url[ 'host' ];
-    }
-
-    /**
-     * @param string $port
-     *
-     * @return Url
-     */
-    public function setPort( string $port ): Url {
-        $this->url[ 'port' ] = $port;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPort(): String {
-        return $this->url[ 'port' ];
-    }
-
-    /**
-     * @param string $path
-     *
-     * @return Url
-     */
-    public function setPath( string $path ): Url {
-        $this->setDir(dirname($path));
-        $this->setFile(basename($path));
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPath(): string {
-        return rtrim($this->getDir(),
-                '/') . '/' . $this->getFile();
-    }
-
-    /**
-     * @param string $dir
-     *
-     * @return Url
-     */
-    public function setDir( string $dir ): Url {
-        $this->url[ 'dir' ] = $dir;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDir(): string {
-        return $this->url[ 'dir' ];
-    }
-
-    /**
-     * @param string $file
-     *
-     * @return Url
-     */
-    public function setFile( string $file ): Url {
-        $this->url[ 'file' ] = $file;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFile(): string {
-        return $this->url[ 'file' ];
-    }
-
-    /**
-     * @param string $key
-     * @param string $value
-     *
-     * @return Url
-     */
-    public function setInput( string $key, string $value ): Url {
-        $this->url[ 'input' ][ $key ] = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return string
-     */
-    public function getInput( string $key ): string {
-        return isset($this->url[ 'input' ][ $key ])
-            ? $this->url[ 'input' ][ $key ]
-            : '';
-    }
-
-    /**
-     * @param string $query
-     *
-     * @return Url
-     */
-    public function setQuery( string $query ): Url {
-        parse_str($query,
-            $this->url[ 'input' ]);
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getQuery(): string {
-        return http_build_query($this->url[ 'input' ]);
-    }
-
-    /**
-     * @param string $fragment
-     *
-     * @return Url
-     */
-    public function setFragment( string $fragment ): Url {
-        $this->url[ 'fragment' ] = $fragment;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFragment(): string {
-        return $this->url[ 'fragment' ];
-    }
-
-    /**
      * @param string $url
      *
      * @return Url
@@ -280,6 +74,157 @@ class Url
     }
 
     /**
+     * @param string $fragment
+     *
+     * @return Url
+     */
+    public function setFragment( string $fragment ): Url {
+        $this->url[ 'fragment' ] = $fragment;
+
+        return $this;
+    }
+
+    /**
+     * @param string $query
+     *
+     * @return Url
+     */
+    public function setQuery( string $query ): Url {
+        parse_str($query,
+            $this->url[ 'input' ]);
+
+        return $this;
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return Url
+     */
+    public function setPath( string $path ): Url {
+        $this->setDir(dirname($path));
+        $this->setFile(basename($path));
+
+        return $this;
+    }
+
+    /**
+     * @param string $dir
+     *
+     * @return Url
+     */
+    public function setDir( string $dir ): Url {
+        $this->url[ 'dir' ] = $dir;
+
+        return $this;
+    }
+
+    /**
+     * @param string $file
+     *
+     * @return Url
+     */
+    public function setFile( string $file ): Url {
+        $this->url[ 'file' ] = $file;
+
+        return $this;
+    }
+
+    /**
+     * @param string $pass
+     *
+     * @return Url
+     */
+    public function setPass( string $pass ): Url {
+        $this->url[ 'pass' ] = $pass;
+
+        return $this;
+    }
+
+    /**
+     * @param string $user
+     *
+     * @return Url
+     */
+    public function setUser( string $user ): Url {
+        $this->url[ 'user' ] = $user;
+
+        return $this;
+    }
+
+    /**
+     * @param string $port
+     *
+     * @return Url
+     */
+    public function setPort( string $port ): Url {
+        $this->url[ 'port' ] = $port;
+
+        return $this;
+    }
+
+    /**
+     * @param string $host
+     *
+     * @return Url
+     */
+    public function setHost( string $host ): Url {
+        $this->url[ 'host' ] = $host;
+
+        return $this;
+    }
+
+    /**
+     * @param string $scheme
+     *
+     * @return Url
+     */
+    public function setScheme( string $scheme ): Url {
+        $this->url[ 'scheme' ] = $scheme;
+
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     *
+     * @return Url
+     */
+    public function setInput( string $key, string $value ): Url {
+        $this->url[ 'input' ][ $key ] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return string
+     */
+    public function getInput( string $key ): string {
+        return isset($this->url[ 'input' ][ $key ])
+            ? $this->url[ 'input' ][ $key ]
+            : '';
+    }
+
+    /**
+     * @return string
+     */
+    public function buildUrl(): string {
+        return $this->buildDsn() . $this->buildPath() . $this->buildQuery() . $this->buildFragment();
+    }
+
+    /**
+     * Construit la partie de l'url "protocole://authentification@hote:port".
+     *
+     * @return string
+     */
+    public function buildDsn(): string {
+        return $this->buildScheme() . $this->buildAuth() . $this->buildHost() . $this->buildPort();
+    }
+
+    /**
      * @return string
      */
     public function buildScheme(): string {
@@ -288,6 +233,13 @@ class Url
         }
 
         return '';
+    }
+
+    /**
+     * @return string
+     */
+    public function getScheme(): string {
+        return $this->url[ 'scheme' ];
     }
 
     /**
@@ -308,8 +260,29 @@ class Url
     /**
      * @return string
      */
+    public function getUser(): string {
+        return $this->url[ 'user' ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getPass(): string {
+        return $this->url[ 'pass' ];
+    }
+
+    /**
+     * @return string
+     */
     public function buildHost(): string {
         return $this->getHost();
+    }
+
+    /**
+     * @return string
+     */
+    public function getHost(): string {
+        return $this->url[ 'host' ];
     }
 
     /**
@@ -324,12 +297,10 @@ class Url
     }
 
     /**
-     * Construit la partie de l'url "protocole://authentification@hote:port".
-     *
      * @return string
      */
-    public function buildDsn(): string {
-        return $this->buildScheme() . $this->buildAuth() . $this->buildHost() . $this->buildPort();
+    public function getPort(): String {
+        return $this->url[ 'port' ];
     }
 
     /**
@@ -337,6 +308,28 @@ class Url
      */
     public function buildPath(): string {
         return $this->getPath();
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath(): string {
+        return rtrim($this->getDir(),
+                '/') . '/' . $this->getFile();
+    }
+
+    /**
+     * @return string
+     */
+    public function getDir(): string {
+        return $this->url[ 'dir' ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getFile(): string {
+        return $this->url[ 'file' ];
     }
 
     /**
@@ -353,6 +346,13 @@ class Url
     /**
      * @return string
      */
+    public function getQuery(): string {
+        return http_build_query($this->url[ 'input' ]);
+    }
+
+    /**
+     * @return string
+     */
     public function buildFragment(): string {
         if( $fragment = $this->getFragment() ) {
             return '#' . $fragment;
@@ -364,7 +364,7 @@ class Url
     /**
      * @return string
      */
-    public function buildUrl(): string {
-        return $this->buildDsn() . $this->buildPath() . $this->buildQuery() . $this->buildFragment();
+    public function getFragment(): string {
+        return $this->url[ 'fragment' ];
     }
 }

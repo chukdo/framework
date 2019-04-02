@@ -87,42 +87,6 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * Retourne la liste des niveaux de la RFC 5424.
-     *
-     * @return array
-     */
-    public static function getLevels(): array {
-        return self::$levels;
-    }
-
-    /**
-     * @param int $level
-     *
-     * @return string
-     */
-    public static function getLevel( int $level ): string {
-        return self::$levels[ $level ];
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return Logger
-     */
-    public function setName( string $name ): self {
-        $this->name = ucfirst(strtolower($name));
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName() {
-        return $this->name;
-    }
-
-    /**
      * Ajoute un gestionnaire de log à la pile des gestionnaires de logs.
      *
      * @param HandlerInterface $handler
@@ -151,6 +115,15 @@ class Logger implements LoggerInterface
     }
 
     /**
+     * Retourne la liste des niveaux de la RFC 5424.
+     *
+     * @return array
+     */
+    public static function getLevels(): array {
+        return self::$levels;
+    }
+
+    /**
      * @param string $message
      * @param array  $context
      *
@@ -162,6 +135,119 @@ class Logger implements LoggerInterface
         return $this->log(self::ALERT,
             $message,
             $context);
+    }
+
+    /**
+     * @param int    $level
+     * @param string $message
+     * @param array  $context
+     *
+     * @return bool
+     *
+     * @throws LoggerException
+     */
+    public function log( int $level, string $message, array $context = [] ): bool {
+        if( empty($this->handlers) ) {
+            throw new LoggerException('You tried to log record from an empty handler stack.');
+        }
+
+        if( !isset(self::$levels[ $level ]) ) {
+            throw new LoggerException("You tried to log record with unknown level [$level]");
+        }
+
+        $record = [
+            'message'   => $this->interpolate($message,
+                $context),
+            'level'     => $level,
+            'levelname' => $this->getLevel($level),
+            'channel'   => $this->getName(),
+            'date'      => time(),
+            'extra'     => [],
+            'formatted' => null,
+        ];
+
+        return $this->handleRecord($this->processRecord($record));
+    }
+
+    /**
+     * @param string $message
+     * @param array  $context
+     *
+     * @return string
+     */
+    public function interpolate( string $message, array $context = [] ): string {
+        $replace = [];
+
+        foreach( $context as $key => $val ) {
+            if( !is_array($val)
+                && (!is_object($val)
+                    || method_exists($val,
+                        '__toString')) ) {
+                $replace[ '{' . $key . '}' ] = $val;
+            }
+        }
+
+        return strtr($message,
+            $replace);
+    }
+
+    /**
+     * @param int $level
+     *
+     * @return string
+     */
+    public static function getLevel( int $level ): string {
+        return self::$levels[ $level ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getName() {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Logger
+     */
+    public function setName( string $name ): self {
+        $this->name = ucfirst(strtolower($name));
+
+        return $this;
+    }
+
+    /**
+     * Envoi l'enregistrement aupres des gestionnaires de logs.
+     *
+     * @param array $record
+     *
+     * @return bool true si un gestionnaire à traiter l'enregistrement false sinon
+     */
+    public function handleRecord( array $record ): bool {
+        $handle = 0;
+
+        foreach( $this->handlers as $handler ) {
+            $handle += (int) $handler->handle($record);
+        }
+
+        return $handle > 0;
+    }
+
+    /**
+     * Modifie / ajoute des données à un enregistrement.
+     *
+     * @param array $record
+     *
+     * @return array
+     */
+    public function processRecord( array $record ): array {
+        foreach( $this->processors as $processor ) {
+            $record = $processor->processRecord($record);
+        }
+
+        return $record;
     }
 
     /**
@@ -260,91 +346,5 @@ class Logger implements LoggerInterface
         return $this->log(self::DEBUG,
             $message,
             $context);
-    }
-
-    /**
-     * @param int    $level
-     * @param string $message
-     * @param array  $context
-     *
-     * @return bool
-     *
-     * @throws LoggerException
-     */
-    public function log( int $level, string $message, array $context = [] ): bool {
-        if( empty($this->handlers) ) {
-            throw new LoggerException('You tried to log record from an empty handler stack.');
-        }
-
-        if( !isset(self::$levels[ $level ]) ) {
-            throw new LoggerException("You tried to log record with unknown level [$level]");
-        }
-
-        $record = [
-            'message'   => $this->interpolate($message,
-                $context),
-            'level'     => $level,
-            'levelname' => $this->getLevel($level),
-            'channel'   => $this->getName(),
-            'date'      => time(),
-            'extra'     => [],
-            'formatted' => null,
-        ];
-
-        return $this->handleRecord($this->processRecord($record));
-    }
-
-    /**
-     * @param string $message
-     * @param array  $context
-     *
-     * @return string
-     */
-    public function interpolate( string $message, array $context = [] ): string {
-        $replace = [];
-
-        foreach( $context as $key => $val ) {
-            if( !is_array($val)
-                && (!is_object($val)
-                    || method_exists($val,
-                        '__toString')) ) {
-                $replace[ '{' . $key . '}' ] = $val;
-            }
-        }
-
-        return strtr($message,
-            $replace);
-    }
-
-    /**
-     * Modifie / ajoute des données à un enregistrement.
-     *
-     * @param array $record
-     *
-     * @return array
-     */
-    public function processRecord( array $record ): array {
-        foreach( $this->processors as $processor ) {
-            $record = $processor->processRecord($record);
-        }
-
-        return $record;
-    }
-
-    /**
-     * Envoi l'enregistrement aupres des gestionnaires de logs.
-     *
-     * @param array $record
-     *
-     * @return bool true si un gestionnaire à traiter l'enregistrement false sinon
-     */
-    public function handleRecord( array $record ): bool {
-        $handle = 0;
-
-        foreach( $this->handlers as $handler ) {
-            $handle += (int) $handler->handle($record);
-        }
-
-        return $handle > 0;
     }
 }

@@ -23,6 +23,19 @@ final class Image
     }
 
     /**
+     * @param string $file
+     *
+     * @return array|null
+     */
+    public static function loadImageFromFile( string $file ): ?array {
+        if( $string = file_get_contents($file) ) {
+            return self::loadImageFromString($string);
+        }
+
+        return false;
+    }
+
+    /**
      * Retourne les proprietes d'une images (largeur, hauteur, mime-type, image sous forme de resource).
      *
      * @param string $string
@@ -50,19 +63,6 @@ final class Image
     }
 
     /**
-     * @param string $file
-     *
-     * @return array|null
-     */
-    public static function loadImageFromFile( string $file ): ?array {
-        if( $string = file_get_contents($file) ) {
-            return self::loadImageFromString($string);
-        }
-
-        return false;
-    }
-
-    /**
      * @param string $base64
      *
      * @return array|null
@@ -71,8 +71,8 @@ final class Image
         $pattern = '/^data:image\/[a-z]{3,4};base64,/';
 
         if( $string = base64_decode(preg_replace($pattern,
-                '',
-                $base64)) ) {
+            '',
+            $base64)) ) {
             return self::loadImageFromString($string);
         }
 
@@ -80,45 +80,15 @@ final class Image
     }
 
     /**
-     * Retourne le flux d'une nouvelle image (que l'on peut sauver dans un fichier).
+     * @param array $image [w, h, t, i] (self::loadImage*)
+     * @param int   $quality
      *
-     * @param resource $image   (imagecreatetruecolor)
-     * @param int      $format  type d'image (IMAGETYPE_GIF | IMAGETYPE_JPEG | IMAGETYPE_PNG)
-     * @param int|null $quality (0 à 100)
-     *
-     * @return string
+     * @return string|null
      */
-    public static function getImage( $image, int $format, int $quality = null ): string {
-        ob_start();
-
-        switch( $format ) {
-            case 'image/gif':
-                imagegif($image);
-                break;
-            case 'image/jpeg':
-                imagejpeg($image,
-                    null,
-                    $quality
-                        ?: 85);
-                break;
-            case 'image/png':
-                $quality = 9 - abs(floor((($quality
-                                    ?: 85) - 1) / 10));
-                imagealphablending($image,
-                    false);
-                imagesavealpha($image,
-                    true);
-                imagepng($image,
-                    null,
-                    $quality
-                        ?: 85);
-                break;
-        }
-
-        $r = ob_get_contents();
-        ob_end_clean();
-
-        return $r;
+    public static function convertToJpg( array $image, int $quality ): ?string {
+        return self::convert($image,
+            IMAGETYPE_JPEG,
+            $quality);
     }
 
     /**
@@ -162,15 +132,45 @@ final class Image
     }
 
     /**
-     * @param array $image [w, h, t, i] (self::loadImage*)
-     * @param int   $quality
+     * Retourne le flux d'une nouvelle image (que l'on peut sauver dans un fichier).
      *
-     * @return string|null
+     * @param resource $image   (imagecreatetruecolor)
+     * @param int      $format  type d'image (IMAGETYPE_GIF | IMAGETYPE_JPEG | IMAGETYPE_PNG)
+     * @param int|null $quality (0 à 100)
+     *
+     * @return string
      */
-    public static function convertToJpg( array $image, int $quality ): ?string {
-        return self::convert($image,
-            IMAGETYPE_JPEG,
-            $quality);
+    public static function getImage( $image, int $format, int $quality = null ): string {
+        ob_start();
+
+        switch( $format ) {
+            case 'image/gif':
+                imagegif($image);
+                break;
+            case 'image/jpeg':
+                imagejpeg($image,
+                    null,
+                    $quality
+                        ?: 85);
+                break;
+            case 'image/png':
+                $quality = 9 - abs(floor((($quality
+                                ?: 85) - 1) / 10));
+                imagealphablending($image,
+                    false);
+                imagesavealpha($image,
+                    true);
+                imagepng($image,
+                    null,
+                    $quality
+                        ?: 85);
+                break;
+        }
+
+        $r = ob_get_contents();
+        ob_end_clean();
+
+        return $r;
     }
 
     /**
@@ -249,35 +249,6 @@ final class Image
     }
 
     /**
-     * Crop une image.
-     *
-     * @param array $image [w, h, t, i]
-     * @param int   $dx    point de depart x
-     * @param int   $dy    point de depart y
-     * @param int   $dw    largeur
-     * @param int   $dh    hauteur
-     *
-     * @return string|null
-     */
-    public static function crop( array $image, int $dx, int $dy, int $dw, int $dh ): ?string {
-        $sw = $image[ 'w' ];
-        $sh = $image[ 'h' ];
-
-        /* Taille finale > taille initiale */
-        if( $dx + $dw > $sw || $dy + $dh > $sh ) {
-            return false;
-        }
-
-        return self::resampleImage($image,
-            $dx,
-            $dy,
-            $dw,
-            $dh,
-            $dw,
-            $dh);
-    }
-
-    /**
      * Retaille une image.
      *
      * @param array    $image [w, h, t, i]
@@ -341,5 +312,34 @@ final class Image
         }
 
         return null;
+    }
+
+    /**
+     * Crop une image.
+     *
+     * @param array $image [w, h, t, i]
+     * @param int   $dx    point de depart x
+     * @param int   $dy    point de depart y
+     * @param int   $dw    largeur
+     * @param int   $dh    hauteur
+     *
+     * @return string|null
+     */
+    public static function crop( array $image, int $dx, int $dy, int $dw, int $dh ): ?string {
+        $sw = $image[ 'w' ];
+        $sh = $image[ 'h' ];
+
+        /* Taille finale > taille initiale */
+        if( $dx + $dw > $sw || $dy + $dh > $sh ) {
+            return false;
+        }
+
+        return self::resampleImage($image,
+            $dx,
+            $dy,
+            $dw,
+            $dh,
+            $dw,
+            $dh);
     }
 }

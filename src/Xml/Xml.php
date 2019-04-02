@@ -51,6 +51,30 @@ class Xml extends Node
     }
 
     /**
+     * @param string $file
+     * @param bool   $html
+     *
+     * @return Xml
+     *
+     * @throws XmlException
+     */
+    public static function loadFromFile( string $file, bool $html = false ): Xml {
+        try {
+            $xml = new Xml();
+            $html === false
+                ? $xml->doc()
+                ->load($file)
+                : $xml->doc()
+                ->loadHTMLFile($file);
+            $xml->setElement($xml->doc()->documentElement);
+
+            return $xml;
+        } catch( Throwable $e ) {
+            throw new XmlException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    /**
      * @return DOMDocument
      */
     public function doc() {
@@ -83,24 +107,64 @@ class Xml extends Node
      * @param string $file
      * @param bool   $html
      *
-     * @return Xml
+     * @return bool
+     */
+    public function saveToFile( string $file, bool $html = false ): bool {
+        $dir = dirname($file);
+
+        if( !is_dir($dir) ) {
+            if( !mkdir($dir,
+                0777,
+                true) ) {
+                return false;
+            }
+        }
+
+        return $html
+            ? $this->doc()
+                ->saveHTMLFile($file)
+            : $this->doc()
+                ->save($file);
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString(): string {
+        return $this->doc()
+            ->saveXML();
+    }
+
+    /**
+     * @return array
+     */
+    public function __sleep(): array {
+        $this->buffer = $this->saveToString();
+
+        return [ 'buffer' ];
+    }
+
+    /**
+     * @param bool $html
      *
+     * @return string
+     */
+    public function saveToString( bool $html = false ): string {
+        return $html
+            ? $this->doc()
+                ->saveHTML()
+            : $this->doc()
+                ->saveXML();
+    }
+
+    /**
+     * @throws NodeException
      * @throws XmlException
      */
-    public static function loadFromFile( string $file, bool $html = false ): Xml {
-        try {
-            $xml = new Xml();
-            $html === false
-                ? $xml->doc()
-                ->load($file)
-                : $xml->doc()
-                ->loadHTMLFile($file);
-            $xml->setElement($xml->doc()->documentElement);
-
-            return $xml;
-        } catch( Throwable $e ) {
-            throw new XmlException($e->getMessage(), $e->getCode(), $e);
-        }
+    public function __wakeup(): void {
+        $xml          = xml::loadFromString($this->buffer);
+        $this->xml    = $xml->doc();
+        $this->__node = $xml->element();
     }
 
     /**
@@ -126,69 +190,5 @@ class Xml extends Node
         } catch( Exception $e ) {
             throw new XmlException($e->getMessage(), $e->getCode(), $e);
         }
-    }
-
-    /**
-     * @param string $file
-     * @param bool   $html
-     *
-     * @return bool
-     */
-    public function saveToFile( string $file, bool $html = false ): bool {
-        $dir = dirname($file);
-
-        if( !is_dir($dir) ) {
-            if( !mkdir($dir,
-                0777,
-                true) ) {
-                return false;
-            }
-        }
-
-        return $html
-            ? $this->doc()
-                ->saveHTMLFile($file)
-            : $this->doc()
-                ->save($file);
-    }
-
-    /**
-     * @param bool $html
-     *
-     * @return string
-     */
-    public function saveToString( bool $html = false ): string {
-        return $html
-            ? $this->doc()
-                ->saveHTML()
-            : $this->doc()
-                ->saveXML();
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString(): string {
-        return $this->doc()
-            ->saveXML();
-    }
-
-    /**
-     * @return array
-     */
-    public function __sleep(): array {
-        $this->buffer = $this->saveToString();
-
-        return [ 'buffer' ];
-    }
-
-    /**
-     * @throws NodeException
-     * @throws XmlException
-     */
-    public function __wakeup(): void {
-        $xml          = xml::loadFromString($this->buffer);
-        $this->xml    = $xml->doc();
-        $this->__node = $xml->element();
     }
 }
