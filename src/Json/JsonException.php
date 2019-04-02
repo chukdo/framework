@@ -7,20 +7,15 @@ use Throwable;
 
 /**
  * Intégration d'une exception dans Json.
- *
  * @version       1.0.0
- *
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
- *
  * @since         08/01/2019
- *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class JsonException extends Json
 {
     /**
      * @param Throwable $e
-     *
      * @return JsonException
      */
     public function loadException( Throwable $e ): self {
@@ -67,7 +62,6 @@ class JsonException extends Json
     /**
      * @param string $file
      * @param int    $line
-     *
      * @return string
      */
     protected function getCode( string $file, int $line ): string {
@@ -98,7 +92,6 @@ class JsonException extends Json
      * @param string|null $title
      * @param string|null $code
      * @param string|null $widthFirstCol
-     *
      * @return string
      */
     public function toHtml( string $title = null, string $code = null, string $widthFirstCol = null ): string {

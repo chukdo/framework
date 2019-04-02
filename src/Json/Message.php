@@ -4,13 +4,9 @@ namespace Chukdo\Json;
 
 /**
  * Gestion des messages.
- *
  * @version      1.0.0
- *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
- *
  * @since        08/01/2019
- *
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Message extends Json
@@ -22,7 +18,6 @@ class Message extends Json
 
     /**
      * Message constructor.
-     *
      * @param string $name
      */
     public function __construct( string $name ) {
@@ -35,7 +30,6 @@ class Message extends Json
      * @param string|null $title
      * @param string|null $color
      * @param string|null $widthFirstCol
-     *
      * @return string
      */
     public function toHtml( string $title = null, string $color = null, string $widthFirstCol = null ): string {

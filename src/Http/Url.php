@@ -4,13 +4,9 @@ namespace Chukdo\Http;
 
 /**
  * Gestion des URLs.
- *
  * @version       1.0.0
- *
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
- *
  * @since         08/01/2019
- *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Url
@@ -32,7 +28,6 @@ class Url
 
     /**
      * Url constructor.
-     *
      * @param string|null $url
      */
     public function __construct( string $url = null ) {
@@ -43,7 +38,6 @@ class Url
 
     /**
      * @param string $url
-     *
      * @return Url
      */
     public function parseUrl( string $url ): Url {
@@ -75,7 +69,6 @@ class Url
 
     /**
      * @param string $fragment
-     *
      * @return Url
      */
     public function setFragment( string $fragment ): Url {
@@ -86,7 +79,6 @@ class Url
 
     /**
      * @param string $query
-     *
      * @return Url
      */
     public function setQuery( string $query ): Url {
@@ -98,7 +90,6 @@ class Url
 
     /**
      * @param string $path
-     *
      * @return Url
      */
     public function setPath( string $path ): Url {
@@ -110,7 +101,6 @@ class Url
 
     /**
      * @param string $dir
-     *
      * @return Url
      */
     public function setDir( string $dir ): Url {
@@ -121,7 +111,6 @@ class Url
 
     /**
      * @param string $file
-     *
      * @return Url
      */
     public function setFile( string $file ): Url {
@@ -132,7 +121,6 @@ class Url
 
     /**
      * @param string $pass
-     *
      * @return Url
      */
     public function setPass( string $pass ): Url {
@@ -143,7 +131,6 @@ class Url
 
     /**
      * @param string $user
-     *
      * @return Url
      */
     public function setUser( string $user ): Url {
@@ -154,7 +141,6 @@ class Url
 
     /**
      * @param string $port
-     *
      * @return Url
      */
     public function setPort( string $port ): Url {
@@ -165,7 +151,6 @@ class Url
 
     /**
      * @param string $host
-     *
      * @return Url
      */
     public function setHost( string $host ): Url {
@@ -176,7 +161,6 @@ class Url
 
     /**
      * @param string $scheme
-     *
      * @return Url
      */
     public function setScheme( string $scheme ): Url {
@@ -188,7 +172,6 @@ class Url
     /**
      * @param string $key
      * @param string $value
-     *
      * @return Url
      */
     public function setInput( string $key, string $value ): Url {
@@ -199,7 +182,6 @@ class Url
 
     /**
      * @param string $key
-     *
      * @return string
      */
     public function getInput( string $key ): string {
@@ -217,7 +199,6 @@ class Url
 
     /**
      * Construit la partie de l'url "protocole://authentification@hote:port".
-     *
      * @return string
      */
     public function buildDsn(): string {

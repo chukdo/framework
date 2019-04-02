@@ -6,7 +6,6 @@ use Chukdo\Contracts\Validation\Validate as ValidateInterface;
 
 /**
  * Validate handler.
- *
  * @version   1.0.0
  * @copyright licence MIT, Copyright (C) 2019 Domingo
  * @since     08/01/2019
@@ -33,7 +32,6 @@ class StringValidate implements ValidateInterface
 
     /**
      * @param array $attributes
-     *
      * @return self
      */
     public function attributes( array $attributes ): ValidateInterface {
@@ -50,7 +48,6 @@ class StringValidate implements ValidateInterface
 
     /**
      * @param $input
-     *
      * @return bool
      */
     public function validate( $input ): bool {

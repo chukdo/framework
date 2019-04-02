@@ -10,20 +10,15 @@ use Closure;
 
 /**
  * Manipulation des données.
- *
  * @version      1.0.0
- *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
- *
  * @since        08/01/2019
- *
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Json extends \ArrayObject
 {
     /**
      * json constructor.
-     *
      * @param mixed $data
      */
     public function __construct( $data = null ) {
@@ -47,7 +42,6 @@ class Json extends \ArrayObject
     /**
      * @param mixed $key
      * @param mixed $value
-     *
      * @return self
      */
     public function offsetSet( $key, $value ): self {
@@ -65,7 +59,6 @@ class Json extends \ArrayObject
 
     /**
      * @param mixed ...$params
-     *
      * @return mixed
      */
     protected function newParentClass( ... $params ) {
@@ -133,15 +126,13 @@ class Json extends \ArrayObject
 
     /**
      * @param array $reset
-     *
      * @return Json
      */
     public function reset( array $reset = [] ): self {
         parent::__construct([]);
 
         foreach( $reset as $key => $value ) {
-            $this->offsetSet($key,
-                $value);
+            $this->offsetSet($key, $value);
         }
 
         return $this;
@@ -157,7 +148,6 @@ class Json extends \ArrayObject
     /**
      * @param int   $key
      * @param mixed $default
-     *
      * @return mixed|null
      */
     public function getIndex( int $key = 0, $default = null ) {
@@ -186,7 +176,6 @@ class Json extends \ArrayObject
     /**
      * @param int  $index
      * @param null $default
-     *
      * @return int|mixed|string|null
      */
     public function getKeyIndex( int $index = 0, $default = null ) {
@@ -204,7 +193,6 @@ class Json extends \ArrayObject
     /**
      * @param string $key
      * @param int    $order
-     *
      * @return Json
      */
     public function sort( string $key, int $order = SORT_ASC ): self {
@@ -215,9 +203,7 @@ class Json extends \ArrayObject
             $toSort[ $k ] = $v[ $key ];
         }
 
-        array_multisort($toSort,
-            $order,
-            $array);
+        array_multisort($toSort, $order, $array);
 
         $this->reset($array);
 
@@ -227,7 +213,6 @@ class Json extends \ArrayObject
     /**
      * @param array $keys
      * @param null  $default
-     *
      * @return mixed|null
      */
     public function offsetGetFirstInList( array $keys, $default = null ) {
@@ -243,7 +228,6 @@ class Json extends \ArrayObject
     /**
      * @param mixed $key
      * @param null  $default
-     *
      * @return mixed|null
      */
     public function offsetGet( $key, $default = null ) {
@@ -257,15 +241,13 @@ class Json extends \ArrayObject
     /**
      * @param iterable|null $merge
      * @param bool|null     $overwrite
-     *
      * @return Json
      */
     public function merge( iterable $merge = null, bool $overwrite = null ): self {
         if( $merge ) {
             foreach( $merge as $k => $v ) {
                 if( $overwrite || !$this->offsetExists($k) ) {
-                    $this->offsetSet($k,
-                        $v);
+                    $this->offsetSet($k, $v);
                 }
             }
         }
@@ -276,7 +258,6 @@ class Json extends \ArrayObject
     /**
      * @param iterable|null $merge
      * @param bool|null     $overwrite
-     *
      * @return Json
      */
     public function mergeRecursive( iterable $merge = null, bool $overwrite = null ): self {
@@ -292,8 +273,7 @@ class Json extends \ArrayObject
                 }
 
                 if( $overwrite || !$this->offsetExists($k) ) {
-                    $this->offsetSet($k,
-                        $v);
+                    $this->offsetSet($k, $v);
                 }
             }
         }
@@ -303,18 +283,14 @@ class Json extends \ArrayObject
 
     /**
      * @param $object
-     *
      * @return bool
      */
     protected function instanceOfJson( $object ): bool {
-        return $object instanceof Json
-               || is_subclass_of($object,
-                'Chukdo\Json\Json');
+        return $object instanceof Json || is_subclass_of($object, 'Chukdo\Json\Json');
     }
 
     /**
      * @param iterable $data
-     *
      * @return Json
      */
     public function addToSet( iterable $data ): self {
@@ -329,7 +305,6 @@ class Json extends \ArrayObject
 
     /**
      * @param $value
-     *
      * @return bool
      */
     public function in( $value ): bool {
@@ -344,7 +319,6 @@ class Json extends \ArrayObject
 
     /**
      * @param mixed $value
-     *
      * @return Json
      */
     public function append( $value ): self {
@@ -360,16 +334,12 @@ class Json extends \ArrayObject
 
     /**
      * Applique une fonction aux resultats.
-     *
      * @param Closure $closure
-     *
      * @return Json
      */
     public function filter( Closure $closure ): self {
         foreach( $this as $k => $v ) {
-            $this->offsetSet($k,
-                $closure($k,
-                    $v));
+            $this->offsetSet($k, $closure($k, $v));
         }
 
         return $this;
@@ -377,9 +347,7 @@ class Json extends \ArrayObject
 
     /**
      * Applique une fonction aux resultats de maniere recursive.
-     *
      * @param closure $closure
-     *
      * @return Json
      */
     public function filterRecursive( Closure $closure ): self {
@@ -388,9 +356,7 @@ class Json extends \ArrayObject
                 $v->filterRecursive($closure);
             }
             else {
-                $this->offsetSet($k,
-                    $closure($k,
-                        $v));
+                $this->offsetSet($k, $closure($k, $v));
             }
         }
 
@@ -399,9 +365,7 @@ class Json extends \ArrayObject
 
     /**
      * Appel d'une methode callback.
-     *
      * @param $callback
-     *
      * @return Json
      */
     public function callBack( $callback ): self {
@@ -424,7 +388,6 @@ class Json extends \ArrayObject
 
     /**
      * @param mixed ...$offsets
-     *
      * @return Json
      */
     public function only( ...$offsets ): self {
@@ -443,18 +406,14 @@ class Json extends \ArrayObject
     /**
      * @param string $path
      * @param null   $default
-     *
      * @return Json|mixed|null
      */
     public function get( string $path, $default = null ) {
-        if( Str::notContain($path,
-            '.') ) {
-            return $this->offsetGet($path,
-                $default);
+        if( Str::notContain($path, '.') ) {
+            return $this->offsetGet($path, $default);
         }
 
-        $arr       = new Arr(Str::split($path,
-            '.'));
+        $arr       = new Arr(Str::split($path, '.'));
         $firstPath = $arr->getFirstAndRemove();
         $endPath   = $arr->join('.');
         $get       = $this->offsetGet($firstPath);
@@ -469,18 +428,14 @@ class Json extends \ArrayObject
     /**
      * @param string $path
      * @param        $value
-     *
      * @return Json
      */
     public function set( string $path, $value ): self {
-        if( Str::notContain($path,
-            '.') ) {
-            return $this->offsetSet($path,
-                $value);
+        if( Str::notContain($path, '.') ) {
+            return $this->offsetSet($path, $value);
         }
 
-        $arr       = new Arr(Str::split($path,
-            '.'));
+        $arr       = new Arr(Str::split($path, '.'));
         $firstPath = $arr->getFirstAndRemove();
         $endPath   = $arr->join('.');
 
@@ -492,7 +447,6 @@ class Json extends \ArrayObject
     /**
      * @param       $key
      * @param mixed $value
-     *
      * @return mixed
      */
     public function offsetGetOrSet( $key, $value = null ) {
@@ -509,7 +463,6 @@ class Json extends \ArrayObject
 
     /**
      * @param mixed ...$offsets
-     *
      * @return Json
      */
     public function except( ...$offsets ): self {
@@ -526,17 +479,14 @@ class Json extends \ArrayObject
 
     /**
      * @param string $path
-     *
      * @return mixed|null
      */
     public function unset( string $path ) {
-        if( Str::notContain($path,
-            '.') ) {
+        if( Str::notContain($path, '.') ) {
             return $this->offsetUnset($path);
         }
 
-        $arr       = new Arr(Str::split($path,
-            '.'));
+        $arr       = new Arr(Str::split($path, '.'));
         $firstPath = $arr->getFirstAndRemove();
         $endPath   = $arr->join('.');
         $get       = $this->offsetGet($firstPath);
@@ -550,7 +500,6 @@ class Json extends \ArrayObject
 
     /**
      * @param mixed $key
-     *
      * @return mixed|null
      */
     public function offsetUnset( $key ) {
@@ -566,7 +515,6 @@ class Json extends \ArrayObject
 
     /**
      * @param string $path
-     *
      * @return bool
      */
     public function filled( string $path ): bool {
@@ -581,7 +529,6 @@ class Json extends \ArrayObject
 
     /**
      * @param string $path
-     *
      * @return bool
      */
     public function exists( string $path ): bool {
@@ -597,14 +544,11 @@ class Json extends \ArrayObject
     /**
      * @param string $path
      * @param bool   $scalarResultOnly
-     *
      * @return Json
      */
     public function wildcard( string $path, $scalarResultOnly = false ): self {
-        $path      = rtrim($path,
-            '.*');
-        $arr       = new Arr(Str::split($path,
-            '.'));
+        $path      = rtrim($path, '.*');
+        $arr       = new Arr(Str::split($path, '.'));
         $firstPath = $arr->getFirstAndRemove();
         $emptyPath = $arr->empty();
         $endPath   = $arr->join('.');
@@ -637,9 +581,7 @@ class Json extends \ArrayObject
 
     /**
      * Retourne l'objet sous forme d'un tableau a 2 dimensions (path => value).
-     *
      * @param string|null $path chemin de depart null par défaut
-     *
      * @return array
      */
     public function toSimpleArray( string $path = null ): array {
@@ -663,7 +605,6 @@ class Json extends \ArrayObject
 
     /**
      * @return Xml
-     *
      * @throws \Chukdo\Xml\NodeException
      * @throws \Chukdo\Xml\XmlException
      */
@@ -685,7 +626,6 @@ class Json extends \ArrayObject
      * @param string|null $title
      * @param string|null $color
      * @param string|null $widthFirstCol
-     *
      * @return string
      */
     public function toHtml( string $title = null, string $color = null, string $widthFirstCol = null ): string {
@@ -729,7 +669,6 @@ class Json extends \ArrayObject
 
     /**
      * @param mixed ...$param
-     *
      * @return mixed
      */
     public function to( ...$param ) {
@@ -745,7 +684,6 @@ class Json extends \ArrayObject
 
     /**
      * @param mixed ...$param
-     *
      * @return mixed
      */
     public function is( ...$param ) {
@@ -768,7 +706,6 @@ class Json extends \ArrayObject
 
     /**
      * @param bool $prettyfy
-     *
      * @return string
      */
     public function toJson( bool $prettyfy = false ): string {
@@ -780,7 +717,6 @@ class Json extends \ArrayObject
 
     /**
      * @param string $key
-     *
      * @return bool
      */
     public function __isset( string $key ): bool {
@@ -789,7 +725,6 @@ class Json extends \ArrayObject
 
     /**
      * @param string $key
-     *
      * @return mixed|null
      */
     public function __get( string $key ) {
@@ -803,13 +738,11 @@ class Json extends \ArrayObject
      * @param        $value
      */
     public function __set( string $key, $value ): void {
-        $this->offsetSet($key,
-            $value);
+        $this->offsetSet($key, $value);
     }
 
     /**
      * @param string $key
-     *
      * @return bool
      */
     public function __unset( string $key ): bool {

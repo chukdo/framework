@@ -6,26 +6,20 @@ use Closure;
 
 /**
  * Initialisation de l'application.
- *
  * @version       1.0.0
- *
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
- *
  * @since         08/01/2019
- *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class App extends Service
 {
     /**
      * Tableau des alias.
-     *
      * @var array
      */
     protected static $aliases = [];
     /**
      * Tableau des ecouteurs de resolution.
-     *
      * @var array
      */
     protected $resolving = [];
@@ -61,7 +55,6 @@ class App extends Service
 
     /**
      * @param string|null $env
-     *
      * @return string
      */
     public function env( string $env = null ): string {
@@ -74,7 +67,6 @@ class App extends Service
 
     /**
      * @param string|null $channel
-     *
      * @return string
      */
     public function channel( string $channel = null ): string {
@@ -87,9 +79,7 @@ class App extends Service
 
     /**
      * @param string $key
-     *
      * @return string|null
-     *
      * @throws ServiceException
      * @throws \ReflectionException
      */
@@ -101,9 +91,7 @@ class App extends Service
     /**
      * @param string $name
      * @param bool   $bindInstance
-     *
      * @return mixed|object|null
-     *
      * @throws ServiceException
      * @throws \ReflectionException
      */
@@ -124,7 +112,6 @@ class App extends Service
 
     /**
      * @param string $name
-     *
      * @return string
      */
     public function getAlias( string $name ): string {
@@ -174,7 +161,6 @@ class App extends Service
 
     /**
      * Ecoute la resolution de tous les objets.
-     *
      * @param Closure $closure
      */
     public function resolvingAny( Closure $closure ): void {
@@ -183,7 +169,6 @@ class App extends Service
 
     /**
      * Ecoute la resolution d'un objet.
-     *
      * @param string  $name
      * @param Closure $closure
      */

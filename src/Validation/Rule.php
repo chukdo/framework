@@ -7,7 +7,6 @@ use Chukdo\Json\Input;
 
 /**
  * Validation de regle.
- *
  * @version   1.0.0
  * @copyright licence MIT, Copyright (C) 2019 Domingo
  * @since     08/01/2019
@@ -61,7 +60,6 @@ class Rule
 
     /**
      * Constructor.
-     *
      * @param string    $path
      * @param string    $rule
      * @param Validator $validator
@@ -119,7 +117,6 @@ class Rule
 
     /**
      * @param string $rule
-     *
      * @return array
      */
     protected function parseAttribute( string $rule ): array {
@@ -151,6 +148,8 @@ class Rule
     public function validate(): bool {
         $input = $this->input();
 
+        // check if input = file >
+
         if( !$this->validateRequired($input) ) {
             return false;
         }
@@ -179,7 +178,6 @@ class Rule
 
     /**
      * @param mixed $input
-     *
      * @return bool
      */
     protected function validateRequired( $input ): bool {
@@ -216,7 +214,6 @@ class Rule
 
     /**
      * @param array $listName
-     *
      * @return string
      */
     protected function message( array $listName ): string {
@@ -226,7 +223,6 @@ class Rule
 
     /**
      * @param mixed $input
-     *
      * @return bool
      */
     protected function validateType( $input ): bool {
@@ -280,7 +276,6 @@ class Rule
 
     /**
      * @param mixed $input
-     *
      * @return bool
      */
     protected function validateValidators( $input ): bool {

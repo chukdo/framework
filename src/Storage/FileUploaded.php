@@ -6,13 +6,9 @@ use Chukdo\Helper\Str;
 
 /**
  * Gestion des fichiers uploadés.
- *
  * @version      1.0.0
- *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
- *
  * @since        08/01/2019
- *
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class FileUploaded
@@ -39,7 +35,6 @@ class FileUploaded
 
     /**
      * FileUploaded constructor.
-     *
      * @param string      $name
      * @param string|null $allowedMimeTypes
      * @param int|null    $maxFileSize
@@ -84,7 +79,6 @@ class FileUploaded
 
     /**
      * @param array $array
-     *
      * @return array
      */
     private static function __normalizeUploadedFiles( array $array ): array {
@@ -127,7 +121,6 @@ class FileUploaded
 
     /**
      * @param $path
-     *
      * @return bool
      */
     public function store( $path ): bool {

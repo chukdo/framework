@@ -7,7 +7,6 @@ use MicrosoftAzure\Storage\Blob\BlobRestProxy;
 
 /**
  * Azure streamWrapper.
- *
  * @copyright     licence MIT, Copyright (C) 2015 Domingo
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
@@ -23,12 +22,9 @@ class AzureStream extends AbstractStream
 
     /**
      * Retourne une portion du contenu du fichier.
-     *
      * @param int $offset
      * @param int $length
-     *
      * @return string|null
-     *
      * @throws StreamException
      */
     public function streamGetRange( int $offset, int $length ): ?string {
@@ -48,9 +44,7 @@ class AzureStream extends AbstractStream
 
     /**
      * Retourne le contenu du fichier.
-     *
      * @return mixed
-     *
      * @throws StreamException
      */
     public function streamGet() {
@@ -67,9 +61,7 @@ class AzureStream extends AbstractStream
 
     /**
      * Lit les informations sur une ressource de fichier.
-     *
      * @return BlobRestProxy
-     *
      * @throws StreamException
      */
     protected function getStream(): BlobRestProxy {
@@ -82,7 +74,6 @@ class AzureStream extends AbstractStream
 
     /**
      * @return BlobRestProxy
-     *
      * @throws StreamException
      */
     public function initStream(): BlobRestProxy {
@@ -106,12 +97,9 @@ class AzureStream extends AbstractStream
 
     /**
      * Ecris une portion de contenu en commencant à l'offset défini.
-     *
      * @param int    $offset
      * @param string $content
-     *
      * @return bool
-     *
      * @throws StreamException
      */
     public function streamSetRange( int $offset, string $content ): bool {
@@ -120,11 +108,8 @@ class AzureStream extends AbstractStream
 
     /**
      * Ajoute du contenu au debut du fichier.
-     *
      * @param string|null $content
-     *
      * @return bool
-     *
      * @throws StreamException
      */
     public function streamSet( ?string $content ): bool {
@@ -136,11 +121,8 @@ class AzureStream extends AbstractStream
 
     /**
      * Ajoute du contenu à la fin du fichier.
-     *
      * @param string $content
-     *
      * @return bool
-     *
      * @throws StreamException
      */
     public function streamAppend( string $content ): bool {
@@ -152,7 +134,6 @@ class AzureStream extends AbstractStream
 
     /**
      * Retourne si le fichier existe.
-     *
      * @return bool
      */
     public function streamExists(): bool {
@@ -166,9 +147,7 @@ class AzureStream extends AbstractStream
 
     /**
      * Retourne la taille du fichier.
-     *
      * @return int
-     *
      * @throws StreamException
      */
     public function streamSize(): int {
@@ -185,9 +164,7 @@ class AzureStream extends AbstractStream
 
     /**
      * Supprime fichier.
-     *
      * @return bool
-     *
      * @throws StreamException
      */
     public function streamDelete(): bool {
@@ -200,11 +177,8 @@ class AzureStream extends AbstractStream
 
     /**
      * Renomme le fichier ou le dossier.
-     *
      * @param string $path
-     *
      * @return bool
-     *
      * @throws StreamException
      */
     public function streamRename( string $path ): bool {
@@ -222,9 +196,7 @@ class AzureStream extends AbstractStream
 
     /**
      * Crée un dossier.
-     *
      * @param bool $recursive
-     *
      * @return bool
      */
     public function streamSetDir( bool $recursive ): bool {
@@ -233,7 +205,6 @@ class AzureStream extends AbstractStream
 
     /**
      * Supprime un dossier.
-     *
      * @return bool
      */
     public function streamDeleteDir(): bool {
@@ -242,7 +213,6 @@ class AzureStream extends AbstractStream
 
     /**
      * Retourne si le fichier est un dossier.
-     *
      * @return bool
      */
     public function streamIsDir(): bool {
@@ -251,9 +221,7 @@ class AzureStream extends AbstractStream
 
     /**
      * Retourne la liste des fichiers present dans le dossier.
-     *
      * @return array
-     *
      * @throws StreamException
      */
     public function streamListDir(): array {
@@ -286,9 +254,7 @@ class AzureStream extends AbstractStream
 
     /**
      * Defini ou retourne la derniere date d'acces au fichier.
-     *
      * @param bool $time
-     *
      * @return int
      */
     public function streamAccessTime( $time = false ): int {
@@ -297,9 +263,7 @@ class AzureStream extends AbstractStream
 
     /**
      * Defini ou retourne la date de creation du fichier.
-     *
      * @param bool $time
-     *
      * @return int
      */
     public function streamCreatedTime( $time = false ): int {
@@ -308,11 +272,8 @@ class AzureStream extends AbstractStream
 
     /**
      * Defini ou retourne la derniere date de modification au fichier.
-     *
      * @param bool $time
-     *
      * @return int
-     *
      * @throws StreamException
      */
     public function streamModifiedTime( $time = false ): int {
@@ -330,7 +291,6 @@ class AzureStream extends AbstractStream
 
     /**
      * Libere le flux.
-     *
      * @return bool
      */
     public function streamClose(): bool {

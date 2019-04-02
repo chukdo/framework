@@ -8,13 +8,9 @@ use ErrorException;
 
 /**
  * Gestion des exception.
- *
  * @version       1.0.0
- *
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
- *
  * @since         08/01/2019
- *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class HandleExceptions
@@ -26,7 +22,6 @@ class HandleExceptions
 
     /**
      * HandleExceptions constructor.
-     *
      * @param App $app
      */
     public function __construct( App $app ) {
@@ -54,7 +49,6 @@ class HandleExceptions
      * @param string $message
      * @param string $file
      * @param int    $line
-     *
      * @throws ErrorException
      */
     public function handleError( int $level, string $message, string $file = '', int $line = 0 ): void {
@@ -75,7 +69,6 @@ class HandleExceptions
 
     /**
      * @param int $type
-     *
      * @return bool
      */
     protected function isFatal( int $type ): bool {
@@ -90,7 +83,6 @@ class HandleExceptions
 
     /**
      * @param Throwable $e
-     *
      * @throws ServiceException
      * @throws \ReflectionException
      */
@@ -116,7 +108,6 @@ class HandleExceptions
 
     /**
      * @return mixed|object|null
-     *
      * @throws ServiceException
      * @throws \ReflectionException
      */
@@ -126,7 +117,6 @@ class HandleExceptions
 
     /**
      * @param array $error
-     *
      * @return ErrorException
      */
     protected function fatalExceptionFromError( array $error ): ErrorException {

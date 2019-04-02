@@ -5,13 +5,9 @@ namespace Chukdo\Helper;
 /**
  * Classe Archive
  * gestion des fichiers compressés.
- *
  * @version   1.0.0
- *
  * @copyright licence GPL, Copyright (C) 2012 Domingo
- *
  * @since     10/06/2012
- *
  * @author    Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 final class Archive
@@ -24,7 +20,6 @@ final class Archive
 
     /**
      * @param string $data
-     *
      * @return string
      */
     public static function ungzipString( string $data ): string {
@@ -69,9 +64,7 @@ final class Archive
 
     /**
      * Decompresse une donnée encodé zip (compression des données via ajax).
-     *
      * @param string $data
-     *
      * @return string
      */
     public static function unzipString( string $data ): string {
@@ -90,7 +83,6 @@ final class Archive
      * @param      $file
      * @param      $path
      * @param bool $root
-     *
      * @return array
      */
     public static function unzipFile( $file, $path, $root = false ): array {

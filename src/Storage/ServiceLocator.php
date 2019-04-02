@@ -7,13 +7,9 @@ use Chukdo\Support\Singleton;
 
 /**
  * Annuaire de ressource pour les flux de données.
- *
  * @version       1.0.0
- *
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
- *
  * @since         08/01/2019
- *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class ServiceLocator extends Singleton
@@ -30,7 +26,6 @@ class ServiceLocator extends Singleton
 
     /**
      * Ajoute un service à l'annuaire.
-     *
      * @param         $scheme
      * @param Closure $closure
      */
@@ -40,11 +35,8 @@ class ServiceLocator extends Singleton
 
     /**
      * Retourne une ressource à l'annuaire.
-     *
      * @param string $scheme
-     *
      * @return object
-     *
      * @throws ServiceLocatorException
      */
     public function getResource( string $scheme ) {
@@ -63,9 +55,7 @@ class ServiceLocator extends Singleton
 
     /**
      * Retourne une ressource en cache.
-     *
      * @param string $scheme
-     *
      * @return mixed
      */
     public function getCacheResource( string $scheme ) {
@@ -76,11 +66,8 @@ class ServiceLocator extends Singleton
 
     /**
      * Retourne un service de l'annuaire.
-     *
      * @param string $scheme
-     *
      * @return closure
-     *
      * @throws ServiceLocatorException
      */
     public function getService( $scheme ): Closure {
@@ -94,7 +81,6 @@ class ServiceLocator extends Singleton
 
     /**
      * Cache une ressource.
-     *
      * @param string $scheme
      * @param        $resource
      */
@@ -104,9 +90,7 @@ class ServiceLocator extends Singleton
 
     /**
      * Supprime une ressource en cache.
-     *
      * @param string $scheme
-     *
      * @return bool true si le cache a été detruit false si le cache n'existait pas
      */
     public function unsetCacheResource( string $scheme ): bool {

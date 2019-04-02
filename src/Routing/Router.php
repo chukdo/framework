@@ -8,13 +8,9 @@ use Chukdo\Http\Request;
 
 /**
  * Gestion des Routes.
- *
  * @version      1.0.0
- *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
- *
  * @since        08/01/2019
- *
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Router
@@ -41,9 +37,7 @@ class Router
 
     /**
      * Router constructor.
-     *
      * @param App $app
-     *
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
@@ -55,7 +49,6 @@ class Router
     /**
      * @param string $key
      * @param string $regex
-     *
      * @return Router
      */
     public function pattern( string $key, string $regex ): self {
@@ -65,7 +58,6 @@ class Router
     /**
      * @param string  $uri
      * @param Closure $closure
-     *
      * @return Route
      */
     public function get( string $uri, Closure $closure ): Route {
@@ -78,7 +70,6 @@ class Router
      * @param string  $method
      * @param string  $uri
      * @param Closure $closure
-     *
      * @return Route
      */
     public function stack( string $method, string $uri, Closure $closure ): Route {
@@ -91,7 +82,6 @@ class Router
     /**
      * @param string  $uri
      * @param Closure $closure
-     *
      * @return Route
      */
     public function post( string $uri, Closure $closure ): Route {
@@ -103,7 +93,6 @@ class Router
     /**
      * @param string  $uri
      * @param Closure $closure
-     *
      * @return Route
      */
     public function put( string $uri, Closure $closure ): Route {
@@ -115,7 +104,6 @@ class Router
     /**
      * @param string  $uri
      * @param Closure $closure
-     *
      * @return Route
      */
     public function delete( string $uri, Closure $closure ): Route {
@@ -127,7 +115,6 @@ class Router
     /**
      * @param string  $uri
      * @param Closure $closure
-     *
      * @return Route
      */
     public function any( string $uri, Closure $closure ): Route {
@@ -139,7 +126,6 @@ class Router
     /**
      * @param string  $uri
      * @param Closure $closure
-     *
      * @return Route
      */
     public function console( string $uri, Closure $closure ): Route {

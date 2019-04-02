@@ -7,13 +7,9 @@ use Chukdo\Json\Json;
 
 /**
  * Moteur de template.
- *
  * @version      1.0.0
- *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
- *
  * @since        08/01/2019
- *
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Template
@@ -35,7 +31,6 @@ class Template
 
     /**
      * Template constructor.
-     *
      * @param string $template
      * @param Json   $data
      * @param View   $view
@@ -58,7 +53,6 @@ class Template
 
     /**
      * @param iterable|null $data
-     *
      * @return Template
      */
     public function data( Iterable $data = null ): self {
@@ -75,7 +69,6 @@ class Template
     /**
      * @param string      $key
      * @param string|null $functions
-     *
      * @return Json|mixed|null
      */
     public function j( string $key, string $functions = null ) {
@@ -86,7 +79,6 @@ class Template
     /**
      * @param             $data
      * @param string|null $functions
-     *
      * @return mixed
      */
     public function v( $data, string $functions = null ) {
@@ -103,7 +95,6 @@ class Template
     /**
      * @param string      $key
      * @param string|null $functions
-     *
      * @return mixed
      */
     public function w( string $key, string $functions = null ) {
@@ -114,7 +105,6 @@ class Template
     /**
      * @param string     $name
      * @param array|null $arguments
-     *
      * @return mixed
      */
     public function __call( string $name, array $arguments ) {

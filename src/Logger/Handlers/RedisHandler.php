@@ -6,13 +6,9 @@ use Chukdo\Contracts\Db\Redis as RedisInterface;
 
 /**
  * Gestionnaire de log pour Redis.
- *
  * @version       1.0.0
- *
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
- *
  * @since         08/01/2019
- *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class RedisHandler extends AbstractHandler
@@ -29,7 +25,6 @@ class RedisHandler extends AbstractHandler
 
     /**
      * RedisHandler constructor.
-     *
      * @param RedisInterface|null $redis
      * @param string|null         $key
      */
@@ -51,7 +46,6 @@ class RedisHandler extends AbstractHandler
 
     /**
      * @param string $record
-     *
      * @return bool
      */
     public function write( $record ): bool {

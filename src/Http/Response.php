@@ -9,13 +9,9 @@ use Chukdo\Xml\Xml;
 
 /**
  * Gestion des entetes HTTP.
- *
  * @version      1.0.0
- *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
- *
  * @since        08/01/2019
- *
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Response
@@ -56,7 +52,6 @@ class Response
 
     /**
      * @param int $status
-     *
      * @return Response
      */
     public function status( int $status ): self {
@@ -68,7 +63,6 @@ class Response
     /**
      * @param string $name
      * @param string $header
-     *
      * @return Response
      */
     public function header( string $name, string $header ): self {
@@ -80,7 +74,6 @@ class Response
 
     /**
      * @param iterable $headers
-     *
      * @return Response
      */
     public function headers( iterable $headers ): self {
@@ -92,7 +85,6 @@ class Response
     /**
      * @param string $name
      * @param string $cookie
-     *
      * @return Response
      */
     public function cookie( string $name, string $cookie ): self {
@@ -104,7 +96,6 @@ class Response
 
     /**
      * @param iterable $cookies
-     *
      * @return Response
      */
     public function cookies( iterable $cookies ): self {
@@ -117,7 +108,6 @@ class Response
      * @param string      $file
      * @param string|null $name
      * @param string|null $type
-     *
      * @return Response
      */
     public function download( string $file, string $name = null, string $type = null ): self {
@@ -139,7 +129,6 @@ class Response
      * @param string      $file
      * @param string|null $name
      * @param string|null $type
-     *
      * @return Response
      */
     public function file( string $file, string $name = null, string $type = null ): self {
@@ -159,7 +148,6 @@ class Response
 
     /**
      * @param string $content
-     *
      * @return Response
      */
     public function html( string $content ): self {
@@ -173,7 +161,6 @@ class Response
 
     /**
      * @param string $content
-     *
      * @return Response
      */
     public function content( string $content ): self {
@@ -184,7 +171,6 @@ class Response
 
     /**
      * @param $content
-     *
      * @return Response
      */
     public function text( $content ): self {
@@ -198,7 +184,6 @@ class Response
 
     /**
      * @param $content
-     *
      * @return Response
      */
     public function json( $content ): self {
@@ -213,7 +198,6 @@ class Response
     /**
      * @param      $content
      * @param bool $html
-     *
      * @return Response
      */
     public function xml( $content, bool $html = false ): self {
@@ -230,7 +214,6 @@ class Response
     /**
      * @param string $url
      * @param int    $code
-     *
      * @return Response
      */
     public function redirect( string $url, int $code = 307 ): self {

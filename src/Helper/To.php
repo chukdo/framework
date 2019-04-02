@@ -5,13 +5,9 @@ namespace Chukdo\Helper;
 /**
  * Classe To
  * Fonctionnalités de converstion des données.
- *
  * @version       1.0.0
- *
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
- *
  * @since         08/01/2019
- *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 final class To
@@ -19,7 +15,6 @@ final class To
     /**
      * @param string $type
      * @param        $value
-     *
      * @return array|bool|float|int|string
      */
     public static function type( string $type, $value ) {
@@ -45,7 +40,6 @@ final class To
     /**
      * @param string      $name
      * @param string|null $prefix
-     *
      * @return string
      */
     public static function qualifiedName( string $name, $prefix = null ): string {
@@ -66,7 +60,6 @@ final class To
      * @param string      $name
      * @param string|null $prefix
      * @param string|null $suffix
-     *
      * @return string
      */
     public static function fileName( string $name, string $prefix = null, string $suffix = null ): string {
@@ -83,7 +76,6 @@ final class To
 
     /**
      * @param string $value
-     *
      * @return string
      */
     public static function utf8( string $value ): string {
@@ -102,7 +94,6 @@ final class To
 
     /**
      * @param $value
-     *
      * @return int
      */
     public static function int( $value ): int {
@@ -111,7 +102,6 @@ final class To
 
     /**
      * @param $value
-     *
      * @return mixed
      */
     public static function scalar( $value ) {
@@ -138,7 +128,6 @@ final class To
 
     /**
      * @param $value
-     *
      * @return float
      */
     public static function float( $value ): float {
@@ -163,9 +152,7 @@ final class To
     /**
      * @param string      $value
      * @param string|null $format
-     *
      * @return \DateTime
-     *
      * @throws \Exception
      */
     public static function date( string $value, string $format = null ): \DateTime {
@@ -182,7 +169,6 @@ final class To
 
     /**
      * @param $value
-     *
      * @return string
      */
     public static function json( $value ): string {
@@ -201,7 +187,6 @@ final class To
 
     /**
      * @param $value
-     *
      * @return array
      */
     public static function arr( $value ): array {
@@ -246,9 +231,7 @@ final class To
 
     /**
      * @param $value
-     *
      * @return \Chukdo\Xml\Xml
-     *
      * @throws \Chukdo\Xml\NodeException
      * @throws \Chukdo\Xml\XmlException
      */

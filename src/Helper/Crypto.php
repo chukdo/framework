@@ -5,20 +5,15 @@ namespace Chukdo\Helper;
 /**
  * Classe Str
  * Fonctionnalités de filtre sur les données.
- *
  * @version       1.0.0
- *
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
- *
  * @since         08/01/2019
- *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 final class Crypto
 {
     /**
      * @param int|null $duration
-     *
      * @return string
      */
     public static function encodeCsrf( int $duration = null ): string {
@@ -33,7 +28,6 @@ final class Crypto
     /**
      * @param string $data
      * @param string $salt
-     *
      * @return string
      */
     public static function encrypt( string $data, string $salt ): string {
@@ -48,7 +42,6 @@ final class Crypto
 
     /**
      * @param string $token
-     *
      * @return bool
      */
     public static function decodeCsrf( string $token ): bool {
@@ -75,7 +68,6 @@ final class Crypto
     /**
      * @param string $data
      * @param string $salt
-     *
      * @return string
      */
     public static function decrypt( string $data, string $salt ): string {
@@ -90,7 +82,6 @@ final class Crypto
 
     /**
      * @param int|null $length
-     *
      * @return string
      */
     public static function password( int $length = null ): string {
@@ -106,9 +97,7 @@ final class Crypto
     /**
      * @param int  $length
      * @param bool $readable
-     *
      * @return string
-     *
      * @throws \Exception
      */
     public static function generateCode( int $length, bool $readable = true ): string {
@@ -128,10 +117,8 @@ final class Crypto
 
     /**
      * Hash un fichier et retourne son chemin de stockage.
-     *
      * @param string $name      nom du fichier
      * @param int    $hashlevel nombre de sous repertoire pour le stockage du fichier
-     *
      * @return string chemin complet du fichier à stocker
      */
     public static function hash( string $name, int $hashlevel = 2 ): string {

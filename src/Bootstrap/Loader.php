@@ -4,27 +4,21 @@ namespace Chukdo\Bootstrap;
 
 /**
  * Class loader PSR-4.
- *
  * @version       1.0.0
- *
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
- *
  * @since         08/01/2019
- *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Loader
 {
     /**
      * Log.
-     *
      * @var array
      */
     private $log = [];
 
     /**
      * Namespaces.
-     *
      * @var array
      */
     private $namespaces = [];
@@ -58,7 +52,6 @@ class Loader
 
     /**
      * Registers a set namespaces.
-     *
      * @param array $namespaces array($namespace => $paths)
      */
     public function registerNameSpaces( array $namespaces ): void {
@@ -71,7 +64,6 @@ class Loader
     /**
      * Registers a set of PSR-4 directories for a given namespace, either
      * appending or prepending to the ones previously set for this namespace.
-     *
      * @param string       $ns      The namespace
      * @param array|string $paths   The base directories
      * @param bool         $prepend Whether to prepend the directories
@@ -105,9 +97,7 @@ class Loader
 
     /**
      * Loads the class file for a given class name.
-     *
      * @param string $nsclass the fully-qualified class name
-     *
      * @return bool true on success, or false on failure
      */
     public function loadClass( string $nsclass ): bool {
@@ -133,10 +123,8 @@ class Loader
 
     /**
      * Load the file for a namespace and class.
-     *
      * @param string $ns    the namespace
      * @param string $class class name
-     *
      * @return bool boolean false if no file can be loaded, or true if the file that was loaded
      */
     protected function loadFile( string $ns, string $class ): bool {
@@ -161,9 +149,7 @@ class Loader
 
     /**
      * If a file exists, require it from the file system.
-     *
      * @param string $file the file to require
-     *
      * @return bool true if the file exists, false if not
      */
     protected function requireFile( string $file ): bool {

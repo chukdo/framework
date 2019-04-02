@@ -4,27 +4,21 @@ namespace Chukdo\Event;
 
 /**
  * Gestion des evenements.
- *
  * @version      1.0.0
- *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
- *
  * @since        08/01/2019
- *
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Event
 {
     /**
      * Tableau des ecouteurs.
-     *
      * @param array $listeners
      */
     protected $listeners = [];
 
     /**
      * Vide un Evenement (Ecouteur).
-     *
      * @param string $event evenement sur lequel ecouter
      */
     public function flush( string $event ): void {
@@ -35,7 +29,6 @@ class Event
 
     /**
      * Ecouteur.
-     *
      * @param string $event    evenement sur lequel ecouter
      * @param mixed  $listener ecouteur (closure)
      */
@@ -50,7 +43,6 @@ class Event
     /**
      * Trigger
      * Declenche les triggers en cascade (dans l'ordre des ajouts).
-     *
      * @param string       $event   evenement sur lequel declencher le trigger
      * @param string|array $payload parametres a passer
      */
@@ -70,9 +62,7 @@ class Event
 
     /**
      * Retourne la liste des ecouteurs.
-     *
      * @param string $event evenement sur lequel ecouter
-     *
      * @return array
      */
     public function getListeners( string $event ): array {

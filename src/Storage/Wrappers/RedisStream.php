@@ -7,7 +7,6 @@ use Chukdo\Storage\ServiceLocator;
 
 /**
  * Redis streamWrapper.
- *
  * @copyright     licence MIT, Copyright (C) 2015 Domingo
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
@@ -20,9 +19,7 @@ class RedisStream extends AbstractStream
 
     /**
      * Retourne le contenu du fichier.
-     *
      * @return mixed
-     *
      * @throws StreamException
      */
     public function streamGet() {
@@ -32,9 +29,7 @@ class RedisStream extends AbstractStream
 
     /**
      * Lit les informations sur une ressource de fichier.
-     *
      * @return RedisInterface
-     *
      * @throws StreamException
      */
     protected function getStream(): RedisInterface {
@@ -47,7 +42,6 @@ class RedisStream extends AbstractStream
 
     /**
      * @return RedisInterface
-     *
      * @throws StreamException
      */
     public function initStream(): RedisInterface {
@@ -73,12 +67,9 @@ class RedisStream extends AbstractStream
 
     /**
      * Retourne une portion du contenu du fichier.
-     *
      * @param int $offset
      * @param int $length
-     *
      * @return string|null
-     *
      * @throws StreamException
      */
     public function streamGetRange( int $offset, int $length ): ?string {
@@ -95,12 +86,9 @@ class RedisStream extends AbstractStream
 
     /**
      * Ecris une portion de contenu en commencant à l'offset défini.
-     *
      * @param int    $offset
      * @param string $content
-     *
      * @return bool
-     *
      * @throws StreamException
      */
     public function streamSetRange( int $offset, string $content ): bool {
@@ -112,11 +100,8 @@ class RedisStream extends AbstractStream
 
     /**
      * Ajoute du contenu au debut du fichier.
-     *
      * @param string|null $content
-     *
      * @return bool
-     *
      * @throws StreamException
      */
     public function streamSet( ?string $content ): bool {
@@ -127,11 +112,8 @@ class RedisStream extends AbstractStream
 
     /**
      * Ajoute du contenu à la fin du fichier.
-     *
      * @param string $content
-     *
      * @return bool
-     *
      * @throws StreamException
      */
     public function streamAppend( string $content ): bool {
@@ -142,9 +124,7 @@ class RedisStream extends AbstractStream
 
     /**
      * Retourne si le fichier existe.
-     *
      * @return bool
-     *
      * @throws StreamException
      */
     public function streamExists(): bool {
@@ -154,9 +134,7 @@ class RedisStream extends AbstractStream
 
     /**
      * Retourne la taille du fichier.
-     *
      * @return int
-     *
      * @throws StreamException
      */
     public function streamSize(): int {
@@ -166,9 +144,7 @@ class RedisStream extends AbstractStream
 
     /**
      * Supprime fichier.
-     *
      * @return bool
-     *
      * @throws StreamException
      */
     public function streamDelete(): bool {
@@ -178,11 +154,8 @@ class RedisStream extends AbstractStream
 
     /**
      * Renomme le fichier ou le dossier.
-     *
      * @param string $path
-     *
      * @return bool
-     *
      * @throws StreamException
      */
     public function streamRename( string $path ): bool {
@@ -197,9 +170,7 @@ class RedisStream extends AbstractStream
 
     /**
      * Crée un dossier.
-     *
      * @param bool $recursive
-     *
      * @return bool
      */
     public function streamSetDir( bool $recursive ): bool {
@@ -208,7 +179,6 @@ class RedisStream extends AbstractStream
 
     /**
      * Supprime un dossier.
-     *
      * @return bool
      */
     public function streamDeleteDir(): bool {
@@ -217,9 +187,7 @@ class RedisStream extends AbstractStream
 
     /**
      * Retourne si le fichier est un dossier.
-     *
      * @return bool
-     *
      * @throws StreamException
      */
     public function streamIsDir(): bool {
@@ -228,9 +196,7 @@ class RedisStream extends AbstractStream
 
     /**
      * Retourne la liste des fichiers present dans le dossier.
-     *
      * @return array
-     *
      * @throws StreamException
      */
     public function streamListDir(): array {
@@ -252,11 +218,8 @@ class RedisStream extends AbstractStream
 
     /**
      * Defini ou retourne la derniere date d'acces au fichier.
-     *
      * @param bool $time
-     *
      * @return int
-     *
      * @throws StreamException
      */
     public function streamAccessTime( $time = false ): int {
@@ -269,13 +232,10 @@ class RedisStream extends AbstractStream
 
     /**
      * Defini des meta données d'information sur le fichier.
-     *
      * @param string $path
      * @param string $name
      * @param null   $value
-     *
      * @return mixed
-     *
      * @throws StreamException
      */
     protected function streamInfo( string $path, string $name, $value = null ) {
@@ -297,11 +257,8 @@ class RedisStream extends AbstractStream
 
     /**
      * Defini ou retourne la date de creation du fichier.
-     *
      * @param bool $time
-     *
      * @return int
-     *
      * @throws StreamException
      */
     public function streamCreatedTime( $time = false ): int {
@@ -314,11 +271,8 @@ class RedisStream extends AbstractStream
 
     /**
      * Defini ou retourne la derniere date de modification au fichier.
-     *
      * @param bool $time
-     *
      * @return int
-     *
      * @throws StreamException
      */
     public function streamModifiedTime( $time = false ): int {
@@ -331,7 +285,6 @@ class RedisStream extends AbstractStream
 
     /**
      * Libere le flux.
-     *
      * @return bool
      */
     public function streamClose(): bool {

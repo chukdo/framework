@@ -5,13 +5,9 @@ namespace Chukdo\Helper;
 /**
  * Classe Image
  * Manipulation d'images.
- *
  * @version      1.0.0
- *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
- *
  * @since        08/01/2019
- *
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 final class Image
@@ -24,7 +20,6 @@ final class Image
 
     /**
      * @param string $file
-     *
      * @return array|null
      */
     public static function loadImageFromFile( string $file ): ?array {
@@ -37,9 +32,7 @@ final class Image
 
     /**
      * Retourne les proprietes d'une images (largeur, hauteur, mime-type, image sous forme de resource).
-     *
      * @param string $string
-     *
      * @return array|null
      */
     public static function loadImageFromString( string $string ): ?array {
@@ -64,7 +57,6 @@ final class Image
 
     /**
      * @param string $base64
-     *
      * @return array|null
      */
     public static function loadImageFromBase64( string $base64 ): ?array {
@@ -82,7 +74,6 @@ final class Image
     /**
      * @param array $image [w, h, t, i] (self::loadImage*)
      * @param int   $quality
-     *
      * @return string|null
      */
     public static function convertToJpg( array $image, int $quality ): ?string {
@@ -93,11 +84,9 @@ final class Image
 
     /**
      * Converti une image dans un autre format.
-     *
      * @param array    $image   [w, h, t, i] (self::loadImage*)
      * @param int      $format  type d'image (IMAGETYPE_GIF | IMAGETYPE_JPEG | IMAGETYPE_PNG)
      * @param int|null $quality (0 à 100)
-     *
      * @return string si l'operation reussi false sinon
      */
     public static function convert( array $image, int $format, int $quality = null ): ?string {
@@ -133,11 +122,9 @@ final class Image
 
     /**
      * Retourne le flux d'une nouvelle image (que l'on peut sauver dans un fichier).
-     *
      * @param resource $image   (imagecreatetruecolor)
      * @param int      $format  type d'image (IMAGETYPE_GIF | IMAGETYPE_JPEG | IMAGETYPE_PNG)
      * @param int|null $quality (0 à 100)
-     *
      * @return string
      */
     public static function getImage( $image, int $format, int $quality = null ): string {
@@ -176,7 +163,6 @@ final class Image
     /**
      * @param array $image [w, h, t, i] (self::loadImage*)
      * @param int   $quality
-     *
      * @return string|null
      */
     public static function convertToPng( array $image, $quality ) {
@@ -187,7 +173,6 @@ final class Image
 
     /**
      * @param array $image [w, h, t, i] (self::loadImage*)
-     *
      * @return string|null
      */
     public static function convertToGif( array $image ) {
@@ -197,11 +182,9 @@ final class Image
 
     /**
      * Resize une image (proportionnel).
-     *
      * @param array    $image [w, h, t, i] (self::loadImage*)
      * @param int      $dw    largeur
      * @param int|null $dh    hauteur
-     *
      * @return string|null
      */
     public static function resize( array $image, int $dw = 0, int $dh = null ): ?string {
@@ -250,7 +233,6 @@ final class Image
 
     /**
      * Retaille une image.
-     *
      * @param array    $image [w, h, t, i]
      * @param int      $sx    point de depart x
      * @param int      $sy    point de depart y
@@ -258,7 +240,6 @@ final class Image
      * @param int      $dh    destination hauteur
      * @param int      $sw    source largeur
      * @param int|null $sh    source hauteur
-     *
      * @return string si l'operation reussi false si le resize n'est pas nécessaire
      */
     public static function resampleImage( array $image, int $sx, int $sy, int $dw, int $dh, int $sw = 0, int $sh = null ): ?string {
@@ -316,13 +297,11 @@ final class Image
 
     /**
      * Crop une image.
-     *
      * @param array $image [w, h, t, i]
      * @param int   $dx    point de depart x
      * @param int   $dy    point de depart y
      * @param int   $dw    largeur
      * @param int   $dh    hauteur
-     *
      * @return string|null
      */
     public static function crop( array $image, int $dx, int $dy, int $dw, int $dh ): ?string {

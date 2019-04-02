@@ -7,13 +7,9 @@ use Elasticsearch\ClientBuilder;
 
 /**
  * Gestionnaire des logs pour fichier.
- *
  * @version       1.0.0
- *
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
- *
  * @since         08/01/2019
- *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class ElasticHandler extends AbstractHandler
@@ -30,7 +26,6 @@ class ElasticHandler extends AbstractHandler
 
     /**
      * ElasticHandler constructor.
-     *
      * @param string|null $dsn
      */
     public function __construct( ?string $dsn ) {
@@ -52,7 +47,6 @@ class ElasticHandler extends AbstractHandler
 
     /**
      * @param array $record
-     *
      * @return bool
      */
     public function write( $record ): bool {

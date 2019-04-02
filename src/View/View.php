@@ -9,13 +9,9 @@ use Chukdo\Contracts\View\Functions;
 
 /**
  * Moteur de template.
- *
  * @version      1.0.0
- *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
- *
  * @since        08/01/2019
- *
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class View
@@ -52,7 +48,6 @@ class View
 
     /**
      * View constructor.
-     *
      * @param string|null   $folder
      * @param Response|null $response
      */
@@ -86,7 +81,6 @@ class View
     /**
      * @param string $name
      * @param string $folder
-     *
      * @return View
      */
     public function addFolder( string $name, string $folder ): self {
@@ -98,7 +92,6 @@ class View
 
     /**
      * @param string $template
-     *
      * @return bool
      */
     public function exists( string $template ): bool {
@@ -107,7 +100,6 @@ class View
 
     /**
      * @param string $template
-     *
      * @return array|null
      */
     public function path( string $template ): ?array {
@@ -146,7 +138,6 @@ class View
     /**
      * @param iterable          $data
      * @param array|string|null $templates
-     *
      * @return View
      */
     public function addData( Iterable $data, $templates = null ): self {
@@ -164,7 +155,6 @@ class View
 
     /**
      * @param string|null $template
-     *
      * @return iterable|null
      */
     public function getData( string $template = null ): ?iterable {
@@ -189,7 +179,6 @@ class View
     /**
      * @param string  $name
      * @param Closure $closure
-     *
      * @return View
      */
     public function registerFunction( string $name, Closure $closure ): self {
@@ -207,7 +196,6 @@ class View
 
     /**
      * @param string $function
-     *
      * @return Closure
      */
     public function callRegisteredFunction( string $function ): Closure {
@@ -221,7 +209,6 @@ class View
 
     /**
      * @param string $function
-     *
      * @return bool
      */
     public function isRegisteredFunction( string $function ): bool {
@@ -241,7 +228,6 @@ class View
     /**
      * @param string        $template
      * @param iterable|null $data
-     *
      * @return Template
      */
     public function make( string $template, iterable $data = null ): Template {

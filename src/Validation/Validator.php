@@ -10,13 +10,9 @@ use Chukdo\Json\Message;
 
 /**
  * Validation de données.
- *
  * @version      1.0.0
- *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
- *
  * @since        08/01/2019
- *
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Validator
@@ -58,7 +54,6 @@ class Validator
 
     /**
      * Validator constructor.
-     *
      * @param Input $inputs
      * @param array $rules
      * @param Lang  $messages
@@ -76,7 +71,6 @@ class Validator
 
     /**
      * @param ValidateInterface $validate
-     *
      * @return Validator
      */
     public function registerValidator( ValidateInterface $validate ): self {
@@ -87,7 +81,6 @@ class Validator
 
     /**
      * @param FilterInterface $filter
-     *
      * @return Validator
      */
     public function registerFilter( FilterInterface $filter ): self {
@@ -125,7 +118,6 @@ class Validator
 
     /**
      * @param string $filter
-     *
      * @return FilterInterface|null
      */
     public function filter( string $filter ): ?FilterInterface {
@@ -145,7 +137,6 @@ class Validator
 
     /**
      * @param string $validator
-     *
      * @return ValidateInterface|null
      */
     public function validator( string $validator ): ?ValidateInterface {
@@ -186,7 +177,6 @@ class Validator
 
     /**
      * @param array $listName
-     *
      * @return string
      */
     public function message( array $listName ): string {

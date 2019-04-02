@@ -7,20 +7,15 @@ use Chukdo\Json\Json;
 /**
  * Classe Str
  * Fonctionnalités de filtre sur les données.
- *
  * @version       1.0.0
- *
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
- *
  * @since         08/01/2019
- *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 final class Str
 {
     /**
      * @param string $name
-     *
      * @return string
      */
     public static function extension( string $name ): string {
@@ -39,10 +34,8 @@ final class Str
 
     /**
      * Verifie si une chaine de caractere ne contient pas une autre chaine de caractere.
-     *
      * @param string $haystack La chaîne dans laquelle on doit chercher
      * @param string $needle   valeur recherché
-     *
      * @return bool
      */
     public static function notContain( string $haystack, string $needle ): bool {
@@ -52,10 +45,8 @@ final class Str
 
     /**
      * Verifie si une chaine de caractere contient une autre chaine de caractere.
-     *
      * @param string $haystack La chaîne dans laquelle on doit chercher
      * @param string $needle   valeur recherché
-     *
      * @return bool
      */
     public static function contain( string $haystack, string $needle ): bool {
@@ -67,10 +58,8 @@ final class Str
 
     /**
      * Retourne un caractere d'une chaine en fonction de sa position.
-     *
      * @param string $string
      * @param int    $index
-     *
      * @return string
      */
     public static function charAt( string $string, int $index ): string {
@@ -87,7 +76,6 @@ final class Str
     /**
      * @param string $pattern
      * @param string $value
-     *
      * @return Json
      */
     public static function matchAll( string $pattern, string $value ): Json {
@@ -120,7 +108,6 @@ final class Str
     /**
      * @param string $pattern
      * @param string $value
-     *
      * @return Json|string|null
      */
     public static function match( string $pattern, string $value ) {
@@ -148,7 +135,6 @@ final class Str
      * @param string   $delimiter
      * @param int|null $pad
      * @param null     $padValue
-     *
      * @return array
      */
     public static function split( string $value, string $delimiter, int $pad = null, $padValue = null ): array {
@@ -167,7 +153,6 @@ final class Str
     /**
      * @param array  $value
      * @param string $glue
-     *
      * @return string
      */
     public static function join( array $value, string $glue ): string {
@@ -177,7 +162,6 @@ final class Str
 
     /**
      * @param int|null $time
-     *
      * @return string
      */
     public static function time( int $time = null ): string {
@@ -200,7 +184,6 @@ final class Str
 
     /**
      * @param int $mem
-     *
      * @return string
      */
     public static function memory( int $mem = null ): string {
@@ -222,7 +205,6 @@ final class Str
 
     /**
      * @param string|null $prefix
-     *
      * @return string
      */
     public static function uid( string $prefix = null ): string {
@@ -232,7 +214,6 @@ final class Str
 
     /**
      * @param string $value
-     *
      * @return string
      */
     public static function stripSpaceBetweenTag( string $value ): string {
@@ -243,7 +224,6 @@ final class Str
 
     /**
      * @param string $value
-     *
      * @return string
      */
     public static function trim( string $value ): string {
@@ -261,7 +241,6 @@ final class Str
      * @param        $pattern
      * @param        $replacement
      * @param string $value
-     *
      * @return string
      */
     public static function replace( $pattern, $replacement, string $value ): string {
@@ -273,7 +252,6 @@ final class Str
     /**
      * @param string $value
      * @param int    $len
-     *
      * @return string
      */
     public static function ellipsis( string $value, int $len ): string {
@@ -288,7 +266,6 @@ final class Str
 
     /**
      * @param string $value
-     *
      * @return string
      */
     public static function allDigit( string $value ): string {
@@ -299,7 +276,6 @@ final class Str
 
     /**
      * @param string $value
-     *
      * @return string
      */
     public static function allText( string $value ): string {
@@ -312,7 +288,6 @@ final class Str
 
     /**
      * @param string $value
-     *
      * @return string
      */
     public static function removeSpecialChars( string $value ): string {
@@ -345,7 +320,6 @@ final class Str
      * @param string $value
      * @param string $tag
      * @param string $replacement
-     *
      * @return string
      */
     public static function stripTag( string $value, string $tag = null, string $replacement = null ): string {
@@ -357,7 +331,6 @@ final class Str
 
     /**
      * @param string $value
-     *
      * @return string
      */
     public static function allSentence( string $value ): string {
@@ -370,7 +343,6 @@ final class Str
 
     /**
      * @param string $value
-     *
      * @return string
      */
     public static function removeWhiteSpace( string $value ): string {

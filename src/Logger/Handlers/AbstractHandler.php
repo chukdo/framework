@@ -10,13 +10,9 @@ use Chukdo\Logger\Formatters\JsonStringFormatter;
 
 /**
  * Abstract class.
- *
  * @version       1.0.0
- *
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
- *
  * @since         08/01/2019
- *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 abstract class AbstractHandler implements HandlerInterface
@@ -52,7 +48,6 @@ abstract class AbstractHandler implements HandlerInterface
 
     /**
      * @param array $record
-     *
      * @return bool
      */
     public function handle( array $record ): bool {
@@ -71,7 +66,6 @@ abstract class AbstractHandler implements HandlerInterface
 
     /**
      * @param array $record
-     *
      * @return bool
      */
     public function isHandling( array $record ): bool {
@@ -81,7 +75,6 @@ abstract class AbstractHandler implements HandlerInterface
 
     /**
      * @param array $record
-     *
      * @return array
      */
     public function processRecord( array $record ): array {
@@ -94,7 +87,6 @@ abstract class AbstractHandler implements HandlerInterface
 
     /**
      * @param FormatterInterface $formatter
-     *
      * @return HandlerInterface
      */
     public function setFormatter( FormatterInterface $formatter ): HandlerInterface {
@@ -105,14 +97,12 @@ abstract class AbstractHandler implements HandlerInterface
 
     /**
      * @param $record
-     *
      * @return bool
      */
     abstract protected function write( $record ): bool;
 
     /**
      * @param ProcessorInterface $processor
-     *
      * @return HandlerInterface
      */
     public function pushProcessor( ProcessorInterface $processor ): HandlerInterface {

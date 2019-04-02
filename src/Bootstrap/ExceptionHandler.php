@@ -10,13 +10,9 @@ use Exception;
 
 /**
  * Gestionnaire par défauts des exceptions.
- *
  * @version       1.0.0
- *
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
- *
  * @since         08/01/2019
- *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class ExceptionHandler implements Handler
@@ -28,7 +24,6 @@ class ExceptionHandler implements Handler
 
     /**
      * ExceptionHandler constructor.
-     *
      * @param App $app
      */
     public function __construct( App $app ) {
@@ -37,7 +32,6 @@ class ExceptionHandler implements Handler
 
     /**
      * @param Exception $e
-     *
      * @throws ServiceException
      * @throws \ReflectionException
      */
@@ -48,7 +42,6 @@ class ExceptionHandler implements Handler
 
     /**
      * @param Exception $e
-     *
      * @throws ServiceException
      * @throws \ReflectionException
      */

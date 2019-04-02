@@ -4,13 +4,9 @@ namespace Chukdo\Helper;
 
 /**
  * Gestion des messages HTTP.
- *
  * @version      1.0.0
- *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
- *
  * @since        08/01/2019
- *
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 final class Http
@@ -23,7 +19,6 @@ final class Http
 
     /**
      * @param string $name
-     *
      * @return string
      */
     public static function mimeContentType( string $name ): string {
@@ -77,7 +72,6 @@ final class Http
 
     /**
      * @param string|null $ua
-     *
      * @return array
      */
     public static function getUserAgent( string $ua = null ): array {
@@ -170,7 +164,6 @@ final class Http
     /**
      * @param             $name
      * @param string|null $default
-     *
      * @return string|null
      */
     public static function server( $name, string $default = null ): ?string {
@@ -182,7 +175,6 @@ final class Http
     /**
      * @param             $name
      * @param string|null $default
-     *
      * @return string|null
      */
     public static function request( $name, string $default = null ): ?string {

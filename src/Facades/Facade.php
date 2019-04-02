@@ -6,34 +6,27 @@ use Chukdo\Bootstrap\App;
 
 /**
  * Initialisation d'une facade.
- *
  * @version       1.0.0
- *
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
- *
  * @since         08/01/2019
- *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Facade
 {
     /**
      * Instance App.
-     *
      * @var \Chukdo\Bootstrap\App
      */
     protected static $app;
 
     /**
      * Cache facades.
-     *
      * @var array
      */
     protected static $facades = [];
 
     /**
      * Attache APP (extension de service) à la facade pour la resolution des injections de dependance.
-     *
      * @param App $app
      */
     public static function setFacadeApplication( App $app ): void {
@@ -58,7 +51,6 @@ class Facade
 
     /**
      * @return mixed
-     *
      * @throws FacadeException
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
@@ -69,11 +61,8 @@ class Facade
 
     /**
      * Retourne l'instance resolu attaché à un nom.
-     *
      * @param string $name
-     *
      * @return mixed
-     *
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
@@ -88,7 +77,6 @@ class Facade
 
     /**
      * @return string
-     *
      * @throws FacadeException
      */
     public static function name(): string {
@@ -98,9 +86,7 @@ class Facade
     /**
      * @param string $method
      * @param array  $args
-     *
      * @return mixed
-     *
      * @throws FacadeException
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException

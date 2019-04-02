@@ -7,20 +7,15 @@ use Chukdo\Helper\Is;
 
 /**
  * Gestion des fichiers de langues.
- *
  * @version      1.0.0
- *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
- *
  * @since        08/01/2019
- *
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Lang extends Json
 {
     /**
      * @param string $dir
-     *
      * @return bool
      */
     public function load( string $dir ): bool {
@@ -43,7 +38,6 @@ class Lang extends Json
 
     /**
      * @param string $file
-     *
      * @return bool
      */
     protected function loadFile( string $file ): bool {

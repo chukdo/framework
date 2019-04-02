@@ -6,13 +6,9 @@ use Chukdo\Helper\Str;
 
 /**
  * Gestion des fichiers.
- *
  * @version      1.0.0
- *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
- *
  * @since        08/01/2019
- *
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Storage
@@ -20,7 +16,6 @@ class Storage
     /**
      * @param string $directory
      * @param int    $visibility
-     *
      * @return bool
      */
     public function makeDirectory( string $directory, int $visibility = 0777 ): bool {
@@ -31,7 +26,6 @@ class Storage
 
     /**
      * @param string $directory
-     *
      * @return bool
      */
     public function deleteDirectory( string $directory ): bool {
@@ -57,7 +51,6 @@ class Storage
 
     /**
      * @param string $file
-     *
      * @return bool
      */
     public function delete( string $file ): bool {
@@ -66,7 +59,6 @@ class Storage
 
     /**
      * @param string $directory
-     *
      * @return array
      */
     public function directories( string $directory ): array {
@@ -90,9 +82,7 @@ class Storage
 
     /**
      * Recursive.
-     *
      * @param string $directory
-     *
      * @return array
      */
     public function allDirectories( string $directory ): array {
@@ -117,7 +107,6 @@ class Storage
 
     /**
      * @param string $file
-     *
      * @return bool
      */
     public function exists( string $file ): bool {
@@ -126,7 +115,6 @@ class Storage
 
     /**
      * @param string $file
-     *
      * @return int
      */
     public function size( string $file ): int {
@@ -136,7 +124,6 @@ class Storage
     /**
      * @param string $oldFile
      * @param string $newFile
-     *
      * @return bool
      */
     public function copy( string $oldFile, string $newFile ): bool {
@@ -147,7 +134,6 @@ class Storage
     /**
      * @param string $file
      * @param string $content
-     *
      * @return bool
      */
     public function put( string $file, string $content ): bool {
@@ -157,7 +143,6 @@ class Storage
 
     /**
      * @param string $file
-     *
      * @return string
      */
     public function get( string $file ): string {
@@ -167,7 +152,6 @@ class Storage
     /**
      * @param string $oldFile
      * @param string $newFile
-     *
      * @return bool
      */
     public function move( string $oldFile, string $newFile ): bool {
@@ -182,7 +166,6 @@ class Storage
     /**
      * @param string      $directory
      * @param string|null $match
-     *
      * @return array
      */
     public function files( string $directory, string $match = null ): array {
@@ -209,7 +192,6 @@ class Storage
     /**
      * @param string      $directory
      * @param string|null $match
-     *
      * @return array
      */
     public function allFiles( string $directory, string $match = null ): array {

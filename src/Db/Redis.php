@@ -6,58 +6,47 @@ use Chukdo\Contracts\Db\Redis as RedisInterface;
 
 /**
  * Gestion de la base de donnée NOSQL Redis basé sur son protocole unifié.
- *
  * @version       1.0.0
- *
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
- *
  * @since         08/01/2019
- *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Redis implements RedisInterface
 {
     /**
      * Socket.
-     *
      * @var resource
      */
     protected $sock = null;
 
     /**
      * Pointer SCAN pour iteration.
-     *
      * @var int
      */
     protected $pointer = 0;
 
     /**
      * Pile de stockage SCAN.
-     *
      * @var array
      */
     protected $stack = [];
 
     /**
      * Arguements par defaut pour le SCAN.
-     *
      * @var array
      */
     protected $args = [];
 
     /**
      * type de SCAN (SCAN, HSCAN, SSCAN).
-     *
      * @var string
      */
     protected $type = null;
 
     /**
      * Redis constructor.
-     *
      * @param string|null $dsn
      * @param int|null    $timeout
-     *
      * @throws RedisException
      */
     public function __construct( string $dsn = null, int $timeout = null ) {
@@ -89,12 +78,9 @@ class Redis implements RedisInterface
 
     /**
      * Appel des commandes redis au travers de la surcharge magique de PHP.
-     *
      * @param string $name
      * @param array  $args
-     *
      * @return mixed
-     *
      * @throws RedisException
      */
     public function __call( string $name, array $args ) {
@@ -110,9 +96,7 @@ class Redis implements RedisInterface
 
     /**
      * Ecriture d'une commande basé sur le protocol unifié de Redis.
-     *
      * @param string $c command
-     *
      * @throws RedisException
      */
     public function write( string $c ): void {
@@ -129,9 +113,7 @@ class Redis implements RedisInterface
 
     /**
      * Formate une commande Redis (protocol unifié de Redis).
-     *
      * @param array $args arguments
-     *
      * @return string
      */
     public function command( array $args ): string {
@@ -146,9 +128,7 @@ class Redis implements RedisInterface
 
     /**
      * Lecture d'une reponse du serveur.
-     *
      * @throws RedisException
-     *
      * @return mixed
      */
     public function read() {
@@ -242,7 +222,6 @@ class Redis implements RedisInterface
     /**
      * Défini le type de commande SCAN lors d'une itération Redis
      * Ex. SCAN SSCAN HSCAN.
-     *
      * @param string $type
      */
     public function setTypeIterator( string $type ): void {
@@ -252,7 +231,6 @@ class Redis implements RedisInterface
     /**
      * Arguments à ajouter à la commande SCAN lors d'une itération Redis
      * Ex. scan 0 MATCH *11*.
-     *
      * @param array $args
      */
     public function setArgsIterator( array $args ): void {
@@ -261,9 +239,7 @@ class Redis implements RedisInterface
 
     /**
      * Retourne le nombre d'enregistrement dans la base redis.
-     *
      * @return int|mixed
-     *
      * @throws RedisException
      */
     public function count() {
@@ -274,7 +250,6 @@ class Redis implements RedisInterface
 
     /**
      * Initialise l'iteration.
-     *
      * @throws RedisException
      */
     public function rewind() {
@@ -294,11 +269,8 @@ class Redis implements RedisInterface
     /**
      * Ecris la commande SCAN lors d'une itération Redis
      * Ex. SCAN SSCAN HSCAN.
-     *
      * @param int $pointer
-     *
      * @return mixed
-     *
      * @throws RedisException
      */
     protected function getIterator( int $pointer ) {
@@ -313,7 +285,6 @@ class Redis implements RedisInterface
 
     /**
      * @return bool|mixed
-     *
      * @throws RedisException
      */
     public function current() {
@@ -356,9 +327,7 @@ class Redis implements RedisInterface
 
     /**
      * @param string $key
-     *
      * @return mixed
-     *
      * @throws RedisException
      */
     public function get( string $key ) {
@@ -368,7 +337,6 @@ class Redis implements RedisInterface
 
     /**
      * Retourne la cle de l'element courant.
-     *
      * @return string
      */
     public function key() {
@@ -379,7 +347,6 @@ class Redis implements RedisInterface
 
     /**
      * Pointe sur l'element suivant.
-     *
      * @throws RedisException
      */
     public function next() {
@@ -400,7 +367,6 @@ class Redis implements RedisInterface
     /**
      * Verifie si il y a un element apres l'element courant
      * apres l'appel de rewind() ou next().
-     *
      * @return bool
      */
     public function valid(): bool {
@@ -418,11 +384,8 @@ class Redis implements RedisInterface
 
     /**
      * Ecriture de commandes dans un pipeline (gain de performance).
-     *
      * @param array $commands
-     *
      * @return array
-     *
      * @throws RedisException
      */
     public function pipe( array $commands ): array {
@@ -449,11 +412,8 @@ class Redis implements RedisInterface
 
     /**
      * Retourne les informations sur le serveur Redis.
-     *
      * @param string $key information precise que l'on souhaite recuperer
-     *
      * @return array|bool|mixed
-     *
      * @throws RedisException
      */
     public function info( string $key = null ) {
@@ -482,9 +442,7 @@ class Redis implements RedisInterface
 
     /**
      * @param string $key
-     *
      * @return mixed
-     *
      * @throws RedisException
      */
     public function exists( string $key ) {
@@ -495,9 +453,7 @@ class Redis implements RedisInterface
     /**
      * @param string $key
      * @param        $value
-     *
      * @return mixed
-     *
      * @throws RedisException
      */
     public function set( string $key, $value ) {
@@ -510,9 +466,7 @@ class Redis implements RedisInterface
 
     /**
      * @param string $key
-     *
      * @return bool
-     *
      * @throws RedisException
      */
     public function del( string $key ) {
@@ -522,9 +476,7 @@ class Redis implements RedisInterface
 
     /**
      * @param string $key
-     *
      * @return mixed
-     *
      * @throws RedisException
      */
     public function __isset( string $key ) {
@@ -534,9 +486,7 @@ class Redis implements RedisInterface
 
     /**
      * @param string $key
-     *
      * @return mixed
-     *
      * @throws RedisException
      */
     public function __get( string $key ) {
@@ -547,9 +497,7 @@ class Redis implements RedisInterface
     /**
      * @param string $key
      * @param        $value
-     *
      * @return mixed
-     *
      * @throws RedisException
      */
     public function __set( string $key, $value ) {
@@ -562,9 +510,7 @@ class Redis implements RedisInterface
 
     /**
      * @param string $key
-     *
      * @return mixed
-     *
      * @throws RedisException
      */
     public function __unset( string $key ) {

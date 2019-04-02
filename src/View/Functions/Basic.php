@@ -9,13 +9,9 @@ use Chukdo\Helper\Str;
 
 /**
  * Fonctions basic pour le moteur de vue.
- *
  * @version      1.0.0
- *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
- *
  * @since        08/01/2019
- *
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Basic implements FunctionsInterface
@@ -38,7 +34,6 @@ class Basic implements FunctionsInterface
     /**
      * @param string $data
      * @param string $search
-     *
      * @return bool
      */
     public function contain( string $data, string $search ): bool {
@@ -48,7 +43,6 @@ class Basic implements FunctionsInterface
 
     /**
      * @param string $data
-     *
      * @return string
      */
     public function removeSpecialChars( string $data ): string {

@@ -10,41 +10,33 @@ use ReflectionParameter;
 
 /**
  * Gestion des injections de dependance.
- *
  * @version       1.0.0
- *
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
- *
  * @since         08/01/2019
- *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Service implements ArrayAccess
 {
     /**
      * Tableau des liaisons.
-     *
      * @var array
      */
     protected $bindings = [];
 
     /**
      * Tableau des singletons.
-     *
      * @var array
      */
     protected $singletons = [];
 
     /**
      * Tableau des instances.
-     *
      * @var array
      */
     protected $instances = [];
 
     /**
      * Tableau de configuration.
-     *
      * @var array
      */
     protected $conf = [];
@@ -78,10 +70,8 @@ class Service implements ArrayAccess
 
     /**
      * Enregistre une closure en tant service partagé (singleton).
-     *
      * @param string $name
      * @param        $closure
-     *
      * @return bool
      */
     public function singleton( string $name, $closure ): bool {
@@ -96,7 +86,6 @@ class Service implements ArrayAccess
 
     /**
      * @param string $name
-     *
      * @return string
      */
     protected function formatNameSpace( string $name ): string {
@@ -106,7 +95,6 @@ class Service implements ArrayAccess
 
     /**
      * @param array $conf
-     *
      * @return bool
      */
     public function conf( array $conf ): bool {
@@ -117,7 +105,6 @@ class Service implements ArrayAccess
 
     /**
      * @param mixed $key
-     *
      * @return bool
      */
     public function offsetExists( $key ): bool {
@@ -132,9 +119,7 @@ class Service implements ArrayAccess
 
     /**
      * @param mixed $key
-     *
      * @return mixed|object|null
-     *
      * @throws ServiceException
      * @throws \ReflectionException
      */
@@ -144,9 +129,7 @@ class Service implements ArrayAccess
 
     /**
      * @param string $name
-     *
      * @return mixed|object|null
-     *
      * @throws ServiceException
      * @throws \ReflectionException
      */
@@ -166,9 +149,7 @@ class Service implements ArrayAccess
 
     /**
      * Retourne une instance lié.
-     *
      * @param string $name
-     *
      * @return object|null
      */
     public function getInstance( string $name ) {
@@ -181,9 +162,7 @@ class Service implements ArrayAccess
 
     /**
      * Retourne un singleton lié.
-     *
      * @param string $name
-     *
      * @return Closure|string|array|null
      */
     public function getSingleton( string $name ) {
@@ -196,10 +175,8 @@ class Service implements ArrayAccess
 
     /**
      * Enregistre un objet en tant que service.
-     *
      * @param string $name
      * @param object $instance
-     *
      * @return bool
      */
     public function instance( string $name, $instance ): bool {
@@ -214,9 +191,7 @@ class Service implements ArrayAccess
 
     /**
      * @param string $name
-     *
      * @return mixed|object
-     *
      * @throws ServiceException
      * @throws \ReflectionException
      */
@@ -247,9 +222,7 @@ class Service implements ArrayAccess
 
     /**
      * Retourne une liaison existe.
-     *
      * @param string $name
-     *
      * @return Closure|string|array|null
      */
     public function getBind( string $name ) {
@@ -263,9 +236,7 @@ class Service implements ArrayAccess
     /**
      * @param string $class
      * @param array  $args
-     *
      * @return object
-     *
      * @throws ServiceException
      * @throws \ReflectionException
      */
@@ -287,9 +258,7 @@ class Service implements ArrayAccess
 
     /**
      * @param string $arg
-     *
      * @return mixed|object|string
-     *
      * @throws ServiceException
      * @throws \ReflectionException
      */
@@ -312,7 +281,6 @@ class Service implements ArrayAccess
 
     /**
      * @param string $key
-     *
      * @return string|null
      */
     public function getConf( string $key ): ?string {
@@ -329,9 +297,7 @@ class Service implements ArrayAccess
     /**
      * @param string $class
      * @param array  $args
-     *
      * @return object
-     *
      * @throws ServiceException
      * @throws \ReflectionException
      */
@@ -359,9 +325,7 @@ class Service implements ArrayAccess
 
     /**
      * @param ReflectionMethod $constructor
-     *
      * @return array
-     *
      * @throws ServiceException
      * @throws \ReflectionException
      */
@@ -378,9 +342,7 @@ class Service implements ArrayAccess
 
     /**
      * @param ReflectionParameter $parameter
-     *
      * @return function|mixed
-     *
      * @throws ServiceException
      * @throws \ReflectionException
      */
@@ -417,10 +379,8 @@ class Service implements ArrayAccess
      * Une closure qui sera retourné lors de l'appel
      * Un tableau (class, args) qui sera instancié lors de l'appel,
      * si un argument commence par @ alors il considere cela comme une auto reference dans service.
-     *
      * @param string               $name
      * @param Closure|string|array $closure
-     *
      * @return bool
      */
     public function bind( string $name, $closure ): bool {

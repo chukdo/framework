@@ -8,34 +8,27 @@ use Throwable;
 /**
  * Classe XML DOCUMENT, etend les fonctionnalites XML de PHP5
  * pour la creation rapide de document XML compatible DOM.
- *
  * @version   1.0.0
- *
  * @copyright licence GPL, Copyright (C) 2008 Domingo
- *
  * @since     15/01/2009
- *
  * @author    Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Xml extends Node
 {
     /**
      * Document XML.
-     *
      * @param object DOMDocument
      */
     protected $xml;
 
     /**
      * Buffer de linearisation.
-     *
      * @param string
      */
     private $buffer;
 
     /**
      * Xml constructor.
-     *
      * @param string $name
      * @param string $uri
      */
@@ -53,9 +46,7 @@ class Xml extends Node
     /**
      * @param string $file
      * @param bool   $html
-     *
      * @return Xml
-     *
      * @throws XmlException
      */
     public static function loadFromFile( string $file, bool $html = false ): Xml {
@@ -85,9 +76,7 @@ class Xml extends Node
      * @param string $name
      * @param string $value
      * @param string $uri
-     *
      * @return Node
-     *
      * @throws NodeException
      */
     public function wrap( string $name, string $value = '', string $uri = 'urn:void' ): Node {
@@ -106,7 +95,6 @@ class Xml extends Node
     /**
      * @param string $file
      * @param bool   $html
-     *
      * @return bool
      */
     public function saveToFile( string $file, bool $html = false ): bool {
@@ -146,7 +134,6 @@ class Xml extends Node
 
     /**
      * @param bool $html
-     *
      * @return string
      */
     public function saveToString( bool $html = false ): string {
@@ -170,9 +157,7 @@ class Xml extends Node
     /**
      * @param string $string
      * @param bool   $html
-     *
      * @return Xml
-     *
      * @throws XmlException
      */
     public static function loadFromString( string $string, bool $html = false ): Xml {

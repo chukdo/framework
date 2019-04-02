@@ -8,13 +8,9 @@ use Chukdo\Contracts\Logger\Processor as ProcessorInterface;
 
 /**
  * Gestion des logs.
- *
  * @version       1.0.0
- *
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
- *
  * @since         08/01/2019
- *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Logger implements LoggerInterface
@@ -33,7 +29,6 @@ class Logger implements LoggerInterface
 
     /**
      * RFC 5424.
-     *
      * @var array
      */
     public static $levels = [
@@ -54,14 +49,12 @@ class Logger implements LoggerInterface
 
     /**
      * Pile des gestionnaires de logs.
-     *
      * @var array
      */
     protected $handlers = [];
 
     /**
      * Processeurs de modifications des enregistrements.
-     *
      * @var array
      */
     protected $processors = [];
@@ -69,7 +62,6 @@ class Logger implements LoggerInterface
     /**
      * Constructeur
      * Initialise l'objet.
-     *
      * @param string $name       nom de l'instance de log
      * @param array  $handlers   liste des gestionnaires
      * @param array  $processors liste des processus
@@ -88,9 +80,7 @@ class Logger implements LoggerInterface
 
     /**
      * Ajoute un gestionnaire de log à la pile des gestionnaires de logs.
-     *
      * @param HandlerInterface $handler
-     *
      * @return $this
      */
     public function pushHandler( HandlerInterface $handler ): self {
@@ -102,9 +92,7 @@ class Logger implements LoggerInterface
 
     /**
      * Ajoute un processeur de modification des enregistrements de log à la pile des processeurs de logs.
-     *
      * @param ProcessorInterface $processor
-     *
      * @return $this
      */
     public function pushProcessor( ProcessorInterface $processor ): self {
@@ -116,7 +104,6 @@ class Logger implements LoggerInterface
 
     /**
      * Retourne la liste des niveaux de la RFC 5424.
-     *
      * @return array
      */
     public static function getLevels(): array {
@@ -126,9 +113,7 @@ class Logger implements LoggerInterface
     /**
      * @param string $message
      * @param array  $context
-     *
      * @return bool
-     *
      * @throws LoggerException
      */
     public function alert( string $message, array $context = [] ): bool {
@@ -141,9 +126,7 @@ class Logger implements LoggerInterface
      * @param int    $level
      * @param string $message
      * @param array  $context
-     *
      * @return bool
-     *
      * @throws LoggerException
      */
     public function log( int $level, string $message, array $context = [] ): bool {
@@ -172,7 +155,6 @@ class Logger implements LoggerInterface
     /**
      * @param string $message
      * @param array  $context
-     *
      * @return string
      */
     public function interpolate( string $message, array $context = [] ): string {
@@ -193,7 +175,6 @@ class Logger implements LoggerInterface
 
     /**
      * @param int $level
-     *
      * @return string
      */
     public static function getLevel( int $level ): string {
@@ -209,7 +190,6 @@ class Logger implements LoggerInterface
 
     /**
      * @param string $name
-     *
      * @return Logger
      */
     public function setName( string $name ): self {
@@ -220,9 +200,7 @@ class Logger implements LoggerInterface
 
     /**
      * Envoi l'enregistrement aupres des gestionnaires de logs.
-     *
      * @param array $record
-     *
      * @return bool true si un gestionnaire à traiter l'enregistrement false sinon
      */
     public function handleRecord( array $record ): bool {
@@ -237,9 +215,7 @@ class Logger implements LoggerInterface
 
     /**
      * Modifie / ajoute des données à un enregistrement.
-     *
      * @param array $record
-     *
      * @return array
      */
     public function processRecord( array $record ): array {
@@ -253,9 +229,7 @@ class Logger implements LoggerInterface
     /**
      * @param string $message
      * @param array  $context
-     *
      * @return bool
-     *
      * @throws LoggerException
      */
     public function critical( string $message, array $context = [] ): bool {
@@ -267,9 +241,7 @@ class Logger implements LoggerInterface
     /**
      * @param string $message
      * @param array  $context
-     *
      * @return bool
-     *
      * @throws LoggerException
      */
     public function emergency( string $message, array $context = [] ): bool {
@@ -281,9 +253,7 @@ class Logger implements LoggerInterface
     /**
      * @param string $message
      * @param array  $context
-     *
      * @return bool
-     *
      * @throws LoggerException
      */
     public function error( string $message, array $context = [] ): bool {
@@ -295,9 +265,7 @@ class Logger implements LoggerInterface
     /**
      * @param string $message
      * @param array  $context
-     *
      * @return bool
-     *
      * @throws LoggerException
      */
     public function warning( string $message, array $context = [] ): bool {
@@ -309,9 +277,7 @@ class Logger implements LoggerInterface
     /**
      * @param string $message
      * @param array  $context
-     *
      * @return bool
-     *
      * @throws LoggerException
      */
     public function notice( string $message, array $context = [] ): bool {
@@ -323,9 +289,7 @@ class Logger implements LoggerInterface
     /**
      * @param string $message
      * @param array  $context
-     *
      * @return bool
-     *
      * @throws LoggerException
      */
     public function info( string $message, array $context = [] ): bool {
@@ -337,9 +301,7 @@ class Logger implements LoggerInterface
     /**
      * @param string $message
      * @param array  $context
-     *
      * @return bool
-     *
      * @throws LoggerException
      */
     public function debug( string $message, array $context = [] ): bool {

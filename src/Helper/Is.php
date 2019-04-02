@@ -7,20 +7,15 @@ use Chukdo\Json\Arr;
 /**
  * Classe Is
  * Fonctionnalités de test des données.
- *
  * @version      1.0.0
- *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
- *
  * @since        08/01/2019
- *
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 final class Is
 {
     /**
      * @param $value
-     *
      * @return bool
      */
     public static function json( $value ): bool {
@@ -31,7 +26,6 @@ final class Is
 
     /**
      * @param $value
-     *
      * @return bool
      */
     public static function arr( $value ): bool {
@@ -42,7 +36,6 @@ final class Is
      * @param        $value
      * @param string $method
      * @param string $property
-     *
      * @return bool
      */
     public static function object( $value, string $method = '', string $property = '' ): bool {
@@ -64,7 +57,6 @@ final class Is
 
     /**
      * @param string $name
-     *
      * @return bool
      */
     public static function qualifiedName( string $name ): bool {
@@ -82,7 +74,6 @@ final class Is
      * @param int $value
      * @param int $min
      * @param int $max
-     *
      * @return bool
      */
     public static function between( int $value, int $min = 0, int $max = 0 ): bool {
@@ -106,7 +97,6 @@ final class Is
 
     /**
      * @param $value
-     *
      * @return bool
      */
     public static function int( $value ): bool {
@@ -116,7 +106,6 @@ final class Is
 
     /**
      * @param $value
-     *
      * @return bool
      */
     public static function float( $value ): bool {
@@ -126,7 +115,6 @@ final class Is
 
     /**
      * @param string $value
-     *
      * @return bool
      */
     public static function alpha( string $value ): bool {
@@ -141,7 +129,6 @@ final class Is
 
     /**
      * @param string $value
-     *
      * @return bool
      */
     public static function alnum( string $value ): bool {
@@ -157,7 +144,6 @@ final class Is
     /**
      * @param             $value
      * @param string|null $format
-     *
      * @return bool
      */
     public static function date( $value, string $format = null ): bool {
@@ -171,7 +157,6 @@ final class Is
 
     /**
      * @param $value
-     *
      * @return bool
      */
     public static function string( $value ): bool {
@@ -180,7 +165,6 @@ final class Is
 
     /**
      * @param string $value
-     *
      * @return bool
      */
     public static function html( string $value ): bool {
@@ -189,7 +173,6 @@ final class Is
 
     /**
      * @param string $value
-     *
      * @return bool
      */
     public static function url( string $value ): bool {
@@ -199,7 +182,6 @@ final class Is
 
     /**
      * @param string $value
-     *
      * @return bool
      */
     public static function email( string $value ): bool {
@@ -209,7 +191,6 @@ final class Is
 
     /**
      * @param $value
-     *
      * @return bool
      */
     public static function zipcode( $value ): bool {
@@ -224,7 +205,6 @@ final class Is
 
     /**
      * @param $value
-     *
      * @return bool
      */
     public static function name( $value ): bool {
@@ -239,7 +219,6 @@ final class Is
 
     /**
      * @param string $value
-     *
      * @return bool
      */
     public static function fileName( string $value ): bool {
@@ -254,7 +233,6 @@ final class Is
 
     /**
      * @param string $value
-     *
      * @return bool
      */
     public static function phone( string $value ): bool {
@@ -269,7 +247,6 @@ final class Is
 
     /**
      * @param string $value
-     *
      * @return bool
      */
     public static function mongoId( string $value ): bool {
@@ -284,7 +261,6 @@ final class Is
 
     /**
      * @param $value
-     *
      * @return bool
      */
     public function empty( $value ): bool {
@@ -308,7 +284,6 @@ final class Is
 
     /**
      * @param $value
-     *
      * @return bool
      */
     public static function scalar( $value ): bool {
@@ -317,7 +292,6 @@ final class Is
 
     /**
      * @param $value
-     *
      * @return bool
      */
     public static function traversable( $value ): bool {

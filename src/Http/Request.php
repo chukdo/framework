@@ -12,13 +12,9 @@ use Chukdo\Storage\FileUploaded;
 
 /**
  * Gestion de requete HTTP entrante.
- *
  * @version      1.0.0
- *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
- *
  * @since        08/01/2019
- *
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Request
@@ -50,9 +46,7 @@ class Request
 
     /**
      * Request constructor.
-     *
      * @param App $app
-     *
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
@@ -92,9 +86,7 @@ class Request
 
     /**
      * @param iterable $rules
-     *
      * @return Validator
-     *
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
@@ -108,7 +100,6 @@ class Request
      * @param string      $name
      * @param string|null $allowedMimeTypes
      * @param int|null    $maxFileSize
-     *
      * @return FileUploaded
      */
     public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): FileUploaded {
@@ -126,7 +117,6 @@ class Request
 
     /**
      * @param string $name
-     *
      * @return mixed|null
      */
     public function input( string $name ) {
@@ -135,7 +125,6 @@ class Request
 
     /**
      * @param mixed ...$offsets
-     *
      * @return Json
      */
     public function only( ...$offsets ): Json {
@@ -144,7 +133,6 @@ class Request
 
     /**
      * @param mixed ...$offsets
-     *
      * @return Json
      */
     public function except( ...$offsets ): Json {
@@ -153,7 +141,6 @@ class Request
 
     /**
      * @param string $path
-     *
      * @return bool
      */
     public function filled( string $path ): bool {
@@ -162,7 +149,6 @@ class Request
 
     /**
      * @param string $path
-     *
      * @return bool
      */
     public function exists( string $path ): bool {
@@ -171,7 +157,6 @@ class Request
 
     /**
      * @param string $path
-     *
      * @return Json
      */
     public function wildcard( string $path ): Json {

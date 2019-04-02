@@ -4,20 +4,15 @@ namespace Chukdo\Support;
 
 /**
  * Singleton.
- *
  * @version       1.0.0
- *
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
- *
  * @since         08/01/2019
- *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Singleton
 {
     /**
      * Tableau des instances.
-     *
      * @var object
      */
     private static $singletonInstance = null;
@@ -30,10 +25,8 @@ class Singleton
 
     /**
      * invoque des méthodes inaccessibles dans un contexte statique.
-     *
      * @param string $name
      * @param array  $args
-     *
      * @return mixed
      */
     public static function __callStatic( $name, $args ) {
@@ -48,7 +41,6 @@ class Singleton
     /**
      * Méthode qui crée l'unique instance de la classe
      * si elle n'existe pas encore puis la retourne.
-     *
      * @return object Singleton $this
      */
     public static function getInstance() {

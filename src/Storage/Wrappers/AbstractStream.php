@@ -8,13 +8,9 @@ use Chukdo\Http\Url;
 
 /**
  * Abstraction de la classe PHP StreamWrapper (File First Vision).
- *
  * @version       1.0.0
- *
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
- *
  * @since         08/01/2019
- *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
@@ -51,10 +47,8 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Place le pointeur de flux à une position.
-     *
      * @param int $offset
      * @param int $whence
-     *
      * @return bool
      */
     public function stream_seek( int $offset, $whence = SEEK_SET ): bool {
@@ -75,7 +69,6 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * deplace la position du pointeur du fichier.
-     *
      * @param int $tell
      */
     protected function appendTell( int $tell ): void {
@@ -84,7 +77,6 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Lit la position courante dans un flux.
-     *
      * @return int
      */
     public function stream_tell(): int {
@@ -93,7 +85,6 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Retourne la position du pointeur du fichier.
-     *
      * @return int
      */
     protected function getTell(): int {
@@ -102,7 +93,6 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Defini la position du pointeur du fichier.
-     *
      * @param int $tell
      */
     protected function setTell( int $tell ): void {
@@ -111,11 +101,9 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * change les métadonnées du flux.
-     *
      * @param string $path
      * @param int    $option
      * @param mixed  $value
-     *
      * @return bool
      */
     public function stream_metadata( string $path, int $option, $value ): bool {
@@ -131,7 +119,6 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Expédie le contenu.
-     *
      * @return bool
      */
     public function stream_flush(): bool {
@@ -140,11 +127,8 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Lecture du fichier.
-     *
      * @param int $count
-     *
      * @return string|null
-     *
      * @throws StreamException
      */
     public function stream_read( int $count ): ?string {
@@ -176,7 +160,6 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Retourne le mode d'ecriture ou de lecture du fichier.
-     *
      * @return string|null
      */
     protected function getMode(): ?string {
@@ -185,7 +168,6 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Defini le mode d'ecriture ou de lecture du fichier.
-     *
      * @param string $mode
      */
     protected function setMode( string $mode ): void {
@@ -196,10 +178,15 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     }
 
     /**
+     * @return Url|null
+     */
+    private function getUrl(): ?Url {
+        return $this->url;
+    }
+
+    /**
      * Tronque un fichier.
-     *
      * @param int $new_size
-     *
      * @return bool
      */
     public function stream_truncate( int $new_size ): bool {
@@ -231,9 +218,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Lit la ressource sous-jacente de flux.
-     *
      * @param int $cast_as
-     *
      * @return bool
      */
     public function stream_cast( int $cast_as ) {
@@ -242,14 +227,11 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Cette méthode est appelée immédiatement après l'initialisation du gestionnaire (fopen() / file_get_contents()).
-     *
      * @param string      $path
      * @param string      $mode
      * @param int         $options
      * @param string|null $opened_path
-     *
      * @return bool
-     *
      * @throws StreamException
      */
     public function stream_open( string $path, string $mode, int $options, ?string &$opened_path ): bool {
@@ -320,7 +302,6 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Retourne si on a atteint la fin du fichier.
-     *
      * @return bool
      */
     protected function getEof(): bool {
@@ -329,7 +310,6 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Defini la fin du fichier.
-     *
      * @return bool
      */
     protected function setEof(): bool {
@@ -338,11 +318,8 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Cette méthode est appelée en réponse à fwrite().
-     *
      * @param string $data
-     *
      * @throws StreamException
-     *
      * @return int le nombre d'octets qui ont pu être stockés correctement, et 0 si aucun n'a pu être stocké
      */
     public function stream_write( string $data ): int {
@@ -379,10 +356,8 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Lit les informations sur un fichier.
-     *
      * @param string $path
      * @param int    $flags
-     *
      * @return array|null
      */
     public function url_stat( string $path, int $flags ): ?array {
@@ -393,7 +368,6 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Lit les informations sur une ressource de fichier.
-     *
      * @return array|null
      */
     public function stream_stat(): ?array {
@@ -414,9 +388,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Efface un fichier.
-     *
      * @param string $path
-     *
      * @return bool
      */
     public function unlink( string $path ): bool {
@@ -427,11 +399,9 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Change les options du flux.
-     *
      * @param int $option
      * @param int $arg1
      * @param int $arg2
-     *
      * @return bool
      */
     public function stream_set_option( int $option, int $arg1, int $arg2 ): bool {
@@ -440,10 +410,8 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Renomme un fichier.
-     *
      * @param string $pathFrom
      * @param string $pathTo
-     *
      * @return bool
      */
     public function rename( string $pathFrom, string $pathTo ): bool {
@@ -471,7 +439,6 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Retourne le host du fichier.
-     *
      * @return string|null
      */
     protected function getHost(): ?string {
@@ -481,9 +448,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Verrouillage logique de fichiers.
-     *
      * @param int $operation
-     *
      * @return bool
      */
     public function stream_lock( int $operation ): bool {
@@ -492,10 +457,8 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Ouvre un dossier en lecture.
-     *
      * @param string $path
      * @param int    $options
-     *
      * @return bool
      */
     public function dir_opendir( string $path, int $options ): bool {
@@ -507,7 +470,6 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Remet au début une ressource de dossier.
-     *
      * @return bool
      */
     public function dir_rewinddir(): bool {
@@ -518,7 +480,6 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Lit un fichier dans un dossier.
-     *
      * @return string|false
      */
     public function dir_readdir() {
@@ -530,7 +491,6 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Ferme une ressource de dossier.
-     *
      * @return bool
      */
     public function dir_closedir(): bool {
@@ -541,11 +501,9 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Crée un dossier.
-     *
      * @param string $path
      * @param int    $mode
      * @param int    $options
-     *
      * @return bool
      */
     public function mkdir( string $path, int $mode, int $options ): bool {
@@ -556,10 +514,8 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Supprime un dossier.
-     *
      * @param string $path
      * @param int    $options
-     *
      * @return bool
      */
     public function rmdir( string $path, int $options ): bool {
@@ -570,7 +526,6 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
 
     /**
      * Retourne le scheme du fichier.
-     *
      * @return string|null
      */
     protected function getScheme(): ?string {
@@ -579,15 +534,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     }
 
     /**
-     * @return Url|null
-     */
-    private function getUrl(): ?Url {
-        return $this->url;
-    }
-
-    /**
      * Retourne le chemin du fichier.
-     *
      * @return string|null
      */
     protected function getPath(): ?string {

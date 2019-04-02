@@ -7,20 +7,15 @@ use Chukdo\Json\Json;
 
 /**
  * Gestion des entetes HTTP.
- *
  * @version      1.0.0
- *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
- *
  * @since        08/01/2019
- *
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Header
 {
     /**
      * Status RFC 2616.
-     *
      * @param array $status
      */
     public $rfc2616 = [
@@ -66,19 +61,16 @@ class Header
     ];
     /**
      * Entete HTTP.
-     *
      * @param string $http
      */
     protected $http = '';
     /**
      * Entetes.
-     *
      * @param Json $header
      */
     protected $header;
     /**
      * Cookie.
-     *
      * @param Json $cookie
      */
     protected $cookie;
@@ -110,9 +102,7 @@ class Header
      * Defini l'entete HTTP
      * Ex. POST /test_rest_modele.php HTTP/1.1 pour un requete HTTP
      * Ex. HTTP/1.1 200 OK pour une reponse HTTP.
-     *
      * @param string $value
-     *
      * @return Header
      */
     public function setHttp( string $value ): self {
@@ -123,7 +113,6 @@ class Header
 
     /**
      * @param iterable $headers
-     *
      * @return Header
      */
     public function setHeaders( iterable $headers ): self {
@@ -146,7 +135,6 @@ class Header
 
     /**
      * @param iterable $cookies
-     *
      * @return Header
      */
     public function setCookies( iterable $cookies ): self {
@@ -163,7 +151,6 @@ class Header
 
     /**
      * @param string $name
-     *
      * @return string|null
      */
     public function unsetCookie( string $name ): ?string {
@@ -183,7 +170,6 @@ class Header
      * @param int         $max        age maximum autorisé du cache en seconde
      * @param bool        $revalidate oblige le client à verifier le cache sur le serveur systematiquement
      * @param string|null $control    ex. public, no_cache. laisser vide la plupart du temps
-     *
      * @return Header
      */
     public function setCacheControl( int $max = 3600, bool $revalidate = false, string $control = null ): self {
@@ -241,7 +227,6 @@ class Header
 
     /**
      * @param string $name
-     *
      * @return string|null
      */
     public function getHeader( string $name ): ?string {
@@ -251,7 +236,6 @@ class Header
     /**
      * @param string $name
      * @param string $value
-     *
      * @return Header
      */
     public function setHeader( string $name, string $value ): self {
@@ -263,7 +247,6 @@ class Header
 
     /**
      * @param string $name
-     *
      * @return string
      */
     public function normalize( string $name ): string {
@@ -279,7 +262,6 @@ class Header
 
     /**
      * @param string $auth
-     *
      * @return Header
      */
     public function setAuthorization( string $auth ): self {
@@ -296,7 +278,6 @@ class Header
 
     /**
      * @param int $status
-     *
      * @return Header
      */
     public function setStatus( int $status ): self {
@@ -322,7 +303,6 @@ class Header
     /**
      * @param string $url
      * @param int    $status
-     *
      * @return Header
      */
     public function setLocation( string $url, int $status = 302 ): self {
@@ -335,9 +315,7 @@ class Header
 
     /**
      * Autorise X-Frame-Options en fonction du referer.
-     *
      * @param string|null $origin
-     *
      * @return Header
      */
     public function setXFrameOptions( string $origin = null ): self {
@@ -376,11 +354,9 @@ class Header
 
     /**
      * Autorise toutes les origines d'appels (utile pour les cross ajax call).
-     *
      * @param string|null $origin
      * @param string|null $method
      * @param string|null $allow
-     *
      * @return Header
      */
     public function setAllowAllOrigin( string $origin = null, string $method = null, string $allow = null ): self {
@@ -473,7 +449,6 @@ class Header
 
     /**
      * @param string $name
-     *
      * @return Json|null
      */
     public function getCookie( string $name ): ?Json {
@@ -487,13 +462,11 @@ class Header
 
     /**
      * Ajoute un cookie.
-     *
      * @param string $name    nom du cookie
      * @param string $value   valeur associée
      * @param string $expires date d'expiration en timestamp
      * @param string $path    le chemin auquel s'applique le cookie '/' all par defaut
      * @param string $domain  le domaine auquel s'applique le cookie '.google.com' pour tout google
-     *
      * @return Header
      */
     public function setCookie( string $name, string $value = null, string $expires = null, string $path = null, string $domain = null ): self {
@@ -521,7 +494,6 @@ class Header
 
     /**
      * @param $key
-     *
      * @return bool
      */
     public function __isset( $key ) {
@@ -530,7 +502,6 @@ class Header
 
     /**
      * @param $key
-     *
      * @return string
      */
     public function __get( $key ) {
@@ -540,7 +511,6 @@ class Header
     /**
      * @param $key
      * @param $value
-     *
      * @return Header
      */
     public function __set( $key, $value ) {
@@ -550,7 +520,6 @@ class Header
 
     /**
      * @param $key
-     *
      * @return bool
      */
     public function __unset( $key ) {
@@ -560,7 +529,6 @@ class Header
     /**
      * @param       $name
      * @param array $params
-     *
      * @return Header|false|string|null
      */
     public function __call( $name, $params = [] ) {
@@ -674,7 +642,6 @@ class Header
 
     /**
      * @param string $name
-     *
      * @return string|null
      */
     public function unsetHeader( string $name ): ?string {

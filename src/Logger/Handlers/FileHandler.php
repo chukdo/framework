@@ -4,13 +4,9 @@ namespace Chukdo\Logger\Handlers;
 
 /**
  * Gestionnaire des logs pour fichier.
- *
  * @version       1.0.0
- *
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
- *
  * @since         08/01/2019
- *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class FileHandler extends AbstractHandler
@@ -22,7 +18,6 @@ class FileHandler extends AbstractHandler
 
     /**
      * FileHandler constructor.
-     *
      * @param string|null $file
      */
     public function __construct( ?string $file ) {
@@ -40,7 +35,6 @@ class FileHandler extends AbstractHandler
 
     /**
      * @param string $record
-     *
      * @return bool
      */
     public function write( $record ): bool {
