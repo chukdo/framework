@@ -51,6 +51,11 @@ class Rule
     protected $isRequired = false;
 
     /**
+     * @var bool
+     */
+    protected $isForm = false;
+
+    /**
      * @var array
      */
     protected $validatorsAndFilters = [];
@@ -98,13 +103,24 @@ class Rule
 
     /**
      * @param string $message
-     *
-     * @return void
+     * @param string|null $path
      */
-    protected function error( string $message ): void
+    protected function error( string $message, string $path = null ): void
     {
+        if( $path ) {
+            if( !Str::contain(
+                $this->path,
+                '*'
+            ) ) {
+                $path = $this->path . '.' . $path;
+            }
+
+        } else {
+            $path = $this->path;
+        }
+
         $this->validator->errors()->offsetSet(
-            $this->path,
+            $path,
             $message
         );
     }
@@ -138,6 +154,9 @@ class Rule
             $attrs  = $parsed[ 'attr' ];
 
             switch( $rule ) {
+                case 'form':
+                    $this->isForm = true;
+                    break;
                 case 'required':
                     $this->isRequired = true;
                     break;
@@ -277,6 +296,12 @@ class Rule
                                 $k,
                                 $v
                             );
+                        } else if( $this->isForm ) {
+                            $this->error(
+                                $this->message([ $name ]),
+                                $k
+                            );
+                            $validated .= false;
                         } else {
                             $this->error($this->message([ $name ]));
                             $validated .= false;
