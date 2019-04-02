@@ -5,11 +5,11 @@ namespace Chukdo\Contracts\Storage;
 /**
  * Interface de stream wrapper.
  *
- * @version    1.0.0
+ * @version       1.0.0
  *
- * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @copyright     licence MIT, Copyright (C) 2019 Domingo
  *
- * @since        08/01/2019
+ * @since         08/01/2019
  *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
@@ -45,8 +45,8 @@ interface StreamWrapper
 
     /**
      * @param string $path
-     * @param int $option
-     * @param $value
+     * @param int    $option
+     * @param        $value
      *
      * @return bool
      */
@@ -56,8 +56,8 @@ interface StreamWrapper
 
     /**
      * @param string $path
-     * @param int $mode
-     * @param int $options
+     * @param int    $mode
+     * @param int    $options
      *
      * @return bool
      */
@@ -65,7 +65,7 @@ interface StreamWrapper
 
     /**
      * @param string $path
-     * @param int $options
+     * @param int    $options
      *
      * @return bool
      */
@@ -98,9 +98,9 @@ interface StreamWrapper
     public function stream_cast( int $cast_as );
 
     /**
-     * @param string $path
-     * @param string $mode
-     * @param int $options
+     * @param string      $path
+     * @param string      $mode
+     * @param int         $options
      * @param string|null $opened_path
      *
      * @return bool
@@ -109,7 +109,7 @@ interface StreamWrapper
 
     /**
      * @param string $path
-     * @param int $options
+     * @param int    $options
      *
      * @return bool
      */
@@ -129,7 +129,7 @@ interface StreamWrapper
 
     /**
      * @param string $path
-     * @param int $flags
+     * @param int    $flags
      *
      * @return array|null
      */

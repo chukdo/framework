@@ -5,13 +5,13 @@ namespace Chukdo\Json;
 /**
  * Gestion des messages.
  *
- * @version    1.0.0
+ * @version      1.0.0
  *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  *
  * @since        08/01/2019
  *
- * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
+ * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Message extends Json
 {
@@ -25,8 +25,7 @@ class Message extends Json
      *
      * @param string $name
      */
-    public function __construct( string $name )
-    {
+    public function __construct( string $name ) {
         $this->name = $name;
 
         parent::__construct([]);
@@ -39,16 +38,14 @@ class Message extends Json
      *
      * @return string
      */
-    public function toHtml( string $title = null, string $color = null, string $widthFirstCol = null ): string
-    {
+    public function toHtml( string $title = null, string $color = null, string $widthFirstCol = null ): string {
         return parent::toHtml($this->name);
     }
 
     /**
      * @return array
      */
-    public function toArray(): array
-    {
+    public function toArray(): array {
         return [
             'result'   => $this->name,
             'messages' => $this->getArrayCopy(),

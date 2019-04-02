@@ -5,11 +5,11 @@ namespace Chukdo\Contracts\Logger;
 /**
  * Interface de Gestion des logs.
  *
- * @version    1.0.0
+ * @version       1.0.0
  *
- * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @copyright     licence MIT, Copyright (C) 2019 Domingo
  *
- * @since        08/01/2019
+ * @since         08/01/2019
  *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
@@ -17,7 +17,7 @@ interface Logger
 {
     /**
      * @param string $message
-     * @param array $context
+     * @param array  $context
      *
      * @return bool
      */
@@ -25,7 +25,7 @@ interface Logger
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array  $context
      *
      * @return bool
      */
@@ -33,7 +33,7 @@ interface Logger
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array  $context
      *
      * @return bool
      */
@@ -41,7 +41,7 @@ interface Logger
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array  $context
      *
      * @return bool
      */
@@ -49,7 +49,7 @@ interface Logger
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array  $context
      *
      * @return bool
      */
@@ -57,7 +57,7 @@ interface Logger
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array  $context
      *
      * @return bool
      */
@@ -65,7 +65,7 @@ interface Logger
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array  $context
      *
      * @return bool
      */
@@ -73,16 +73,16 @@ interface Logger
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array  $context
      *
      * @return bool
      */
     public function debug( string $message, array $context = [] ): bool;
 
     /**
-     * @param int $level
+     * @param int    $level
      * @param string $message
-     * @param array $context
+     * @param array  $context
      *
      * @return bool
      */

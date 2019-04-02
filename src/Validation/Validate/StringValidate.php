@@ -7,10 +7,10 @@ use Chukdo\Contracts\Validation\Validate as ValidateInterface;
 /**
  * Validate handler.
  *
- * @version 1.0.0
+ * @version   1.0.0
  * @copyright licence MIT, Copyright (C) 2019 Domingo
- * @since 08/01/2019
- * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
+ * @since     08/01/2019
+ * @author    Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class StringValidate implements ValidateInterface
 {
@@ -27,8 +27,7 @@ class StringValidate implements ValidateInterface
     /**
      * @return string
      */
-    public function name(): string
-    {
+    public function name(): string {
         return 'string';
     }
 
@@ -37,13 +36,10 @@ class StringValidate implements ValidateInterface
      *
      * @return self
      */
-    public function attributes( array $attributes ): ValidateInterface
-    {
-        $attributes = array_pad(
-            $attributes,
+    public function attributes( array $attributes ): ValidateInterface {
+        $attributes = array_pad($attributes,
             2,
-            0
-        );
+            0);
         $this->min  = $attributes[ 0 ];
         $this->max  = $attributes[ 1 ]
             ?: $attributes[ 0 ]
@@ -57,8 +53,7 @@ class StringValidate implements ValidateInterface
      *
      * @return bool
      */
-    public function validate( $input ): bool
-    {
+    public function validate( $input ): bool {
         if( is_string($input) ) {
             $len = strlen($input);
 

@@ -11,13 +11,13 @@ use Chukdo\Json\Message;
 /**
  * Validation de données.
  *
- * @version    1.0.0
+ * @version      1.0.0
  *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  *
  * @since        08/01/2019
  *
- * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
+ * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Validator
 {
@@ -61,21 +61,16 @@ class Validator
      *
      * @param Input $inputs
      * @param array $rules
-     * @param Lang $messages
+     * @param Lang  $messages
      */
-    public function __construct( Input $inputs, array $rules, Lang $messages )
-    {
+    public function __construct( Input $inputs, array $rules, Lang $messages ) {
         $this->error     = new Message('error');
         $this->inputs    = $inputs->clone();
         $this->messages  = $messages;
         $this->validated = new Input([]);
 
         foreach( $rules as $path => $rule ) {
-            $this->rules[] = new Rule(
-                $path,
-                $rule,
-                $this
-            );
+            $this->rules[] = new Rule($path, $rule, $this);
         }
     }
 
@@ -84,8 +79,7 @@ class Validator
      *
      * @return Validator
      */
-    public function registerValidator( ValidateInterface $validate ): self
-    {
+    public function registerValidator( ValidateInterface $validate ): self {
         $this->validators[ $validate->name() ] = $validate;
 
         return $this;
@@ -96,8 +90,7 @@ class Validator
      *
      * @return Validator
      */
-    public function registerFilter( FilterInterface $filter ): self
-    {
+    public function registerFilter( FilterInterface $filter ): self {
         $this->filters[ $filter->name() ] = $filter;
 
         return $this;
@@ -106,16 +99,14 @@ class Validator
     /**
      * @return bool
      */
-    public function fails(): bool
-    {
+    public function fails(): bool {
         return $this->error->count() > 0;
     }
 
     /**
      * @return bool
      */
-    public function validate(): bool
-    {
+    public function validate(): bool {
         $validate = true;
 
         foreach( $this->rules() as $rule ) {
@@ -130,8 +121,7 @@ class Validator
      *
      * @return FilterInterface|null
      */
-    public function filter( string $filter ): ?FilterInterface
-    {
+    public function filter( string $filter ): ?FilterInterface {
         if( isset($this->filters[ $filter ]) ) {
             return $this->filters[ $filter ];
         }
@@ -142,8 +132,7 @@ class Validator
     /**
      * @return array
      */
-    public function filters(): array
-    {
+    public function filters(): array {
         return $this->filters;
     }
 
@@ -152,8 +141,7 @@ class Validator
      *
      * @return ValidateInterface|null
      */
-    public function validator( string $validator ): ?ValidateInterface
-    {
+    public function validator( string $validator ): ?ValidateInterface {
         if( isset($this->validators[ $validator ]) ) {
             return $this->validators[ $validator ];
         }
@@ -164,40 +152,35 @@ class Validator
     /**
      * @return array
      */
-    public function validators(): array
-    {
+    public function validators(): array {
         return $this->validators;
     }
 
     /**
      * @return Input
      */
-    public function validated(): Input
-    {
+    public function validated(): Input {
         return $this->validated;
     }
 
     /**
      * @return Input
      */
-    public function inputs(): Input
-    {
+    public function inputs(): Input {
         return $this->inputs;
     }
 
     /**
      * @return array
      */
-    public function rules(): array
-    {
+    public function rules(): array {
         return $this->rules;
     }
 
     /**
      * @return Message
      */
-    public function errors(): Message
-    {
+    public function errors(): Message {
         return $this->error;
     }
 
@@ -206,17 +189,10 @@ class Validator
      *
      * @return string
      */
-    public function message( array $listName ): string
-    {
-        return $this->messages->offsetGetFirstInList(
-            $listName,
-            sprintf(
-                'Validation message [%s] cannot be found',
-                implode(
-                    ', ',
-                    $listName
-                )
-            )
-        );
+    public function message( array $listName ): string {
+        return $this->messages->offsetGetFirstInList($listName,
+            sprintf('Validation message [%s] cannot be found',
+                implode(', ',
+                    $listName)));
     }
 }

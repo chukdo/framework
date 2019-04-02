@@ -8,11 +8,11 @@ use Chukdo\Helper\Http;
 /**
  * Ajoute la request HTTP au log.
  *
- * @version    1.0.0
+ * @version       1.0.0
  *
- * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @copyright     licence MIT, Copyright (C) 2019 Domingo
  *
- * @since        08/01/2019
+ * @since         08/01/2019
  *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
@@ -25,16 +25,13 @@ class RequestProcessor implements ProcessorInterface
      *
      * @return array
      */
-    public function processRecord( array $record ): array
-    {
+    public function processRecord( array $record ): array {
         $browser = Http::getUserAgent(Http::server('HTTP_USER_AGENT'));
 
         $record[ 'extra' ][ 'request' ] = [
             'uri'       => Http::server('REQUEST_URI')
-                ?: implode(
-                    ' ',
-                    Http::argv()
-                ),
+                ?: implode(' ',
+                    Http::argv()),
             'remote'    => Http::server('REMOTE_ADDR'),
             'referer'   => Http::server('HTTP_REFERER'),
             'method'    => Http::server('REQUEST_METHOD'),

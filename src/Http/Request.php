@@ -13,13 +13,13 @@ use Chukdo\Storage\FileUploaded;
 /**
  * Gestion de requete HTTP entrante.
  *
- * @version    1.0.0
+ * @version      1.0.0
  *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  *
  * @since        08/01/2019
  *
- * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
+ * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Request
 {
@@ -56,8 +56,7 @@ class Request
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    public function __construct( App $app )
-    {
+    public function __construct( App $app ) {
         $this->app    = $app;
         $this->inputs = $app->make('Chukdo\Json\Input');
         $this->header = new Header();
@@ -65,35 +64,23 @@ class Request
         $this->method = Http::request('httpverb')
             ?: Http::server('REQUEST_METHOD');
 
-        $this->header->setHeader(
-            'Content-Type',
-            Http::server(
-                'CONTENT_TYPE',
-                ''
-            )
-        );
-        $this->header->setHeader(
-            'Content-Length',
-            Http::server(
-                'CONTENT_LENGTH',
-                ''
-            )
-        );
+        $this->header->setHeader('Content-Type',
+            Http::server('CONTENT_TYPE',
+                ''));
+        $this->header->setHeader('Content-Length',
+            Http::server('CONTENT_LENGTH',
+                ''));
 
         foreach( $_SERVER as $key => $value ) {
-            if( $name = Str::match(
-                '/^HTTP_(.*)/',
-                $key
-            ) ) {
+            if( $name = Str::match('/^HTTP_(.*)/',
+                $key) ) {
                 switch( $name ) {
                     case 'HOST':
                     case 'COOKIE':
                         break;
                     default:
-                        $this->header->setHeader(
-                            $name,
-                            $value
-                        );
+                        $this->header->setHeader($name,
+                            $value);
                 }
             }
         }
@@ -111,35 +98,29 @@ class Request
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    public function validate( Iterable $rules ): Validator
-    {
-        return $this->inputs->validate(
-            $rules,
-            $this->app->make('Chukdo\Json\Lang')->offsetGet('validation')
-        );
+    public function validate( Iterable $rules ): Validator {
+        return $this->inputs->validate($rules,
+            $this->app->make('Chukdo\Json\Lang')
+                ->offsetGet('validation'));
     }
 
     /**
-     * @param string $name
+     * @param string      $name
      * @param string|null $allowedMimeTypes
-     * @param int|null $maxFileSize
+     * @param int|null    $maxFileSize
      *
      * @return FileUploaded
      */
-    public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): FileUploaded
-    {
-        return $this->inputs->file(
-            $name,
+    public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): FileUploaded {
+        return $this->inputs->file($name,
             $allowedMimeTypes,
-            $maxFileSize
-        );
+            $maxFileSize);
     }
 
     /**
      * @return Input
      */
-    public function inputs(): Input
-    {
+    public function inputs(): Input {
         return $this->inputs;
     }
 
@@ -148,8 +129,7 @@ class Request
      *
      * @return mixed|null
      */
-    public function input( string $name )
-    {
+    public function input( string $name ) {
         return $this->inputs->get($name);
     }
 
@@ -158,8 +138,7 @@ class Request
      *
      * @return Json
      */
-    public function only( ...$offsets ): Json
-    {
+    public function only( ...$offsets ): Json {
         return $this->inputs->only($offsets);
     }
 
@@ -168,8 +147,7 @@ class Request
      *
      * @return Json
      */
-    public function except( ...$offsets ): Json
-    {
+    public function except( ...$offsets ): Json {
         return $this->inputs->except($offsets);
     }
 
@@ -178,8 +156,7 @@ class Request
      *
      * @return bool
      */
-    public function filled( string $path ): bool
-    {
+    public function filled( string $path ): bool {
         return $this->inputs->filled($path);
     }
 
@@ -188,8 +165,7 @@ class Request
      *
      * @return bool
      */
-    public function exists( string $path ): bool
-    {
+    public function exists( string $path ): bool {
         return $this->inputs->exists($path);
     }
 
@@ -198,72 +174,60 @@ class Request
      *
      * @return Json
      */
-    public function wildcard( string $path ): Json
-    {
+    public function wildcard( string $path ): Json {
         return $this->inputs->wildcard($path);
     }
 
     /**
      * @return Header
      */
-    public function header(): Header
-    {
+    public function header(): Header {
         return $this->header;
     }
 
     /**
      * @return Url
      */
-    public function url(): Url
-    {
+    public function url(): Url {
         return $this->url;
     }
 
     /**
      * @return string|null
      */
-    public function from(): ?string
-    {
-        return parse_url(
-            Http::server('HTTP_ORIGIN')
-                ?: Http::server('HTTP_REFERER')
+    public function from(): ?string {
+        return parse_url(Http::server('HTTP_ORIGIN')
+            ?: Http::server('HTTP_REFERER')
                 ?: Http::server('REMOTE_ADDR'),
-            PHP_URL_HOST
-        );
+            PHP_URL_HOST);
     }
 
     /**
      * @return bool
      */
-    public function ajax(): bool
-    {
+    public function ajax(): bool {
         return $this->header->getHeader('X-Requested-with') === 'XMLHttpRequest';
     }
 
     /**
      * @return string|null
      */
-    public function method(): ?string
-    {
+    public function method(): ?string {
         return $this->method;
     }
 
     /**
      * @return array
      */
-    public function userAgent(): array
-    {
+    public function userAgent(): array {
         return Http::getUserAgent(Http::server('HTTP_USER_AGENT'));
     }
 
     /**
      * @return bool
      */
-    public function secured(): bool
-    {
+    public function secured(): bool {
         return Http::server('HTTPS') || Http::server('SERVER_PORT') == '443'
-            || Http::server(
-                'REQUEST_SCHEME'
-            ) == 'https';
+               || Http::server('REQUEST_SCHEME') == 'https';
     }
 }

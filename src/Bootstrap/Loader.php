@@ -5,11 +5,11 @@ namespace Chukdo\Bootstrap;
 /**
  * Class loader PSR-4.
  *
- * @version    1.0.0
+ * @version       1.0.0
  *
- * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @copyright     licence MIT, Copyright (C) 2019 Domingo
  *
- * @since        08/01/2019
+ * @since         08/01/2019
  *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
@@ -33,58 +33,46 @@ class Loader
      * Constructeur
      * Initialise l'objet.
      */
-    public function __construct()
-    {
+    public function __construct() {
     }
 
     /**
      * Register loader with SPL autoloader stack.
      */
-    public function register(): void
-    {
-        spl_autoload_register(
-            [
+    public function register(): void {
+        spl_autoload_register([
                 $this,
                 'loadClass',
-            ]
-        );
+            ]);
     }
 
     /**
      * Unregisters this instance as an autoloader.
      */
-    public function unregister(): void
-    {
-        spl_autoload_unregister(
-            [
+    public function unregister(): void {
+        spl_autoload_unregister([
                 $this,
                 'loadClass',
-            ]
-        );
+            ]);
     }
 
     /**
      * Registers a set of PSR-4 directories for a given namespace, either
      * appending or prepending to the ones previously set for this namespace.
      *
-     * @param string $ns The namespace
-     * @param array|string $paths The base directories
-     * @param bool $prepend Whether to prepend the directories
+     * @param string       $ns      The namespace
+     * @param array|string $paths   The base directories
+     * @param bool         $prepend Whether to prepend the directories
      */
-    public function registerNameSpace( string $ns, $paths, bool $prepend = false ): void
-    {
+    public function registerNameSpace( string $ns, $paths, bool $prepend = false ): void {
         /** normalize namespace */
-        $ns = trim(
-            $ns,
-            '\\'
-        );
+        $ns = trim($ns,
+            '\\');
 
         foreach( (array) $paths as $path ) {
             /** normalize the base directory with a separator */
-            $path = rtrim(
-                    $path,
-                    DIRECTORY_SEPARATOR
-                ) . DIRECTORY_SEPARATOR;
+            $path = rtrim($path,
+                    DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 
             /* initialize the namespace array */
             if( isset($this->namespaces[ $ns ]) === false ) {
@@ -93,15 +81,12 @@ class Loader
 
             /* retain the base directory for the namespace */
             if( $prepend ) {
-                array_unshift(
-                    $this->namespaces[ $ns ],
-                    $path
-                );
-            } else {
-                array_push(
-                    $this->namespaces[ $ns ],
-                    $path
-                );
+                array_unshift($this->namespaces[ $ns ],
+                    $path);
+            }
+            else {
+                array_push($this->namespaces[ $ns ],
+                    $path);
             }
         }
     }
@@ -111,13 +96,10 @@ class Loader
      *
      * @param array $namespaces array($namespace => $paths)
      */
-    public function registerNameSpaces( array $namespaces ): void
-    {
+    public function registerNameSpaces( array $namespaces ): void {
         foreach( $namespaces as $ns => $paths ) {
-            $this->registerNameSpace(
-                $ns,
-                $paths
-            );
+            $this->registerNameSpace($ns,
+                $paths);
         }
     }
 
@@ -128,33 +110,22 @@ class Loader
      *
      * @return bool true on success, or false on failure
      */
-    public function loadClass( string $nsclass ): bool
-    {
-        $ns      = explode(
-            '\\',
-            $nsclass
-        );
+    public function loadClass( string $nsclass ): bool {
+        $ns      = explode('\\',
+            $nsclass);
         $class   = [];
         $class[] = array_pop($ns);
 
         while( !empty($ns) ) {
-            if( $this->loadFile(
-                implode(
-                    '\\',
-                    $ns
-                ),
-                implode(
-                    '\\',
-                    $class
-                )
-            ) ) {
+            if( $this->loadFile(implode('\\',
+                $ns),
+                implode('\\',
+                    $class)) ) {
                 return true;
             }
 
-            array_unshift(
-                $class,
-                array_pop($ns)
-            );
+            array_unshift($class,
+                array_pop($ns));
         }
 
         return false;
@@ -163,23 +134,20 @@ class Loader
     /**
      * Load the file for a namespace and class.
      *
-     * @param string $ns the namespace
+     * @param string $ns    the namespace
      * @param string $class class name
      *
      * @return bool boolean false if no file can be loaded, or true if the file that was loaded
      */
-    protected function loadFile( string $ns, string $class ): bool
-    {
+    protected function loadFile( string $ns, string $class ): bool {
         if( !isset($this->namespaces[ $ns ]) ) {
             return false;
         }
 
         foreach( $this->namespaces[ $ns ] as $path ) {
-            $file = $path . str_replace(
-                    '\\',
+            $file = $path . str_replace('\\',
                     DIRECTORY_SEPARATOR,
-                    $class
-                ) . '.php';
+                    $class) . '.php';
 
             if( $this->requireFile($file) ) {
                 $this->log[ $class ] = $file;
@@ -198,8 +166,7 @@ class Loader
      *
      * @return bool true if the file exists, false if not
      */
-    protected function requireFile( string $file ): bool
-    {
+    protected function requireFile( string $file ): bool {
         if( file_exists($file) ) {
             require $file;
 

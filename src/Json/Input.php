@@ -8,13 +8,13 @@ use Chukdo\Validation\Validator;
 /**
  * Gestion des inputs.
  *
- * @version    1.0.0
+ * @version      1.0.0
  *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  *
  * @since        08/01/2019
  *
- * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
+ * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class Input extends Json
 {
@@ -23,53 +23,44 @@ class Input extends Json
      *
      * @param null $data
      */
-    public function __construct( $data = null )
-    {
+    public function __construct( $data = null ) {
         $data = $data === null
             ? $_REQUEST
             : $data;
 
         /* Trim all input */
-        array_walk_recursive(
-            $data,
+        array_walk_recursive($data,
             function( &$v, $k ) {
                 if( is_scalar($v) ) {
                     $v = trim($v);
                 }
-            }
-        );
+            });
 
         parent::__construct($data);
     }
 
     /**
      * @param iterable $rules
-     * @param Lang $messages
+     * @param Lang     $messages
      *
      * @return Validator
      */
-    public function validate( Iterable $rules, Lang $messages ): Validator
-    {
-        return new Validator(
-            $this,
-            (array) $rules,
-            $messages
-        );
+    public function validate( Iterable $rules, Lang $messages ): Validator {
+        return new Validator($this, (array) $rules, $messages);
     }
 
     /**
-     * @param string $name
+     * @param string      $name
      * @param string|null $allowedMimeTypes
-     * @param int|null $maxFileSize
+     * @param int|null    $maxFileSize
      *
-     * @return FileUploaded
+     * @return FileUploaded|null
      */
-    public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): FileUploaded
-    {
-        return new FileUploaded(
-            $name,
-            $allowedMimeTypes,
-            $maxFileSize
-        );
+    public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): ?FileUploaded {
+        try {
+            return new FileUploaded($name, $allowedMimeTypes, $maxFileSize);
+        } catch( \Throwable $e ) {
+            return null;
+        }
     }
 }

@@ -9,11 +9,11 @@ use ErrorException;
 /**
  * Gestion des exception.
  *
- * @version    1.0.0
+ * @version       1.0.0
  *
- * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @copyright     licence MIT, Copyright (C) 2019 Domingo
  *
- * @since        08/01/2019
+ * @since         08/01/2019
  *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
@@ -29,53 +29,37 @@ class HandleExceptions
      *
      * @param App $app
      */
-    public function __construct( App $app )
-    {
+    public function __construct( App $app ) {
         $this->app = $app;
 
         error_reporting(-1);
-        set_error_handler(
-            [
+        set_error_handler([
                 $this,
                 'handleError',
-            ]
-        );
-        set_exception_handler(
-            [
+            ]);
+        set_exception_handler([
                 $this,
                 'handleException',
-            ]
-        );
-        register_shutdown_function(
-            [
+            ]);
+        register_shutdown_function([
                 $this,
                 'handleShutdown',
-            ]
-        );
-        ini_set(
-            'display_errors',
-            'Off'
-        );
+            ]);
+        ini_set('display_errors',
+            'Off');
     }
 
     /**
-     * @param int $level
+     * @param int    $level
      * @param string $message
      * @param string $file
-     * @param int $line
+     * @param int    $line
      *
      * @throws ErrorException
      */
-    public function handleError( int $level, string $message, string $file = '', int $line = 0 ): void
-    {
+    public function handleError( int $level, string $message, string $file = '', int $line = 0 ): void {
         if( error_reporting() & $level ) {
-            throw new ErrorException(
-                $message,
-                0,
-                $level,
-                $file,
-                $line
-            );
+            throw new ErrorException($message, 0, $level, $file, $line);
         }
     }
 
@@ -85,14 +69,9 @@ class HandleExceptions
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function handleException( Throwable $e )
-    {
+    public function handleException( Throwable $e ) {
         if( !$e instanceof Exception ) {
-            $e = new AppException(
-                $e->getMessage(),
-                $e->getCode(),
-                $e
-            );
+            $e = new AppException($e->getMessage(), $e->getCode(), $e);
         }
 
         $exceptionHandler = $this->getExceptionHandler();
@@ -104,7 +83,8 @@ class HandleExceptions
 
         if( $this->app->runningInConsole() ) {
             $exceptionHandler->renderForConsole($e);
-        } else {
+        }
+        else {
             $exceptionHandler->render($e);
         }
     }
@@ -113,8 +93,7 @@ class HandleExceptions
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function handleShutdown(): void
-    {
+    public function handleShutdown(): void {
         if( !is_null($error = error_get_last()) && $this->isFatal($error[ 'type' ]) ) {
             $this->handleException($this->fatalExceptionFromError($error));
         }
@@ -125,15 +104,8 @@ class HandleExceptions
      *
      * @return ErrorException
      */
-    protected function fatalExceptionFromError( array $error ): ErrorException
-    {
-        return new ErrorException(
-            $error[ 'message' ],
-            0,
-            $error[ 'type' ],
-            $error[ 'file' ],
-            $error[ 'line' ]
-        );
+    protected function fatalExceptionFromError( array $error ): ErrorException {
+        return new ErrorException($error[ 'message' ], 0, $error[ 'type' ], $error[ 'file' ], $error[ 'line' ]);
     }
 
     /**
@@ -141,17 +113,14 @@ class HandleExceptions
      *
      * @return bool
      */
-    protected function isFatal( int $type ): bool
-    {
-        return in_array(
-            $type,
+    protected function isFatal( int $type ): bool {
+        return in_array($type,
             [
                 E_COMPILE_ERROR,
                 E_CORE_ERROR,
                 E_ERROR,
                 E_PARSE,
-            ]
-        );
+            ]);
     }
 
     /**
@@ -160,8 +129,7 @@ class HandleExceptions
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    protected function getExceptionHandler()
-    {
+    protected function getExceptionHandler() {
         return $this->app->make('Chukdo\Bootstrap\ExceptionHandler');
     }
 }

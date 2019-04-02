@@ -9,11 +9,11 @@ use Chukdo\Http\Url;
 /**
  * Abstraction de la classe PHP StreamWrapper (File First Vision).
  *
- * @version    1.0.0
+ * @version       1.0.0
  *
- * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @copyright     licence MIT, Copyright (C) 2019 Domingo
  *
- * @since        08/01/2019
+ * @since         08/01/2019
  *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
@@ -52,16 +52,14 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     /**
      * @param string $url
      */
-    private function setUrl( string $url ): void
-    {
+    private function setUrl( string $url ): void {
         $this->url = new Url($url);
     }
 
     /**
      * @return Url|null
      */
-    private function getUrl(): ?Url
-    {
+    private function getUrl(): ?Url {
         return $this->url;
     }
 
@@ -70,9 +68,9 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return string|null
      */
-    protected function getScheme(): ?string
-    {
-        return $this->getUrl()->getScheme();
+    protected function getScheme(): ?string {
+        return $this->getUrl()
+            ->getScheme();
     }
 
     /**
@@ -80,9 +78,9 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return string|null
      */
-    protected function getHost(): ?string
-    {
-        return $this->getUrl()->getHost();
+    protected function getHost(): ?string {
+        return $this->getUrl()
+            ->getHost();
     }
 
     /**
@@ -90,12 +88,10 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return string|null
      */
-    protected function getPath(): ?string
-    {
-        return trim(
-            $this->getUrl()->getPath(),
-            '/'
-        );
+    protected function getPath(): ?string {
+        return trim($this->getUrl()
+            ->getPath(),
+            '/');
     }
 
     /**
@@ -103,14 +99,11 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @param string $mode
      */
-    protected function setMode( string $mode ): void
-    {
+    protected function setMode( string $mode ): void {
         /* On ne tient pas compte du flag B(inary) */
-        $this->mode = str_replace(
-            'b',
+        $this->mode = str_replace('b',
             '',
-            $mode
-        );
+            $mode);
     }
 
     /**
@@ -118,8 +111,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return string|null
      */
-    protected function getMode(): ?string
-    {
+    protected function getMode(): ?string {
         return $this->mode;
     }
 
@@ -128,8 +120,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return int
      */
-    protected function getTell(): int
-    {
+    protected function getTell(): int {
         return $this->tell;
     }
 
@@ -138,8 +129,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @param int $tell
      */
-    protected function setTell( int $tell ): void
-    {
+    protected function setTell( int $tell ): void {
         $this->tell = $tell;
     }
 
@@ -148,8 +138,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @param int $tell
      */
-    protected function appendTell( int $tell ): void
-    {
+    protected function appendTell( int $tell ): void {
         $this->tell += $tell;
     }
 
@@ -158,8 +147,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return bool
      */
-    protected function getEof(): bool
-    {
+    protected function getEof(): bool {
         return $this->eof;
     }
 
@@ -168,8 +156,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return bool
      */
-    protected function setEof(): bool
-    {
+    protected function setEof(): bool {
         return $this->eof = true;
     }
 
@@ -178,8 +165,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return array|null
      */
-    public function stream_stat(): ?array
-    {
+    public function stream_stat(): ?array {
         if( $size = $this->streamSize() ) {
             return [
                 'size'  => $size,
@@ -203,8 +189,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return bool
      */
-    public function stream_seek( int $offset, $whence = SEEK_SET ): bool
-    {
+    public function stream_seek( int $offset, $whence = SEEK_SET ): bool {
         switch( $whence ) {
             case SEEK_SET:
                 $this->setTell($offset);
@@ -225,8 +210,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return int
      */
-    public function stream_tell(): int
-    {
+    public function stream_tell(): int {
         return $this->getTell();
     }
 
@@ -234,21 +218,19 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      * change les métadonnées du flux.
      *
      * @param string $path
-     * @param int $option
-     * @param mixed $value
+     * @param int    $option
+     * @param mixed  $value
      *
      * @return bool
      */
-    public function stream_metadata( string $path, int $option, $value ): bool
-    {
+    public function stream_metadata( string $path, int $option, $value ): bool {
         return true;
     }
 
     /**
      * @return bool
      */
-    public function stream_close(): void
-    {
+    public function stream_close(): void {
         $this->streamClose();
     }
 
@@ -257,8 +239,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return bool
      */
-    public function stream_flush(): bool
-    {
+    public function stream_flush(): bool {
         return true;
     }
 
@@ -271,33 +252,23 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @throws StreamException
      */
-    public function stream_read( int $count ): ?string
-    {
+    public function stream_read( int $count ): ?string {
         switch( $this->getMode() ) {
             case 'w':
             case 'a':
             case 'x':
             case 'c':
-                throw new StreamException(
-                    sprintf(
-                        '[%s] has writeonly mode [%s]',
-                        $this->getUrl()->getPath(),
-                        $this->getMode()
-                    )
-                );
+                throw new StreamException(sprintf('[%s] has writeonly mode [%s]',
+                        $this->getUrl()
+                            ->getPath(),
+                        $this->getMode()));
                 break;
         }
 
-        $read = $this->streamGetRange(
-            $this->getTell(),
-            $count
-        );
-        $this->appendTell(
-            min(
-                strlen($read),
-                $count
-            )
-        );
+        $read = $this->streamGetRange($this->getTell(),
+            $count);
+        $this->appendTell(min(strlen($read),
+                $count));
 
         if( $this->getTell() >= $this->streamSize() ) {
             $this->setEof();
@@ -315,38 +286,27 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return bool
      */
-    public function stream_truncate( int $new_size ): bool
-    {
+    public function stream_truncate( int $new_size ): bool {
         $size = $this->streamSize();
 
         if( $new_size > $size ) {
-            return $this->streamSetRange(
-                $size,
-                str_repeat(
-                    chr(0),
-                    $new_size - $size
-                )
-            );
-        } else if( $new_size < $size ) {
+            return $this->streamSetRange($size,
+                str_repeat(chr(0),
+                    $new_size - $size));
+        }
+        elseif( $new_size < $size ) {
             if( $new_size == 0 ) {
                 $this->streamSet(null);
-            } else {
-                $this->streamSet(
-                    $this->streamGetRange(
-                        0,
-                        $new_size
-                    )
-                );
+            }
+            else {
+                $this->streamSet($this->streamGetRange(0,
+                    $new_size));
             }
 
             if( $this->getTell() > $new_size ) {
-                $this->streamSetRange(
-                    $new_size,
-                    str_repeat(
-                        chr(0),
-                        $this->getTell() - $new_size
-                    )
-                );
+                $this->streamSetRange($new_size,
+                    str_repeat(chr(0),
+                        $this->getTell() - $new_size));
             }
         }
 
@@ -360,25 +320,23 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return bool
      */
-    public function stream_cast( int $cast_as )
-    {
+    public function stream_cast( int $cast_as ) {
         return false;
     }
 
     /**
      * Cette méthode est appelée immédiatement après l'initialisation du gestionnaire (fopen() / file_get_contents()).
      *
-     * @param string $path
-     * @param string $mode
-     * @param int $options
+     * @param string      $path
+     * @param string      $mode
+     * @param int         $options
      * @param string|null $opened_path
      *
      * @return bool
      *
      * @throws StreamException
      */
-    public function stream_open( string $path, string $mode, int $options, ?string &$opened_path ): bool
-    {
+    public function stream_open( string $path, string $mode, int $options, ?string &$opened_path ): bool {
         $this->setUrl($path);
         $this->setMode($mode);
         $exits = $this->streamExists();
@@ -387,12 +345,9 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
             case 'r':
             case 'r+':
                 if( !$exits ) {
-                    throw new StreamException(
-                        sprintf(
-                            "File [%s] doesn't exists",
-                            $this->getUrl()->getPath()
-                        )
-                    );
+                    throw new StreamException(sprintf("File [%s] doesn't exists",
+                            $this->getUrl()
+                                ->getPath()));
                 }
                 break;
             case 'w':
@@ -403,19 +358,17 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
             case 'a+':
                 if( $tell = $this->streamSize() ) {
                     $this->setTell($tell);
-                } else {
+                }
+                else {
                     $this->streamSet(null);
                 }
                 break;
             case 'x':
             case 'x+':
                 if( $exits ) {
-                    throw new StreamException(
-                        sprintf(
-                            'Mode X not allow [%s] file exists',
-                            $this->getUrl()->getPath()
-                        )
-                    );
+                    throw new StreamException(sprintf('Mode X not allow [%s] file exists',
+                            $this->getUrl()
+                                ->getPath()));
                 }
 
                 $this->streamSet(null);
@@ -438,8 +391,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     /**
      * @return bool
      */
-    public function stream_eof(): bool
-    {
+    public function stream_eof(): bool {
         return $this->getEof();
     }
 
@@ -452,26 +404,20 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return int le nombre d'octets qui ont pu être stockés correctement, et 0 si aucun n'a pu être stocké
      */
-    public function stream_write( string $data ): int
-    {
+    public function stream_write( string $data ): int {
         $strlen = mb_strlen($data);
 
         switch( $this->getMode() ) {
             case 'r':
-                throw new StreamException(
-                    sprintf(
-                        '[%s] is in readonly mode',
-                        $this->getUrl()->getPath()
-                    )
-                );
+                throw new StreamException(sprintf('[%s] is in readonly mode',
+                        $this->getUrl()
+                            ->getPath()));
                 break;
             case 'r+':
             case 'c':
             case 'c+':
-                $this->streamSetRange(
-                    $this->getTell(),
-                    $data
-                );
+                $this->streamSetRange($this->getTell(),
+                    $data);
                 $this->appendTell($strlen);
                 break;
             case 'w':
@@ -494,12 +440,11 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      * Lit les informations sur un fichier.
      *
      * @param string $path
-     * @param int $flags
+     * @param int    $flags
      *
      * @return array|null
      */
-    public function url_stat( string $path, int $flags ): ?array
-    {
+    public function url_stat( string $path, int $flags ): ?array {
         $this->setUrl($path);
 
         return $this->stream_stat();
@@ -512,8 +457,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return bool
      */
-    public function unlink( string $path ): bool
-    {
+    public function unlink( string $path ): bool {
         $this->setUrl($path);
 
         return (bool) $this->streamDelete();
@@ -528,8 +472,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return bool
      */
-    public function stream_set_option( int $option, int $arg1, int $arg2 ): bool
-    {
+    public function stream_set_option( int $option, int $arg1, int $arg2 ): bool {
         return true;
     }
 
@@ -541,8 +484,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return bool
      */
-    public function rename( string $pathFrom, string $pathTo ): bool
-    {
+    public function rename( string $pathFrom, string $pathTo ): bool {
         $this->setUrl($pathFrom);
         $urlTo = new Url($pathTo);
 
@@ -551,10 +493,8 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
             return false;
         }
 
-        $rename = trim(
-            $urlTo->getPath(),
-            '/'
-        );
+        $rename = trim($urlTo->getPath(),
+            '/');
 
         if( $this->streamRename($rename) ) {
             $this->url = $urlTo;
@@ -574,8 +514,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return bool
      */
-    public function stream_lock( int $operation ): bool
-    {
+    public function stream_lock( int $operation ): bool {
         return true;
     }
 
@@ -583,12 +522,11 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      * Ouvre un dossier en lecture.
      *
      * @param string $path
-     * @param int $options
+     * @param int    $options
      *
      * @return bool
      */
-    public function dir_opendir( string $path, int $options ): bool
-    {
+    public function dir_opendir( string $path, int $options ): bool {
         $this->setUrl($path);
         $this->dir = $this->streamListDir();
 
@@ -600,8 +538,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return bool
      */
-    public function dir_rewinddir(): bool
-    {
+    public function dir_rewinddir(): bool {
         reset($this->dir);
 
         return true;
@@ -612,8 +549,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return string|false
      */
-    public function dir_readdir()
-    {
+    public function dir_readdir() {
         $read = current($this->dir);
         next($this->dir);
 
@@ -625,8 +561,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      *
      * @return bool
      */
-    public function dir_closedir(): bool
-    {
+    public function dir_closedir(): bool {
         $this->dir = [];
 
         return true;
@@ -636,13 +571,12 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      * Crée un dossier.
      *
      * @param string $path
-     * @param int $mode
-     * @param int $options
+     * @param int    $mode
+     * @param int    $options
      *
      * @return bool
      */
-    public function mkdir( string $path, int $mode, int $options ): bool
-    {
+    public function mkdir( string $path, int $mode, int $options ): bool {
         $this->setUrl($path);
 
         return $this->streamSetDir($options & 1);
@@ -652,12 +586,11 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      * Supprime un dossier.
      *
      * @param string $path
-     * @param int $options
+     * @param int    $options
      *
      * @return bool
      */
-    public function rmdir( string $path, int $options ): bool
-    {
+    public function rmdir( string $path, int $options ): bool {
         $this->setUrl($path);
 
         return $this->streamDeleteDir();

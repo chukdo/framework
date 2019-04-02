@@ -5,21 +5,20 @@ namespace Chukdo\Helper;
 /**
  * Gestion des messages HTTP.
  *
- * @version    1.0.0
+ * @version      1.0.0
  *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  *
  * @since        08/01/2019
  *
- * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
+ * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 final class Http
 {
     /**
      * Http constructor.
      */
-    private function __construct()
-    {
+    private function __construct() {
     }
 
     /**
@@ -27,8 +26,7 @@ final class Http
      *
      * @return string
      */
-    public static function mimeContentType( string $name ): string
-    {
+    public static function mimeContentType( string $name ): string {
         $mimeTypes = [
             'txt'  => 'text/plain',
             'htm'  => 'text/html',
@@ -68,12 +66,11 @@ final class Http
 
         $ext = Str::extension($name);
 
-        if( array_key_exists(
-            $ext,
-            $mimeTypes
-        ) ) {
+        if( array_key_exists($ext,
+            $mimeTypes) ) {
             return $mimeTypes[ $ext ];
-        } else {
+        }
+        else {
             return 'application/octet-stream';
         }
     }
@@ -83,8 +80,7 @@ final class Http
      *
      * @return array
      */
-    public static function getUserAgent( string $ua = null ): array
-    {
+    public static function getUserAgent( string $ua = null ): array {
         $browser = [
             'platform' => null,
             'browser'  => null,
@@ -94,21 +90,15 @@ final class Http
         ];
 
         $ua               = strtolower($ua);
-        $browser[ 'bot' ] = Str::match(
-            '/baiduspider|googlebot|yandexbot|bingbot|lynx|wget|curl/',
-            $ua
-        );
+        $browser[ 'bot' ] = Str::match('/baiduspider|googlebot|yandexbot|bingbot|lynx|wget|curl/',
+            $ua);
         $is               = function( $contain, $name = false ) use ( $ua, &$browser ) {
-            if( Str::contain(
-                $ua,
-                $contain
-            ) ) {
+            if( Str::contain($ua,
+                $contain) ) {
                 $browser[ 'browser' ] = $name
                     ?: $contain;
-                $browser[ 'version' ] = Str::match(
-                    '/' . $contain . '[\/\s](\d+)/',
-                    $ua
-                );
+                $browser[ 'version' ] = Str::match('/' . $contain . '[\/\s](\d+)/',
+                    $ua);
 
                 return true;
             }
@@ -118,24 +108,16 @@ final class Http
 
         /* Browser & Version */
         if( !$is('firefox') ) {
-            if( !$is(
-                'edge',
-                'msie'
-            ) ) {
+            if( !$is('edge',
+                'msie') ) {
                 if( !$is('msie') ) {
-                    if( !$is(
-                        'trident',
-                        'msie'
-                    ) ) {
+                    if( !$is('trident',
+                        'msie') ) {
                         if( !$is('opera') ) {
-                            if( !$is(
-                                'opr',
-                                'opera'
-                            ) ) {
-                                if( !$is(
-                                    'chromium',
-                                    'chrome'
-                                ) ) {
+                            if( !$is('opr',
+                                'opera') ) {
+                                if( !$is('chromium',
+                                    'chrome') ) {
                                     if( !$is('chrome') ) {
                                         $is('safari');
                                     }
@@ -148,37 +130,28 @@ final class Http
         }
 
         /* Platform */
-        if( Str::contain(
-            $ua,
-            'windows'
-        ) ) {
+        if( Str::contain($ua,
+            'windows') ) {
             $browser[ 'platform' ] = 'windows';
-        } else if( Str::contain(
-            $ua,
-            'linux'
-        ) ) {
+        }
+        elseif( Str::contain($ua,
+            'linux') ) {
             $browser[ 'platform' ] = 'linux';
-        } else if( Str::contain(
-            $ua,
-            'mac'
-        ) ) {
+        }
+        elseif( Str::contain($ua,
+            'mac') ) {
             $browser[ 'platform' ] = 'osx';
         }
 
         /* Mobile */
-        if( Str::contain(
-                $ua,
-                'ipad'
-            )
-            || Str::contain(
-                $ua,
-                'iphone'
-            ) ) {
+        if( Str::contain($ua,
+                'ipad')
+            || Str::contain($ua,
+                'iphone') ) {
             $browser[ 'mobile' ] = 'ios';
-        } else if( Str::contain(
-            $ua,
-            'android'
-        ) ) {
+        }
+        elseif( Str::contain($ua,
+            'android') ) {
             $browser[ 'mobile' ] = 'android';
         }
 
@@ -188,34 +161,31 @@ final class Http
     /**
      * @return array
      */
-    public static function argv(): array
-    {
+    public static function argv(): array {
         return isset($_SERVER[ 'argv' ])
             ? $_SERVER[ 'argv' ]
             : [];
     }
 
     /**
-     * @param $name
+     * @param             $name
      * @param string|null $default
      *
      * @return string|null
      */
-    public static function server( $name, string $default = null ): ?string
-    {
+    public static function server( $name, string $default = null ): ?string {
         return isset($_SERVER[ $name ])
             ? $_SERVER[ $name ]
             : $default;
     }
 
     /**
-     * @param $name
+     * @param             $name
      * @param string|null $default
      *
      * @return string|null
      */
-    public static function request( $name, string $default = null ): ?string
-    {
+    public static function request( $name, string $default = null ): ?string {
         return isset($_REQUEST[ $name ])
             ? $_REQUEST[ $name ]
             : $default;

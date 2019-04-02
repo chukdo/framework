@@ -135,8 +135,9 @@ $validator = new \Chukdo\Validation\Validator(
     Input::all(),
     [
         //'title'      => 'required|array:2,3',
-        'title.*.cp' => 'form|required|array:1,2|string:2|striptags|label:code postal',
-        'x' => 'required|form|array|striptags|string:2',
+        'title.*.cp' => 'required|array:1,2|string:2|striptags|label:code postal',
+        'x' => 'required|array|striptags|string:2',
+        'dossier' => 'required|file:pdf,gif,jpg,10'
         //'title.name' => 'required|string:3,6',
         //'title.cp'   => 'required|string:5|label:code postal',
     ],
@@ -146,6 +147,10 @@ $validator = new \Chukdo\Validation\Validator(
 $validator->registerFilter(new \Chukdo\Validation\Filter\StriptagsFilter());
 $validator->registerValidator(new \Chukdo\Validation\Validate\StringValidate());
 $validator->validate();
+
+echo '<html><body><form method="POST" action="/index.php" enctype="multipart/form-data"><input type="file" name="dossier"><input type="submit"></form></body>';
+
+dd(Input::file('dossier'));
 
 if ($validator->fails()) {
     dd($validator->errors());

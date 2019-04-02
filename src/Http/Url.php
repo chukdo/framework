@@ -5,11 +5,11 @@ namespace Chukdo\Http;
 /**
  * Gestion des URLs.
  *
- * @version    1.0.0
+ * @version       1.0.0
  *
- * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @copyright     licence MIT, Copyright (C) 2019 Domingo
  *
- * @since        08/01/2019
+ * @since         08/01/2019
  *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
@@ -18,26 +18,24 @@ class Url
     /**
      * @var array
      */
-    protected $url
-        = [
-            'scheme'   => 'file',
-            'host'     => '',
-            'port'     => '',
-            'user'     => '',
-            'pass'     => '',
-            'dir'      => '',
-            'file'     => '',
-            'input'    => [],
-            'fragment' => '',
-        ];
+    protected $url = [
+        'scheme'   => 'file',
+        'host'     => '',
+        'port'     => '',
+        'user'     => '',
+        'pass'     => '',
+        'dir'      => '',
+        'file'     => '',
+        'input'    => [],
+        'fragment' => '',
+    ];
 
     /**
      * Url constructor.
      *
      * @param string|null $url
      */
-    public function __construct( string $url = null )
-    {
+    public function __construct( string $url = null ) {
         if( $url ) {
             $this->parseUrl($url);
         }
@@ -48,8 +46,7 @@ class Url
      *
      * @return Url
      */
-    public function setScheme( string $scheme ): Url
-    {
+    public function setScheme( string $scheme ): Url {
         $this->url[ 'scheme' ] = $scheme;
 
         return $this;
@@ -58,8 +55,7 @@ class Url
     /**
      * @return string
      */
-    public function getScheme(): string
-    {
+    public function getScheme(): string {
         return $this->url[ 'scheme' ];
     }
 
@@ -68,8 +64,7 @@ class Url
      *
      * @return Url
      */
-    public function setUser( string $user ): Url
-    {
+    public function setUser( string $user ): Url {
         $this->url[ 'user' ] = $user;
 
         return $this;
@@ -78,8 +73,7 @@ class Url
     /**
      * @return string
      */
-    public function getUser(): string
-    {
+    public function getUser(): string {
         return $this->url[ 'user' ];
     }
 
@@ -88,8 +82,7 @@ class Url
      *
      * @return Url
      */
-    public function setPass( string $pass ): Url
-    {
+    public function setPass( string $pass ): Url {
         $this->url[ 'pass' ] = $pass;
 
         return $this;
@@ -98,8 +91,7 @@ class Url
     /**
      * @return string
      */
-    public function getPass(): string
-    {
+    public function getPass(): string {
         return $this->url[ 'pass' ];
     }
 
@@ -108,8 +100,7 @@ class Url
      *
      * @return Url
      */
-    public function setHost( string $host ): Url
-    {
+    public function setHost( string $host ): Url {
         $this->url[ 'host' ] = $host;
 
         return $this;
@@ -118,8 +109,7 @@ class Url
     /**
      * @return string
      */
-    public function getHost(): string
-    {
+    public function getHost(): string {
         return $this->url[ 'host' ];
     }
 
@@ -128,8 +118,7 @@ class Url
      *
      * @return Url
      */
-    public function setPort( string $port ): Url
-    {
+    public function setPort( string $port ): Url {
         $this->url[ 'port' ] = $port;
 
         return $this;
@@ -138,8 +127,7 @@ class Url
     /**
      * @return string
      */
-    public function getPort(): String
-    {
+    public function getPort(): String {
         return $this->url[ 'port' ];
     }
 
@@ -148,8 +136,7 @@ class Url
      *
      * @return Url
      */
-    public function setPath( string $path ): Url
-    {
+    public function setPath( string $path ): Url {
         $this->setDir(dirname($path));
         $this->setFile(basename($path));
 
@@ -159,12 +146,9 @@ class Url
     /**
      * @return string
      */
-    public function getPath(): string
-    {
-        return rtrim(
-                $this->getDir(),
-                '/'
-            ) . '/' . $this->getFile();
+    public function getPath(): string {
+        return rtrim($this->getDir(),
+                '/') . '/' . $this->getFile();
     }
 
     /**
@@ -172,8 +156,7 @@ class Url
      *
      * @return Url
      */
-    public function setDir( string $dir ): Url
-    {
+    public function setDir( string $dir ): Url {
         $this->url[ 'dir' ] = $dir;
 
         return $this;
@@ -182,8 +165,7 @@ class Url
     /**
      * @return string
      */
-    public function getDir(): string
-    {
+    public function getDir(): string {
         return $this->url[ 'dir' ];
     }
 
@@ -192,8 +174,7 @@ class Url
      *
      * @return Url
      */
-    public function setFile( string $file ): Url
-    {
+    public function setFile( string $file ): Url {
         $this->url[ 'file' ] = $file;
 
         return $this;
@@ -202,8 +183,7 @@ class Url
     /**
      * @return string
      */
-    public function getFile(): string
-    {
+    public function getFile(): string {
         return $this->url[ 'file' ];
     }
 
@@ -213,8 +193,7 @@ class Url
      *
      * @return Url
      */
-    public function setInput( string $key, string $value ): Url
-    {
+    public function setInput( string $key, string $value ): Url {
         $this->url[ 'input' ][ $key ] = $value;
 
         return $this;
@@ -225,8 +204,7 @@ class Url
      *
      * @return string
      */
-    public function getInput( string $key ): string
-    {
+    public function getInput( string $key ): string {
         return isset($this->url[ 'input' ][ $key ])
             ? $this->url[ 'input' ][ $key ]
             : '';
@@ -237,12 +215,9 @@ class Url
      *
      * @return Url
      */
-    public function setQuery( string $query ): Url
-    {
-        parse_str(
-            $query,
-            $this->url[ 'input' ]
-        );
+    public function setQuery( string $query ): Url {
+        parse_str($query,
+            $this->url[ 'input' ]);
 
         return $this;
     }
@@ -250,8 +225,7 @@ class Url
     /**
      * @return string
      */
-    public function getQuery(): string
-    {
+    public function getQuery(): string {
         return http_build_query($this->url[ 'input' ]);
     }
 
@@ -260,8 +234,7 @@ class Url
      *
      * @return Url
      */
-    public function setFragment( string $fragment ): Url
-    {
+    public function setFragment( string $fragment ): Url {
         $this->url[ 'fragment' ] = $fragment;
 
         return $this;
@@ -270,8 +243,7 @@ class Url
     /**
      * @return string
      */
-    public function getFragment(): string
-    {
+    public function getFragment(): string {
         return $this->url[ 'fragment' ];
     }
 
@@ -280,8 +252,7 @@ class Url
      *
      * @return Url
      */
-    public function parseUrl( string $url ): Url
-    {
+    public function parseUrl( string $url ): Url {
         $mergeUrl = [
             'scheme'   => 'file',
             'host'     => '',
@@ -293,16 +264,17 @@ class Url
             'fragment' => '',
         ];
 
-        $url = array_merge(
-            $mergeUrl,
-            (array) parse_url($url)
-        );
+        $url = array_merge($mergeUrl,
+            (array) parse_url($url));
 
-        $this->setScheme($url[ 'scheme' ])->setHost($url[ 'host' ])->setPort($url[ 'port' ])->setUser(
-            $url[ 'user' ]
-        )->setPass($url[ 'pass' ])->setPath($url[ 'path' ])->setQuery($url[ 'query' ])->SetFragment(
-            $url[ 'fragment' ]
-        );
+        $this->setScheme($url[ 'scheme' ])
+            ->setHost($url[ 'host' ])
+            ->setPort($url[ 'port' ])
+            ->setUser($url[ 'user' ])
+            ->setPass($url[ 'pass' ])
+            ->setPath($url[ 'path' ])
+            ->setQuery($url[ 'query' ])
+            ->SetFragment($url[ 'fragment' ]);
 
         return $this;
     }
@@ -310,8 +282,7 @@ class Url
     /**
      * @return string
      */
-    public function buildScheme(): string
-    {
+    public function buildScheme(): string {
         if( $scheme = $this->getScheme() ) {
             return $scheme . '://';
         }
@@ -322,8 +293,7 @@ class Url
     /**
      * @return string
      */
-    public function buildAuth(): string
-    {
+    public function buildAuth(): string {
         if( $user = $this->getUser() ) {
             if( $pass = $this->getPass() ) {
                 $pass = ':' . $pass;
@@ -338,16 +308,14 @@ class Url
     /**
      * @return string
      */
-    public function buildHost(): string
-    {
+    public function buildHost(): string {
         return $this->getHost();
     }
 
     /**
      * @return string
      */
-    public function buildPort(): string
-    {
+    public function buildPort(): string {
         if( $port = $this->getPort() ) {
             return ':' . $port;
         }
@@ -360,24 +328,21 @@ class Url
      *
      * @return string
      */
-    public function buildDsn(): string
-    {
+    public function buildDsn(): string {
         return $this->buildScheme() . $this->buildAuth() . $this->buildHost() . $this->buildPort();
     }
 
     /**
      * @return string
      */
-    public function buildPath(): string
-    {
+    public function buildPath(): string {
         return $this->getPath();
     }
 
     /**
      * @return string
      */
-    public function buildQuery(): string
-    {
+    public function buildQuery(): string {
         if( $query = $this->getQuery() ) {
             return '?' . $query;
         }
@@ -388,8 +353,7 @@ class Url
     /**
      * @return string
      */
-    public function buildFragment(): string
-    {
+    public function buildFragment(): string {
         if( $fragment = $this->getFragment() ) {
             return '#' . $fragment;
         }
@@ -400,8 +364,7 @@ class Url
     /**
      * @return string
      */
-    public function buildUrl(): string
-    {
+    public function buildUrl(): string {
         return $this->buildDsn() . $this->buildPath() . $this->buildQuery() . $this->buildFragment();
     }
 }

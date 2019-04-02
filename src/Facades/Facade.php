@@ -7,11 +7,11 @@ use Chukdo\Bootstrap\App;
 /**
  * Initialisation d'une facade.
  *
- * @version    1.0.0
+ * @version       1.0.0
  *
- * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @copyright     licence MIT, Copyright (C) 2019 Domingo
  *
- * @since        08/01/2019
+ * @since         08/01/2019
  *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
@@ -36,8 +36,7 @@ class Facade
      *
      * @throws FacadeException
      */
-    public static function name(): string
-    {
+    public static function name(): string {
         throw new FacadeException("Facade does not implement 'Name' method.");
     }
 
@@ -46,16 +45,14 @@ class Facade
      *
      * @param App $app
      */
-    public static function setFacadeApplication( App $app ): void
-    {
+    public static function setFacadeApplication( App $app ): void {
         static::$app = $app;
     }
 
     /**
      * @return App
      */
-    public static function getFacadeApplication(): App
-    {
+    public static function getFacadeApplication(): App {
         return static::$app;
     }
 
@@ -69,13 +66,10 @@ class Facade
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    public static function getInstance( string $name )
-    {
+    public static function getInstance( string $name ) {
         if( !isset(static::$facades[ $name ]) ) {
-            static::$facades[ $name ] = static::$app->make(
-                $name,
-                true
-            );
+            static::$facades[ $name ] = static::$app->make($name,
+                true);
         }
 
         return static::$facades[ $name ];
@@ -85,12 +79,9 @@ class Facade
      * @param string $name
      * @param string $alias
      */
-    public static function setClassAlias( string $name, string $alias ): void
-    {
-        class_alias(
-            $name,
-            $alias
-        );
+    public static function setClassAlias( string $name, string $alias ): void {
+        class_alias($name,
+            $alias);
     }
 
     /**
@@ -100,14 +91,13 @@ class Facade
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    public static function object()
-    {
+    public static function object() {
         return static::getInstance(static::name());
     }
 
     /**
      * @param string $method
-     * @param array $args
+     * @param array  $args
      *
      * @return mixed
      *
@@ -115,30 +105,23 @@ class Facade
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    public static function __callStatic( string $method, array $args = [] )
-    {
+    public static function __callStatic( string $method, array $args = [] ) {
         $name     = static::name();
         $instance = static::getInstance($name);
 
-        if( !method_exists(
-                $instance,
-                $method
-            )
-            && !method_exists(
-                $instance,
-                '__call'
-            ) ) {
+        if( !method_exists($instance,
+                $method)
+            && !method_exists($instance,
+                '__call') ) {
             $class = get_called_class();
 
             throw new FacadeException("[$class] does not implement [$method] method.");
         }
 
-        return call_user_func_array(
-            [
-                $instance,
-                $method,
-            ],
-            $args
-        );
+        return call_user_func_array([
+            $instance,
+            $method,
+        ],
+            $args);
     }
 }

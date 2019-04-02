@@ -7,18 +7,17 @@ use Chukdo\Contracts\Validation\Filter as FilterInterface;
 /**
  * Validate handler.
  *
- * @version 1.0.0
+ * @version   1.0.0
  * @copyright licence MIT, Copyright (C) 2019 Domingo
- * @since 08/01/2019
- * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
+ * @since     08/01/2019
+ * @author    Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class StriptagsFilter implements FilterInterface
 {
     /**
      * @return string
      */
-    public function name(): string
-    {
+    public function name(): string {
         return 'striptags';
     }
 
@@ -27,8 +26,7 @@ class StriptagsFilter implements FilterInterface
      *
      * @return self
      */
-    public function attributes( array $attributes ): FilterInterface
-    {
+    public function attributes( array $attributes ): FilterInterface {
         return $this;
     }
 
@@ -37,8 +35,7 @@ class StriptagsFilter implements FilterInterface
      *
      * @return mixed
      */
-    public function filter( $input )
-    {
+    public function filter( $input ) {
         return strip_tags($input);
     }
 }

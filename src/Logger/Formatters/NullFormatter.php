@@ -7,11 +7,11 @@ use Chukdo\Contracts\Logger\Formatter as FormatterInterface;
 /**
  * Formatter de log par defaut.
  *
- * @version    1.0.0
+ * @version       1.0.0
  *
- * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @copyright     licence MIT, Copyright (C) 2019 Domingo
  *
- * @since        08/01/2019
+ * @since         08/01/2019
  *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
@@ -22,8 +22,7 @@ class NullFormatter implements FormatterInterface
      *
      * @return mixed
      */
-    public function formatRecord( array $record )
-    {
+    public function formatRecord( array $record ) {
         return $record;
     }
 }

@@ -9,11 +9,11 @@ use Chukdo\Contracts\Logger\Processor as ProcessorInterface;
 /**
  * Gestion des logs.
  *
- * @version    1.0.0
+ * @version       1.0.0
  *
- * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @copyright     licence MIT, Copyright (C) 2019 Domingo
  *
- * @since        08/01/2019
+ * @since         08/01/2019
  *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
@@ -22,13 +22,13 @@ class Logger implements LoggerInterface
     /**
      * RFC 5424.
      */
-    const DEBUG = 100;
-    const INFO = 200;
-    const NOTICE = 250;
-    const WARNING = 300;
-    const ERROR = 400;
-    const CRITICAL = 500;
-    const ALERT = 550;
+    const DEBUG     = 100;
+    const INFO      = 200;
+    const NOTICE    = 250;
+    const WARNING   = 300;
+    const ERROR     = 400;
+    const CRITICAL  = 500;
+    const ALERT     = 550;
     const EMERGENCY = 600;
 
     /**
@@ -36,17 +36,16 @@ class Logger implements LoggerInterface
      *
      * @var array
      */
-    public static $levels
-        = [
-            100 => 'Debug',
-            200 => 'Info',
-            250 => 'Notice',
-            300 => 'Warning',
-            400 => 'Error',
-            500 => 'Critical',
-            550 => 'Alert',
-            600 => 'Emergency',
-        ];
+    public static $levels = [
+        100 => 'Debug',
+        200 => 'Info',
+        250 => 'Notice',
+        300 => 'Warning',
+        400 => 'Error',
+        500 => 'Critical',
+        550 => 'Alert',
+        600 => 'Emergency',
+    ];
 
     /**
      * @var string
@@ -71,12 +70,11 @@ class Logger implements LoggerInterface
      * Constructeur
      * Initialise l'objet.
      *
-     * @param string $name nom de l'instance de log
-     * @param array $handlers liste des gestionnaires
-     * @param array $processors liste des processus
+     * @param string $name       nom de l'instance de log
+     * @param array  $handlers   liste des gestionnaires
+     * @param array  $processors liste des processus
      */
-    public function __construct( $name, array $handlers = [], array $processors = [] )
-    {
+    public function __construct( $name, array $handlers = [], array $processors = [] ) {
         $this->name = $name;
 
         foreach( $handlers as $handler ) {
@@ -93,8 +91,7 @@ class Logger implements LoggerInterface
      *
      * @return array
      */
-    public static function getLevels(): array
-    {
+    public static function getLevels(): array {
         return self::$levels;
     }
 
@@ -103,8 +100,7 @@ class Logger implements LoggerInterface
      *
      * @return string
      */
-    public static function getLevel( int $level ): string
-    {
+    public static function getLevel( int $level ): string {
         return self::$levels[ $level ];
     }
 
@@ -113,8 +109,7 @@ class Logger implements LoggerInterface
      *
      * @return Logger
      */
-    public function setName( string $name ): self
-    {
+    public function setName( string $name ): self {
         $this->name = ucfirst(strtolower($name));
 
         return $this;
@@ -123,8 +118,7 @@ class Logger implements LoggerInterface
     /**
      * @return string
      */
-    public function getName()
-    {
+    public function getName() {
         return $this->name;
     }
 
@@ -135,12 +129,9 @@ class Logger implements LoggerInterface
      *
      * @return $this
      */
-    public function pushHandler( HandlerInterface $handler ): self
-    {
-        array_push(
-            $this->handlers,
-            $handler
-        );
+    public function pushHandler( HandlerInterface $handler ): self {
+        array_push($this->handlers,
+            $handler);
 
         return $this;
     }
@@ -152,163 +143,135 @@ class Logger implements LoggerInterface
      *
      * @return $this
      */
-    public function pushProcessor( ProcessorInterface $processor ): self
-    {
-        array_push(
-            $this->processors,
-            $processor
-        );
+    public function pushProcessor( ProcessorInterface $processor ): self {
+        array_push($this->processors,
+            $processor);
 
         return $this;
     }
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array  $context
      *
      * @return bool
      *
      * @throws LoggerException
      */
-    public function alert( string $message, array $context = [] ): bool
-    {
-        return $this->log(
-            self::ALERT,
+    public function alert( string $message, array $context = [] ): bool {
+        return $this->log(self::ALERT,
             $message,
-            $context
-        );
+            $context);
     }
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array  $context
      *
      * @return bool
      *
      * @throws LoggerException
      */
-    public function critical( string $message, array $context = [] ): bool
-    {
-        return $this->log(
-            self::CRITICAL,
+    public function critical( string $message, array $context = [] ): bool {
+        return $this->log(self::CRITICAL,
             $message,
-            $context
-        );
+            $context);
     }
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array  $context
      *
      * @return bool
      *
      * @throws LoggerException
      */
-    public function emergency( string $message, array $context = [] ): bool
-    {
-        return $this->log(
-            self::EMERGENCY,
+    public function emergency( string $message, array $context = [] ): bool {
+        return $this->log(self::EMERGENCY,
             $message,
-            $context
-        );
+            $context);
     }
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array  $context
      *
      * @return bool
      *
      * @throws LoggerException
      */
-    public function error( string $message, array $context = [] ): bool
-    {
-        return $this->log(
-            self::ERROR,
+    public function error( string $message, array $context = [] ): bool {
+        return $this->log(self::ERROR,
             $message,
-            $context
-        );
+            $context);
     }
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array  $context
      *
      * @return bool
      *
      * @throws LoggerException
      */
-    public function warning( string $message, array $context = [] ): bool
-    {
-        return $this->log(
-            self::WARNING,
+    public function warning( string $message, array $context = [] ): bool {
+        return $this->log(self::WARNING,
             $message,
-            $context
-        );
+            $context);
     }
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array  $context
      *
      * @return bool
      *
      * @throws LoggerException
      */
-    public function notice( string $message, array $context = [] ): bool
-    {
-        return $this->log(
-            self::NOTICE,
+    public function notice( string $message, array $context = [] ): bool {
+        return $this->log(self::NOTICE,
             $message,
-            $context
-        );
+            $context);
     }
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array  $context
      *
      * @return bool
      *
      * @throws LoggerException
      */
-    public function info( string $message, array $context = [] ): bool
-    {
-        return $this->log(
-            self::INFO,
+    public function info( string $message, array $context = [] ): bool {
+        return $this->log(self::INFO,
             $message,
-            $context
-        );
+            $context);
     }
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array  $context
      *
      * @return bool
      *
      * @throws LoggerException
      */
-    public function debug( string $message, array $context = [] ): bool
-    {
-        return $this->log(
-            self::DEBUG,
+    public function debug( string $message, array $context = [] ): bool {
+        return $this->log(self::DEBUG,
             $message,
-            $context
-        );
+            $context);
     }
 
     /**
-     * @param int $level
+     * @param int    $level
      * @param string $message
-     * @param array $context
+     * @param array  $context
      *
      * @return bool
      *
      * @throws LoggerException
      */
-    public function log( int $level, string $message, array $context = [] ): bool
-    {
+    public function log( int $level, string $message, array $context = [] ): bool {
         if( empty($this->handlers) ) {
             throw new LoggerException('You tried to log record from an empty handler stack.');
         }
@@ -318,10 +281,8 @@ class Logger implements LoggerInterface
         }
 
         $record = [
-            'message'   => $this->interpolate(
-                $message,
-                $context
-            ),
+            'message'   => $this->interpolate($message,
+                $context),
             'level'     => $level,
             'levelname' => $this->getLevel($level),
             'channel'   => $this->getName(),
@@ -335,29 +296,24 @@ class Logger implements LoggerInterface
 
     /**
      * @param string $message
-     * @param array $context
+     * @param array  $context
      *
      * @return string
      */
-    public function interpolate( string $message, array $context = [] ): string
-    {
+    public function interpolate( string $message, array $context = [] ): string {
         $replace = [];
 
         foreach( $context as $key => $val ) {
             if( !is_array($val)
                 && (!is_object($val)
-                    || method_exists(
-                        $val,
-                        '__toString'
-                    )) ) {
+                    || method_exists($val,
+                        '__toString')) ) {
                 $replace[ '{' . $key . '}' ] = $val;
             }
         }
 
-        return strtr(
-            $message,
-            $replace
-        );
+        return strtr($message,
+            $replace);
     }
 
     /**
@@ -367,8 +323,7 @@ class Logger implements LoggerInterface
      *
      * @return array
      */
-    public function processRecord( array $record ): array
-    {
+    public function processRecord( array $record ): array {
         foreach( $this->processors as $processor ) {
             $record = $processor->processRecord($record);
         }
@@ -383,8 +338,7 @@ class Logger implements LoggerInterface
      *
      * @return bool true si un gestionnaire à traiter l'enregistrement false sinon
      */
-    public function handleRecord( array $record ): bool
-    {
+    public function handleRecord( array $record ): bool {
         $handle = 0;
 
         foreach( $this->handlers as $handler ) {

@@ -7,13 +7,13 @@ use Chukdo\Helper\Str;
 /**
  * Gestion des fichiers uploadés.
  *
- * @version    1.0.0
+ * @version      1.0.0
  *
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  *
  * @since        08/01/2019
  *
- * @author Domingo Jean-Pierre <jp.domingo@gmail.com>
+ * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
 class FileUploaded
 {
@@ -40,12 +40,11 @@ class FileUploaded
     /**
      * FileUploaded constructor.
      *
-     * @param string $name
+     * @param string      $name
      * @param string|null $allowedMimeTypes
-     * @param int|null $maxFileSize
+     * @param int|null    $maxFileSize
      */
-    public function __construct( string $name, string $allowedMimeTypes = null, int $maxFileSize = null )
-    {
+    public function __construct( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ) {
         $uploadedFiles = $this->normalizeUploadedFiles();
 
         if( isset($uploadedFiles[ $name ]) ) {
@@ -53,77 +52,67 @@ class FileUploaded
             $this->maxFileSize      = $maxFileSize;
             $this->allowedMimeTypes = $allowedMimeTypes;
             $this->uploadedFile     = $uploadedFiles[ $name ];
-        }
 
-        throw new FileUploadedException(
-            sprintf(
-                'Uploaded file [%s] does not exist',
-                $name
-            )
-        );
+        }
+        else {
+            throw new FileUploadedException(sprintf('Uploaded file [%s] does not exist',
+                $name));
+        }
     }
 
     /**
      * @return string
      */
-    public function name(): string
-    {
+    public function name(): string {
         return (string) $this->uploadedFile[ 'name' ];
     }
 
     /**
      * @return string
      */
-    public function path(): string
-    {
+    public function path(): string {
         return (string) $this->uploadedFile[ 'tmp_name' ];
     }
 
     /**
      * @return int
      */
-    public function size(): int
-    {
+    public function size(): int {
         return (int) $this->uploadedFile[ 'size' ];
     }
 
     /**
      * @return string
      */
-    public function extension(): string
-    {
+    public function extension(): string {
         return Str::extension($this->uploadedFile[ 'name' ]);
     }
 
     /**
      * @return string
      */
-    public function mimeType(): string
-    {
+    public function mimeType(): string {
         return (string) $this->uploadedFile[ 'type' ];
     }
 
     /**
      * @return string
      */
-    public function error(): string
-    {
+    public function error(): string {
         return (string) $this->uploadedFile[ 'error' ];
     }
 
     /**
      * @return bool
      */
-    public function isValid(): bool
-    {
+    public function isValid(): bool {
         return $this->isValidSize() && $this->isValidMimeType();
     }
 
     /**
      * @return bool
      */
-    public function isValidSize(): bool
-    {
+    public function isValidSize(): bool {
         if( $this->maxFileSize ) {
             return $this->size() < $this->maxFileSize;
         }
@@ -134,17 +123,10 @@ class FileUploaded
     /**
      * @return bool
      */
-    public function isValidMimeType(): bool
-    {
+    public function isValidMimeType(): bool {
         if( $this->allowedMimeTypes ) {
-            foreach( str::split(
-                $this->allowedMimeTypes,
-                ','
-            ) as $allowedMimeType ) {
-                if( preg_match(
-                    "#$allowedMimeType#i",
-                    $this->mimeType()
-                ) ) {
+            foreach( str::split($this->allowedMimeTypes, ',') as $allowedMimeType ) {
+                if( preg_match("#$allowedMimeType#i", $this->mimeType()) ) {
                     return true;
                 }
             }
@@ -160,38 +142,26 @@ class FileUploaded
      *
      * @return bool
      */
-    public function store( $path ): bool
-    {
+    public function store( $path ): bool {
         if( $this->isValid() ) {
-            if( move_uploaded_file(
-                $this->path(),
-                $path
-            ) ) {
+            if( move_uploaded_file($this->path(), $path) ) {
                 return true;
-            } else {
-                throw new FileUploadedException(
-                    sprintf(
-                        'Can\'t store uploaded file [%s] to [%s]',
-                        $this->name,
-                        $path
-                    )
-                );
+            }
+            else {
+                throw new FileUploadedException(sprintf('Can\'t store uploaded file [%s] to [%s]',
+                    $this->name,
+                    $path));
             }
         }
 
-        throw new FileUploadedException(
-            sprintf(
-                'Uploaded file [%s] is not valid',
-                $this->name
-            )
-        );
+        throw new FileUploadedException(sprintf('Uploaded file [%s] is not valid',
+            $this->name));
     }
 
     /**
      * @return array
      */
-    private static function normalizeUploadedFiles(): array
-    {
+    private static function normalizeUploadedFiles(): array {
         $uploadedFiles = [];
 
         foreach( $_FILES as $name => $file ) {
@@ -200,7 +170,8 @@ class FileUploaded
                     foreach( self::__normalizeUploadedFiles($value) as $nName => $nValue ) {
                         $uploadedFiles[ $name . '.' . $nName ][ $type ] = $nValue;
                     }
-                } else {
+                }
+                else {
                     $uploadedFiles[ $name ][ $type ] = $value;
                 }
             }
@@ -214,8 +185,7 @@ class FileUploaded
      *
      * @return array
      */
-    private static function __normalizeUploadedFiles( array $array ): array
-    {
+    private static function __normalizeUploadedFiles( array $array ): array {
         $uploadedFiles = [];
 
         foreach( $array as $k => $v ) {
@@ -223,7 +193,8 @@ class FileUploaded
                 foreach( self::__normalizeUploadedFiles($v) as $_k => $_v ) {
                     $uploadedFiles[ $k . '.' . $_k ] = $_v;
                 }
-            } else {
+            }
+            else {
                 $uploadedFiles[ $k ] = $v;
             }
         }

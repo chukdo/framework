@@ -8,11 +8,11 @@ use Elasticsearch\ClientBuilder;
 /**
  * Gestionnaire des logs pour fichier.
  *
- * @version    1.0.0
+ * @version       1.0.0
  *
- * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @copyright     licence MIT, Copyright (C) 2019 Domingo
  *
- * @since        08/01/2019
+ * @since         08/01/2019
  *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
@@ -33,23 +33,19 @@ class ElasticHandler extends AbstractHandler
      *
      * @param string|null $dsn
      */
-    public function __construct( ?string $dsn )
-    {
+    public function __construct( ?string $dsn ) {
         $this->dsn     = $dsn;
-        $this->elastic = ClientBuilder::create()->setHosts(
-            explode(
-                ',',
-                $dsn
-            )
-        )->build();
+        $this->elastic = ClientBuilder::create()
+            ->setHosts(explode(',',
+                    $dsn))
+            ->build();
 
         $this->setFormatter(new NullFormatter());
 
         parent::__construct();
     }
 
-    public function __destruct()
-    {
+    public function __destruct() {
         $this->dsn     = null;
         $this->elastic = null;
     }
@@ -59,21 +55,16 @@ class ElasticHandler extends AbstractHandler
      *
      * @return bool
      */
-    public function write( $record ): bool
-    {
+    public function write( $record ): bool {
         $this->init($record[ 'channel' ]);
 
-        $write = $this->elastic->index(
-            [
+        $write = $this->elastic->index([
                 'index' => $record[ 'channel' ],
                 'type'  => 'search',
-                'id'    => uniqid(
-                    '',
-                    true
-                ),
+                'id'    => uniqid('',
+                    true),
                 'body'  => $record,
-            ]
-        );
+            ]);
 
         return !isset($write[ 'error' ]);
     }
@@ -81,30 +72,27 @@ class ElasticHandler extends AbstractHandler
     /**
      * @param string $channel
      */
-    protected function init( string $channel ): void
-    {
-        if( !$this->elastic->indices()->exists(
-            [
-                'index' => $channel,
-            ]
-        ) ) {
-            $this->elastic->indices()->create(
-                [
+    protected function init( string $channel ): void {
+        if( !$this->elastic->indices()
+            ->exists([
                     'index' => $channel,
-                    'body'  => [
-                        'mappings' => [
-                            'search' => [
-                                'properties' => [
-                                    'date' => [
-                                        'type'   => 'date',
-                                        'format' => 'epoch_second',
+                ]) ) {
+            $this->elastic->indices()
+                ->create([
+                        'index' => $channel,
+                        'body'  => [
+                            'mappings' => [
+                                'search' => [
+                                    'properties' => [
+                                        'date' => [
+                                            'type'   => 'date',
+                                            'format' => 'epoch_second',
+                                        ],
                                     ],
                                 ],
                             ],
                         ],
-                    ],
-                ]
-            );
+                    ]);
         }
     }
 }

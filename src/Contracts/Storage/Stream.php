@@ -5,11 +5,11 @@ namespace Chukdo\Contracts\Storage;
 /**
  * Interface de gestion de flux.
  *
- * @version    1.0.0
+ * @version       1.0.0
  *
- * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @copyright     licence MIT, Copyright (C) 2019 Domingo
  *
- * @since        08/01/2019
+ * @since         08/01/2019
  *
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
@@ -53,7 +53,7 @@ interface Stream
     /**
      * Ecris une portion du fichier en commencant à l'offet défini.
      *
-     * @param int $offset
+     * @param int    $offset
      * @param string $content
      *
      * @return bool
