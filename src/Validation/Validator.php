@@ -79,12 +79,38 @@ class Validator
     }
 
     /**
-     * @param ValidateInterface $validate
+     * @param array $validators
      * @return Validator
      */
-    public function registerValidator( ValidateInterface $validate ): self
+    public function registerValidators( array $validators ): self
     {
-        $this->validators[ $validate->name() ] = $validate;
+        foreach ($validators as $validator) {
+            $this->registerValidator($validator);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ValidateInterface $validator
+     * @return Validator
+     */
+    public function registerValidator( ValidateInterface $validator ): self
+    {
+        $this->validators[ $validator->name() ] = $validator;
+
+        return $this;
+    }
+
+    /**
+     * @param array $filters
+     * @return Validator
+     */
+    public function registerFilters( array $filters ): self
+    {
+        foreach ($filters as $filter) {
+            $this->registerFilter($filter);
+        }
 
         return $this;
     }
