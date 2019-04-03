@@ -174,7 +174,7 @@ class Rule
     {
         if( $this->input() === null ) {
             if( $this->isRequired ) {
-                $this->error($this->validator->message('required'));
+                $this->error($this->message('required'));
                 return false;
             }
         }
@@ -288,8 +288,7 @@ class Rule
         }
 
         $this->validator->errors()
-            ->offsetSet($path,
-                $message);
+            ->offsetSet($path, $message);
     }
 
     /**
@@ -316,13 +315,11 @@ class Rule
             });
 
             $this->validator->inputs()
-                ->mergeRecursive($input,
-                    true);
+                ->mergeRecursive($input, true);
         }
         else {
             $this->validator->inputs()
-                ->set($this->path,
-                    $filter->filter($input));
+                ->set($this->path, $filter->filter($input));
         }
     }
 

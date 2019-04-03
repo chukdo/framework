@@ -137,6 +137,7 @@ $json = new \Chukdo\Json\Json(
 );
 
 Input::set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, 'azerty'));
+Input::set('tel', '0626148329');
 
 $validator = Request::validate([
     'tel' => 'required|&phone|phone',
