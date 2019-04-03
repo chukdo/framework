@@ -12,14 +12,14 @@ use Chukdo\Helper\Str;
  * @since     08/01/2019
  * @author    Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class PhoneFilter implements FilterInterface
+class BoolFilter implements FilterInterface
 {
     /**
      * @return string
      */
     public function name(): string
     {
-        return 'phone';
+        return 'bool';
     }
 
     /**
@@ -37,21 +37,11 @@ class PhoneFilter implements FilterInterface
      */
     public function filter( $input )
     {
-
-        if( Str::match('/^(?:(?:\+|00)\d{2}|0)\s{0,2}[1-9](?:[\s.-]{0,3}\d{2}){4}$/', $input) ) {
-            return str_replace([
-                '.',
-                ',',
-                ' ',
-                '+',
-            ],
-                [
-                    '',
-                    '',
-                    '',
-                    '00',
-                ],
-                $input);
+        if( $input === '0' ) {
+            return false;
+        }
+        elseif( $input === '1' ) {
+            return true;
         }
 
         return $input;

@@ -14,16 +14,17 @@ final class Crypto
 {
     /**
      * @param int|null $duration
+     * @param string   $salt
      * @return string
      */
-    public static function encodeCsrf( int $duration = null ): string
+    public static function encodeCsrf( int $duration, string $salt ): string
     {
         return self::encrypt(json_encode([
             'time'     => time(),
             'duration' => (int) $duration
                 ?: 60,
         ]),
-            '[A"[6cnTDT{J[6s\'');
+            $salt);
     }
 
     /**
@@ -33,10 +34,7 @@ final class Crypto
      */
     public static function encrypt( string $data, string $salt ): string
     {
-        $encrypted = openssl_encrypt($data,
-            'bf-ecb',
-            $salt,
-            true);
+        $encrypted = openssl_encrypt($data, 'aes-256-ecb', $salt, true);
         $result    = base64_encode($encrypted);
 
         return $result;
@@ -44,9 +42,10 @@ final class Crypto
 
     /**
      * @param string $token
+     * @param string $salt
      * @return bool
      */
-    public static function decodeCsrf( string $token ): bool
+    public static function decodeCsrf( string $token, string $salt ): bool
     {
         /* URI Decode */
         if( strpos($token,
@@ -58,8 +57,7 @@ final class Crypto
         $token = str_replace(' ',
             '+',
             $token);
-        $json  = json_decode(self::decrypt($token,
-            '[A"[6cnTDT{J[6s\''));
+        $json  = json_decode(self::decrypt($token, $salt));
 
         if( $json->time + $json->duration >= time() ) {
             return true;
@@ -76,10 +74,7 @@ final class Crypto
     public static function decrypt( string $data, string $salt ): string
     {
         $data      = base64_decode($data);
-        $decrypted = openssl_decrypt($data,
-            'bf-ecb',
-            $salt,
-            true);
+        $decrypted = openssl_decrypt($data, 'aes-256-ecb', $salt, true);
 
         return $decrypted;
     }

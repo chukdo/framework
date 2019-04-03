@@ -615,16 +615,15 @@ class Json extends \ArrayObject
     }
 
     /**
-     * Retourne l'objet sous forme d'un tableau a 2 dimensions (path => value).
-     * @param string|null $path chemin de depart null par défaut
+     * @param string|null $prefix
      * @return array
      */
-    public function toSimpleArray( string $path = null ): array
+    public function toSimpleArray( string $prefix = null ): array
     {
         $mixed = [];
 
         foreach( $this as $k => $v ) {
-            $k = trim($path . '.' . $k,
+            $k = trim($prefix . '.' . $k,
                 '.');
 
             if( $this->instanceOfJson($v) ) {

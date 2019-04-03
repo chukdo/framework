@@ -66,12 +66,12 @@ class Rule
     protected $filters = [];
 
     /**
-     * Constructor.
+     * Rule constructor.
+     * @param Validator $validator
      * @param string    $path
      * @param string    $rule
-     * @param Validator $validator
      */
-    public function __construct( string $path, string $rule, Validator $validator )
+    public function __construct( Validator $validator, string $path, string $rule )
     {
         $this->path      = trim($path);
         $this->validator = $validator;
@@ -150,6 +150,8 @@ class Rule
 
     /**
      * @return bool
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
     public function validate(): bool
     {
@@ -165,12 +167,14 @@ class Rule
 
     /**
      * @return bool
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
     protected function validateRequired(): bool
     {
         if( $this->input() === null ) {
             if( $this->isRequired ) {
-                $this->error($this->message([ 'required' ]));
+                $this->error($this->validator->message('required'));
                 return false;
             }
         }
@@ -180,6 +184,8 @@ class Rule
 
     /**
      * @return bool
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
     protected function validateType(): bool
     {
@@ -194,11 +200,11 @@ class Rule
                 }
             }
 
-            $this->error($this->message([ 'array' ]));
+            $this->error($this->message('array'));
             return false;
         }
         elseif( $input instanceof Input ) {
-            $this->error($this->message([ 'scalar' ]));
+            $this->error($this->message('scalar'));
             return false;
         }
 
@@ -223,6 +229,8 @@ class Rule
 
     /**
      * @return bool
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
     protected function validateValidators(): bool
     {
@@ -285,13 +293,14 @@ class Rule
     }
 
     /**
-     * @param array $listName
+     * @param string $key
      * @return string
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
-    protected function message( array $listName ): string
+    protected function message( string $key ): string
     {
-        return sprintf($this->validator->message($listName),
-            $this->label);
+        return sprintf($this->validator->message($key), $this->label);
     }
 
     /**
@@ -321,6 +330,8 @@ class Rule
      * @param ValidateInterface $validate
      * @param string            $name
      * @return bool
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
     protected function validateValidator( ValidateInterface $validate, string $name ): bool
     {
@@ -335,7 +346,7 @@ class Rule
                 ->set($this->path, $input);
         }
         else {
-            $this->error($this->message([ $name ]));
+            $this->error($this->message($name));
             $validated .= false;
         }
 
@@ -346,6 +357,8 @@ class Rule
      * @param ValidateInterface $validate
      * @param string            $name
      * @return bool
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
     protected function validateInputs( ValidateInterface $validate, string $name ): bool
     {
@@ -358,11 +371,11 @@ class Rule
                     ->set($k, $v);
             }
             elseif( $this->isForm ) {
-                $this->error($this->message([ $name ]), $k);
+                $this->error($this->message($name), $k);
                 $validated .= false;
             }
             else {
-                $this->error($this->message([ $name ]));
+                $this->error($this->message($name));
                 $validated .= false;
                 break;
             }

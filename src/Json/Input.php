@@ -36,16 +36,6 @@ class Input extends Json
     }
 
     /**
-     * @param iterable $rules
-     * @param Lang     $messages
-     * @return Validator
-     */
-    public function validate( Iterable $rules, Lang $messages ): Validator
-    {
-        return new Validator($this, (array) $rules, $messages);
-    }
-
-    /**
      * @param string      $name
      * @param string|null $allowedMimeTypes
      * @param int|null    $maxFileSize

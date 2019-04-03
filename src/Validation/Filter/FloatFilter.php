@@ -19,7 +19,7 @@ class FloatFilter implements FilterInterface
      */
     public function name(): string
     {
-        return '&float';
+        return 'float';
     }
 
     /**

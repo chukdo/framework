@@ -346,9 +346,10 @@ class Service implements ArrayAccess
 
     /**
      * @param string $key
+     * @param null   $default
      * @return string|null
      */
-    public function getConf( string $key ): ?string
+    public function getConf( string $key , $default = null): ?string
     {
         $key = '/' . trim($key,
                 '/');
@@ -357,7 +358,7 @@ class Service implements ArrayAccess
             return $this->conf[ $key ];
         }
 
-        return null;
+        return $default;
     }
 
     /**

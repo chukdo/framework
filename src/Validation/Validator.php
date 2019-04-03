@@ -4,8 +4,8 @@ namespace Chukdo\Validation;
 
 use Chukdo\Contracts\Validation\Filter as FilterInterface;
 use Chukdo\Contracts\Validation\Validate as ValidateInterface;
+use Chukdo\Http\Request;
 use Chukdo\Json\Input;
-use Chukdo\Json\Lang;
 use Chukdo\Json\Message;
 
 /**
@@ -18,6 +18,11 @@ use Chukdo\Json\Message;
 class Validator
 {
     /**
+     * @var Request
+     */
+    protected $request;
+
+    /**
      * @var Input
      */
     protected $inputs;
@@ -26,11 +31,6 @@ class Validator
      * @var Input
      */
     protected $validated;
-
-    /**
-     * @var Lang
-     */
-    protected $messages;
 
     /**
      * @var Message
@@ -54,20 +54,28 @@ class Validator
 
     /**
      * Validator constructor.
-     * @param Input $inputs
-     * @param array $rules
-     * @param Lang  $messages
+     * @param Request $request
      */
-    public function __construct( Input $inputs, array $rules, Lang $messages )
+    public function __construct( Request $request )
     {
+        $this->request   = $request;
         $this->error     = new Message('error');
-        $this->inputs    = $inputs->clone();
-        $this->messages  = $messages;
         $this->validated = new Input([]);
+        $this->inputs    = $request->inputs()
+            ->clone();
+    }
 
+    /**
+     * @param array $rules
+     * @return Validator
+     */
+    public function registerRules( array $rules ): self
+    {
         foreach( $rules as $path => $rule ) {
-            $this->rules[] = new Rule($path, $rule, $this);
+            $this->rules[] = new Rule($this, $path, $rule);
         }
+
+        return $this;
     }
 
     /**
@@ -189,14 +197,13 @@ class Validator
     }
 
     /**
-     * @param array $listName
+     * @param string $key
      * @return string
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
-    public function message( array $listName ): string
+    public function message( string $key ): string
     {
-        return $this->messages->offsetGetFirstInList($listName,
-            sprintf('Validation message [%s] cannot be found',
-                implode(', ',
-                    $listName)));
+        return $this->request->getLang($key, sprintf('Validation message [%s] cannot be found', $key));
     }
 }

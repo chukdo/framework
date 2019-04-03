@@ -91,6 +91,10 @@ Facade::setClassAlias(
     'Request'
 );
 Facade::setClassAlias(
+    \Chukdo\Facades\Validator::class,
+    'Validator'
+);
+Facade::setClassAlias(
     \Chukdo\Facades\Response::class,
     'Response'
 );
@@ -104,9 +108,9 @@ Facade::setClassAlias(
 );
 
 /* Configuration */
-Lang::load(LANG_PATH);
+Lang::loadDir(LANG_PATH);
 //dd(Lang::all());
-Conf::load(CONF_PATH . 'Conf.json');
+Conf::loadFile(CONF_PATH . 'Conf.json');
 //Conf::load(CONF_PATH.'conf_prod.json');
 
 /* App */
@@ -131,30 +135,29 @@ $json = new \Chukdo\Json\Json(
     ]
 );
 
-Input::set('tel', '+33 6.26.14.83.29');
+Input::set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, 'azerty'));
 
-$validator = new \Chukdo\Validation\Validator(
-    Input::all(),
-    [
-        'tel' => 'required|&phone|phone'
-        //'title'      => 'required|array:2,3',
-        //'title.*.cp' => 'required|array:1,2|string:2|striptags|label:code postal',
-        //'x' => 'required|array|&striptags|string:2',
-        //'dossier' => 'required|file:sheet',
-        //'prix' => 'required|&float|float'
-        //'title.name' => 'required|string:3,6',
-        //'title.cp'   => 'required|string:5|label:code postal',
-    ],
-    Lang::offsetGet('validation')
-);
+Validator::registerFilter(new \Chukdo\Validation\Filter\PhoneFilter());
+Validator::registerFilter(new \Chukdo\Validation\Filter\StriptagsFilter());
+Validator::registerValidator(new \Chukdo\Validation\Validate\CsrfValidate());
+Validator::registerValidator(new \Chukdo\Validation\Validate\FileValidate());
+Validator::registerValidator(new \Chukdo\Validation\Validate\PhoneValidate());
+Validator::registerValidator(new \Chukdo\Validation\Validate\StringValidate());
 
 
-$validator->registerFilter(new \Chukdo\Validation\Filter\PhoneFilter());
-$validator->registerFilter(new \Chukdo\Validation\Filter\StriptagsFilter());
-$validator->registerValidator(new \Chukdo\Validation\Validate\fileValidate());
-$validator->registerValidator(new \Chukdo\Validation\Validate\PhoneValidate());
-$validator->registerValidator(new \Chukdo\Validation\Validate\StringValidate());
-$validator->validate();
+$validator = Request::validate([
+    'tel' => 'required|&phone|phone',
+    'csrf'=> 'required|csrf:azerty'
+    //'title'      => 'required|array:2,3',
+    //'title.*.cp' => 'required|array:1,2|string:2|striptags|label:code postal',
+    //'x' => 'required|array|&striptags|string:2',
+    //'dossier' => 'required|file:sheet',
+    //'prix' => 'required|&float|float'
+    //'title.name' => 'required|string:3,6',
+    //'title.cp'   => 'required|string:5|label:code postal',
+]);
+
+
 
 //echo '<html><body><form method="POST" action="/index.php" enctype="multipart/form-data"><input type="file" name="dossier"><input type="submit"></form></body>';
 

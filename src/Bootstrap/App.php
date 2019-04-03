@@ -83,14 +83,28 @@ class App extends Service
 
     /**
      * @param string $key
+     * @param null   $default
      * @return string|null
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function getConf( string $key ): ?string
+    public function getConf( string $key, $default = null ): ?string
     {
         return $this->make('Chukdo\Json\Conf')
-            ->offsetGet($key);
+            ->offsetGet($key, $default);
+    }
+
+    /**
+     * @param string $key
+     * @param null   $default
+     * @return string|null
+     * @throws ServiceException
+     * @throws \ReflectionException
+     */
+    public function getLang( string $key, $default = null  ): ?string
+    {
+        return $this->make('Chukdo\Json\Lang')
+            ->offsetGet($key, $default);
     }
 
     /**

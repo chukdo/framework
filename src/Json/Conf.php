@@ -14,10 +14,33 @@ use Chukdo\Storage\Storage;
 class Conf extends Json
 {
     /**
+     * @param string $dir
+     * @return bool
+     */
+    public function loadDir( string $dir ): bool
+    {
+        $storage = new Storage();
+        $files   = $storage->files($dir,
+            '/\.json$/');
+
+        if( count($files) == 0 ) {
+            return false;
+        }
+
+        foreach( $files as $file ) {
+            if( !$this->loadFile($file) ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @param string $file
      * @return bool
      */
-    public function load( string $file ): bool
+    public function loadFile( string $file ): bool
     {
         $storage = new Storage();
 

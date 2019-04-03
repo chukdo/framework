@@ -1,8 +1,8 @@
 <?php
 
-namespace Chukdo\Validation\Filter;
+namespace Chukdo\Validation\Validate;
 
-use Chukdo\Contracts\Validation\Filter as FilterInterface;
+use Chukdo\Contracts\Validation\Validate as ValidateInterface;
 
 /**
  * Validate handler.
@@ -11,31 +11,35 @@ use Chukdo\Contracts\Validation\Filter as FilterInterface;
  * @since     08/01/2019
  * @author    Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class StriptagsFilter implements FilterInterface
+class BoolValidate implements ValidateInterface
 {
     /**
      * @return string
      */
     public function name(): string
     {
-        return 'striptags';
+        return 'int';
     }
 
     /**
      * @param array $attributes
      * @return self
      */
-    public function attributes( array $attributes ): FilterInterface
+    public function attributes( array $attributes ): ValidateInterface
     {
         return $this;
     }
 
     /**
      * @param $input
-     * @return mixed
+     * @return bool
      */
-    public function filter( $input )
+    public function validate( $input ): bool
     {
-        return strip_tags($input);
+        if( is_bool($input) ) {
+            return true;
+        }
+
+        return false;
     }
 }

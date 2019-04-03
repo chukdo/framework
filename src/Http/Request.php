@@ -81,21 +81,43 @@ class Request
         }
     }
 
-    // function rules()
-    // function messages()
-    // function filters()
+    /**
+     * @param string $key
+     * @param null   $default
+     * @return string|null
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
+     */
+    public function getConf( string $key, $default = null ): ?string
+    {
+        return $this->app->getConf($key, $default);
+    }
 
     /**
-     * @param iterable $rules
+     * @param string $key
+     * @param null   $default
+     * @return string|null
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
+     */
+    public function getLang( string $key, $default = null): ?string
+    {
+        return  $this->app->getLang('validation.' . $key , $default);
+    }
+
+    /**
+     * @param array $rules
      * @return Validator
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    public function validate( Iterable $rules ): Validator
+    public function validate( array $rules ): Validator
     {
-        return $this->inputs->validate($rules,
-            $this->app->make('Chukdo\Json\Lang')
-                ->offsetGet('validation'));
+        $validator = $this->app->make('Chukdo\Validation\Validator');
+        $validator->registerRules($rules);
+        $validator->validate();
+
+        return $validator;
     }
 
     /**

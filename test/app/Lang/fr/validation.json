@@ -7,7 +7,9 @@
   "email": "Le champs %s doit être un email valide",
   "url": "Le champs %s doit être une url valide",
   "int": "Le champs %s doit être un numéro entier valide",
+  "bool": "Le champs %s doit être 0 ou 1",
   "float": "Le champs %s doit être un numéro entier ou un chiffre à virgule valide",
   "phone": "Le champs %s doit être un numéro de téléphone valide",
-  "zipcode": "Le champs %s doit être un code postal valide"
+  "zipcode": "Le champs %s doit être un code postal valide",
+  "csrf": "Les données du formulaire sont obsolètes merci de recommencer"
 }

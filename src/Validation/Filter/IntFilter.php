@@ -19,7 +19,7 @@ class IntFilter implements FilterInterface
      */
     public function name(): string
     {
-        return '&int';
+        return 'int';
     }
 
     /**
