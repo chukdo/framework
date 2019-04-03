@@ -148,8 +148,7 @@ class Service implements ArrayAccess
             return $instance;
         }
         elseif( $singleton = $this->getSingleton($name) ) {
-            $this->instance($name,
-                $closure = $this->getClosure($name));
+            $this->instance($name, $closure = $this->getClosure($name));
 
             return $closure;
         }
@@ -195,7 +194,6 @@ class Service implements ArrayAccess
     {
         if( is_object($instance) ) {
             $this->instances[ $this->formatNameSpace($name) ] = $instance;
-
             return true;
         }
 
@@ -349,7 +347,7 @@ class Service implements ArrayAccess
      * @param null   $default
      * @return string|null
      */
-    public function getConf( string $key , $default = null): ?string
+    public function getConf( string $key, $default = null ): ?string
     {
         $key = '/' . trim($key,
                 '/');

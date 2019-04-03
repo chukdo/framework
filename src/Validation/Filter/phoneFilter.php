@@ -19,7 +19,7 @@ class PhoneFilter implements FilterInterface
      */
     public function name(): string
     {
-        return 'phone';
+        return '&phone';
     }
 
     /**

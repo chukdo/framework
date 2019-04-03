@@ -83,10 +83,6 @@ Facade::setClassAlias(
     'Event'
 );
 Facade::setClassAlias(
-    \Chukdo\Facades\Input::class,
-    'Input'
-);
-Facade::setClassAlias(
     \Chukdo\Facades\Request::class,
     'Request'
 );
@@ -113,6 +109,8 @@ Lang::loadDir(LANG_PATH);
 Conf::loadFile(CONF_PATH . 'Conf.json');
 //Conf::load(CONF_PATH.'conf_prod.json');
 
+Request::Inputs()->set('tel', '+33626148329');
+
 /* App */
 App::env(App::getConf('env'));
 App::channel('orpi');
@@ -136,8 +134,8 @@ $json = new \Chukdo\Json\Json(
     ]
 );
 
-Input::set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, 'azerty'));
-Input::set('tel', '0626148329');
+Request::Inputs()->set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, 'azerty'));
+Request::Inputs()->set('tel', '+33626148329');
 
 $validator = Request::validate([
     'tel' => 'required|&phone|phone',
