@@ -114,10 +114,10 @@ Conf::loadFile(CONF_PATH . 'Conf.json');
 /* App */
 App::env(App::getConf('env'));
 App::channel('orpi');
+App::registerHandleExceptions();
 App::register(\App\Providers\ServiceLocatorServiceProvider::class);
 App::register(\App\Providers\LoggerHandlerServiceProvider::class);
 App::register(\App\Providers\ExceptionLoggerServiceProvider::class);
-App::registerHandleExceptions();
 App::register(\App\Providers\ValidatorServiceProvider::class);
 
 $json = new \Chukdo\Json\Json(
