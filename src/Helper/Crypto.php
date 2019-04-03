@@ -59,8 +59,10 @@ final class Crypto
             $token);
         $json  = json_decode(self::decrypt($token, $salt));
 
-        if( $json->time + $json->duration >= time() ) {
-            return true;
+        if ($json) {
+            if( $json->time + $json->duration >= time() ) {
+                return true;
+            }
         }
 
         return false;

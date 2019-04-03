@@ -148,6 +148,14 @@ class Validator
     }
 
     /**
+     * @return Request
+     */
+    public function request(): Request
+    {
+        return $this->request;
+    }
+
+    /**
      * @return array
      */
     public function rules(): array

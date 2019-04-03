@@ -131,20 +131,32 @@ class Rule
     /**
      * @param string $rule
      * @return array
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
     protected function parseAttribute( string $rule ): array
     {
-        list($rule, $attributes) = array_pad(explode(':',
+        list($rule, $attrs) = array_pad(explode(':',
             $rule),
             2,
             '');
 
+        $attrs = strlen($attrs) == 0
+            ? []
+            : explode(',',
+                $attrs);
+
+        /* Recherche d'attribut faisant référence à un chemin de configuration (commence par @) */
+        foreach( $attrs as $k => $attr ) {
+            if( substr($attr, 0, 1) == '@' ) {
+                $attrs[ $k ] = $this->validator->request()
+                    ->getConf(substr($attr, 1));
+            }
+        }
+
         return [
             'rule' => $rule,
-            'attr' => strlen($attributes) == 0
-                ? []
-                : explode(',',
-                    $attributes),
+            'attr' => $attrs,
         ];
     }
 
