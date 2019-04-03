@@ -109,7 +109,7 @@ Lang::loadDir(LANG_PATH);
 Conf::loadFile(CONF_PATH . 'Conf.json');
 //Conf::load(CONF_PATH.'conf_prod.json');
 
-Request::Inputs()->set('tel', '+33626148329');
+
 
 /* App */
 App::env(App::getConf('env'));
@@ -117,8 +117,8 @@ App::channel('orpi');
 App::register(\App\Providers\ServiceLocatorServiceProvider::class);
 App::register(\App\Providers\LoggerHandlerServiceProvider::class);
 App::register(\App\Providers\ExceptionLoggerServiceProvider::class);
-App::register(\App\Providers\ValidatorServiceProvider::class);
 App::registerHandleExceptions();
+App::register(\App\Providers\ValidatorServiceProvider::class);
 
 $json = new \Chukdo\Json\Json(
     [
@@ -135,7 +135,7 @@ $json = new \Chukdo\Json\Json(
 );
 
 Request::Inputs()->set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, 'azerty'));
-Request::Inputs()->set('tel', '+33626148329');
+Request::Inputs()->set('tel', '+33626148328');
 
 $validator = Request::validate([
     'tel' => 'required|&phone|phone',

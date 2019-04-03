@@ -61,8 +61,7 @@ class Validator
         $this->request   = $request;
         $this->error     = new Message('error');
         $this->validated = new Input([]);
-        $this->inputs    = $request->inputs()
-            ->clone();
+        $this->inputs    = $request->inputs();
     }
 
     /**

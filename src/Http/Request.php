@@ -53,7 +53,7 @@ class Request
     public function __construct( App $app )
     {
         $this->app    = $app;
-        $this->inputs = $app->make('Chukdo\Json\Input');
+        $this->inputs = $app->make('Chukdo\Json\Input', true);
         $this->header = new Header();
         $this->url    = new Url(Http::server('SCRIPT_URI'));
         $this->method = Http::request('httpverb')
