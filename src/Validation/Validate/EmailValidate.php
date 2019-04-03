@@ -11,14 +11,14 @@ use Chukdo\Contracts\Validation\Validate as ValidateInterface;
  * @since     08/01/2019
  * @author    Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class urlValidate implements ValidateInterface
+class EmailValidate implements ValidateInterface
 {
     /**
      * @return string
      */
     public function name(): string
     {
-        return 'url';
+        return 'email';
     }
 
     /**
@@ -36,7 +36,7 @@ class urlValidate implements ValidateInterface
      */
     public function validate( $input ): bool
     {
-        if( filter_var($input, FILTER_VALIDATE_URL) ) {
+        if( filter_var($input, FILTER_VALIDATE_EMAIL) ) {
             return true;
         }
 

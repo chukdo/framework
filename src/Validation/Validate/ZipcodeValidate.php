@@ -3,6 +3,7 @@
 namespace Chukdo\Validation\Validate;
 
 use Chukdo\Contracts\Validation\Validate as ValidateInterface;
+use Chukdo\Helper\Str;
 
 /**
  * Validate handler.
@@ -11,14 +12,14 @@ use Chukdo\Contracts\Validation\Validate as ValidateInterface;
  * @since     08/01/2019
  * @author    Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class emailValidate implements ValidateInterface
+class ZipcodeValidate implements ValidateInterface
 {
     /**
      * @return string
      */
     public function name(): string
     {
-        return 'email';
+        return 'zipcode';
     }
 
     /**
@@ -36,7 +37,7 @@ class emailValidate implements ValidateInterface
      */
     public function validate( $input ): bool
     {
-        if( filter_var($input, FILTER_VALIDATE_EMAIL) ) {
+        if( Str::match('/^\d{5}$/', $input) ) {
             return true;
         }
 

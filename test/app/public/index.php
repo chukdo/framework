@@ -119,6 +119,7 @@ App::channel('orpi');
 App::register(\App\Providers\ServiceLocatorServiceProvider::class);
 App::register(\App\Providers\LoggerHandlerServiceProvider::class);
 App::register(\App\Providers\ExceptionLoggerServiceProvider::class);
+App::register(\App\Providers\ValidatorServiceProvider::class);
 App::registerHandleExceptions();
 
 $json = new \Chukdo\Json\Json(
@@ -137,14 +138,6 @@ $json = new \Chukdo\Json\Json(
 
 Input::set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, 'azerty'));
 
-Validator::registerFilter(new \Chukdo\Validation\Filter\PhoneFilter());
-Validator::registerFilter(new \Chukdo\Validation\Filter\StriptagsFilter());
-Validator::registerValidator(new \Chukdo\Validation\Validate\CsrfValidate());
-Validator::registerValidator(new \Chukdo\Validation\Validate\FileValidate());
-Validator::registerValidator(new \Chukdo\Validation\Validate\PhoneValidate());
-Validator::registerValidator(new \Chukdo\Validation\Validate\StringValidate());
-
-
 $validator = Request::validate([
     'tel' => 'required|&phone|phone',
     'csrf'=> 'required|csrf:azerty'
@@ -156,8 +149,6 @@ $validator = Request::validate([
     //'title.name' => 'required|string:3,6',
     //'title.cp'   => 'required|string:5|label:code postal',
 ]);
-
-
 
 //echo '<html><body><form method="POST" action="/index.php" enctype="multipart/form-data"><input type="file" name="dossier"><input type="submit"></form></body>';
 
