@@ -5,6 +5,7 @@ namespace Chukdo\Validation;
 use Chukdo\Contracts\Validation\Filter as FilterInterface;
 use Chukdo\Contracts\Validation\Validate as ValidateInterface;
 use Chukdo\Helper\Str;
+use Chukdo\Json\Json;
 use Chukdo\Json\Input;
 
 /**
@@ -65,8 +66,6 @@ class Rule
      * @param Validator $validator
      * @param string    $path
      * @param string    $rule
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
      */
     public function __construct( Validator $validator, string $path, string $rule )
     {
@@ -79,8 +78,6 @@ class Rule
 
     /**
      * @param string $rule
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
      */
     protected function parseRule( string $rule ): void
     {
@@ -88,9 +85,7 @@ class Rule
             $rule);
 
         foreach( $rules as $rule ) {
-            $parsed = $this->parseAttributes($rule);
-            $rule   = $parsed[ 'rule' ];
-            $attrs  = $parsed[ 'attr' ];
+            list($rule, $attrs) = $this->parseAttributes($rule);
 
             switch( $rule ) {
                 case 'form':
@@ -100,24 +95,17 @@ class Rule
                     $this->isRequired = true;
                     break;
                 case 'label':
-                    $this->label = $attrs[ 0 ];
+                    $this->label = $attrs->get(0);
                     break;
                 case 'array':
-                    $min        = isset($attrs[ 0 ])
-                        ? $attrs[ 0 ]
-                        : 0;
-                    $max        = isset($attrs[ 1 ])
-                        ? $attrs[ 1 ]
-                        : ($min
-                            ?: 10000);
                     $this->type = [
                         'array' => true,
-                        'min'   => $min,
-                        'max'   => $max,
+                        'min'   => $attrs->get(0, 0),
+                        'max'   => $attrs->get(1, $attrs->get(0, 10000)),
                     ];
                     break;
                 default:
-                    $this->rules[ $rule ] = $attrs;
+                    $this->rules[ $rule ] = (array) $attrs;
             }
         }
     }
@@ -125,32 +113,29 @@ class Rule
     /**
      * @param string $rule
      * @return array
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
      */
     protected function parseAttributes( string $rule ): array
     {
-        list($rule, $attrs) = array_pad(explode(':',
-            $rule),
-            2,
-            '');
+        list($rule, $attrs) = Str::explode(':', $rule, 2);
 
-        $attrs = strlen($attrs) == 0
-            ? []
-            : explode(',',
-                $attrs);
+        $attrs = new Json(Str::explode(',', $attrs));
 
-        /* Recherche d'attribut faisant référence à un chemin de configuration (commence par @) */
-        foreach( $attrs as $k => $attr ) {
-            if( substr($attr, 0, 1) == '@' ) {
-                $attrs[ $k ] = $this->validator->request()
-                    ->getConf(substr($attr, 1));
+        /* Recherche d'attributs faisant référence à un chemin de configuration (commence par @) */
+        $attrs->filter(function($k, $v) {
+            $isConf = substr($v, 0, 1) == '@';
+            $conf   = substr($v, 1);
+
+            if( $isConf ) {
+                return $this->validator->request()
+                    ->getConf($conf);
             }
-        }
+
+            return $v;
+        });
 
         return [
-            'rule' => $rule,
-            'attr' => $attrs,
+            $rule,
+            $attrs,
         ];
     }
 

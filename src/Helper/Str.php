@@ -60,6 +60,31 @@ final class Str
     }
 
     /**
+     * @param string|null $delimiter
+     * @param string|null $string
+     * @param int|null    $length
+     * @return array
+     */
+    public static function explode( ?string $delimiter, ?string $string, int $length = null ): array
+    {
+        $explode = explode($delimiter, $string);
+
+        if( $explode !== false ) {
+            if( count($explode) == 1 ) {
+                if( $explode[ 0 ] === "" ) {
+                    $explode = [];
+                }
+            }
+        }
+
+        if( $length ) {
+            return array_pad($explode, $length, null);
+        }
+
+        return $explode;
+    }
+
+    /**
      * Retourne un caractere d'une chaine en fonction de sa position.
      * @param string $string
      * @param int    $index
@@ -145,8 +170,7 @@ final class Str
      */
     public static function split( string $value, string $delimiter, int $pad = null, $padValue = null ): array
     {
-        $split = explode($delimiter,
-            $value);
+        $split = explode($delimiter, $value);
 
         if( $pad ) {
             $split = array_pad($split,
@@ -164,8 +188,7 @@ final class Str
      */
     public static function join( array $value, string $glue ): string
     {
-        return implode($glue,
-            $value);
+        return implode($glue, $value);
     }
 
     /**
@@ -175,16 +198,13 @@ final class Str
     public static function time( int $time = null ): string
     {
         if( $time < 0.1 ) {
-            return round($time * 1000,
-                    3) . ' Micro-secondes';
+            return round($time * 1000, 3) . ' Micro-secondes';
         }
         elseif( $time < 1 ) {
-            return round($time * 1000,
-                    3) . ' Milli-secondes';
+            return round($time * 1000, 3) . ' Milli-secondes';
         }
         elseif( $time ) {
-            return round($time,
-                    3) . ' Secondes';
+            return round($time, 3) . ' Secondes';
         }
         else {
             return '0';
@@ -201,12 +221,10 @@ final class Str
             return $mem . ' Octets';
         }
         elseif( $mem < 1048576 ) {
-            return round($mem / 1024,
-                    2) . ' Kilo-octets';
+            return round($mem / 1024, 2) . ' Kilo-octets';
         }
         elseif( $mem ) {
-            return round($mem / 1048576,
-                    2) . ' Mega-octets';
+            return round($mem / 1048576, 2) . ' Mega-octets';
         }
         else {
             return '0';
@@ -219,8 +237,7 @@ final class Str
      */
     public static function uid( string $prefix = null ): string
     {
-        return $prefix . md5(uniqid(rand(),
-                true));
+        return $prefix . md5(uniqid(rand(), true));
     }
 
     /**
@@ -229,9 +246,7 @@ final class Str
      */
     public static function stripSpaceBetweenTag( string $value ): string
     {
-        return self::trim(preg_replace('/>[\s|\t|\r|\n]+</',
-            '><',
-            $value));
+        return self::trim(preg_replace('/>[\s|\t|\r|\n]+</', '><', $value));
     }
 
     /**
@@ -240,12 +255,8 @@ final class Str
      */
     public static function trim( string $value ): string
     {
-        $value = self::replace('/\n|\r|\t/',
-            ' ',
-            $value);
-        $value = self::replace('/\s{2,}/',
-            ' ',
-            $value);
+        $value = self::replace('/\n|\r|\t/', ' ', $value);
+        $value = self::replace('/\s{2,}/', ' ', $value);
 
         return trim($value);
     }
@@ -258,9 +269,7 @@ final class Str
      */
     public static function replace( $pattern, $replacement, string $value ): string
     {
-        return preg_replace($pattern,
-            $replacement,
-            $value);
+        return preg_replace($pattern, $replacement, $value);
     }
 
     /**
@@ -271,9 +280,7 @@ final class Str
     public static function ellipsis( string $value, int $len ): string
     {
         if( strlen($value) > $len ) {
-            return substr($value,
-                    0,
-                    $len) . '...';
+            return substr($value, 0, $len) . '...';
         }
 
         return $value;
@@ -285,9 +292,7 @@ final class Str
      */
     public static function allDigit( string $value ): string
     {
-        return self::replace('/[^\d]/u',
-            '',
-            $value);
+        return self::replace('/[^\d]/u', '', $value);
     }
 
     /**
