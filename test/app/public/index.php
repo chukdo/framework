@@ -138,8 +138,8 @@ Request::Inputs()->set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, Conf::get('
 Request::Inputs()->set('tel', '+33626148328');
 
 $validator = Request::validate([
-    'tel' => 'required|&phone|phone',
-    'csrf'=> 'required|csrf:@salt' // add @a.b.c = conf
+    'tel' => 'required|phone', //todo mettre juste phone (= ajout auto filter et validate if exist)
+    'csrf'=> 'required|csrf:@salt'
     //'title'      => 'required|array:2,3',
     //'title.*.cp' => 'required|array:1,2|string:2|striptags|label:code postal',
     //'x' => 'required|array|&striptags|string:2',

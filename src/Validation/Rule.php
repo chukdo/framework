@@ -58,18 +58,15 @@ class Rule
     /**
      * @var array
      */
-    protected $validators = [];
-
-    /**
-     * @var array
-     */
-    protected $filters = [];
+    protected $rules = [];
 
     /**
      * Rule constructor.
      * @param Validator $validator
      * @param string    $path
      * @param string    $rule
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
     public function __construct( Validator $validator, string $path, string $rule )
     {
@@ -82,6 +79,8 @@ class Rule
 
     /**
      * @param string $rule
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
     protected function parseRule( string $rule ): void
     {
@@ -89,7 +88,7 @@ class Rule
             $rule);
 
         foreach( $rules as $rule ) {
-            $parsed = $this->parseAttribute($rule);
+            $parsed = $this->parseAttributes($rule);
             $rule   = $parsed[ 'rule' ];
             $attrs  = $parsed[ 'attr' ];
 
@@ -118,12 +117,7 @@ class Rule
                     ];
                     break;
                 default:
-                    if( substr($rule, 0, 1) == '&' ) {
-                        $this->filters[ $rule ] = $attrs;
-                    }
-                    else {
-                        $this->validators[ $rule ] = $attrs;
-                    }
+                    $this->rules[ $rule ] = $attrs;
             }
         }
     }
@@ -134,7 +128,7 @@ class Rule
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    protected function parseAttribute( string $rule ): array
+    protected function parseAttributes( string $rule ): array
     {
         list($rule, $attrs) = array_pad(explode(':',
             $rule),
@@ -167,10 +161,10 @@ class Rule
      */
     public function validate(): bool
     {
-        if( $this->validateRequired() ) {
-            if( $this->validateType() ) {
-                $this->validateFilters();
-                return $this->validateValidators();
+        if( $this->inputRequired() ) {
+            if( $this->inputScalarOrArray() ) {
+                $this->inputFilters();
+                return $this->validateRule();
             }
         }
 
@@ -182,11 +176,11 @@ class Rule
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    protected function validateRequired(): bool
+    protected function inputRequired(): bool
     {
         if( $this->input() === null ) {
             if( $this->isRequired ) {
-                $this->error($this->message('required'));
+                $this->error('required');
                 return false;
             }
         }
@@ -199,7 +193,7 @@ class Rule
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    protected function validateType(): bool
+    protected function inputScalarOrArray(): bool
     {
         $input = $this->input();
 
@@ -212,11 +206,11 @@ class Rule
                 }
             }
 
-            $this->error($this->message('array'));
+            $this->error('array');
             return false;
         }
         elseif( $input instanceof Input ) {
-            $this->error($this->message('scalar'));
+            $this->error('scalar');
             return false;
         }
 
@@ -226,15 +220,12 @@ class Rule
     /**
      *
      */
-    protected function validateFilters(): void
+    protected function inputFilters(): void
     {
-        foreach( $this->filters as $name => $attrs ) {
+        foreach( $this->rules as $name => $attrs ) {
             if( $filter = $this->validator->filter($name) ) {
                 $filter->attributes($attrs);
-                $this->validateFilter($filter);
-            }
-            else {
-                throw new ValidationException(sprintf('Filter Rule [%s] does not exist', $name));
+                $this->inputFilter($filter);
             }
         }
     }
@@ -244,17 +235,14 @@ class Rule
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    protected function validateValidators(): bool
+    protected function validateRule(): bool
     {
         $validated = true;
 
-        foreach( $this->validators as $name => $attrs ) {
+        foreach( $this->rules as $name => $attrs ) {
             if( $validate = $this->validator->validator($name) ) {
                 $validate->attributes($attrs);
-                $validated .= $this->validateValidator($validate, $name);
-            }
-            else {
-                throw new ValidationException(sprintf('Validation Rule [%s] does not exist', $name));
+                $validated .= $this->validateInput($validate, $name);
             }
         }
 
@@ -284,10 +272,12 @@ class Rule
     }
 
     /**
-     * @param string      $message
+     * @param string      $key
      * @param string|null $path
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
-    protected function error( string $message, string $path = null ): void
+    protected function error( string $key, string $path = null ): void
     {
         if( $path ) {
             if( !Str::contain($this->path,
@@ -300,24 +290,13 @@ class Rule
         }
 
         $this->validator->errors()
-            ->offsetSet($path, $message);
-    }
-
-    /**
-     * @param string $key
-     * @return string
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
-     */
-    protected function message( string $key ): string
-    {
-        return sprintf($this->validator->message($key), $this->label);
+            ->offsetSet($path, sprintf($this->validator->message($key), $this->label));
     }
 
     /**
      * @param FilterInterface $filter
      */
-    protected function validateFilter( FilterInterface $filter ): void
+    protected function inputFilter( FilterInterface $filter ): void
     {
         $input = $this->input();
 
@@ -342,21 +321,43 @@ class Rule
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    protected function validateValidator( ValidateInterface $validate, string $name ): bool
+    protected function validateInput( ValidateInterface $validate, string $name ): bool
+    {
+        $input = $this->input();
+
+        if( $input instanceof Input ) {
+            return $this->validateArray($validate, $name);
+        }
+
+        return $this->validateScalar($validate, $name);
+    }
+
+    /**
+     * @param ValidateInterface $validate
+     * @param string            $name
+     * @return bool
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
+     */
+    protected function validateArray( ValidateInterface $validate, string $name ): bool
     {
         $validated = true;
         $input     = $this->input();
 
-        if( $input instanceof Input ) {
-            $validated .= $this->validateInputs($validate, $name);
-        }
-        elseif( $validate->validate($input) ) {
-            $this->validator->validated()
-                ->set($this->path, $input);
-        }
-        else {
-            $this->error($this->message($name));
-            $validated .= false;
+        foreach( $input->toSimpleArray() as $k => $v ) {
+            if( $validate->validate($v) ) {
+                $this->validator->validated()
+                    ->set($k, $v);
+            }
+            elseif( $this->isForm ) {
+                $this->error($name, $k);
+                $validated .= false;
+            }
+            else {
+                $this->error($name);
+                $validated .= false;
+                break;
+            }
         }
 
         return $validated;
@@ -369,25 +370,18 @@ class Rule
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    protected function validateInputs( ValidateInterface $validate, string $name ): bool
+    protected function validateScalar( ValidateInterface $validate, string $name ): bool
     {
         $validated = true;
         $input     = $this->input();
 
-        foreach( $input->toSimpleArray() as $k => $v ) {
-            if( $validate->validate($v) ) {
-                $this->validator->validated()
-                    ->set($k, $v);
-            }
-            elseif( $this->isForm ) {
-                $this->error($this->message($name), $k);
-                $validated .= false;
-            }
-            else {
-                $this->error($this->message($name));
-                $validated .= false;
-                break;
-            }
+        if( $validate->validate($input) ) {
+            $this->validator->validated()
+                ->set($this->path, $input);
+        }
+        else {
+            $this->error($name);
+            $validated .= false;
         }
 
         return $validated;
