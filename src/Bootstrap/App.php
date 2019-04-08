@@ -2,6 +2,7 @@
 
 namespace Chukdo\Bootstrap;
 
+use Chukdo\Facades\Facade;
 use Closure;
 
 /**
@@ -42,6 +43,9 @@ class App extends Service
         $this->instance('\Chukdo\Bootstrap\App', $this);
     }
 
+    /**
+     *
+     */
     public function registerHandleExceptions()
     {
         new HandleExceptions($this);

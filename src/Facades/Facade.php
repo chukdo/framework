@@ -27,11 +27,13 @@ class Facade
 
     /**
      * Attache APP (extension de service) à la facade pour la resolution des injections de dependance.
-     * @param App $app
+     * @param App        $app
+     * @param array|null $alias
      */
-    public static function setFacadeApplication( App $app ): void
+    public static function setFacadeApplication( App $app, array $alias = null ): void
     {
         static::$app = $app;
+        self::registerAlias($alias);
     }
 
     /**
@@ -43,12 +45,22 @@ class Facade
     }
 
     /**
-     * @param string $name
-     * @param string $alias
+     * @param array|null $alias
      */
-    public static function setClassAlias( string $name, string $alias ): void
+    public static function registerAlias( array $alias = null ): void
     {
-        class_alias($name, $alias);
+        foreach( $alias as $name => $class ) {
+            self::setClassAlias($name, $class);
+        }
+    }
+
+    /**
+     * @param string $name
+     * @param string $class
+     */
+    public static function setClassAlias( string $name, string $class ): void
+    {
+        class_alias($class, $name);
     }
 
     /**

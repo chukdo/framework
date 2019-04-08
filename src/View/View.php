@@ -62,8 +62,7 @@ class View
      */
     public function setDefaultFolder( string $folder = null ): void
     {
-        $this->defaultFolder = rtrim($folder,
-            '/');
+        $this->defaultFolder = rtrim($folder, '/');
     }
 
     /**
@@ -89,8 +88,7 @@ class View
      */
     public function addFolder( string $name, string $folder ): self
     {
-        $this->folders[ $name ] = rtrim($folder,
-            '/');
+        $this->folders[ $name ] = rtrim($folder, '/');
 
         return $this;
     }
@@ -235,8 +233,7 @@ class View
      */
     public function render( string $template, iterable $data = null )
     {
-        $this->make($template,
-            $data)
+        $this->make($template, $data)
             ->render();
     }
 

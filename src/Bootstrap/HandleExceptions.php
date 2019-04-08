@@ -100,7 +100,7 @@ class HandleExceptions
 
         try {
             $exceptionHandler->report($e);
-        } catch( Exception $e ) {
+        } catch( Throwable $e ) {
         }
 
         if( $this->app->runningInConsole() ) {
