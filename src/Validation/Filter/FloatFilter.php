@@ -40,7 +40,7 @@ class FloatFilter implements FilterInterface
         if( Str::match('/^[0-9 .,]+$/', $input) ) {
             $input = str_replace(' ', '', $input);
 
-            if( strpos($input, '.') !== false && strpos($input, ',') !== false ) {
+            if( Str::contain($input, '.') && Str::contain($input, ',') ) {
                 $input = str_replace('.', '', $input);
             }
 

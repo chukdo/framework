@@ -250,8 +250,7 @@ class AzureStream extends AbstractStream
             $name = $blob->getName();
 
             if( $path ) {
-                if( strpos($name,
-                        $path) === 0 ) {
+                if( strpos($name, $path) === 0 ) {
                     $list[] = trim(substr($name,
                         strlen($path)),
                         '/');

@@ -37,7 +37,7 @@ class Url
     {
         if( $url ) {
             if( $defaultScheme ) {
-                if (!Str::match('/^[a-z0-9]+:\/\//', $url)) {
+                if( !Str::match('/^[a-z0-9]+:\/\//', $url) ) {
                     $url = $defaultScheme . '://' . $url;
                 }
             }
@@ -315,8 +315,7 @@ class Url
      */
     public function getPath(): string
     {
-        return rtrim($this->getDir(),
-                '/') . '/' . $this->getFile();
+        return '/' . trim($this->getDir(), '/') . '/' . $this->getFile();
     }
 
     /**
@@ -379,8 +378,8 @@ class Url
     {
         $tld  = '.' . $this->getTld();
         $host = $this->getHost();
-        dd($host);
-        if( strpos($host, '.') !== false ) {
+
+        if( Str::contain($host, '.') ) {
             $domain = explode('.', str_replace($tld, '', $host));
 
             return end($domain);
@@ -407,7 +406,7 @@ class Url
         $domainAndTld = '.' . $this->getDomain() . '.' . $this->getTld();
         $host         = str_replace('www.', '', $this->getHost());
 
-        if( strpos($host, $domainAndTld) !== false ) {
+        if( Str::contain($host, $domainAndTld) ) {
             return explode('.', str_replace($domainAndTld, '', $host));
         }
 

@@ -48,8 +48,7 @@ final class Crypto
     public static function decodeCsrf( string $token, string $salt ): bool
     {
         /* URI Decode */
-        if( strpos($token,
-                '%') !== false ) {
+        if( Str::contain($token, '%') ) {
             $token = rawurldecode($token);
         }
 
@@ -59,7 +58,7 @@ final class Crypto
             $token);
         $json  = json_decode(self::decrypt($token, $salt));
 
-        if ($json) {
+        if( $json ) {
             if( $json->time + $json->duration >= time() ) {
                 return true;
             }

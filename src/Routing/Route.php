@@ -2,7 +2,9 @@
 
 namespace Chukdo\Routing;
 
+use Chukdo\Helper\Str;
 use Chukdo\Http\Request;
+use Chukdo\Http\Url;
 use Closure;
 
 /**
@@ -45,26 +47,16 @@ class Route
     protected $name = null;
 
     /**
-     * @var ?string
-     */
-    protected $domain = null;
-
-    /**
-     * @var ?string
-     */
-    protected $subDomain = null;
-
-    /**
      * Route constructor.
      * @param string  $method
      * @param string  $uri
-     * @param Closure $closure
      * @param Request $request
+     * @param Closure $closure
      */
-    public function __construct( string $method, string $uri, Closure $closure, Request $request )
+    public function __construct( string $method, string $uri, Request $request, Closure $closure )
     {
         $this->method  = $method;
-        $this->uri     = $uri;
+        $this->uri     = new Url($uri);
         $this->closure = $closure;
         $this->request = $request;
     }
@@ -78,9 +70,9 @@ class Route
     }
 
     /**
-     * @return string
+     * @return Url
      */
-    public function uri(): string
+    public function uri(): Url
     {
         return $this->uri;
     }
@@ -90,22 +82,23 @@ class Route
      */
     public function match(): bool
     {
-        if( !$this->matchMethod() ) {
-            return false;
+        if( $this->matchMethod() ) {
+            if( $this->matchDomain() ) {
+                if( $this->matchSubDomain() ) {
+                    if( $this->matchPath() ) {
+                        return true;
+                    }
+                }
+            }
         }
 
-        if( !$this->matchDomain() ) {
-            return false;
-        }
+        return false;
 
-        if( !$this->matchSubDomain() ) {
-            return false;
-        }
+        //get path == request
+        // match {} => replace par wheres
 
         // attache une route à un groupe !!!
 
-        // subdomain > group
-        // domain > group
         // method
         // uri
         //  trim(/) == ensuite !
@@ -113,6 +106,47 @@ class Route
         // push request > param !!!
     }
 
+    /**
+     * @return bool
+     */
+    public function matchPath(): bool
+    {
+        $requestPath = $this->request->url()
+            ->getPath();
+        $routePath   = $this->uri()
+            ->getPath();
+
+        if( $requestPath == $routePath ) {
+            return true;
+        }
+        elseif( Str::contain($routePath, '{') ) {
+            $params = Str::matchAll('/\{[a-z0-9_]+\}/', $routePath);
+
+            foreach( $params as $param ) {
+                $routePath = str_replace($param,
+                    isset($this->wheres[ $param ])
+                        ? '(' . $this->wheres[ $param ] . ')'
+                        : '(.*?)',
+                    $routePath);
+            }
+
+            $vars = Str::matchAll('`^' . $routePath . '$`', $requestPath);
+
+            if( count($vars) > 0 ) {
+                foreach( $params as $k => $param ) {
+                    $this->request->inputs()
+                        ->offsetSet(str_replace(['{', '}'], '', $param), $vars[ $k ]);
+                }
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
     public function matchMethod(): bool
     {
         $method = $this->request->method();
@@ -129,10 +163,12 @@ class Route
      */
     public function matchDomain(): bool
     {
-        $domain = $this->request->url()
+        $requestDomain = $this->request->url()
+            ->getDomain();
+        $routeDomain   = $this->uri()
             ->getDomain();
 
-        if( $this->domain == $domain || $this->domain == null ) {
+        if( $requestDomain == $routeDomain || $routeDomain == null ) {
             return true;
         }
 
@@ -144,10 +180,12 @@ class Route
      */
     public function matchSubDomain(): bool
     {
-        $subDomain = $this->request->url()
+        $requestSubDomain = $this->request->url()
+            ->getSubDomain();
+        $routeSubDomain   = $this->uri()
             ->getSubDomain();
 
-        if( $this->subDomain == $subDomain || $this->subDomain == null ) {
+        if( $requestSubDomain == $routeSubDomain || $routeSubDomain == null ) {
             return true;
         }
 
@@ -169,28 +207,6 @@ class Route
     public function setName( $name ): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * @param $domain
-     * @return Route
-     */
-    public function setDomain( $domain ): self
-    {
-        $this->domain = $domain;
-
-        return $this;
-    }
-
-    /**
-     * @param $subDomain
-     * @return Route
-     */
-    public function setSubDomain( $subDomain ): self
-    {
-        $this->subDomain = $subDomain;
 
         return $this;
     }

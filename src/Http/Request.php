@@ -82,6 +82,14 @@ class Request
     }
 
     /**
+     * @return Request
+     */
+    public function instance(): self
+    {
+        return $this;
+    }
+
+    /**
      * @param string $key
      * @param null   $default
      * @return string|null

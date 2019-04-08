@@ -142,18 +142,11 @@ final class To
             '',
             self::scalar($value));
 
-        if( strpos($value,
-                '.') !== false
-            && strpos($value,
-                ',') !== false ) {
-            $value = str_replace('.',
-                '',
-                $value);
+        if( Str::contain($value, '.') && Str::contain($value, ',') ) {
+            $value = str_replace('.', '', $value);
         }
 
-        return (float) str_replace(',',
-            '.',
-            $value);
+        return (float) str_replace(',', '.', $value);
     }
 
     /**

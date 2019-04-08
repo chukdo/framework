@@ -64,7 +64,16 @@ Conf::loadFile(CONF_PATH . 'Conf.json');
 App::env(App::conf('env'));
 App::channel('orpi');
 
+$route = new \Chukdo\Routing\Route('GET', 'user/{id}', Request::instance(), function($request) {
+    dd($request->inputs());
+});
+$route->match();
+dd(Request::inputs());
+
+dd(parse_url('https://{projkey}.modelo.fr/user/{id}'));
 // route
+// Router::get('{projkey}.modelo.fr/user/{id}', function() {});
+// Router::get('user/{id}', function() {});
 // get closure
 // get controler@action
 // route::match([] , regex
