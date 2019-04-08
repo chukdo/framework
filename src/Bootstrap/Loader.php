@@ -33,36 +33,45 @@ class Loader
 
     /**
      * Register loader with SPL autoloader stack.
+     * @return Loader
      */
-    public function register(): void
+    public function register(): self
     {
         spl_autoload_register([
             $this,
             'loadClass',
         ]);
+
+        return $this;
     }
 
     /**
      * Unregisters this instance as an autoloader.
+     * @return Loader
      */
-    public function unregister(): void
+    public function unregister(): self
     {
         spl_autoload_unregister([
             $this,
             'loadClass',
         ]);
+
+        return $this;
     }
 
     /**
      * Registers a set namespaces.
      * @param array $namespaces array($namespace => $paths)
+     * @return Loader
      */
-    public function registerNameSpaces( array $namespaces ): void
+    public function registerNameSpaces( array $namespaces ): self
     {
         foreach( $namespaces as $ns => $paths ) {
             $this->registerNameSpace($ns,
                 $paths);
         }
+
+        return $this;
     }
 
     /**
@@ -71,8 +80,9 @@ class Loader
      * @param string       $ns      The namespace
      * @param array|string $paths   The base directories
      * @param bool         $prepend Whether to prepend the directories
+     * @return Loader
      */
-    public function registerNameSpace( string $ns, $paths, bool $prepend = false ): void
+    public function registerNameSpace( string $ns, $paths, bool $prepend = false ): self
     {
         /** normalize namespace */
         $ns = trim($ns,
@@ -98,6 +108,8 @@ class Loader
                     $path);
             }
         }
+
+        return $this;
     }
 
     /**

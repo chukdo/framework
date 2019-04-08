@@ -44,11 +44,13 @@ class App extends Service
     }
 
     /**
-     *
+     * @return App
      */
-    public function registerHandleExceptions()
+    public function registerHandleExceptions(): self
     {
         new HandleExceptions($this);
+
+        return $this;
     }
 
     /**
@@ -146,8 +148,9 @@ class App extends Service
     /**
      * @param string $name
      * @param        $bindObject
+     * @return App
      */
-    protected function resolve( string $name, $bindObject )
+    protected function resolve( string $name, $bindObject ): self
     {
         if( isset($this->resolving[ '__ANY__' ]) ) {
             $this->resolving[ '__ANY__' ]($bindObject, $name);
@@ -156,15 +159,19 @@ class App extends Service
         if( isset($this->resolving[ $name ]) ) {
             $this->resolving[ $name ]($bindObject, $name);
         }
+
+        return $this;
     }
 
     /**
      * @param string $name
      * @param string $alias
+     * @return App
      */
-    public function setAlias( string $name, string $alias ): void
+    public function setAlias( string $name, string $alias ): self
     {
         self::$aliases[ $name ] = $alias;
+        return $this;
     }
 
     /**
@@ -176,30 +183,52 @@ class App extends Service
     }
 
     /**
-     * @param string $name
+     * @param array|null $services
+     * @return App
      */
-    public function register( string $name ): void
+    public function registerServices( array $services = null ): self
+    {
+        foreach ($services as $service) {
+            $this->registerService($service);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return App
+     */
+    public function registerService( string $name ): self
     {
         $instance = new $name($this);
         $instance->register();
+
+        return $this;
     }
 
     /**
      * Ecoute la resolution de tous les objets.
      * @param Closure $closure
+     * @return App
      */
-    public function resolvingAny( Closure $closure ): void
+    public function resolvingAny( Closure $closure ): self
     {
         $this->resolving[ '__ANY__' ] = $closure;
+
+        return $this;
     }
 
     /**
      * Ecoute la resolution d'un objet.
      * @param string  $name
      * @param Closure $closure
+     * @return App
      */
-    public function resolving( string $name, Closure $closure ): void
+    public function resolving( string $name, Closure $closure ): self
     {
         $this->resolving[ $name ] = $closure;
+
+        return $this;
     }
 }

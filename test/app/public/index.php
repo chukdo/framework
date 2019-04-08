@@ -22,38 +22,45 @@ require_once CHUKDO_PATH . 'Bootstrap/Loader.php';
 require_once VENDOR_PATH . 'autoload.php';
 
 /** boostrap framework */
-$loader = new \Chukdo\Bootstrap\Loader();
-$loader->registerNameSpace('\Chukdo', CHUKDO_PATH);
-$loader->registerNameSpace('\App', APP_PATH);
-$loader->register();
+use \Chukdo\Bootstrap;
+use \Chukdo\Facades;
+use \App\Providers;
+
+/* Loader */
+$loader = new Bootstrap\Loader();
+$loader->registerNameSpace('\Chukdo', CHUKDO_PATH)
+    ->registerNameSpace('\App', APP_PATH)
+    ->register();
 
 /* App */
-$app = new \Chukdo\Bootstrap\App();
-$app->registerHandleExceptions();
-$app->register(\App\Providers\ServiceLocatorServiceProvider::class);
-$app->register(\App\Providers\LoggerHandlerServiceProvider::class);
-$app->register(\App\Providers\ExceptionLoggerServiceProvider::class);
-$app->register(\App\Providers\ValidatorServiceProvider::class);
+$app = new Bootstrap\App();
+$app->registerHandleExceptions()
+    ->registerServices([
+        Providers\ServiceLocatorServiceProvider::class,
+        Providers\LoggerHandlerServiceProvider::class,
+        Providers\ExceptionLoggerServiceProvider::class,
+        Providers\ValidatorServiceProvider::class,
+    ]);
 
 /* Facades */
-\Chukdo\Facades\Facade::setFacadeApplication($app, [
-    'Facade'    => \Chukdo\Facades\Facade::class,
-    'App'       => \Chukdo\Facades\App::class,
-    'Redis'     => \Chukdo\Facades\Redis::class,
-    'Conf'      => \Chukdo\Facades\Conf::class,
-    'Lang'      => \Chukdo\Facades\Lang::class,
-    'Event'     => \Chukdo\Facades\Event::class,
-    'Request'   => \Chukdo\Facades\Request::class,
-    'Validator' => \Chukdo\Facades\Validator::class,
-    'Response'  => \Chukdo\Facades\Response::class,
-    'View'      => \Chukdo\Facades\View::class,
-    'Router'    => \Chukdo\Facades\Router::class,
-]);
+Facades\Facade::setFacadeApplication($app,
+    [
+        'Facade'    => Facades\Facade::class,
+        'App'       => Facades\App::class,
+        'Redis'     => Facades\Redis::class,
+        'Conf'      => Facades\Conf::class,
+        'Lang'      => Facades\Lang::class,
+        'Event'     => Facades\Event::class,
+        'Request'   => Facades\Request::class,
+        'Validator' => Facades\Validator::class,
+        'Response'  => Facades\Response::class,
+        'View'      => Facades\View::class,
+        'Router'    => Facades\Router::class,
+    ]);
 
 /* Configuration */
 Lang::loadDir(LANG_PATH);
 Conf::loadFile(CONF_PATH . 'Conf.json');
-
 App::env(App::getConf('env'));
 App::channel('orpi');
 
