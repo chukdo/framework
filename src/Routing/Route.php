@@ -2,6 +2,7 @@
 
 namespace Chukdo\Routing;
 
+use Chukdo\Http\Request;
 use Closure;
 
 /**
@@ -14,9 +15,19 @@ use Closure;
 class Route
 {
     /**
-     * @var Router
+     * @var string
      */
-    protected $router;
+    protected $method;
+
+    /**
+     * @var string
+     */
+    protected $uri;
+
+    /**
+     * @var Request
+     */
+    protected $request;
 
     /**
      * @var Closure
@@ -24,13 +35,101 @@ class Route
     protected $closure;
 
     /**
-     * Route constructor.
-     * @param Router  $router
-     * @param Closure $closure
+     * @var array
      */
-    public function __construct( Router $router, Closure $closure )
+    protected $wheres = [];
+
+    /**
+     * @var ?string
+     */
+    protected $name = null;
+
+    /**
+     * Route constructor.
+     * @param string  $method
+     * @param string  $uri
+     * @param Closure $closure
+     * @param Request $request
+     */
+    public function __construct( string $method, string $uri, Closure $closure, Request $request )
     {
-        $this->router  = $router;
+        $this->method  = $method;
+        $this->uri     = $uri;
         $this->closure = $closure;
+        $this->request = $request;
+    }
+
+    /**
+     * @return string
+     */
+    public function method(): string
+    {
+        return $this->method;
+    }
+
+    /**
+     * @return string
+     */
+    public function uri(): string
+    {
+        return $this->uri;
+    }
+
+    /**
+     * @param Request $request
+     * @return bool
+     */
+    public function match(Request $request): bool
+    {
+        // domain
+        // method
+        // uri
+        //  trim(/) == ensuite !
+        //  extract {} > check in wheres et replace absent par .*? puis match
+            // push request > param !!!
+    }
+
+    /**
+     * @return string
+     */
+    public function name(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param $name
+     * @return Route
+     */
+    public function setName($name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param string $regex
+     * @return Route
+     */
+    public function where(string $key, string $regex): self
+    {
+        $this->wheres[$key] = $regex;
+
+        return $this;
+    }
+
+    /**
+     * @param array $wheres
+     * @return Route
+     */
+    public function wheres(array $wheres): self
+    {
+        foreach ($wheres as $key => $regex) {
+            $this->where($key, $regex);
+        }
+
+        return $this;
     }
 }

@@ -94,7 +94,7 @@ class App extends Service
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function getConf( string $key, $default = null ): ?string
+    public function conf( string $key, $default = null ): ?string
     {
         return $this->make('Chukdo\Json\Conf')
             ->offsetGet($key, $default);
@@ -107,7 +107,7 @@ class App extends Service
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function getLang( string $key, $default = null  ): ?string
+    public function lang( string $key, $default = null  ): ?string
     {
         return $this->make('Chukdo\Json\Lang')
             ->offsetGet($key, $default);

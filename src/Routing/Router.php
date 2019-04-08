@@ -28,11 +28,6 @@ class Router
     /**
      * @var array
      */
-    protected $pattern = [];
-
-    /**
-     * @var array
-     */
     protected $stack = [];
 
     /**
@@ -45,16 +40,6 @@ class Router
     {
         $this->app     = $app;
         $this->request = $app->make('Chukdo\Http\Request');
-    }
-
-    /**
-     * @param string $key
-     * @param string $regex
-     * @return Router
-     */
-    public function pattern( string $key, string $regex ): self
-    {
-        $this->pattern[ $key ] = $regex;
     }
 
     /**
@@ -75,8 +60,8 @@ class Router
      */
     public function stack( string $method, string $uri, Closure $closure ): Route
     {
-        $route                                 = new Route($this, $closure);
-        $this->stack[ $method . '://' . $uri ] = $route;
+        $route         = new Route($method, $uri, $closure, $this->request);
+        $this->stack[] = $route;
 
         return $route;
     }

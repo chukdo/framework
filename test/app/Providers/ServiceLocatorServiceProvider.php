@@ -16,7 +16,7 @@ class ServiceLocatorServiceProvider extends ServiceProvider
         $this->app->instance('\Chukdo\Storage\ServiceLocator', $serviceLocator);
         Stream::register('azure', AzureStream::class);
         $serviceLocator->setService('azure', function () {
-            return BlobRestProxy::createBlobService($this->app->getConf('storage.azure.endpoint'));
+            return BlobRestProxy::createBlobService($this->app->conf('storage.azure.endpoint'));
         });
     }
 }

@@ -443,7 +443,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
         $this->setUrl($pathFrom);
         $urlTo = new Url($pathTo);
 
-        /* Chagement de DB = Error */
+        /* Changement de host = Error */
         if( $this->getHost() != $urlTo->getHost() ) {
             return false;
         }

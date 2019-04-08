@@ -2,6 +2,8 @@
 
 namespace Chukdo\Http;
 
+use Chukdo\Helper\Str;
+
 /**
  * Gestion des URLs.
  * @version       1.0.0
@@ -29,10 +31,17 @@ class Url
     /**
      * Url constructor.
      * @param string|null $url
+     * @param string|null $defaultScheme
      */
-    public function __construct( string $url = null )
+    public function __construct( string $url = null, string $defaultScheme = null )
     {
         if( $url ) {
+            if( $defaultScheme ) {
+                if (!Str::match('/^[a-z0-9]+:\/\//', $url)) {
+                    $url = $defaultScheme . '://' . $url;
+                }
+            }
+
             $this->parseUrl($url);
         }
     }
@@ -348,6 +357,61 @@ class Url
     public function getPass(): string
     {
         return $this->url[ 'pass' ];
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTld(): ?string
+    {
+        $tld = explode('.', substr($this->getHost(), strlen($this->getHost()) - 8));
+        array_shift($tld);
+
+        return empty($tld)
+            ? null
+            : implode('.', $tld);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDomain(): ?string
+    {
+        $tld  = '.' . $this->getTld();
+        $host = $this->getHost();
+        dd($host);
+        if( strpos($host, '.') !== false ) {
+            $domain = explode('.', str_replace($tld, '', $host));
+
+            return end($domain);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSubDomain(): ?string
+    {
+        $subDomains = $this->getSubDomains();
+
+        return reset($subDomains);
+    }
+
+    /**
+     * @return array
+     */
+    public function getSubDomains(): array
+    {
+        $domainAndTld = '.' . $this->getDomain() . '.' . $this->getTld();
+        $host         = str_replace('www.', '', $this->getHost());
+
+        if( strpos($host, $domainAndTld) !== false ) {
+            return explode('.', str_replace($domainAndTld, '', $host));
+        }
+
+        return [];
     }
 
     /**

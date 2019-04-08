@@ -237,6 +237,6 @@ class Validator
      */
     public function message( string $key ): string
     {
-        return $this->request->getLang($key, sprintf('Validation message [%s] cannot be found', $key));
+        return $this->request->lang($key, sprintf('Validation message [%s] cannot be found', $key));
     }
 }

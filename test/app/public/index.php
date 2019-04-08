@@ -61,7 +61,7 @@ Facades\Facade::setFacadeApplication($app,
 /* Configuration */
 Lang::loadDir(LANG_PATH);
 Conf::loadFile(CONF_PATH . 'Conf.json');
-App::env(App::getConf('env'));
+App::env(App::conf('env'));
 App::channel('orpi');
 
 // route
@@ -93,6 +93,10 @@ App::channel('orpi');
 //$route = Route::current();
 //$name = Route::currentRouteName();
 //$action = Route::currentRouteAction();
+
+// Route::get('api/user/{userid}')
+// Route::get('api/user/{userid?}')
+// Route::get('api/user/{userid}')->where('userid', //)->wheres([])
 
 $json = new \Chukdo\Json\Json([
     'title'    => 'Liste des voitures',

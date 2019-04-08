@@ -36,12 +36,6 @@ class Service implements ArrayAccess
     protected $instances = [];
 
     /**
-     * Tableau de configuration.
-     * @var array
-     */
-    protected $conf = [];
-
-    /**
      * Service constructor.
      */
     public function __construct()
@@ -97,17 +91,6 @@ class Service implements ArrayAccess
     {
         return trim($name,
             '\\');
-    }
-
-    /**
-     * @param array $conf
-     * @return bool
-     */
-    public function conf( array $conf ): bool
-    {
-        $this->conf = $conf;
-
-        return true;
     }
 
     /**
@@ -318,7 +301,7 @@ class Service implements ArrayAccess
             return $this->make($lastPart);
         }
         elseif( $firstPart == '#' ) {
-            return $this->getConf($lastPart);
+            return $this->conf($lastPart);
         }
 
         return $arg;
@@ -347,16 +330,9 @@ class Service implements ArrayAccess
      * @param null   $default
      * @return string|null
      */
-    public function getConf( string $key, $default = null ): ?string
+    public function conf( string $key, $default = null ): ?string
     {
-        $key = '/' . trim($key,
-                '/');
-
-        if( isset($this->conf[ $key ]) ) {
-            return $this->conf[ $key ];
-        }
-
-        return $default;
+        return null;
     }
 
     /**

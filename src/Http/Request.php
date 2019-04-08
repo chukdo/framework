@@ -88,9 +88,9 @@ class Request
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    public function getConf( string $key, $default = null ): ?string
+    public function conf( string $key, $default = null ): ?string
     {
-        return $this->app->getConf($key, $default);
+        return $this->app->conf($key, $default);
     }
 
     /**
@@ -100,9 +100,9 @@ class Request
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    public function getLang( string $key, $default = null): ?string
+    public function lang( string $key, $default = null): ?string
     {
-        return  $this->app->getLang('validation.' . $key , $default);
+        return  $this->app->lang('validation.' . $key , $default);
     }
 
     /**

@@ -127,7 +127,7 @@ class Rule
 
             if( $isConf ) {
                 return $this->validator->request()
-                    ->getConf($conf);
+                    ->conf($conf);
             }
 
             return $v;
