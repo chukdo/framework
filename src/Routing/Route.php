@@ -70,14 +70,6 @@ class Route
     }
 
     /**
-     * @return Url
-     */
-    public function uri(): Url
-    {
-        return $this->uri;
-    }
-
-    /**
      * @return bool
      */
     public function match(): bool
@@ -93,61 +85,12 @@ class Route
         }
 
         return false;
-
-        //get path == request
-        // match {} => replace par wheres
-
-        // attache une route à un groupe !!!
-
-        // method
-        // uri
-        //  trim(/) == ensuite !
-        //  extract {} > check in wheres et replace absent par .*? puis match
-        // push request > param !!!
     }
 
     /**
      * @return bool
      */
-    public function matchPath(): bool
-    {
-        $requestPath = $this->request->url()
-            ->getPath();
-        $routePath   = $this->uri()
-            ->getPath();
-
-        if( $requestPath == $routePath ) {
-            return true;
-        }
-        elseif( Str::contain($routePath, '{') ) {
-            $params = Str::matchAll('/\{[a-z0-9_]+\}/', $routePath);
-
-            foreach( $params as $param ) {
-                $routePath = str_replace($param,
-                    isset($this->wheres[ $param ])
-                        ? '(' . $this->wheres[ $param ] . ')'
-                        : '(.*?)',
-                    $routePath);
-            }
-
-            $vars = Str::matchAll('`^' . $routePath . '$`', $requestPath);
-
-            if( count($vars) > 0 ) {
-                foreach( $params as $k => $param ) {
-                    $this->request->inputs()
-                        ->offsetSet(str_replace(['{', '}'], '', $param), $vars[ $k ]);
-                }
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @return bool
-     */
-    public function matchMethod(): bool
+    protected function matchMethod(): bool
     {
         $method = $this->request->method();
 
@@ -161,7 +104,7 @@ class Route
     /**
      * @return bool
      */
-    public function matchDomain(): bool
+    protected function matchDomain(): bool
     {
         $requestDomain = $this->request->url()
             ->getDomain();
@@ -172,13 +115,13 @@ class Route
             return true;
         }
 
-        return false;
+        return $this->matchPattern($routeDomain, $requestDomain);
     }
 
     /**
      * @return bool
      */
-    public function matchSubDomain(): bool
+    protected function matchSubDomain(): bool
     {
         $requestSubDomain = $this->request->url()
             ->getSubDomain();
@@ -189,7 +132,91 @@ class Route
             return true;
         }
 
+        return $this->matchPattern($routeSubDomain, $requestSubDomain);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function matchPath(): bool
+    {
+        $requestPath = $this->request->url()
+            ->getPath();
+        $routePath   = $this->uri()
+            ->getPath();
+
+        if( $requestPath == $routePath ) {
+            return true;
+        }
+
+        return $this->matchPattern($routePath, $requestPath);
+    }
+
+    /**
+     * @return Url
+     */
+    public function uri(): Url
+    {
+        return $this->uri;
+    }
+
+    /**
+     * @param string $routePattern
+     * @param string $requestPattern
+     * @return bool
+     */
+    protected function matchPattern( string $routePattern, string $requestPattern ): bool
+    {
+        if( Str::contain($routePattern, '{') ) {
+            if( $inputs = $this->extractInputs($routePattern, $requestPattern) ) {
+                $this->request->inputs()
+                    ->merge($inputs, true);
+                return true;
+            }
+        }
+
         return false;
+    }
+
+    /**
+     * @param string $routePath
+     * @param string $requestPath
+     * @return array|null
+     */
+    protected function extractInputs( string $routePath, string $requestPath ): ?array
+    {
+        $keys      = Str::matchAll('/\{([a-z0-9_]+)\}/', $routePath);
+        $countKeys = count($keys);
+
+        foreach( $keys as $key ) {
+            $routePath = str_replace('{' . $key . '}', '(' . $this->parseWhere($key) . ')', $routePath);
+        }
+
+        $values      = (array) Str::match('`^' . $routePath . '$`', $requestPath);
+        $countValues = count($values);
+
+        if( $countValues > 0 && $countValues == $countKeys ) {
+            $match = [];
+
+            foreach( $keys as $k => $key ) {
+                $match[ $key ] = $values[ $k ];
+            }
+
+            return $match;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    protected function parseWhere( string $name ): string
+    {
+        return isset($this->wheres[ $name ])
+            ? $this->wheres[ $name ]
+            : '.*?';
     }
 
     /**
@@ -212,18 +239,6 @@ class Route
     }
 
     /**
-     * @param string $key
-     * @param string $regex
-     * @return Route
-     */
-    public function where( string $key, string $regex ): self
-    {
-        $this->wheres[ $key ] = $regex;
-
-        return $this;
-    }
-
-    /**
      * @param array $wheres
      * @return Route
      */
@@ -232,6 +247,18 @@ class Route
         foreach( $wheres as $key => $regex ) {
             $this->where($key, $regex);
         }
+
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param string $regex
+     * @return Route
+     */
+    public function where( string $key, string $regex ): self
+    {
+        $this->wheres[ $key ] = $regex;
 
         return $this;
     }

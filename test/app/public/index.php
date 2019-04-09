@@ -64,10 +64,26 @@ Conf::loadFile(CONF_PATH . 'Conf.json');
 App::env(App::conf('env'));
 App::channel('orpi');
 
-$route = new \Chukdo\Routing\Route('GET', 'user/{id}', Request::instance(), function($request) {
+
+use HeadlessChromium\BrowserFactory;
+
+$browserFactory = new BrowserFactory('chromium-browser');
+
+// starts headless chrome
+$browser = $browserFactory->createBrowser();
+
+// creates a new page and navigate to an url
+$page = $browser->createPage();
+$page->navigate('https://www.modelo.fr')->waitForNavigation();
+
+// get page title
+$pageTitle = $page->evaluate('document.title')->getReturnValue();
+dd($pageTitle);
+
+$route = (new \Chukdo\Routing\Route('GET', '//{projkey}.modelo.test/user/{id}/test/{comment}', Request::instance(), function($request) {
     dd($request->inputs());
-});
-$route->match();
+}))->where('id', '[a-z]+');
+var_dump($route->match());
 dd(Request::inputs());
 
 dd(parse_url('https://{projkey}.modelo.fr/user/{id}'));
