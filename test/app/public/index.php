@@ -64,48 +64,41 @@ Conf::loadFile(CONF_PATH . 'Conf.json');
 App::env(App::conf('env'));
 App::channel('orpi');
 
-/**
-use HeadlessChromium\BrowserFactory;
+Response::content('test');
+$dispatcher = new \Chukdo\Middleware\Dispatcher();
 
-$browserFactory = new BrowserFactory('chromium-browser');
+$dispatcher->pipe(function($request, $response, $next) {
+    $response->prepend('a');
+    $response->append('a');
 
-// starts headless chrome
-$browser = $browserFactory->createBrowser();
+    return $next($request, $response);
+});
 
-// creates a new page and navigate to an url
-$page = $browser->createPage();
-$page->navigate('https://www.cci.fr/web/trouver-un-professionnel-de-l-immobilier')->waitForNavigation();
+$dispatcher->pipe(function($request, $response, $next) {
+    $response->prepend('"');
+    $response->append('"');
 
-$regionEval = $page->evaluate("$('#_CAIM_Recherche_WAR_CAIM_Rechercheportlet_INSTANCE_jA2G_region option').length");
-$regionsLength = $regionEval->getReturnValue();
+    return $next($request, $response);
+});
 
-for($i = 1; $i < $regionsLength; $i++) { // =20 simplofier
-    $regionEval = $page->evaluate("$('#_CAIM_Recherche_WAR_CAIM_Rechercheportlet_INSTANCE_jA2G_region option:eq(" . $i . ")').prop('selected', true)");
-    $page->evaluate("$('#fm-caim-recherche').submit()")->waitForPageReload();
+$dispatcher->handle(Request::instance(), Response::instance());
 
-    $page = $page->evaluate('document.querySelector("#p_p_id_CAIM_Resultats_WAR_CAIM_Resultatsportlet_INSTANCE_iAa2_").innerHTML')->getReturnValue();
-    dd($page);
-
-    // nav suivant until suivant absent bouvle last link nav !!
-    // extract des lien carte pro simple !!!
-
-    $links = $page->evaluate("$('a[href*=\"​CPI\"]').attr(\"href\")")->getReturnValue();
-    dd($links);
-}
-*/
-
+Response::send();
+exit;
 
 $route = (new \Chukdo\Routing\Route('GET', '//{projkey}.modelo.test/user/{id}/test/{comment}', Request::instance(), function($request) {
     dd($request->inputs());
 }))->where('id', '[a-z]+');
+
+
 var_dump($route->match());
 dd(Request::inputs());
 
 dd(parse_url('https://{projkey}.modelo.fr/user/{id}'));
-// route
-// Router::get('{projkey}.modelo.fr/user/{id}', function() {});
-// Router::get('user/{id}', function() {});
-// get closure
+// *route
+// *Router::get('{projkey}.modelo.fr/user/{id}', function() {});
+// *Router::get('user/{id}', function() {});
+// *get closure
 // get controler@action
 // route::match([] , regex
 //route::redirect 302

@@ -471,4 +471,9 @@ class Url
     {
         return $this->url[ 'file' ];
     }
+
+    public function __toString()
+    {
+        return $this->buildUrl();
+    }
 }

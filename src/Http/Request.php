@@ -108,9 +108,9 @@ class Request
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
      */
-    public function lang( string $key, $default = null): ?string
+    public function lang( string $key, $default = null ): ?string
     {
-        return  $this->app->lang('validation.' . $key , $default);
+        return $this->app->lang('validation.' . $key, $default);
     }
 
     /**
@@ -209,6 +209,22 @@ class Request
     public function header(): Header
     {
         return $this->header;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function type(): ?string
+    {
+        return $this->header->getHeader('Content-Type');
+    }
+
+    /**
+     * @return string|null
+     */
+    public function length(): ?string
+    {
+        return $this->header->getHeader('Content-Length');
     }
 
     /**

@@ -52,6 +52,14 @@ class Response
     }
 
     /**
+     * @return Response
+     */
+    public function instance(): self
+    {
+        return $this;
+    }
+
+    /**
      * @param int $status
      * @return Response
      */
@@ -175,6 +183,28 @@ class Response
     public function content( string $content ): self
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    /**
+     * @param string $content
+     * @return Response
+     */
+    public function append( string $content ): self
+    {
+        $this->content .= $content;
+
+        return $this;
+    }
+
+    /**
+     * @param string $content
+     * @return Response
+     */
+    public function prepend( string $content ): self
+    {
+        $this->content = $content . $this->content;
 
         return $this;
     }
