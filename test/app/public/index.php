@@ -64,7 +64,7 @@ Conf::loadFile(CONF_PATH . 'Conf.json');
 App::env(App::conf('env'));
 App::channel('orpi');
 
-
+/**
 use HeadlessChromium\BrowserFactory;
 
 $browserFactory = new BrowserFactory('chromium-browser');
@@ -74,11 +74,26 @@ $browser = $browserFactory->createBrowser();
 
 // creates a new page and navigate to an url
 $page = $browser->createPage();
-$page->navigate('https://www.modelo.fr')->waitForNavigation();
+$page->navigate('https://www.cci.fr/web/trouver-un-professionnel-de-l-immobilier')->waitForNavigation();
 
-// get page title
-$pageTitle = $page->evaluate('document.title')->getReturnValue();
-dd($pageTitle);
+$regionEval = $page->evaluate("$('#_CAIM_Recherche_WAR_CAIM_Rechercheportlet_INSTANCE_jA2G_region option').length");
+$regionsLength = $regionEval->getReturnValue();
+
+for($i = 1; $i < $regionsLength; $i++) { // =20 simplofier
+    $regionEval = $page->evaluate("$('#_CAIM_Recherche_WAR_CAIM_Rechercheportlet_INSTANCE_jA2G_region option:eq(" . $i . ")').prop('selected', true)");
+    $page->evaluate("$('#fm-caim-recherche').submit()")->waitForPageReload();
+
+    $page = $page->evaluate('document.querySelector("#p_p_id_CAIM_Resultats_WAR_CAIM_Resultatsportlet_INSTANCE_iAa2_").innerHTML')->getReturnValue();
+    dd($page);
+
+    // nav suivant until suivant absent bouvle last link nav !!
+    // extract des lien carte pro simple !!!
+
+    $links = $page->evaluate("$('a[href*=\"​CPI\"]').attr(\"href\")")->getReturnValue();
+    dd($links);
+}
+*/
+
 
 $route = (new \Chukdo\Routing\Route('GET', '//{projkey}.modelo.test/user/{id}/test/{comment}', Request::instance(), function($request) {
     dd($request->inputs());
