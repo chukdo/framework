@@ -22,6 +22,7 @@ require_once CHUKDO_PATH . 'Bootstrap/Loader.php';
 require_once VENDOR_PATH . 'autoload.php';
 
 /** boostrap framework */
+
 use \Chukdo\Bootstrap;
 use \Chukdo\Facades;
 use \App\Providers;
@@ -45,17 +46,18 @@ $app->registerHandleExceptions()
 /* Facades */
 Facades\Facade::setFacadeApplication($app,
     [
-        'Facade'    => Facades\Facade::class,
-        'App'       => Facades\App::class,
-        'Redis'     => Facades\Redis::class,
-        'Conf'      => Facades\Conf::class,
-        'Lang'      => Facades\Lang::class,
-        'Event'     => Facades\Event::class,
-        'Request'   => Facades\Request::class,
-        'Validator' => Facades\Validator::class,
-        'Response'  => Facades\Response::class,
-        'View'      => Facades\View::class,
-        'Router'    => Facades\Router::class,
+        'Facade'     => Facades\Facade::class,
+        'App'        => Facades\App::class,
+        'Redis'      => Facades\Redis::class,
+        'Conf'       => Facades\Conf::class,
+        'Lang'       => Facades\Lang::class,
+        'Event'      => Facades\Event::class,
+        'Request'    => Facades\Request::class,
+        'Validator'  => Facades\Validator::class,
+        'Response'   => Facades\Response::class,
+        'Dispatcher' => Facades\Dispatcher::class,
+        'View'       => Facades\View::class,
+        'Router'     => Facades\Router::class,
     ]);
 
 /* Configuration */
@@ -65,30 +67,61 @@ App::env(App::conf('env'));
 App::channel('orpi');
 
 Response::content('test');
-$dispatcher = new \Chukdo\Middleware\Dispatcher();
 
-$dispatcher->pipe(function($request, $response, $next) {
-    $response->prepend('a');
-    $response->append('a');
+class QuoteMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
+{
+    public function process(\Chukdo\Http\Request $request, \Chukdo\Middleware\Dispatcher $dispatcher): \Chukdo\Http\Response
+    {
+        $response = $dispatcher->handle($request);
 
-    return $next($request, $response);
-});
+        $response->prepend('"');
+        $response->append('"');
 
-$dispatcher->pipe(function($request, $response, $next) {
-    $response->prepend('"');
-    $response->append('"');
+        return $response;
+    }
+}
 
-    return $next($request, $response);
-});
+class UnderscoreMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
+{
+    public function process(\Chukdo\Http\Request $request, \Chukdo\Middleware\Dispatcher $dispatcher): \Chukdo\Http\Response
+    {
+        $response = $dispatcher->handle($request);
 
-$dispatcher->handle(Request::instance(), Response::instance());
+        $response->prepend('__');
+        $response->append('__');
 
-Response::send();
+        return $response;
+    }
+}
+
+class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
+{
+    public function process(\Chukdo\Http\Request $request, \Chukdo\Middleware\Dispatcher $dispatcher): \Chukdo\Http\Response
+    {
+        $response = $dispatcher->handle($request);
+
+        $response->prepend('--');
+        $response->append('--');
+
+        return $response;
+    }
+}
+Dispatcher::response()->content('toto');
+Dispatcher::pipe(new QuoteMiddleWare());
+Dispatcher::pipe(new UnderscoreMiddleWare());
+Dispatcher::pipe(new TraitMiddleWare());
+
+$r = Dispatcher::handle(Request::instance());
+
+$r->send();
 exit;
 
-$route = (new \Chukdo\Routing\Route('GET', '//{projkey}.modelo.test/user/{id}/test/{comment}', Request::instance(), function($request) {
-    dd($request->inputs());
-}))->where('id', '[a-z]+');
+$route = (new \Chukdo\Routing\Route('GET',
+    '//{projkey}.modelo.test/user/{id}/test/{comment}',
+    Request::instance(),
+    function( $request ) {
+        dd($request->inputs());
+    }))->where('id', '[a-z]+');
 
 
 var_dump($route->match());

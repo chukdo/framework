@@ -46,9 +46,7 @@ class Response
             ->setDate(time())
             ->setServer('Apache')
             ->setConnection('close')
-            ->setCacheControl(false,
-                false,
-                'no-store, no-cache, must-revalidate');
+            ->setCacheControl(false, false, 'no-store, no-cache, must-revalidate');
     }
 
     /**
@@ -261,11 +259,9 @@ class Response
      */
     public function redirect( string $url, int $code = 307 ): self
     {
-        $this->header->setLocation($url,
-            $code);
-        $this->send();
+        $this->header->setLocation($url, $code);
 
-        return $this;
+        return $this->send();
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Chukdo\Middleware;
 
+use Chukdo\Contracts\Middleware\Middleware as MiddlewareInterface;
 use Chukdo\Http\Request;
 use Chukdo\Http\Response;
 
@@ -18,31 +19,51 @@ class Dispatcher
     private $index = 0;
 
     /**
-     * @param callable $middleware
+     * @var Response
+     */
+    private $response;
+
+    /**
+     * Dispatcher constructor.
+     */
+    public function __construct()
+    {
+        $this->response = new Response();
+    }
+
+    /**
+     * @return Response
+     */
+    public function response(): Response
+    {
+        return $this->response;
+    }
+
+    /**
+     * @param MiddlewareInterface $middleware
      * @return Dispatcher
      */
-    public function pipe(callable $middleware): self
+    public function pipe( MiddlewareInterface $middleware ): self
     {
-        $this->middlewares[] = $middleware;
+        array_unshift($this->middlewares, $middleware);
 
         return $this;
     }
 
     /**
-     * @param Request  $request
-     * @param Response $response
+     * @param Request $request
      * @return Response
      */
-    public function handle(Request $request, Response $response): Response
+    public function handle( Request $request ): Response
     {
         $middleware = $this->getMiddleware();
         $this->index++;
 
-        if (is_callable($middleware)) {
-            return $middleware($request, $response, [$this, 'handle']);
+        if( is_null($middleware) ) {
+            return $this->response;
         }
 
-        return $response;
+        return $middleware->process($request, $this);
     }
 
     /**
@@ -50,8 +71,8 @@ class Dispatcher
      */
     private function getMiddleware()
     {
-        if (isset($this->middlewares[$this->index])) {
-            return $this->middlewares[$this->index];
+        if( isset($this->middlewares[ $this->index ]) ) {
+            return $this->middlewares[ $this->index ];
         }
 
         return null;
