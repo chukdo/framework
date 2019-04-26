@@ -70,7 +70,7 @@ Response::content('test');
 
 class QuoteMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 {
-    public function process(\Chukdo\Http\Request $request, \Chukdo\Middleware\Dispatcher $dispatcher): \Chukdo\Http\Response
+    public function process( \Chukdo\Http\Request $request, \Chukdo\Middleware\Dispatcher $dispatcher ): \Chukdo\Http\Response
     {
         $response = $dispatcher->handle($request);
 
@@ -83,7 +83,7 @@ class QuoteMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 
 class UnderscoreMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 {
-    public function process(\Chukdo\Http\Request $request, \Chukdo\Middleware\Dispatcher $dispatcher): \Chukdo\Http\Response
+    public function process( \Chukdo\Http\Request $request, \Chukdo\Middleware\Dispatcher $dispatcher ): \Chukdo\Http\Response
     {
         $response = $dispatcher->handle($request);
 
@@ -96,7 +96,7 @@ class UnderscoreMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 
 class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 {
-    public function process(\Chukdo\Http\Request $request, \Chukdo\Middleware\Dispatcher $dispatcher): \Chukdo\Http\Response
+    public function process( \Chukdo\Http\Request $request, \Chukdo\Middleware\Dispatcher $dispatcher ): \Chukdo\Http\Response
     {
         $response = $dispatcher->handle($request);
 
@@ -106,28 +106,39 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
         return $response;
     }
 }
-Dispatcher::response()->content('toto');
-Dispatcher::pipe(new QuoteMiddleWare());
-Dispatcher::pipe(new UnderscoreMiddleWare());
-Dispatcher::pipe(new TraitMiddleWare());
 
-$r = Dispatcher::handle(Request::instance());
-
-$r->send();
-exit;
+/**
+ * Dispatcher::response()
+ * ->content('toto');
+ * Dispatcher::pipe(new QuoteMiddleWare());
+ * Dispatcher::pipe(new UnderscoreMiddleWare());
+ * Dispatcher::pipe(new TraitMiddleWare());
+ * $r = Dispatcher::handle(Request::instance());
+ * $r->send();
+ * exit;
+ */
 
 $route = (new \Chukdo\Routing\Route('GET',
     '//{projkey}.modelo.test/user/{id}/test/{comment}',
     Request::instance(),
     function( $request ) {
         dd($request->inputs());
-    }))->where('id', '[a-z]+');
+    }))->where('id', '[a-z0-9]+')
+    ->validator([
+        'id'   => 'required|int',
+        'tel'  => 'required|phone',
+        'csrf' => 'required|csrf:@salt',
+    ])->middlewares([
+        QuoteMiddleWare::class,
+        UnderscoreMiddleWare::class,
+        TraitMiddleWare::class
+    ]);
 
+dd($route->dispatch());
 
-var_dump($route->match());
-dd(Request::inputs());
+// route validator
+// route middleware
 
-dd(parse_url('https://{projkey}.modelo.fr/user/{id}'));
 // *route
 // *Router::get('{projkey}.modelo.fr/user/{id}', function() {});
 // *Router::get('user/{id}', function() {});

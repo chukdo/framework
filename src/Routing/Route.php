@@ -5,6 +5,7 @@ namespace Chukdo\Routing;
 use Chukdo\Helper\Str;
 use Chukdo\Http\Request;
 use Chukdo\Http\Url;
+use Chukdo\Validation\Validator;
 use Closure;
 
 /**
@@ -40,6 +41,17 @@ class Route
      * @var array
      */
     protected $wheres = [];
+
+
+    /**
+     * @var array
+     */
+    protected $middlewares = [];
+
+    /**
+     * @var array
+     */
+    protected $validators = [];
 
     /**
      * @var ?string
@@ -259,6 +271,51 @@ class Route
     public function where( string $key, string $regex ): self
     {
         $this->wheres[ $key ] = $regex;
+
+        return $this;
+    }
+
+    /**
+     * @return Validator
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
+     */
+    public function validate(): Validator
+    {
+        return $this->request->validate($this->validators);
+    }
+
+    /**
+     * @param array $validators
+     * @return Route
+     */
+    public function validator( array $validators ): self
+    {
+        $this->validators = $validators;
+
+        return $this;
+    }
+
+    /**
+     * @param array $middlewares
+     * @return Route
+     */
+    public function middlewares( array $middlewares ): self
+    {
+        foreach( $middlewares as $middleware ) {
+            $this->middleware($middleware);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $middleware
+     * @return Route
+     */
+    public function middleware( string $middleware ): self
+    {
+        $this->middlewares[] = $middleware;
 
         return $this;
     }
