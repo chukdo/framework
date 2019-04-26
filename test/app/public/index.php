@@ -107,6 +107,25 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
     }
 }
 
+
+Router::get('//{projkey}.modelo.test/user/{id}/test/{comment}',
+    function( \Chukdo\Http\Request $request, \Chukdo\Http\Response $response ) {
+        dd($request->inputs());
+    })
+    ->where('id', '[a-z0-9]+')
+    ->validator([
+        'id'   => 'required|int',
+        'tel'  => 'required|phone',
+        'csrf' => 'required|csrf:@salt',
+    ])
+    ->middlewares([
+        QuoteMiddleWare::class,
+        UnderscoreMiddleWare::class,
+        TraitMiddleWare::class,
+    ]);
+dd(Router::route());
+
+exit;
 /**
  * Dispatcher::response()
  * ->content('toto');
@@ -121,20 +140,25 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 $route = (new \Chukdo\Routing\Route('GET',
     '//{projkey}.modelo.test/user/{id}/test/{comment}',
     Request::instance(),
-    function( $request ) {
-        dd($request->inputs());
+    function( \Chukdo\Json\Input $inputs, \Chukdo\Http\Response $response ) {
+        dd($inputs);
     }))->where('id', '[a-z0-9]+')
     ->validator([
         'id'   => 'required|int',
         'tel'  => 'required|phone',
         'csrf' => 'required|csrf:@salt',
-    ])->middlewares([
+    ])
+    ->middlewares([
         QuoteMiddleWare::class,
         UnderscoreMiddleWare::class,
-        TraitMiddleWare::class
+        TraitMiddleWare::class,
     ]);
-
-dd($route->dispatch());
+$route->dispatcher()
+    ->send();
+exit;
+// new dispatcher
+// pipe > middlewares
+// process
 
 // route validator
 // route middleware

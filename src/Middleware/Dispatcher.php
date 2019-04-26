@@ -40,6 +40,19 @@ class Dispatcher
     }
 
     /**
+     * @param array $middleswares
+     * @return Dispatcher
+     */
+    public function pipes( array $middleswares ): self
+    {
+        foreach( $middleswares as $middlesware ) {
+            $this->pipe($middlesware);
+        }
+
+        return $this;
+    }
+
+    /**
      * @param MiddlewareInterface $middleware
      * @return Dispatcher
      */

@@ -5,6 +5,7 @@ namespace Chukdo\Routing;
 use Closure;
 use Chukdo\Bootstrap\App;
 use Chukdo\Http\Request;
+use http\Exception;
 
 /**
  * Gestion des Routes.
@@ -60,7 +61,7 @@ class Router
      */
     public function stack( string $method, string $uri, Closure $closure ): Route
     {
-        $route         = new Route($method, $uri, $closure, $this->request);
+        $route         = new Route($method, $uri, $this->request, $closure);
         $this->stack[] = $route;
 
         return $route;
@@ -114,5 +115,25 @@ class Router
     public function console( string $uri, Closure $closure ): Route
     {
         return $this->stack('CLI', $uri, $closure);
+    }
+
+    public function route()
+    {
+        foreach ($this->stack as $stack) {
+            if ($stack->match()) {
+                $response = $stack->dispatcher();
+
+                // validate
+                    // ok > input validated
+                    // ko > response addapté lié au message
+
+                // midleware
+                // validator
+                // exec closure
+                return $stack;
+            }
+        }
+
+        throw new \Exception('ERROR ROUTE');
     }
 }

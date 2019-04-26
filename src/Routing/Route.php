@@ -4,7 +4,9 @@ namespace Chukdo\Routing;
 
 use Chukdo\Helper\Str;
 use Chukdo\Http\Request;
+use Chukdo\Http\Response;
 use Chukdo\Http\Url;
+use Chukdo\Middleware\Dispatcher;
 use Chukdo\Validation\Validator;
 use Closure;
 
@@ -294,6 +296,20 @@ class Route
         $this->validators = $validators;
 
         return $this;
+    }
+
+    /**
+     * @return Response
+     */
+    public function dispatcher(): Response
+    {
+        $dispatcher = new Dispatcher();
+
+        foreach( $this->middlewares as $middleware ) {
+            $dispatcher->pipe(new $middleware());
+        }
+
+        return $dispatcher->handle($this->request);
     }
 
     /**
