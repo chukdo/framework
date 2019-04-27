@@ -9,9 +9,9 @@ class LoggerHandlerServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton('LoggerHandler', [
-            'class' => \Chukdo\Logger\Handlers\ElasticHandler::class,
+            'class' => \Chukdo\Logger\Handlers\FileHandler::class,
             'args' => [
-                '#db.elastic.host',
+                '#log.file',
             ],
         ]);
     }

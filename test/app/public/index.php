@@ -107,14 +107,13 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
     }
 }
 
-
 Request::Inputs()
     ->set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, Conf::get('salt')));
 Request::Inputs()
     ->set('tel', '+33626148328');
 
 Router::get('//{projkey}.modelo.test/user/{id}/test/{comment}',
-    function(  \Chukdo\Json\Input $inputs, \Chukdo\Http\Response $response ) {
+    function(  \Chukdo\Json\Input $inputs ) {
         dd($inputs);
     })
     ->where('id', '[a-z0-9]+')
@@ -142,25 +141,6 @@ exit;
  * exit;
  */
 
-$route = (new \Chukdo\Routing\Route('GET',
-    '//{projkey}.modelo.test/user/{id}/test/{comment}',
-    Request::instance(),
-    function( \Chukdo\Json\Input $inputs, \Chukdo\Http\Response $response ) {
-        dd($inputs);
-    }))->where('id', '[a-z0-9]+')
-    ->validator([
-        'id'   => 'required|int',
-        'tel'  => 'required|phone',
-        'csrf' => 'required|csrf:@salt',
-    ])
-    ->middlewares([
-        QuoteMiddleWare::class,
-        UnderscoreMiddleWare::class,
-        TraitMiddleWare::class,
-    ]);
-$route->dispatcher()
-    ->send();
-exit;
 // new dispatcher
 // pipe > middlewares
 // process

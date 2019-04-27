@@ -41,8 +41,7 @@ class FileHandler extends AbstractHandler
      */
     public function write( $record ): bool
     {
-        $fp = fopen($this->file,
-            'a');
+        $fp = fopen($this->file, 'a');
         $r  = fwrite($fp,
             $record . "\n");
 

@@ -235,9 +235,7 @@ class Request
      */
     public function render(): string
     {
-        $render = Str::match('/\.([a-z]+)$/',
-            $this->url()
-                ->getPath());
+        $render = Str::extension($this->url()->getPath());
 
         if( $render ) {
             return $render;

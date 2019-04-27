@@ -269,6 +269,10 @@ class Response
      */
     public function send(): self
     {
+        if( headers_sent($filename, $linenum) ) {
+            throw new HttpException("Headers already sent from file $filename at line $linenum");
+        }
+
         $hasContent = $this->content != null;
         $hasFile    = $this->file != null;
 
@@ -370,21 +374,19 @@ class Response
      */
     protected function sendHeaderResponse(): self
     {
-        if( headers_sent() ) {
-            return $this;
-        }
-
         header_remove();
 
         foreach( explode("\n",
             $this->header->send()) as $header ) {
-            header($header,
-                true);
+            header($header, true);
         }
 
         return $this;
     }
 
+    /**
+     *
+     */
     public function end()
     {
         exit;

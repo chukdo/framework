@@ -35,7 +35,7 @@ class Message extends Json
      */
     public function toHtml( string $title = null, string $color = null, string $widthFirstCol = null ): string
     {
-        return parent::toHtml($this->name, $color);
+        return parent::toHtml($title ?: $this->name, $color);
     }
 
     /**
