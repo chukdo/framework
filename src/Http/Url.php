@@ -361,33 +361,6 @@ class Url
     /**
      * @return string|null
      */
-    public function getControler(): ?string
-    {
-        $path = $this->getPath();
-
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getAction(): ?string
-    {
-        $path = $this->getPath();
-
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getRender(): ?string
-    {
-        $path = $this->getPath();
-
-    }
-
-    /**
-     * @return string|null
-     */
     public function getTld(): ?string
     {
         $tld = explode('.', substr($this->getHost(), strlen($this->getHost()) - 8));

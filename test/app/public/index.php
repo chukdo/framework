@@ -108,9 +108,14 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 }
 
 
+Request::Inputs()
+    ->set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, Conf::get('salt')));
+Request::Inputs()
+    ->set('tel', '+33626148328');
+
 Router::get('//{projkey}.modelo.test/user/{id}/test/{comment}',
-    function( \Chukdo\Http\Request $request, \Chukdo\Http\Response $response ) {
-        dd($request->inputs());
+    function(  \Chukdo\Json\Input $inputs, \Chukdo\Http\Response $response ) {
+        dd($inputs);
     })
     ->where('id', '[a-z0-9]+')
     ->validator([
@@ -123,7 +128,7 @@ Router::get('//{projkey}.modelo.test/user/{id}/test/{comment}',
         UnderscoreMiddleWare::class,
         TraitMiddleWare::class,
     ]);
-dd(Router::route());
+Router::route();
 
 exit;
 /**

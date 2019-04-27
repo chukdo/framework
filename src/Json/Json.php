@@ -673,12 +673,9 @@ class Json extends \ArrayObject
         if( $title ) {
             $color = $color
                 ?: '#499cef';
-            $html  .= "
-                <thead style=\"color: #fff;background: $color;\">
-                    <tr>
-                        <th colspan=\"2\" style=\"padding:20px;font-size:30px;\">$title</th>
-                    </tr>
-                </thead>";
+            $html  .= '<thead style="color: #fff;background: ' . $color
+                      . ';"><tr><th colspan="2" style="padding:20px;font-size:30px;">' . ucfirst($title)
+                      . "</th></tr></thead>";
         }
 
         foreach( $this as $k => $v ) {
@@ -688,14 +685,11 @@ class Json extends \ArrayObject
                     $widthFirstCol)
                 : $v;
 
-            $html .= "
-                <tr>
-                    <td style=\"background:#eee;padding:6px;border:1px solid #eee;width:$widthFirstCol;\">$k</td>
-                    <td  style=\"padding:6px;border:1px solid #eee;\">$v</td>
-                </tr>";
+            $html .= '<tr><td style="background:#eee;padding:6px;border:1px solid #eee;width:' . $widthFirstCol . ';">'
+                     . $k . '</td><td  style="padding:6px;border:1px solid #eee;">' . $v . '</td></tr>';
         }
 
-        return "<table id=\"JsonTableRender\" style=\"$style\">$html</table>";
+        return '<table id="JsonTableRender" style="' . $style . '">' . $html . '</table>';
     }
 
     public function toConsole(): void

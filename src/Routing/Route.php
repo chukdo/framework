@@ -6,6 +6,7 @@ use Chukdo\Helper\Str;
 use Chukdo\Http\Request;
 use Chukdo\Http\Response;
 use Chukdo\Http\Url;
+use Chukdo\Json\Input;
 use Chukdo\Middleware\Dispatcher;
 use Chukdo\Validation\Validator;
 use Closure;
@@ -73,6 +74,18 @@ class Route
         $this->uri     = new Url($uri);
         $this->closure = $closure;
         $this->request = $request;
+    }
+
+    /**
+     * @param Input    $input
+     * @param Response $response
+     * @return Route
+     */
+    public function invoke(Input $input, Response $response): self
+    {
+        $this->closure($input, $response);
+
+        return $this;
     }
 
     /**

@@ -117,20 +117,32 @@ class Router
         return $this->stack('CLI', $uri, $closure);
     }
 
-    public function route()
+    public function route(): self
     {
-        foreach ($this->stack as $stack) {
-            if ($stack->match()) {
-                $response = $stack->dispatcher();
+        foreach( $this->stack as $route ) {
+            if( $route->match() ) {
+                $response = $route->dispatcher();
+                $validate = $route->validate();
 
-                // validate
-                    // ok > input validated
-                    // ko > response addapté lié au message
+                if( $validate->fails() ) {
+                    switch( $this->request->render() ) {
+                        case 'json' :
+                            $response->json($validate->errors());
+                            break;
+                        case 'xml' :
+                            $response->xml($validate->errors());
+                            break;
+                        default :
+                            $response->html($validate->errors()->toHtml());
+                    }
 
-                // midleware
-                // validator
-                // exec closure
-                return $stack;
+                    $response->send();
+                }
+                else {
+                    $route->invoke($validate->validated(), $response);
+                }
+
+                return $this;
             }
         }
 

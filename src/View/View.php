@@ -74,6 +74,14 @@ class View
     }
 
     /**
+     * @return View
+     */
+    public function instance(): self
+    {
+        return $this;
+    }
+
+    /**
      * @return Response|null
      */
     public function getResponseHandler(): ?Response

@@ -204,14 +204,6 @@ class Request
     }
 
     /**
-     * @return Header
-     */
-    public function header(): Header
-    {
-        return $this->header;
-    }
-
-    /**
      * @return string|null
      */
     public function type(): ?string
@@ -228,14 +220,6 @@ class Request
     }
 
     /**
-     * @return Url
-     */
-    public function url(): Url
-    {
-        return $this->url;
-    }
-
-    /**
      * @return string|null
      */
     public function from(): ?string
@@ -244,6 +228,54 @@ class Request
             ?: Http::server('HTTP_REFERER')
                 ?: Http::server('REMOTE_ADDR'),
             PHP_URL_HOST);
+    }
+
+    /**
+     * @return string
+     */
+    public function render(): string
+    {
+        $render = Str::match('/\.([a-z]+)$/',
+            $this->url()
+                ->getPath());
+
+        if( $render ) {
+            return $render;
+        }
+
+        if( $accept = $this->header()
+            ->getHeader('Accepts') ) {
+            $renders = [
+                'json' => 'json',
+                'xml'  => 'xml',
+                'pdf'  => 'pdf',
+                'zip'  => 'zip',
+            ];
+
+            foreach( $renders as $contain => $render ) {
+                if( Str::contain($accept, $contain) ) {
+                    return $render;
+                }
+            }
+        }
+
+        return 'html';
+    }
+
+    /**
+     * @return Url
+     */
+    public function url(): Url
+    {
+        return $this->url;
+    }
+
+    /**
+     * @return Header
+     */
+    public function header(): Header
+    {
+        return $this->header;
     }
 
     /**
