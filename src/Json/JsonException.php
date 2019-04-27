@@ -127,7 +127,7 @@ class JsonException extends Json
         ]);
         $table->addRow([
             $this->get('Code'),
-            $this->get('Message'),
+            $this->get('Error'),
             $this->get('File'),
             $this->get('Line'),
         ]);

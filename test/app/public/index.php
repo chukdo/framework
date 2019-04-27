@@ -70,9 +70,9 @@ Response::content('test');
 
 class QuoteMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 {
-    public function process( \Chukdo\Http\Request $request, \Chukdo\Middleware\Dispatcher $dispatcher ): \Chukdo\Http\Response
+    public function process( \Chukdo\Middleware\Dispatcher $dispatcher ): \Chukdo\Http\Response
     {
-        $response = $dispatcher->handle($request);
+        $response = $dispatcher->handle();
 
         $response->prepend('"');
         $response->append('"');
@@ -83,9 +83,9 @@ class QuoteMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 
 class UnderscoreMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 {
-    public function process( \Chukdo\Http\Request $request, \Chukdo\Middleware\Dispatcher $dispatcher ): \Chukdo\Http\Response
+    public function process( \Chukdo\Middleware\Dispatcher $dispatcher ): \Chukdo\Http\Response
     {
-        $response = $dispatcher->handle($request);
+        $response = $dispatcher->handle();
 
         $response->prepend('__');
         $response->append('__');
@@ -96,9 +96,9 @@ class UnderscoreMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 
 class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 {
-    public function process( \Chukdo\Http\Request $request, \Chukdo\Middleware\Dispatcher $dispatcher ): \Chukdo\Http\Response
+    public function process( \Chukdo\Middleware\Dispatcher $dispatcher ): \Chukdo\Http\Response
     {
-        $response = $dispatcher->handle($request);
+        $response = $dispatcher->handle();
 
         $response->prepend('--');
         $response->append('--');
@@ -115,7 +115,7 @@ Request::Inputs()
 // gestion des vues au niveau du routeur
 
 Router::get('//{projkey}.modelo.test/user/{id}/test/{comment}',
-    function(  \Chukdo\Json\Input $inputs ) {
+    function( \Chukdo\Json\Input $inputs ) {
         dd($inputs);
     })
     ->where('id', '[a-z0-9]+')

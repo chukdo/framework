@@ -77,9 +77,6 @@ class ExceptionHandler implements Handler
                 $contentType = Http::mimeContentType('html');
         }
 
-        /* Important: purge des ob_start avant l'envoi d'une réponse */
-        ob_end_clean();
-
         $response->status(500)
             ->header('Content-Type',
                 $contentType . '; charset=utf-8')

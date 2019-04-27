@@ -2,7 +2,6 @@
 
 namespace Chukdo\Contracts\Middleware;
 
-use Chukdo\Http\Request;
 use Chukdo\Http\Response;
 use Chukdo\Middleware\Dispatcher;
 
@@ -16,9 +15,8 @@ use Chukdo\Middleware\Dispatcher;
 interface Middleware
 {
     /**
-     * @param Request  $request
-     * @param Delegate $delegate
+     * @param Dispatcher $delegate
      * @return Response
      */
-    public function process( Request $request, Dispatcher $delegate ): Response;
+    public function process( Dispatcher $delegate ): Response;
 }

@@ -6,7 +6,6 @@ use Chukdo\Http\HttpException;
 use Closure;
 use Chukdo\Bootstrap\App;
 use Chukdo\Http\Request;
-use http\Exception;
 
 /**
  * Gestion des Routes.
@@ -28,6 +27,11 @@ class Router
     protected $request;
 
     /**
+     * @var Response
+     */
+    protected $response;
+
+    /**
      * @var array
      */
     protected $stack = [];
@@ -40,8 +44,9 @@ class Router
      */
     public function __construct( App $app )
     {
-        $this->app     = $app;
-        $this->request = $app->make('Chukdo\Http\Request');
+        $this->app      = $app;
+        $this->request  = $app->make('Chukdo\Http\Request');
+        $this->response = $this->app->make('Chukdo\Http\Response');
     }
 
     /**
@@ -122,7 +127,7 @@ class Router
     {
         foreach( $this->stack as $route ) {
             if( $route->match() ) {
-                $response = $route->dispatcher($this->app->make('Chukdo\Http\Response'));
+                $response = $route->dispatcher($this->request, $this->response);
                 $validate = $route->validate();
 
                 if( $validate->fails() ) {
@@ -134,7 +139,8 @@ class Router
                             $response->xml($validate->errors());
                             break;
                         default :
-                            $response->html($validate->errors()->toHtml('Input Error', '#b80000'));
+                            $response->html($validate->errors()
+                                ->toHtml('Input Error', '#b80000'));
                     }
 
                     $response->send();

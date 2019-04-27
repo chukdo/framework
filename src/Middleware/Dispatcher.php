@@ -19,17 +19,32 @@ class Dispatcher
     private $index = 0;
 
     /**
+     * @var Request
+     */
+    private $request;
+
+    /**
      * @var Response
      */
     private $response;
 
     /**
      * Dispatcher constructor.
+     * @param Request  $request
      * @param Response $response
      */
-    public function __construct(Response $response)
+    public function __construct( Request $request, Response $response )
     {
+        $this->request  = $request;
         $this->response = $response;
+    }
+
+    /**
+     * @return Request
+     */
+    public function request(): Request
+    {
+        return $this->request;
     }
 
     /**
@@ -65,10 +80,9 @@ class Dispatcher
     }
 
     /**
-     * @param Request $request
      * @return Response
      */
-    public function handle( Request $request ): Response
+    public function handle(): Response
     {
         $middleware = $this->getMiddleware();
         $this->index++;
@@ -77,7 +91,7 @@ class Dispatcher
             return $this->response;
         }
 
-        return $middleware->process($request, $this);
+        return $middleware->process($this);
     }
 
     /**

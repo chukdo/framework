@@ -312,12 +312,13 @@ class Route
     }
 
     /**
+     * @param Request  $request
      * @param Response $response
      * @return Response
      */
-    public function dispatcher(Response $response): Response
+    public function dispatcher(Request $request, Response $response): Response
     {
-        $dispatcher = new Dispatcher($response);
+        $dispatcher = new Dispatcher($request, $response);
 
         foreach( $this->middlewares as $middleware ) {
             $dispatcher->pipe(new $middleware());
