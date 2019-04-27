@@ -122,7 +122,7 @@ class Router
     {
         foreach( $this->stack as $route ) {
             if( $route->match() ) {
-                $response = $route->dispatcher();
+                $response = $route->dispatcher($this->app->make('Chukdo\Http\Response'));
                 $validate = $route->validate();
 
                 if( $validate->fails() ) {

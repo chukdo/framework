@@ -37,24 +37,36 @@ class Response
     protected $deleteFileAfterSend = false;
 
     /**
-     * Response constructor.
-     */
-    public function __construct()
-    {
-        $this->header = new Header();
-        $this->header->setStatus(200)
-            ->setDate(time())
-            ->setServer('Apache')
-            ->setConnection('close')
-            ->setCacheControl(false, false, 'no-store, no-cache, must-revalidate');
-    }
-
-    /**
      * @return Response
      */
     public function instance(): self
     {
         return $this;
+    }
+
+    /**
+     * @return Response
+     */
+    public function reset(): self
+    {
+        $this->__construct();
+
+        return $this;
+    }
+
+    /**
+     * Response constructor.
+     */
+    public function __construct()
+    {
+        $this->content = null;
+        $this->file    = null;
+        $this->header  = new Header();
+        $this->header->setStatus(200)
+            ->setDate(time())
+            ->setServer('Apache')
+            ->setConnection('close')
+            ->setCacheControl(false, false, 'no-store, no-cache, must-revalidate');
     }
 
     /**

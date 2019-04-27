@@ -25,10 +25,11 @@ class Dispatcher
 
     /**
      * Dispatcher constructor.
+     * @param Response $response
      */
-    public function __construct()
+    public function __construct(Response $response)
     {
-        $this->response = new Response();
+        $this->response = $response;
     }
 
     /**

@@ -112,6 +112,8 @@ Request::Inputs()
 Request::Inputs()
     ->set('tel', '+33626148328');
 
+// gestion des vues au niveau du routeur
+
 Router::get('//{projkey}.modelo.test/user/{id}/test/{comment}',
     function(  \Chukdo\Json\Input $inputs ) {
         dd($inputs);
