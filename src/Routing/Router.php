@@ -2,6 +2,7 @@
 
 namespace Chukdo\Routing;
 
+use Chukdo\Http\HttpException;
 use Closure;
 use Chukdo\Bootstrap\App;
 use Chukdo\Http\Request;
@@ -133,7 +134,7 @@ class Router
                             $response->xml($validate->errors());
                             break;
                         default :
-                            $response->html($validate->errors()->toHtml());
+                            $response->html($validate->errors()->toHtml('Input Error', '#b80000'));
                     }
 
                     $response->send();
@@ -146,6 +147,6 @@ class Router
             }
         }
 
-        throw new \Exception('ERROR ROUTE');
+        throw new HttpException('No valid route');
     }
 }
