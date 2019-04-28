@@ -123,27 +123,18 @@ class Router
         return $this->stack('CLI', $uri, $closure);
     }
 
+    /**
+     * @return Router
+     */
     public function route(): self
     {
         foreach( $this->stack as $route ) {
             if( $route->match() ) {
-                $response = $route->dispatcher($this->request, $this->response);
+                $response = $route->dispatcher($this->response);
                 $validate = $route->validate();
 
                 if( $validate->fails() ) {
-                    switch( $this->request->render() ) {
-                        case 'json' :
-                            $response->json($validate->errors());
-                            break;
-                        case 'xml' :
-                            $response->xml($validate->errors());
-                            break;
-                        default :
-                            $response->html($validate->errors()
-                                ->toHtml('Input Error', '#b80000'));
-                    }
-
-                    $response->send();
+                    $route->error($validate->errors(), $response);
                 }
                 else {
                     $route->invoke($validate->validated(), $response);

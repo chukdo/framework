@@ -9,6 +9,7 @@ use Chukdo\Xml\Xml;
 
 /**
  * Gestion des entetes HTTP.
+ * Le output_buffering de php doit être à Off dans le php.ini: output_buffering = Off
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019

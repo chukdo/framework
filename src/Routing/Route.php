@@ -7,6 +7,7 @@ use Chukdo\Http\Request;
 use Chukdo\Http\Response;
 use Chukdo\Http\Url;
 use Chukdo\Json\Input;
+use Chukdo\Json\Message;
 use Chukdo\Middleware\Dispatcher;
 use Chukdo\Validation\Validator;
 use Closure;
@@ -57,16 +58,22 @@ class Route
     protected $validators = [];
 
     /**
+     * @var Closure
+     */
+    protected $error;
+
+    /**
      * @var ?string
      */
     protected $name = null;
 
     /**
      * Route constructor.
-     * @param string  $method
-     * @param string  $uri
-     * @param Request $request
-     * @param Closure $closure
+     * @param string   $method
+     * @param string   $uri
+     * @param Request  $request
+     * @param Response $response
+     * @param Closure  $closure
      */
     public function __construct( string $method, string $uri, Request $request, Closure $closure )
     {
@@ -81,9 +88,9 @@ class Route
      * @param Response $response
      * @return Route
      */
-    public function invoke(Input $input, Response $response): self
+    public function invoke( Input $input, Response $response ): self
     {
-        $this->closure($input, $response);
+        ($this->closure)($input, $response);
 
         return $this;
     }
@@ -291,6 +298,34 @@ class Route
     }
 
     /**
+     * @param Message  $errors
+     * @param Response $response
+     * @return Route
+     */
+    public function error( Message $errors, Response $response ): self
+    {
+        if ($this->error) {
+            ($this->error)($errors, $response);
+            return $this;
+        }
+
+        switch( $this->request->render() ) {
+            case 'json' :
+                $response->json($errors);
+                break;
+            case 'xml' :
+                $response->xml($errors);
+                break;
+            default :
+                $response->html($errors->toHtml('Input Errors', '#dd0000'));
+        }
+
+        $response->send();
+
+        return $this;
+    }
+
+    /**
      * @return Validator
      * @throws \Chukdo\Bootstrap\ServiceException
      * @throws \ReflectionException
@@ -301,30 +336,31 @@ class Route
     }
 
     /**
-     * @param array $validators
+     * @param array        $validators
+     * @param Closure|null $error
      * @return Route
      */
-    public function validator( array $validators ): self
+    public function validator( array $validators, Closure $error = null ): self
     {
         $this->validators = $validators;
+        $this->error      = $error;
 
         return $this;
     }
 
     /**
-     * @param Request  $request
      * @param Response $response
      * @return Response
      */
-    public function dispatcher(Request $request, Response $response): Response
+    public function dispatcher( Response $response ): Response
     {
-        $dispatcher = new Dispatcher($request, $response);
+        $dispatcher = new Dispatcher($this->request, $response);
 
         foreach( $this->middlewares as $middleware ) {
             $dispatcher->pipe(new $middleware());
         }
 
-        return $dispatcher->handle($this->request);
+        return $dispatcher->handle();
     }
 
     /**

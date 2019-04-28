@@ -119,10 +119,12 @@ Router::get('//{projkey}.modelo.test/user/{id}/test/{comment}',
         dd($inputs);
     })
     ->where('id', '[a-z0-9]+')
+    ->where('projkey', '[a-z0-9]+')
     ->validator([
-        'id'   => 'required|int',
-        'tel'  => 'required|phone',
-        'csrf' => 'required|csrf:@salt',
+        'projkey' => 'required|string',
+        'id'      => 'required|int',
+        'tel'     => 'required|phone',
+        'csrf'    => 'required|csrf:@salt',
     ])
     ->middlewares([
         QuoteMiddleWare::class,
