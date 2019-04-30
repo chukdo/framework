@@ -3,6 +3,7 @@
 namespace Chukdo\Routing;
 
 use Chukdo\Http\HttpException;
+use Chukdo\Http\Response;
 use Closure;
 use Chukdo\Bootstrap\App;
 use Chukdo\Http\Request;
@@ -67,6 +68,7 @@ class Router
      */
     public function stack( string $method, string $uri, Closure $closure ): Route
     {
+
         $route         = new Route($method, $uri, $this->request, $closure);
         $this->stack[] = $route;
 
@@ -126,21 +128,11 @@ class Router
     /**
      * @return Router
      */
-    public function route(): self
+    public function route(): Response
     {
         foreach( $this->stack as $route ) {
             if( $route->match() ) {
-                $response = $route->dispatcher($this->response);
-                $validate = $route->validate();
-
-                if( $validate->fails() ) {
-                    $route->error($validate->errors(), $response);
-                }
-                else {
-                    $route->invoke($validate->validated(), $response);
-                }
-
-                return $this;
+                return $route->dispatcher($this->response);
             }
         }
 

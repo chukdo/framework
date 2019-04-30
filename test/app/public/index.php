@@ -98,11 +98,20 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 {
     public function process( \Chukdo\Middleware\Dispatcher $dispatcher ): \Chukdo\Http\Response
     {
+        $request  = $dispatcher->request();
+
+        // check token
+        // check useracl
+            // ok => handle()
+
+        // tout se passe et ajouter tag <ga> ? cela fonctionne si app = middleware
+        // transforme ma closure en un middleware special et qui traitera les validators ! puis send
+
         $response = $dispatcher->handle();
 
         $response->prepend('--');
         $response->append('--');
-
+//dd('ok');
         return $response;
     }
 }
@@ -111,12 +120,24 @@ Request::Inputs()
     ->set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, Conf::get('salt')));
 Request::Inputs()
     ->set('tel', '+33626148328');
-
+dd(Request::instance()->url());
 // gestion des vues au niveau du routeur
-
+Router::get('//*',
+    function( $inputs, $response ) {
+        return $response->content('all_toto2')->send();
+    })
+    ->validator([
+        'tel'     => 'required|phone',
+        'csrf'    => 'required|csrf:@salt',
+    ])
+    ->middlewares([
+        QuoteMiddleWare::class,
+        UnderscoreMiddleWare::class,
+        TraitMiddleWare::class,
+    ]);
 Router::get('//{projkey}.modelo.test/user/{id}/test/{comment}',
-    function( \Chukdo\Json\Input $inputs ) {
-        dd($inputs);
+    function( $inputs, $response ) {
+        return $response->content('toto2')->send();
     })
     ->where('id', '[a-z0-9]+')
     ->where('projkey', '[a-z0-9]+')

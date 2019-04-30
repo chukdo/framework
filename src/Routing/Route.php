@@ -6,10 +6,9 @@ use Chukdo\Helper\Str;
 use Chukdo\Http\Request;
 use Chukdo\Http\Response;
 use Chukdo\Http\Url;
-use Chukdo\Json\Input;
-use Chukdo\Json\Message;
+use Chukdo\Json\Input;;
+use Chukdo\Middleware\AppMiddleware;
 use Chukdo\Middleware\Dispatcher;
-use Chukdo\Validation\Validator;
 use Closure;
 
 /**
@@ -69,11 +68,10 @@ class Route
 
     /**
      * Route constructor.
-     * @param string   $method
-     * @param string   $uri
-     * @param Request  $request
-     * @param Response $response
-     * @param Closure  $closure
+     * @param string  $method
+     * @param string  $uri
+     * @param Request $request
+     * @param Closure $closure
      */
     public function __construct( string $method, string $uri, Request $request, Closure $closure )
     {
@@ -298,44 +296,6 @@ class Route
     }
 
     /**
-     * @param Message  $errors
-     * @param Response $response
-     * @return Route
-     */
-    public function error( Message $errors, Response $response ): self
-    {
-        if ($this->error) {
-            ($this->error)($errors, $response);
-            return $this;
-        }
-
-        switch( $this->request->render() ) {
-            case 'json' :
-                $response->json($errors);
-                break;
-            case 'xml' :
-                $response->xml($errors);
-                break;
-            default :
-                $response->html($errors->toHtml('Input Errors', '#dd0000'));
-        }
-
-        $response->send();
-
-        return $this;
-    }
-
-    /**
-     * @return Validator
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
-     */
-    public function validate(): Validator
-    {
-        return $this->request->validate($this->validators);
-    }
-
-    /**
      * @param array        $validators
      * @param Closure|null $error
      * @return Route
@@ -359,6 +319,8 @@ class Route
         foreach( $this->middlewares as $middleware ) {
             $dispatcher->pipe(new $middleware());
         }
+
+        $dispatcher->pipe(new AppMiddleware($this->closure, $this->error, $this->validators));
 
         return $dispatcher->handle();
     }
