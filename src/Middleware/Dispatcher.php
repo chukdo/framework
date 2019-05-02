@@ -74,8 +74,7 @@ class Dispatcher
      */
     public function pipe( MiddlewareInterface $middleware ): self
     {
-        $this->middlewares[] = $middleware;
-        //array_unshift($this->middlewares, $middleware);
+        array_unshift($this->middlewares, $middleware);
 
         return $this;
     }

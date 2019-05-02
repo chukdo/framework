@@ -2,13 +2,13 @@
 
 namespace Chukdo\Middleware;
 
-use Chukdo\Contracts\Middleware\Middleware as MiddlewareInterface;
 use Chukdo\Http\Request;
 use Chukdo\Http\Response;
 use Chukdo\Json\Message;
+use Chukdo\Routing\Route;
 use Closure;
 
-class AppMiddleware implements MiddlewareInterface
+class AppMiddleware extends ClosureMiddleware
 {
     /**
      * @var \Closure
@@ -27,15 +27,24 @@ class AppMiddleware implements MiddlewareInterface
 
     /**
      * AppMiddleware constructor.
-     * @param Closure      $closure
-     * @param Closure|null $error
-     * @param array        $validators
+     * @param Closure $closure
      */
-    public function __construct( \Closure $closure, \Closure $error = null, array $validators = [] )
+    public function __construct( \Closure $closure )
+    {
+        $this->closure = $closure;
+    }
+
+    /**
+     * @param array        $validators
+     * @param Closure|null $error
+     * @return Route
+     */
+    public function validator( array $validators, Closure $error = null ): self
     {
         $this->validators = $validators;
-        $this->closure    = $closure;
         $this->error      = $error;
+
+        return $this;
     }
 
     /**

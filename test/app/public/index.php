@@ -41,6 +41,7 @@ $app->registerHandleExceptions()
         Providers\LoggerHandlerServiceProvider::class,
         Providers\ExceptionLoggerServiceProvider::class,
         Providers\ValidatorServiceProvider::class,
+        Providers\AppServiceProvider::class,
     ]);
 
 /* Facades */
@@ -66,12 +67,11 @@ Conf::loadFile(CONF_PATH . 'Conf.json');
 App::env(App::conf('env'));
 App::channel('orpi');
 
-Response::content('test');
-
 class QuoteMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 {
     public function process( \Chukdo\Middleware\Dispatcher $dispatcher ): \Chukdo\Http\Response
     {
+
         $response = $dispatcher->handle();
 
         $response->prepend('"');
@@ -111,7 +111,7 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 
         $response->prepend('--');
         $response->append('--');
-//dd('ok');
+
         return $response;
     }
 }
@@ -120,11 +120,10 @@ Request::Inputs()
     ->set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, Conf::get('salt')));
 Request::Inputs()
     ->set('tel', '+33626148328');
-dd(Request::instance()->url());
-// gestion des vues au niveau du routeur
-Router::get('//*',
+// route pour la console !!!
+Router::console('',
     function( $inputs, $response ) {
-        return $response->content('all_toto2')->send();
+        return $response->content('all_toto2');
     })
     ->validator([
         'tel'     => 'required|phone',
@@ -137,7 +136,7 @@ Router::get('//*',
     ]);
 Router::get('//{projkey}.modelo.test/user/{id}/test/{comment}',
     function( $inputs, $response ) {
-        return $response->content('toto2')->send();
+        return $response->content('toto2');
     })
     ->where('id', '[a-z0-9]+')
     ->where('projkey', '[a-z0-9]+')
@@ -152,8 +151,8 @@ Router::get('//{projkey}.modelo.test/user/{id}/test/{comment}',
         UnderscoreMiddleWare::class,
         TraitMiddleWare::class,
     ]);
-Router::route();
-
+Router::route()->send();
+// cli -u = url parsable !!!
 exit;
 /**
  * Dispatcher::response()

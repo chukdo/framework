@@ -6,7 +6,10 @@ use Chukdo\Helper\Str;
 use Chukdo\Http\Request;
 use Chukdo\Http\Response;
 use Chukdo\Http\Url;
-use Chukdo\Json\Input;;
+use Chukdo\Json\Input;
+
+;
+
 use Chukdo\Middleware\AppMiddleware;
 use Chukdo\Middleware\Dispatcher;
 use Closure;
@@ -315,12 +318,14 @@ class Route
     public function dispatcher( Response $response ): Response
     {
         $dispatcher = new Dispatcher($this->request, $response);
+        $app        = new AppMiddleware($this->closure);
+
+        $app->validator($this->validators, $this->error);
+        $dispatcher->pipe($app);
 
         foreach( $this->middlewares as $middleware ) {
             $dispatcher->pipe(new $middleware());
         }
-
-        $dispatcher->pipe(new AppMiddleware($this->closure, $this->error, $this->validators));
 
         return $dispatcher->handle();
     }
