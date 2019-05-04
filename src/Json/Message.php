@@ -2,6 +2,8 @@
 
 namespace Chukdo\Json;
 
+use Chukdo\Http\Response;
+
 /**
  * Gestion des messages.
  * @version      1.0.0
@@ -17,14 +19,60 @@ class Message extends Json
     protected $name;
 
     /**
+     * @var
+     */
+    protected $render;
+
+    /**
      * Message constructor.
      * @param string $name
+     * @param string $render
      */
-    public function __construct( string $name )
+    public function __construct( string $name, string $render = 'html' )
     {
-        $this->name = $name;
+        $this->name   = $name;
+        $this->render = $render;
 
         parent::__construct([]);
+    }
+
+    /**
+     * @return string
+     */
+    public function name(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function render(): string
+    {
+        return $this->render;
+    }
+
+    /**
+     * @param Response|null $response
+     * @return Response
+     */
+    public function response( Response $response = null ): Response
+    {
+        $response = $response
+            ?: new Response();
+
+        switch( $this->render ) {
+            case 'json' :
+                $response->json($this);
+                break;
+            case 'xml' :
+                $response->xml($this);
+                break;
+            default :
+                $response->html($this->toHtml(null, '#dd0000'));
+        }
+
+        return $response;
     }
 
     /**
@@ -35,7 +83,10 @@ class Message extends Json
      */
     public function toHtml( string $title = null, string $color = null, string $widthFirstCol = null ): string
     {
-        return parent::toHtml($title ?: $this->name, $color);
+        return parent::toHtml($title
+            ?: $this->name,
+            $color,
+            $widthFirstCol);
     }
 
     /**

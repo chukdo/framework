@@ -60,11 +60,6 @@ class Route
     protected $validators = [];
 
     /**
-     * @var Closure
-     */
-    protected $error;
-
-    /**
      * @var ?string
      */
     protected $name = null;
@@ -299,14 +294,12 @@ class Route
     }
 
     /**
-     * @param array        $validators
-     * @param Closure|null $error
+     * @param array $validators
      * @return Route
      */
-    public function validator( array $validators, Closure $error = null ): self
+    public function validator( array $validators ): self
     {
         $this->validators = $validators;
-        $this->error      = $error;
 
         return $this;
     }
@@ -320,7 +313,7 @@ class Route
         $dispatcher = new Dispatcher($this->request, $response);
         $app        = new AppMiddleware($this->closure);
 
-        $app->validator($this->validators, $this->error);
+        $app->validator($this->validators);
         $dispatcher->pipe($app);
 
         foreach( $this->middlewares as $middleware ) {

@@ -19,11 +19,6 @@ class ClosureMiddleware implements MiddlewareInterface
     protected $validators = [];
 
     /**
-     * @var Closure
-     */
-    protected $error;
-
-    /**
      * ClosureMiddleware constructor.
      * @param Closure $closure
      */

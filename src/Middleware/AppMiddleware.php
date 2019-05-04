@@ -2,10 +2,7 @@
 
 namespace Chukdo\Middleware;
 
-use Chukdo\Http\Request;
 use Chukdo\Http\Response;
-use Chukdo\Json\Message;
-use Chukdo\Routing\Route;
 use Closure;
 
 class AppMiddleware extends ClosureMiddleware
@@ -35,14 +32,12 @@ class AppMiddleware extends ClosureMiddleware
     }
 
     /**
-     * @param array        $validators
-     * @param Closure|null $error
-     * @return Route
+     * @param array $validators
+     * @return AppMiddleware
      */
-    public function validator( array $validators, Closure $error = null ): self
+    public function validator( array $validators ): self
     {
         $this->validators = $validators;
-        $this->error      = $error;
 
         return $this;
     }
@@ -59,37 +54,11 @@ class AppMiddleware extends ClosureMiddleware
             ->validate($this->validators);
 
         if( $validate->fails() ) {
-            return $this->error($validate->errors(), $delegate->request(), $delegate->response());
+            return $validate->errors()
+                ->response($delegate->response())
+                ->send();
         }
 
         return ($this->closure)($validate->validated(), $delegate->response());
-    }
-
-    /**
-     * @param Message  $errors
-     * @param Request  $request
-     * @param Response $response
-     * @return Response
-     */
-    protected function error( Message $errors, Request $request, Response $response ): Response
-    {
-        if( $this->error ) {
-            return ($this->error)($errors, $response);
-        }
-
-        switch( $request->render() ) {
-            case 'json' :
-                $response->json($errors);
-                break;
-            case 'xml' :
-                $response->xml($errors);
-                break;
-            default :
-                $response->html($errors->toHtml('Input Errors', '#dd0000'));
-        }
-
-        $response->send();
-
-        return $response;
     }
 }

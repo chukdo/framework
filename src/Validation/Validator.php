@@ -59,7 +59,7 @@ class Validator
     public function __construct( Request $request )
     {
         $this->request   = $request;
-        $this->error     = new Message('error');
+        $this->error     = new Message('error', $request->render());
         $this->validated = new Input([]);
         $this->inputs    = $request->inputs();
     }
