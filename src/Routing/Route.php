@@ -2,17 +2,13 @@
 
 namespace Chukdo\Routing;
 
+use Chukdo\Contracts\Middleware\Middleware as MiddlewareInterface;
 use Chukdo\Helper\Str;
 use Chukdo\Http\Request;
 use Chukdo\Http\Response;
 use Chukdo\Http\Url;
-use Chukdo\Json\Input;
-
-;
-
 use Chukdo\Middleware\AppMiddleware;
 use Chukdo\Middleware\Dispatcher;
-use Closure;
 
 /**
  * Gestion d'une Route.
@@ -39,9 +35,9 @@ class Route
     protected $request;
 
     /**
-     * @var Closure
+     * @var AppMiddleware
      */
-    protected $closure;
+    protected $appMiddleware;
 
     /**
      * @var array
@@ -66,29 +62,17 @@ class Route
 
     /**
      * Route constructor.
-     * @param string  $method
-     * @param string  $uri
-     * @param Request $request
-     * @param Closure $closure
+     * @param string              $method
+     * @param string              $uri
+     * @param Request             $request
+     * @param MiddlewareInterface $appMiddleware
      */
-    public function __construct( string $method, string $uri, Request $request, Closure $closure )
+    public function __construct( string $method, string $uri, Request $request, MiddlewareInterface $appMiddleware )
     {
-        $this->method  = $method;
-        $this->uri     = new Url($uri);
-        $this->closure = $closure;
-        $this->request = $request;
-    }
-
-    /**
-     * @param Input    $input
-     * @param Response $response
-     * @return Route
-     */
-    public function invoke( Input $input, Response $response ): self
-    {
-        ($this->closure)($input, $response);
-
-        return $this;
+        $this->method        = $method;
+        $this->uri           = new Url($uri);
+        $this->appMiddleware = $appMiddleware;
+        $this->request       = $request;
     }
 
     /**
@@ -311,10 +295,7 @@ class Route
     public function dispatcher( Response $response ): Response
     {
         $dispatcher = new Dispatcher($this->request, $response);
-        $app        = new AppMiddleware($this->closure);
-
-        $app->validator($this->validators);
-        $dispatcher->pipe($app);
+        $dispatcher->pipe($this->appMiddleware->validator($this->validators));
 
         foreach( $this->middlewares as $middleware ) {
             $dispatcher->pipe(new $middleware());

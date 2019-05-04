@@ -18,11 +18,6 @@ class AppMiddleware extends ClosureMiddleware
     protected $validators = [];
 
     /**
-     * @var Closure
-     */
-    protected $error;
-
-    /**
      * AppMiddleware constructor.
      * @param Closure $closure
      */

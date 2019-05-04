@@ -4,6 +4,7 @@ namespace Chukdo\Routing;
 
 use Chukdo\Http\HttpException;
 use Chukdo\Http\Response;
+use Chukdo\Middleware\AppMiddleware;
 use Closure;
 use Chukdo\Bootstrap\App;
 use Chukdo\Http\Request;
@@ -51,76 +52,88 @@ class Router
     }
 
     /**
-     * @param string  $uri
-     * @param Closure $closure
+     * @param string         $uri
+     * @param Closure|string $closure
      * @return Route
      */
-    public function get( string $uri, Closure $closure ): Route
+    public function get( string $uri, $closure ): Route
     {
         return $this->stack('GET', $uri, $closure);
     }
 
     /**
-     * @param string  $method
-     * @param string  $uri
-     * @param Closure $closure
+     * @param string         $method
+     * @param string         $uri
+     * @param Closure|string $closure
      * @return Route
      */
-    public function stack( string $method, string $uri, Closure $closure ): Route
+    public function stack( string $method, string $uri, $closure ): Route
     {
+        if( $closure instanceof Closure ) {
+            $appMiddleware = new AppMiddleware($closure);
+        }
+        elseif( is_string($closure) ) {
+            /**$appMiddleware = new AppMiddleware(function( $input, $response ) use ( $closure ) {
+                $class = new $closure($request, $response);
+                return $class->xyz($input);
+            });*/
+        }
+        else {
+            throw new HttpException('Router stack need a Closure or a String');
+        }
 
-        $route         = new Route($method, $uri, $this->request, $closure);
+        $route         = new Route($method, $uri, $this->request, $appMiddleware);
         $this->stack[] = $route;
 
         return $route;
     }
 
     /**
-     * @param string  $uri
-     * @param Closure $closure
+     * @param string         $uri
+     * @param Closure|string $closure
      * @return Route
      */
-    public function post( string $uri, Closure $closure ): Route
+    public function post( string $uri, $closure ): Route
     {
         return $this->stack('POST', $uri, $closure);
     }
 
     /**
-     * @param string  $uri
-     * @param Closure $closure
+     * @param string         $uri
+     * @param Closure|string $closure
      * @return Route
      */
-    public function put( string $uri, Closure $closure ): Route
+    public function put( string $uri, $closure ): Route
     {
         return $this->stack('PUT', $uri, $closure);
     }
 
     /**
-     * @param string  $uri
-     * @param Closure $closure
+     * @param string         $uri
+     * @param Closure|string $closure
      * @return Route
      */
-    public function delete( string $uri, Closure $closure ): Route
+    public function delete( string $uri, $closure ): Route
     {
         return $this->stack('DELETE', $uri, $closure);
     }
 
     /**
-     * @param string  $uri
-     * @param Closure $closure
+     * @param string         $uri
+     * @param Closure|string $closure
      * @return Route
      */
-    public function any( string $uri, Closure $closure ): Route
+    public function any( string $uri, $closure ): Route
     {
         return $this->stack('ALL', $uri, $closure);
     }
 
     /**
-     * @param string  $uri
-     * @param Closure $closure
+     * @param string         $uri
+     * @param Closure|string $closure
      * @return Route
      */
-    public function console( string $uri, Closure $closure ): Route
+    public function console( string $uri, $closure ): Route
     {
         return $this->stack('CLI', $uri, $closure);
     }

@@ -67,8 +67,15 @@ Conf::loadFile(CONF_PATH . 'Conf.json');
 App::env(App::conf('env'));
 App::channel('orpi');
 
+/**
+ * Class QuoteMiddleWare
+ */
 class QuoteMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 {
+    /**
+     * @param \Chukdo\Middleware\Dispatcher $dispatcher
+     * @return \Chukdo\Http\Response
+     */
     public function process( \Chukdo\Middleware\Dispatcher $dispatcher ): \Chukdo\Http\Response
     {
 
@@ -81,8 +88,15 @@ class QuoteMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
     }
 }
 
+/**
+ * Class UnderscoreMiddleWare
+ */
 class UnderscoreMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 {
+    /**
+     * @param \Chukdo\Middleware\Dispatcher $dispatcher
+     * @return \Chukdo\Http\Response
+     */
     public function process( \Chukdo\Middleware\Dispatcher $dispatcher ): \Chukdo\Http\Response
     {
         $response = $dispatcher->handle();
@@ -94,19 +108,17 @@ class UnderscoreMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
     }
 }
 
+/**
+ * Class TraitMiddleWare
+ */
 class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 {
+    /**
+     * @param \Chukdo\Middleware\Dispatcher $dispatcher
+     * @return \Chukdo\Http\Response
+     */
     public function process( \Chukdo\Middleware\Dispatcher $dispatcher ): \Chukdo\Http\Response
     {
-        $request  = $dispatcher->request();
-
-        // check token
-        // check useracl
-            // ok => handle()
-
-        // tout se passe et ajouter tag <ga> ? cela fonctionne si app = middleware
-        // transforme ma closure en un middleware special et qui traitera les validators ! puis send
-
         $response = $dispatcher->handle();
 
         $response->prepend('--');
