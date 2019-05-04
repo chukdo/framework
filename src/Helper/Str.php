@@ -35,11 +35,11 @@ final class Str
 
     /**
      * Verifie si une chaine de caractere ne contient pas une autre chaine de caractere.
-     * @param string $haystack La chaîne dans laquelle on doit chercher
-     * @param string $needle   valeur recherché
+     * @param string|null $haystack La chaîne dans laquelle on doit chercher
+     * @param string|null $needle   valeur recherché
      * @return bool
      */
-    public static function notContain( string $haystack, string $needle ): bool
+    public static function notContain( ?string $haystack, ?string $needle ): bool
     {
         return !self::contain($haystack,
             $needle);
@@ -47,11 +47,11 @@ final class Str
 
     /**
      * Verifie si une chaine de caractere contient une autre chaine de caractere.
-     * @param string $haystack La chaîne dans laquelle on doit chercher
-     * @param string $needle   valeur recherché
+     * @param string|null $haystack La chaîne dans laquelle on doit chercher
+     * @param string|null $needle   valeur recherché
      * @return bool
      */
-    public static function contain( string $haystack, string $needle ): bool
+    public static function contain( ?string $haystack, ?string $needle ): bool
     {
         return strpos($haystack,
             $needle) === false

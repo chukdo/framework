@@ -3,6 +3,7 @@
 namespace Chukdo\Http;
 
 use Chukdo\Bootstrap\App;
+use Chukdo\Helper\Cli;
 use Chukdo\Helper\Str;
 use Chukdo\Helper\Http;
 use Chukdo\Json\Json;
@@ -55,9 +56,12 @@ class Request
         $this->app    = $app;
         $this->inputs = $app->make('Chukdo\Json\Input', true);
         $this->header = new Header();
-        $this->url    = new Url(Http::server('SCRIPT_URI'));
-        $this->method = Http::request('httpverb')
-            ?: Http::server('REQUEST_METHOD');
+        $this->url    = new Url(Cli::runningInConsole()
+            ? Cli::uri()
+            : Http::server('SCRIPT_URI'));
+        $this->method = Cli::runningInConsole()
+            ? 'CLI'
+            : Http::request('httpverb', Http::server('REQUEST_METHOD'));
 
         $this->header->setHeader('Content-Type',
             Http::server('CONTENT_TYPE',
@@ -235,7 +239,8 @@ class Request
      */
     public function render(): string
     {
-        $render = Str::extension($this->url()->getPath());
+        $render = Str::extension($this->url()
+            ->getPath());
 
         if( $render ) {
             return $render;

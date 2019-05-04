@@ -133,8 +133,9 @@ Request::Inputs()
 Request::Inputs()
     ->set('tel', '+33626148328');
 // route pour la console !!!
-Router::console('',
+Router::console('/test/toto',
     function( $inputs, $response ) {
+    dd($inputs);
         return $response->content('all_toto2');
     })
     ->validator([

@@ -2,8 +2,8 @@
 
 namespace Chukdo\Json;
 
+use Chukdo\Helper\Cli;
 use Chukdo\Storage\FileUploaded;
-use Chukdo\Validation\Validator;
 
 /**
  * Gestion des inputs.
@@ -20,9 +20,10 @@ class Input extends Json
      */
     public function __construct( $data = null )
     {
-        $data = $data === null
-            ? $_REQUEST
-            : $data;
+        $data = $data
+            ?: (Cli::runningInConsole()
+                ? Cli::inputs()
+                : $_REQUEST);
 
         /* Trim all input */
         array_walk_recursive($data,
@@ -36,9 +37,9 @@ class Input extends Json
     }
 
     /**
-     * @param string      $name
+     * @param string $name
      * @param string|null $allowedMimeTypes
-     * @param int|null    $maxFileSize
+     * @param int|null $maxFileSize
      * @return FileUploaded|null
      */
     public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): ?FileUploaded

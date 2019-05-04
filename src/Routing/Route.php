@@ -89,10 +89,12 @@ class Route
     public function match(): bool
     {
         if( $this->matchMethod() ) {
-            if( $this->matchDomain() ) {
-                if( $this->matchSubDomain() ) {
-                    if( $this->matchPath() ) {
-                        return true;
+            if( $this->matchScheme() ) {
+                if( $this->matchDomain() ) {
+                    if( $this->matchSubDomain() ) {
+                        if( $this->matchPath() ) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -109,6 +111,23 @@ class Route
         $method = $this->request->method();
 
         if( $this->method == $method || $this->method == 'ALL' ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function matchScheme(): bool
+    {
+        $requestScheme = $this->request->url()
+            ->getScheme();
+        $routeScheme   = $this->uri()
+            ->getScheme();
+
+        if( $requestScheme == $routeScheme || $routeScheme == 'file' ) {
             return true;
         }
 
