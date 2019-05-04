@@ -73,10 +73,7 @@ class Router
             $appMiddleware = new AppMiddleware($closure);
         }
         elseif( is_string($closure) ) {
-            /**$appMiddleware = new AppMiddleware(function( $input, $response ) use ( $closure ) {
-                $class = new $closure($request, $response);
-                return $class->xyz($input);
-            });*/
+
         }
         else {
             throw new HttpException('Router stack need a Closure or a String');
