@@ -136,13 +136,13 @@ class Router
     }
 
     /**
-     * @return Router
+     * @return Response
      */
     public function route(): Response
     {
         foreach( $this->stack as $route ) {
             if( $route->match() ) {
-                return $route->dispatcher($this->response);
+                return $route->dispatcher($this->response)->send();
             }
         }
 

@@ -106,6 +106,30 @@ class Response
     }
 
     /**
+     * @return Header
+     */
+    public function getHeaders(): Header
+    {
+        return $this->header;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getContent(): ?string
+    {
+        return $this->content;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFile(): ?string
+    {
+        return $this->file;
+    }
+
+    /**
      * @param string $name
      * @param string $cookie
      * @return Response

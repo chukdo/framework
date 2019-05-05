@@ -2,6 +2,7 @@
 
 namespace Chukdo\Middleware;
 
+use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
 use Chukdo\Http\Response;
 use Closure;
 
@@ -18,6 +19,11 @@ class AppMiddleware extends ClosureMiddleware
     protected $validators = [];
 
     /**
+     * @var ErrorMiddlewareInterface
+     */
+    protected $errorMiddleware = null;
+
+    /**
      * AppMiddleware constructor.
      * @param Closure $closure
      */
@@ -27,12 +33,14 @@ class AppMiddleware extends ClosureMiddleware
     }
 
     /**
-     * @param array $validators
+     * @param array                         $validators
+     * @param ErrorMiddlewareInterface|null $errorMiddleware
      * @return AppMiddleware
      */
-    public function validator( array $validators ): self
+    public function validator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
     {
-        $this->validators = $validators;
+        $this->validators      = $validators;
+        $this->errorMiddleware = $errorMiddleware;
 
         return $this;
     }
@@ -49,9 +57,9 @@ class AppMiddleware extends ClosureMiddleware
             ->validate($this->validators);
 
         if( $validate->fails() ) {
-            return $validate->errors()
-                ->response($delegate->response())
-                ->send();
+            return ($this->errorMiddleware
+                ?: new ErrorMiddleware())->errorMessage($validate->errors())
+                ->process($delegate);
         }
 
         return ($this->closure)($validate->validated(), $delegate->response());

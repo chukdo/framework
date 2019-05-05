@@ -53,29 +53,6 @@ class Message extends Json
     }
 
     /**
-     * @param Response|null $response
-     * @return Response
-     */
-    public function response( Response $response = null ): Response
-    {
-        $response = $response
-            ?: new Response();
-
-        switch( $this->render ) {
-            case 'json' :
-                $response->json($this);
-                break;
-            case 'xml' :
-                $response->xml($this);
-                break;
-            default :
-                $response->html($this->toHtml(null, '#dd0000'));
-        }
-
-        return $response;
-    }
-
-    /**
      * @param string|null $title
      * @param string|null $color
      * @param string|null $widthFirstCol

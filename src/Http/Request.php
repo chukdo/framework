@@ -239,6 +239,10 @@ class Request
      */
     public function render(): string
     {
+        if (Cli::runningInConsole()) {
+            return 'cli';
+        }
+
         $render = Str::extension($this->url()
             ->getPath());
 

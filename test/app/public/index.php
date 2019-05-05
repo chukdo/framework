@@ -78,11 +78,12 @@ class QuoteMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
      */
     public function process( \Chukdo\Middleware\Dispatcher $dispatcher ): \Chukdo\Http\Response
     {
-
         $response = $dispatcher->handle();
 
-        $response->prepend('"');
-        $response->append('"');
+        if ($response->getHeaders()->getStatus() == 200) {
+            $response->prepend('"');
+            $response->append('"');
+        }
 
         return $response;
     }
@@ -101,9 +102,10 @@ class UnderscoreMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
     {
         $response = $dispatcher->handle();
 
-        $response->prepend('__');
-        $response->append('__');
-
+        if ($response->getHeaders()->getStatus() == 200) {
+            $response->prepend('__');
+            $response->append('__');
+        }
         return $response;
     }
 }
@@ -121,8 +123,10 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
     {
         $response = $dispatcher->handle();
 
-        $response->prepend('--');
-        $response->append('--');
+        if ($response->getHeaders()->getStatus() == 200) {
+            $response->prepend('--');
+            $response->append('--');
+        }
 
         return $response;
     }
@@ -139,6 +143,7 @@ Router::console('/test/toto',
         return $response->content('all_toto2');
     })
     ->validator([
+        'a'     => 'required|string:3',
         'tel'     => 'required|phone',
         'csrf'    => 'required|csrf:@salt',
     ])
@@ -164,8 +169,8 @@ Router::get('//{projkey}.modelo.test/user/{id}/test/{comment}',
         UnderscoreMiddleWare::class,
         TraitMiddleWare::class,
     ]);
-Router::route()->send();
-// cli -u = url parsable !!!
+Router::route();
+
 exit;
 /**
  * Dispatcher::response()

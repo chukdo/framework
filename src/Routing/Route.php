@@ -2,6 +2,7 @@
 
 namespace Chukdo\Routing;
 
+use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
 use Chukdo\Contracts\Middleware\Middleware as MiddlewareInterface;
 use Chukdo\Helper\Str;
 use Chukdo\Http\Request;
@@ -49,6 +50,11 @@ class Route
      * @var array
      */
     protected $middlewares = [];
+
+    /**
+     * @var ErrorMiddlewareInterface
+     */
+    protected $errorMiddleware = null;
 
     /**
      * @var array
@@ -297,12 +303,14 @@ class Route
     }
 
     /**
-     * @param array $validators
+     * @param array                         $validators
+     * @param ErrorMiddlewareInterface|null $errorMiddleware
      * @return Route
      */
-    public function validator( array $validators ): self
+    public function validator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
     {
-        $this->validators = $validators;
+        $this->validators      = $validators;
+        $this->errorMiddleware = $errorMiddleware;
 
         return $this;
     }
@@ -314,7 +322,7 @@ class Route
     public function dispatcher( Response $response ): Response
     {
         $dispatcher = new Dispatcher($this->request, $response);
-        $dispatcher->pipe($this->appMiddleware->validator($this->validators));
+        $dispatcher->pipe($this->appMiddleware->validator($this->validators, $this->errorMiddleware));
 
         foreach( $this->middlewares as $middleware ) {
             $dispatcher->pipe(new $middleware());
