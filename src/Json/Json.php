@@ -5,6 +5,7 @@ namespace Chukdo\Json;
 use ArrayObject;
 use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
+use Chukdo\Helper\To;
 use Chukdo\Xml\Xml;
 use Closure;
 
@@ -667,37 +668,24 @@ class Json extends \ArrayObject
      */
     public function toHtml( string $title = null, string $color = null, string $widthFirstCol = null ): string
     {
-        $html  = '';
-        $style = 'border-spacing:0;border-collapse:collapse;font-family:Arial;width:100%;word-break:break-word;';
-
-        if( $title ) {
-            $color = $color
-                ?: '#499cef';
-            $html  .= '<thead style="color: #fff;background: ' . $color
-                      . ';"><tr><th colspan="2" style="padding:20px;font-size:30px;">' . ucfirst($title)
-                      . "</th></tr></thead>";
-        }
-
-        foreach( $this as $k => $v ) {
-            $v = $this->instanceOfJson($v)
-                ? $v->toHtml(null,
-                    null,
-                    $widthFirstCol)
-                : $v;
-
-            $html .= '<tr><td style="background:#eee;padding:6px;border:1px solid #eee;width:' . $widthFirstCol . ';">'
-                     . $k . '</td><td  style="padding:6px;border:1px solid #eee;">' . $v . '</td></tr>';
-        }
-
-        return '<table id="JsonTableRender" style="' . $style . '">' . $html . '</table>';
+        return To::html($this, $title, $color, $widthFirstCol);
     }
 
-    public function toConsole(): void
+    /**
+     * @param string|null $title
+     * @return string
+     */
+    public function toConsole( string $title = null ): string
     {
+        ob_start();
         $tree = new \cli\Tree();
         $tree->setData($this->toArray());
         $tree->setRenderer(new \cli\tree\Ascii());
         $tree->display();
+        $stdout = ob_get_contents();
+        ob_end_clean();
+
+        return $stdout;
     }
 
     /**

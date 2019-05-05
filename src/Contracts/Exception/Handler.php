@@ -22,9 +22,4 @@ interface Handler
      * @param Exception $e
      */
     public function render( Exception $e ): void;
-
-    /**
-     * @param Exception $e
-     */
-    public function renderForConsole( Exception $e ): void;
 }

@@ -254,4 +254,38 @@ final class To
             return $xml;
         }
     }
+
+    /**
+     * @param             $value
+     * @param string|null $title
+     * @param string|null $color
+     * @param int|null    $widthFirstCol
+     * @return string
+     */
+    public static function html( $value, string $title = null, string $color = null, int $widthFirstCol = null) : string
+    {
+        $html  = '';
+        $style = 'border-spacing:0;border-collapse:collapse;font-family:Arial;width:100%;word-break:break-word;';
+
+        if( $title ) {
+            $color = $color
+                ?: '#499cef';
+            $html  .= '<thead style="color: #fff;background: ' . $color
+                      . ';"><tr><th colspan="2" style="padding:20px;font-size:30px;">' . ucfirst($title)
+                      . "</th></tr></thead>";
+        }
+
+        foreach( $value as $k => $v ) {
+            $v = is_iterable($v)
+                ? self::html($v, null,
+                    null,
+                    $widthFirstCol)
+                : $v;
+
+            $html .= '<tr><td style="background:#eee;padding:6px;border:1px solid #eee;width:' . $widthFirstCol . ';">'
+                     . $k . '</td><td  style="padding:6px;border:1px solid #eee;">' . $v . '</td></tr>';
+        }
+
+        return '<table id="ToHtml" style="' . $style . '">' . $html . '</table>';
+    }
 }

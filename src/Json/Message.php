@@ -2,7 +2,7 @@
 
 namespace Chukdo\Json;
 
-use Chukdo\Http\Response;
+use Chukdo\Helper\To;
 
 /**
  * Gestion des messages.
@@ -19,19 +19,13 @@ class Message extends Json
     protected $name;
 
     /**
-     * @var
-     */
-    protected $render;
-
-    /**
      * Message constructor.
      * @param string $name
      * @param string $render
      */
-    public function __construct( string $name, string $render = 'html' )
+    public function __construct( string $name )
     {
-        $this->name   = $name;
-        $this->render = $render;
+        $this->name = $name;
 
         parent::__construct([]);
     }
@@ -45,14 +39,6 @@ class Message extends Json
     }
 
     /**
-     * @return string
-     */
-    public function render(): string
-    {
-        return $this->render;
-    }
-
-    /**
      * @param string|null $title
      * @param string|null $color
      * @param string|null $widthFirstCol
@@ -60,8 +46,9 @@ class Message extends Json
      */
     public function toHtml( string $title = null, string $color = null, string $widthFirstCol = null ): string
     {
-        return parent::toHtml($title
-            ?: $this->name,
+        return To::html($this,
+            $title
+                ?: $this->name,
             $color,
             $widthFirstCol);
     }

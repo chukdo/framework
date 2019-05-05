@@ -54,14 +54,6 @@ class App extends Service
     }
 
     /**
-     * @return bool
-     */
-    public function runningInConsole(): bool
-    {
-        return php_sapi_name() == 'cli';
-    }
-
-    /**
      * @param string|null $env
      * @return string
      */

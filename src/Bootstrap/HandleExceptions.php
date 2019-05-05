@@ -2,6 +2,7 @@
 
 namespace Chukdo\Bootstrap;
 
+use Chukdo\Helper\Cli;
 use Throwable;
 use Exception;
 use ErrorException;
@@ -103,12 +104,7 @@ class HandleExceptions
         } catch( Throwable $e ) {
         }
 
-        if( $this->app->runningInConsole() ) {
-            $exceptionHandler->renderForConsole($e);
-        }
-        else {
-            $exceptionHandler->render($e);
-        }
+        $exceptionHandler->render($e);
     }
 
     /**

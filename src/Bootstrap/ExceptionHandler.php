@@ -4,8 +4,6 @@ namespace Chukdo\Bootstrap;
 
 use Chukdo\Contracts\Exception\Handler;
 use Chukdo\Helper\Http;
-use Chukdo\Helper\Str;
-use Chukdo\Json\JsonException;
 use Exception;
 
 /**
@@ -47,50 +45,10 @@ class ExceptionHandler implements Handler
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function render( Exception $e ): void
+    public function render(Exception $e): void
     {
-        $response = $this->app->make('Chukdo\Http\Response');
-        $message  = new JsonException();
+        $message  = new ExceptionMessage($e, $this->app->env());
 
-        $message->set('Error', 'Error happened');
-
-        /* Dev mode */
-        if( $this->app->env() == 0 ) {
-            $message->loadException($e);
-        }
-
-        switch( Str::extension(Http::server('SCRIPT_URL')) ) {
-            case 'xml':
-                $content     = $message->toXml()
-                    ->toXmlString();
-                $contentType = Http::mimeContentType('xml');
-                break;
-            case 'json':
-                $content     = $message->toJson(true);
-                $contentType = Http::mimeContentType('json');
-                break;
-            case 'html':
-            default:
-                $content     = $message->toHtml(get_class($e), 500);
-                $contentType = Http::mimeContentType('html');
-        }
-
-        $response->status(500)
-            ->header('Content-Type',
-                $contentType . '; charset=utf-8')
-            ->content($content)
-            ->send()
-            ->end();
-    }
-
-    /**
-     * @param Exception $e
-     */
-    public function renderForConsole( Exception $e ): void
-    {
-        $message = new JsonException();
-        $message->loadException($e)
-            ->toConsole(get_class($e));
-        exit;
+        die($message->render());
     }
 }
