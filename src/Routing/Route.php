@@ -45,11 +45,15 @@ class Route
      */
     protected $wheres = [];
 
-
     /**
      * @var array
      */
     protected $middlewares = [];
+
+    /**
+     * @var string
+     */
+    protected $prefix = null;
 
     /**
      * @var ErrorMiddlewareInterface
@@ -181,8 +185,8 @@ class Route
     {
         $requestPath = $this->request->url()
             ->getPath();
-        $routePath   = $this->uri()
-            ->getPath();
+        $routePath   = $this->prefix . $this->uri()
+                ->getPath();
 
         if( $requestPath == $routePath ) {
             return true;
@@ -351,6 +355,17 @@ class Route
     public function middleware( string $middleware ): self
     {
         $this->middlewares[] = $middleware;
+
+        return $this;
+    }
+
+    /**
+     * @param string $prefix
+     * @return Route
+     */
+    public function prefix( ?string $prefix ): self
+    {
+        $this->prefix = '/' . trim($prefix, '/');
 
         return $this;
     }

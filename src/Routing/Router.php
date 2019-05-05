@@ -39,6 +39,21 @@ class Router
     protected $stack = [];
 
     /**
+     * @var array
+     */
+    protected $middlewares = [];
+
+    /**
+     * @var string
+     */
+    protected $prefix = null;
+
+    /**
+     * @var string
+     */
+    protected $namespace = null;
+
+    /**
      * Router constructor.
      * @param App $app
      * @throws \Chukdo\Bootstrap\ServiceException
@@ -73,7 +88,7 @@ class Router
             $appMiddleware = new AppMiddleware($closure);
         }
         elseif( is_string($closure) ) {
-
+            // namespace
         }
         else {
             throw new HttpException('Router stack need a Closure or a String');
@@ -83,6 +98,41 @@ class Router
         $this->stack[] = $route;
 
         return $route;
+    }
+
+    /**
+     * @param array   $attributes
+     * @param Closure $closure
+     * @return Router
+     */
+    public function group( array $attributes, Closure $closure ): self
+    {
+        $attributes        = array_merge($attributes,
+            [
+                'middleware' => [],
+                'namespace'  => null,
+                'prefix'     => null,
+            ]);
+        $middlewares       = (array) $attributes[ 'middleware' ];
+        $namespace         = $attributes[ 'namespace' ];
+        $prefix            = $attributes[ 'prefix' ];
+
+        $__middleWares     = $this->middlewares;
+        $this->middlewares = array_merge($this->middlewares, $middlewares);
+
+        $__prefix          = $this->prefix;
+        $this->prefix      = $prefix;
+
+        $__namespace       = $this->namespace;
+        $this->namespace   = $namespace;
+
+        $closure();
+
+        $this->middlewares = $__middleWares;
+        $this->prefix      = $__prefix;
+        $this->namespace   = $__namespace;
+
+        return $this;
     }
 
     /**
@@ -142,7 +192,11 @@ class Router
     {
         foreach( $this->stack as $route ) {
             if( $route->match() ) {
-                return $route->dispatcher($this->response)->send();
+                $route->middlewares($this->middlewares);
+                $route->prefix($this->prefix);
+
+                return $route->dispatcher($this->response)
+                    ->send();
             }
         }
 

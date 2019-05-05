@@ -136,41 +136,36 @@ Request::Inputs()
     ->set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, Conf::get('salt')));
 Request::Inputs()
     ->set('tel', '+33626148328');
-// route pour la console !!!
-Router::console('/test/toto',
-    function( $inputs, $response ) {
-    dd($inputs);
-        return $response->content('all_toto2');
-    })
-    ->validator([
-        'a'     => 'required|string:3',
-        'tel'     => 'required|phone',
-        'csrf'    => 'required|csrf:@salt',
-    ])
-    ->middlewares([
-        QuoteMiddleWare::class,
-        UnderscoreMiddleWare::class,
-        TraitMiddleWare::class,
-    ]);
-Router::get('//{projkey}.modelo.test/user/{id}/test/{comment}',
-    function( $inputs, $response ) {
-        return $response->content('toto2');
-    })
-    ->where('id', '[a-z0-9]+')
-    ->where('projkey', '[a-z0-9]+')
-    ->validator([
-        'projkey' => 'required|string',
-        'id'      => 'required|int',
-        'tel'     => 'required|phone',
-        'csrf'    => 'required|csrf:@salt',
-    ])
-    ->middlewares([
-        QuoteMiddleWare::class,
-        UnderscoreMiddleWare::class,
-        TraitMiddleWare::class,
-    ]);
-Router::route();
 
+Router::middlewares([
+    QuoteMiddleWare::class,
+    UnderscoreMiddleWare::class,
+    TraitMiddleWare::class,
+])->group([], function() {
+    Router::console('/test/toto',
+        function( $inputs, $response ) {
+            dd($inputs);
+            return $response->content('all_toto2');
+        })
+        ->validator([
+            'a'     => 'required|string:3',
+            'tel'     => 'required|phone',
+            'csrf'    => 'required|csrf:@salt',
+        ]);
+    Router::get('//{projkey}.modelo.test/user/{id}/test/{comment}',
+        function( $inputs, $response ) {
+            return $response->content('toto2');
+        })
+        ->where('id', '[a-z0-9]+')
+        ->where('projkey', '[a-z0-9]+')
+        ->validator([
+            'projkey' => 'required|string',
+            'id'      => 'required|int',
+            'tel'     => 'required|phone',
+            'csrf'    => 'required|csrf:@salt',
+        ]);
+});
+Router::route();
 exit;
 /**
  * Dispatcher::response()
