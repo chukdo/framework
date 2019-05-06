@@ -35,22 +35,23 @@ class RouteGroup
     }
 
     /**
-     * @return RouteAttributes
-     */
-    public function attributes(): RouteAttributes
-    {
-        return $this->attributes;
-    }
-
-    /**
      * @param array $middlewares
      * @return RouteGroup
      */
     public function middleware( array $middlewares ): self
     {
-        $this->attributes()->setMiddleware($middlewares);
+        $this->attributes()
+            ->setMiddleware($middlewares);
 
         return $this;
+    }
+
+    /**
+     * @return RouteAttributes
+     */
+    public function attributes(): RouteAttributes
+    {
+        return $this->attributes;
     }
 
     /**
@@ -60,7 +61,8 @@ class RouteGroup
      */
     public function validator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
     {
-        $this->attributes()->setValidator($validators, $errorMiddleware);
+        $this->attributes()
+            ->setValidator($validators, $errorMiddleware);
 
         return $this;
     }
@@ -71,7 +73,8 @@ class RouteGroup
      */
     public function prefix( ?string $prefix ): self
     {
-        $this->attributes()->setPrefix($prefix);
+        $this->attributes()
+            ->setPrefix($prefix);
 
         return $this;
     }
@@ -82,7 +85,8 @@ class RouteGroup
      */
     public function namespace( ?string $namespace ): self
     {
-        $this->attributes()->setNamespace($namespace);
+        $this->attributes()
+            ->setNamespace($namespace);
 
         return $this;
     }
@@ -92,11 +96,15 @@ class RouteGroup
      */
     public function group( Closure $closure )
     {
-        $attributes = $this->router->attributes()->get();
-        $this->router->attributes()->add($this->attributes()->get());
+        $attributes = $this->router->attributes()
+            ->get();
+        $this->router->attributes()
+            ->add($this->attributes()
+                ->get());
 
         ( $closure )();
 
-        $this->router->attributes()->set($attributes);
+        $this->router->attributes()
+            ->set($attributes);
     }
 }
