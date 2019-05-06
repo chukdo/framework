@@ -102,11 +102,11 @@ class RouteAttributes
     public function getAttributes(): array
     {
         return [
-            'middleware'      => $this->middlewares,
-            'validator'       => $this->validators,
-            'errorMiddleware' => $this->errorMiddleware,
-            'prefix'          => $this->prefix,
-            'namespace'       => $this->namespace,
+            'middleware'      => $this->getMiddleware(),
+            'validator'       => $this->getValidator(),
+            'errorMiddleware' => $this->getErrorMiddleware(),
+            'prefix'          => $this->getPrefix(),
+            'namespace'       => $this->getNamespace(),
         ];
     }
 
@@ -137,19 +137,27 @@ class RouteAttributes
         ],
             $attributes);
 
-        $this->middleware($attributes[ 'middleware' ]);
-        $this->validator($attributes[ 'validator' ], $attributes[ 'errorMiddleware' ]);
-        $this->prefix($attributes[ 'prefix' ]);
-        $this->namespace($attributes[ 'namespace' ]);
+        $this->setMiddleware($attributes[ 'middleware' ]);
+        $this->setValidator($attributes[ 'validator' ], $attributes[ 'errorMiddleware' ]);
+        $this->setPrefix($attributes[ 'prefix' ]);
+        $this->setNamespace($attributes[ 'namespace' ]);
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMiddleware(): array
+    {
+        return $this->middlewares;
     }
 
     /**
      * @param array $middlewares
      * @return RouteAttributes
      */
-    public function middleware( array $middlewares ): self
+    public function setMiddleware( array $middlewares ): self
     {
         foreach ( $middlewares as $middleware ) {
             if ( substr($middleware, 0, 1) == '@' ) {
@@ -167,11 +175,19 @@ class RouteAttributes
     }
 
     /**
+     * @return array
+     */
+    public function getValidator(): array
+    {
+        return $this->validators;
+    }
+
+    /**
      * @param array                         $validators
      * @param ErrorMiddlewareInterface|null $errorMiddleware
      * @return RouteAttributes
      */
-    public function validator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
+    public function setValidator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
     {
         $this->validators      = $validators;
         $this->errorMiddleware = $errorMiddleware;
@@ -180,10 +196,26 @@ class RouteAttributes
     }
 
     /**
+     * @return ErrorMiddlewareInterface|null
+     */
+    public function getErrorMiddleware(): ?ErrorMiddlewareInterface
+    {
+        return $this->errorMiddleware;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrefix(): string
+    {
+        return $this->prefix;
+    }
+
+    /**
      * @param string|null $prefix
      * @return RouteAttributes
      */
-    public function prefix( ?string $prefix ): self
+    public function setPrefix( ?string $prefix ): self
     {
         $prefix = trim($prefix, '/');
 
@@ -195,10 +227,18 @@ class RouteAttributes
     }
 
     /**
+     * @return string
+     */
+    public function getNamespace(): string
+    {
+        return $this->namespace;
+    }
+
+    /**
      * @param string|null $namespace
      * @return RouteAttributes
      */
-    public function namespace( ?string $namespace ): self
+    public function setNamespace( ?string $namespace ): self
     {
         $namespace = trim($namespace, '/');
 
