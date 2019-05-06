@@ -40,9 +40,9 @@ class Router
     protected $stack = [];
 
     /**
-     * @var array
+     * @var RouteAttributes
      */
-    protected $attributes = [];
+    protected $attributes;
 
     /**
      * @var Closure
@@ -57,11 +57,17 @@ class Router
      */
     public function __construct( App $app )
     {
-        $this->app      = $app;
-        $this->request  = $app->make('Chukdo\Http\Request');
-        $this->response = $this->app->make('Chukdo\Http\Response');
+        $this->app        = $app;
+        $this->request    = $app->make('Chukdo\Http\Request');
+        $this->response   = $this->app->make('Chukdo\Http\Response');
+        $this->attributes = new RouteAttributes($this->request);
+    }
 
-        $this->setAttributes([]);
+    public function resetAttributes(): self
+    {
+        $this->attributes->resetAttributes();
+
+        return $this;
     }
 
     /**
@@ -69,7 +75,7 @@ class Router
      */
     public function getAttributes(): array
     {
-        return $this->attributes;
+        return $this->attributes->getAttributes();
     }
 
     /**
@@ -78,14 +84,7 @@ class Router
      */
     public function setAttributes( array $attributes ): self
     {
-        $this->attributes = array_merge([
-            'middleware'      => [],
-            'validator'       => [],
-            'errorMiddleware' => null,
-            'prefix'          => '',
-            'namespace'       => '',
-        ],
-            $attributes);
+        $this->attributes->setAttributes($attributes);
 
         return $this;
     }
@@ -96,27 +95,7 @@ class Router
      */
     public function addAttributes( array $attributes ): self
     {
-        $attributes = array_merge([
-            'middleware'      => [],
-            'validator'       => [],
-            'errorMiddleware' => null,
-            'prefix'          => '',
-            'namespace'       => '',
-        ],
-            $attributes);
-
-        $this->attributes[ 'middleware' ]      = array_merge($this->attributes[ 'middleware' ], $attributes[ 'middleware' ]);
-        $this->attributes[ 'validator' ]       = array_merge($this->attributes[ 'validator' ], $attributes[ 'validator' ]);
-        $this->attributes[ 'errorMiddleware' ] = $attributes[ 'errorMiddleware' ]
-            ?: $this->attributes[ 'errorMiddleware' ];
-
-        if ( strlen($prefix = trim($attributes[ 'prefix' ], '/')) > 0 ) {
-            $this->attributes[ 'prefix' ] .= '/' . $prefix;
-        }
-
-        if ( strlen($namespace = trim($attributes[ 'namespace' ], '/')) > 0 ) {
-            $this->attributes[ 'namespace' ] .= '/' . $namespace;
-        }
+        $this->attributes->addAttributes($attributes);
 
         return $this;
     }
@@ -204,7 +183,7 @@ class Router
         }
 
         $route = new Route($method, $uri, $this->request, $appMiddleware);
-        $route->attributes($this->attributes);
+        $route->setAttributes($this->getAttributes());
 
         $this->stack[] = $route;
 

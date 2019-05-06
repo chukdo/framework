@@ -46,29 +46,9 @@ class Route
     protected $wheres = [];
 
     /**
-     * @var array
+     * @var RouteAttributes
      */
-    protected $middlewares = [];
-
-    /**
-     * @var string
-     */
-    protected $prefix = '';
-
-    /**
-     * @var string
-     */
-    protected $namespace = '';
-
-    /**
-     * @var ErrorMiddlewareInterface
-     */
-    protected $errorMiddleware = null;
-
-    /**
-     * @var array
-     */
-    protected $validators = [];
+    protected $attributes;
 
     /**
      * Route constructor.
@@ -83,27 +63,45 @@ class Route
         $this->uri           = new Url($uri);
         $this->appMiddleware = $appMiddleware;
         $this->request       = $request;
+        $this->attributes    = new RouteAttributes($request);
+    }
+
+    /**
+     * @return Route
+     */
+    public function resetAttributes(): self
+    {
+        $this->attributes->resetAttributes();
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttributes(): array
+    {
+        return $this->attributes->getAttributes();
     }
 
     /**
      * @param array $attributes
      * @return Route
      */
-    public function attributes( array $attributes ): self
+    public function setAttributes( array $attributes ): self
     {
-        $attributes = array_merge([
-            'middleware'      => [],
-            'validator'       => [],
-            'errorMiddleware' => null,
-            'prefix'          => '',
-            'namespace'       => '',
-        ],
-            $attributes);
+        $this->attributes->setAttributes($attributes);
 
-        $this->middleware($attributes[ 'middleware' ]);
-        $this->validator($attributes[ 'validator' ], $attributes[ 'errorMiddleware' ]);
-        $this->prefix($attributes[ 'prefix' ]);
-        $this->namespace($attributes[ 'namespace' ]);
+        return $this;
+    }
+
+    /**
+     * @param array $attributes
+     * @return Route
+     */
+    public function addAttributes( array $attributes ): self
+    {
+        $this->attributes->addAttributes($attributes);
 
         return $this;
     }
@@ -114,17 +112,7 @@ class Route
      */
     public function middleware( array $middlewares ): self
     {
-        foreach ( $middlewares as $middleware ) {
-            if ( substr($middleware, 0, 1) == '@' ) {
-                try {
-                    $middleware = $this->request->conf(substr($middleware, 1));
-                } catch ( \Throwable $e ) {
-                }
-
-            }
-
-            $this->middlewares[] = $middleware;
-        }
+        $this->attributes->middleware($middlewares);
 
         return $this;
     }
@@ -136,8 +124,7 @@ class Route
      */
     public function validator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
     {
-        $this->validators      = $validators;
-        $this->errorMiddleware = $errorMiddleware;
+        $this->attributes->validator($validators, $errorMiddleware);
 
         return $this;
     }
@@ -148,11 +135,7 @@ class Route
      */
     public function prefix( ?string $prefix ): self
     {
-        $prefix = trim($prefix, '/');
-
-        if ( strlen($prefix) > 0 ) {
-            $this->prefix .= '/' . $prefix;
-        }
+        $this->attributes->prefix($prefix);
 
         return $this;
     }
@@ -163,11 +146,7 @@ class Route
      */
     public function namespace( ?string $namespace ): self
     {
-        $namespace = trim($namespace, '/');
-
-        if ( strlen($namespace) > 0 ) {
-            $this->namespace .= '/' . $namespace;
-        }
+        $this->attributes->namespace($namespace);
 
         return $this;
     }
@@ -272,7 +251,7 @@ class Route
     {
         $requestPath = $this->request->url()
             ->getPath();
-        $routePath   = $this->prefix . $this->uri()
+        $routePath   = $this->attributes->getAttribute('prefix') . $this->uri()
                 ->getPath();
 
         if ( $requestPath == $routePath ) {
@@ -381,9 +360,9 @@ class Route
     public function dispatcher( Response $response ): Response
     {
         $dispatcher = new Dispatcher($this->request, $response);
-        $dispatcher->pipe($this->appMiddleware->validator($this->validators, $this->errorMiddleware));
+        $dispatcher->pipe($this->appMiddleware->validator($this->attributes->getAttribute('validator'), $this->attributes->getAttribute('errorMiddleware')));
 
-        foreach ( $this->middlewares as $middleware ) {
+        foreach ( $this->attributes->getAttribute('middleware') as $middleware ) {
             $dispatcher->pipe(new $middleware());
         }
 

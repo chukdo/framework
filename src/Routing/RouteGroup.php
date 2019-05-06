@@ -3,7 +3,6 @@
 namespace Chukdo\Routing;
 
 use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
-use Chukdo\Http\Request;
 use Closure;
 
 /**
@@ -21,29 +20,9 @@ class RouteGroup
     protected $router;
 
     /**
-     * @var array
+     * @var RouteAttributes
      */
-    protected $middlewares = [];
-
-    /**
-     * @var string
-     */
-    protected $prefix = '';
-
-    /**
-     * @var string
-     */
-    protected $namespace = '';
-
-    /**
-     * @var ErrorMiddlewareInterface
-     */
-    protected $errorMiddleware = null;
-
-    /**
-     * @var array
-     */
-    protected $validators = [];
+    protected $attributes;
 
     /**
      * RouteGroup constructor.
@@ -51,7 +30,48 @@ class RouteGroup
      */
     public function __construct( Router $router )
     {
-        $this->router = $router;
+        $this->router     = $router;
+        $this->attributes = new RouteAttributes($router->request());
+    }
+
+    /**
+     * @return RouteGroup
+     */
+    public function resetAttributes(): self
+    {
+        $this->attributes->resetAttributes();
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttributes(): array
+    {
+        return $this->attributes->getAttributes();
+    }
+
+    /**
+     * @param array $attributes
+     * @return Router
+     */
+    public function setAttributes( array $attributes ): self
+    {
+        $this->attributes->setAttributes($attributes);
+
+        return $this;
+    }
+
+    /**
+     * @param array $attributes
+     * @return RouteGroup
+     */
+    public function addAttributes( array $attributes ): self
+    {
+        $this->attributes->addAttributes($attributes);
+
+        return $this;
     }
 
     /**
@@ -60,7 +80,7 @@ class RouteGroup
      */
     public function middleware( array $middlewares ): self
     {
-        $this->middlewares = $middlewares;
+        $this->attributes->middleware($middlewares);
 
         return $this;
     }
@@ -72,8 +92,7 @@ class RouteGroup
      */
     public function validator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
     {
-        $this->validators      = $validators;
-        $this->errorMiddleware = $errorMiddleware;
+        $this->attributes->validator($validators, $errorMiddleware);
 
         return $this;
     }
@@ -84,7 +103,7 @@ class RouteGroup
      */
     public function prefix( ?string $prefix ): self
     {
-        $this->prefix = trim($prefix, '/');
+        $this->attributes->prefix($prefix);
 
         return $this;
     }
@@ -95,7 +114,7 @@ class RouteGroup
      */
     public function namespace( ?string $namespace ): self
     {
-        $this->namespace = trim($namespace, '/');
+        $this->attributes->namespace($namespace);
 
         return $this;
     }
@@ -106,14 +125,7 @@ class RouteGroup
     public function group( Closure $closure )
     {
         $attributes = $this->router->getAttributes();
-
-        $this->router->addAttributes([
-            'middleware'      => $this->middlewares,
-            'validator'       => $this->validators,
-            'errorMiddleware' => $this->errorMiddleware,
-            'prefix'          => $this->prefix,
-            'namespace'       => $this->namespace,
-        ]);
+        $this->router->addAttributes($this->attributes->getAttributes());
 
         ( $closure )();
 
