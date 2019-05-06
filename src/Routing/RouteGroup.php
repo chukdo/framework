@@ -35,43 +35,11 @@ class RouteGroup
     }
 
     /**
-     * @return RouteGroup
+     * @return RouteAttributes
      */
-    public function resetAttributes(): self
+    public function attributes(): RouteAttributes
     {
-        $this->attributes->resetAttributes();
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes->getAttributes();
-    }
-
-    /**
-     * @param array $attributes
-     * @return Router
-     */
-    public function setAttributes( array $attributes ): self
-    {
-        $this->attributes->setAttributes($attributes);
-
-        return $this;
-    }
-
-    /**
-     * @param array $attributes
-     * @return RouteGroup
-     */
-    public function addAttributes( array $attributes ): self
-    {
-        $this->attributes->addAttributes($attributes);
-
-        return $this;
+        return $this->attributes;
     }
 
     /**
@@ -80,7 +48,7 @@ class RouteGroup
      */
     public function middleware( array $middlewares ): self
     {
-        $this->attributes->middleware($middlewares);
+        $this->attributes()->setMiddleware($middlewares);
 
         return $this;
     }
@@ -92,7 +60,7 @@ class RouteGroup
      */
     public function validator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
     {
-        $this->attributes->validator($validators, $errorMiddleware);
+        $this->attributes()->setValidator($validators, $errorMiddleware);
 
         return $this;
     }
@@ -103,7 +71,7 @@ class RouteGroup
      */
     public function prefix( ?string $prefix ): self
     {
-        $this->attributes->prefix($prefix);
+        $this->attributes()->setPrefix($prefix);
 
         return $this;
     }
@@ -114,7 +82,7 @@ class RouteGroup
      */
     public function namespace( ?string $namespace ): self
     {
-        $this->attributes->namespace($namespace);
+        $this->attributes()->setNamespace($namespace);
 
         return $this;
     }
@@ -124,11 +92,11 @@ class RouteGroup
      */
     public function group( Closure $closure )
     {
-        $attributes = $this->router->getAttributes();
-        $this->router->addAttributes($this->attributes->getAttributes());
+        $attributes = $this->router->attributes()->get();
+        $this->router->attributes()->add($this->attributes()->get());
 
         ( $closure )();
 
-        $this->router->setAttributes($attributes);
+        $this->router->attributes()->set($attributes);
     }
 }

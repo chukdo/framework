@@ -67,43 +67,11 @@ class Route
     }
 
     /**
-     * @return Route
+     * @return RouteAttributes
      */
-    public function resetAttributes(): self
+    public function attributes(): RouteAttributes
     {
-        $this->attributes->resetAttributes();
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes->getAttributes();
-    }
-
-    /**
-     * @param array $attributes
-     * @return Route
-     */
-    public function setAttributes( array $attributes ): self
-    {
-        $this->attributes->setAttributes($attributes);
-
-        return $this;
-    }
-
-    /**
-     * @param array $attributes
-     * @return Route
-     */
-    public function addAttributes( array $attributes ): self
-    {
-        $this->attributes->addAttributes($attributes);
-
-        return $this;
+        return $this->attributes;
     }
 
     /**
@@ -112,7 +80,8 @@ class Route
      */
     public function middleware( array $middlewares ): self
     {
-        $this->attributes->middleware($middlewares);
+        $this->attributes()
+            ->setMiddleware($middlewares);
 
         return $this;
     }
@@ -124,7 +93,8 @@ class Route
      */
     public function validator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
     {
-        $this->attributes->validator($validators, $errorMiddleware);
+        $this->attributes()
+            ->setValidator($validators, $errorMiddleware);
 
         return $this;
     }
@@ -135,7 +105,8 @@ class Route
      */
     public function prefix( ?string $prefix ): self
     {
-        $this->attributes->prefix($prefix);
+        $this->attributes()
+            ->setPrefix($prefix);
 
         return $this;
     }
@@ -146,7 +117,8 @@ class Route
      */
     public function namespace( ?string $namespace ): self
     {
-        $this->attributes->namespace($namespace);
+        $this->attributes()
+            ->setNamespace($namespace);
 
         return $this;
     }
@@ -251,8 +223,9 @@ class Route
     {
         $requestPath = $this->request->url()
             ->getPath();
-        $routePath   = $this->attributes->getAttribute('prefix') . $this->uri()
-                ->getPath();
+        $routePath   = $this->attributes()
+                           ->getPrefix() . $this->uri()
+                           ->getPath();
 
         if ( $requestPath == $routePath ) {
             return true;
@@ -360,9 +333,17 @@ class Route
     public function dispatcher( Response $response ): Response
     {
         $dispatcher = new Dispatcher($this->request, $response);
-        $dispatcher->pipe($this->appMiddleware->validator($this->attributes->getAttribute('validator'), $this->attributes->getAttribute('errorMiddleware')));
+        $dispatcher->pipe(
+            $this->appMiddleware->validator(
+                $this->attributes()
+                    ->getValidator(),
+                $this->attributes()
+                    ->getErrorMiddleware()
+            )
+        );
 
-        foreach ( $this->attributes->getAttribute('middleware') as $middleware ) {
+        foreach ( $this->attributes()
+            ->getMiddleware() as $middleware ) {
             $dispatcher->pipe(new $middleware());
         }
 

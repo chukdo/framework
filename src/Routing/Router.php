@@ -63,41 +63,12 @@ class Router
         $this->attributes = new RouteAttributes($this->request);
     }
 
-    public function resetAttributes(): self
-    {
-        $this->attributes->resetAttributes();
-
-        return $this;
-    }
-
     /**
-     * @return array
+     * @return RouteAttributes
      */
-    public function getAttributes(): array
+    public function attributes(): RouteAttributes
     {
-        return $this->attributes->getAttributes();
-    }
-
-    /**
-     * @param array $attributes
-     * @return Router
-     */
-    public function setAttributes( array $attributes ): self
-    {
-        $this->attributes->setAttributes($attributes);
-
-        return $this;
-    }
-
-    /**
-     * @param array $attributes
-     * @return Router
-     */
-    public function addAttributes( array $attributes ): self
-    {
-        $this->attributes->addAttributes($attributes);
-
-        return $this;
+        return $this->attributes;
     }
 
     /**
@@ -183,7 +154,7 @@ class Router
         }
 
         $route = new Route($method, $uri, $this->request, $appMiddleware);
-        $route->setAttributes($this->getAttributes());
+        $route->attributes()->set($this->attributes()->get());
 
         $this->stack[] = $route;
 
