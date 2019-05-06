@@ -120,7 +120,7 @@ class Router
      * @param array $attributes
      * @return Router
      */
-    public function attributes(array $attributes): self
+    public function attributes( array $attributes ): self
     {
         $this->attributes = $attributes;
 
