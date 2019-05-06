@@ -140,83 +140,55 @@ Request::Inputs()
 Request::Inputs()
     ->set('tel', '+33626148328');
 
-Router::group(function() {
-    Router::console('/toto',
-        function( $inputs, $response ) {
-            return $response->content('all_toto2');
-        });
-    Router::get('/user/{a}/test/{comment}',
-        function( $inputs, $response ) {
-            return $response->content('toto2');
-        })
-        ->where('a', '[a-z0-9]+')
-        ->middleware([ TraitMiddleWare::class ]);
-})
-    ->middleware([
-        QuoteMiddleWare::class,
-        UnderscoreMiddleWare::class,
-    ])
+Router::middleware([
+    QuoteMiddleWare::class,
+    UnderscoreMiddleWare::class,
+])
     ->validator([
         'a'    => 'required|string:3',
         'tel'  => 'required|phone',
         'csrf' => 'required|csrf:@salt',
     ])
-    ->prefix('test');
+    ->prefix('test')
+    ->group(function() {
+        Router::console('/toto',
+            function( $inputs, $response ) {
+                return $response->content('all_toto2');
+            });
+        Router::get('/user/{a}/test/{comment}',
+            function( $inputs, $response ) {
+                return $response->content('toto2');
+            })
+            ->where('a', '[a-z0-9]+')
+            ->middleware([ TraitMiddleWare::class ]);
+    });
 
-Router::group(function() {
-    Router::get('/user/{a}/test/{comment}',
-        function( $inputs, $response ) {
-            return $response->content('toto2-2');
-        })
-        ->where('a', '[a-z0-9]+');
-})
-    ->middleware([
-        QuoteMiddleWare::class,
-        TraitMiddleWare::class,
-    ])
+Router::middleware([
+    QuoteMiddleWare::class,
+    TraitMiddleWare::class,
+])
     ->validator([
         'a'    => 'required|string:3',
         'tel'  => 'required|phone',
         'csrf' => 'required|csrf:@salt',
-    ]);
+    ])
+    ->group(function() {
+        Router::get('/user/{a}/test/{comment}',
+            function( $inputs, $response ) {
+                return $response->content('toto2-2');
+            })
+            ->where('a', '[a-z0-9]+');
+    });
 
 Router::fallback(function() {
     dd('rien de valide');
 });
 Router::route();
 exit;
-/**
- * Dispatcher::response()
- * ->content('toto');
- * Dispatcher::pipe(new QuoteMiddleWare());
- * Dispatcher::pipe(new UnderscoreMiddleWare());
- * Dispatcher::pipe(new TraitMiddleWare());
- * $r = Dispatcher::handle(Request::instance());
- * $r->send();
- * exit;
- */
 
-// new dispatcher
-// pipe > middlewares
-// process
-
-// route validator
-// route middleware
-
-// *route
-// *Router::get('{projkey}.modelo.fr/user/{id}', function() {});
-// *Router::get('user/{id}', function() {});
-// *get closure
-// get controler@action
-// route::match([] , regex
 //route::redirect 302
 //permanentRedirect 301
-//route::view(route, file, data)
-//route::get('user/{id}', function($id) {}
-//route::get('user/{id?}', function($id = null) {}
-//route::get()->where('a', '32', 'b' => '[a-z]+
-//// route::name() = utile pour appel d'une route
-/// $request->route()->named('profile')
+
 //Route::namespace('Admin')->group(function () {
 // Controllers Within The "App\Http\Controllers\Admin" Namespace
 //});

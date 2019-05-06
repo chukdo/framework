@@ -2,6 +2,7 @@
 
 namespace Chukdo\Routing;
 
+use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
 use Chukdo\Contracts\Middleware\Middleware as MiddlewareInterface;
 use Chukdo\Helper\Str;
 use Chukdo\Http\Request;
@@ -17,7 +18,7 @@ use Chukdo\Middleware\Dispatcher;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class Route extends RouteAttribute
+class Route
 {
     /**
      * @var string
@@ -45,6 +46,31 @@ class Route extends RouteAttribute
     protected $wheres = [];
 
     /**
+     * @var array
+     */
+    protected $middlewares = [];
+
+    /**
+     * @var string
+     */
+    protected $prefix = '';
+
+    /**
+     * @var string
+     */
+    protected $namespace = '';
+
+    /**
+     * @var ErrorMiddlewareInterface
+     */
+    protected $errorMiddleware = null;
+
+    /**
+     * @var array
+     */
+    protected $validators = [];
+
+    /**
      * Route constructor.
      * @param string              $method
      * @param string              $uri
@@ -57,6 +83,94 @@ class Route extends RouteAttribute
         $this->uri           = new Url($uri);
         $this->appMiddleware = $appMiddleware;
         $this->request       = $request;
+    }
+
+    /**
+     * @param array $attributes
+     * @return Route
+     */
+    public function attributes( array $attributes ): self
+    {
+        $initAttributes = [
+            'middleware'      => [],
+            'validator'       => [],
+            'errorMiddleware' => null,
+            'prefix'          => '',
+            'namespace'       => '',
+        ];
+
+        $attributes = array_merge($initAttributes, $attributes);
+
+        $this->middleware($attributes[ 'middleware' ]);
+        $this->validator($attributes[ 'validator' ], $attributes[ 'errorMiddleware' ]);
+        $this->prefix($attributes[ 'prefix' ]);
+        $this->namespace($attributes[ 'namespace' ]);
+
+        return $this;
+    }
+
+    /**
+     * @param array $middlewares
+     * @return Route
+     */
+    public function middleware( array $middlewares ): self
+    {
+        foreach( $middlewares as $middleware ) {
+            if( substr($middleware, 0, 1) == '@' ) {
+                try {
+                    $middleware = $this->request->conf(substr($middleware, 1));
+                } catch( \Throwable $e ) {
+                }
+
+            }
+
+            $this->middlewares[] = $middleware;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array                         $validators
+     * @param ErrorMiddlewareInterface|null $errorMiddleware
+     * @return Route
+     */
+    public function validator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
+    {
+        $this->validators      = $validators;
+        $this->errorMiddleware = $errorMiddleware;
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $prefix
+     * @return Route
+     */
+    public function prefix( ?string $prefix ): self
+    {
+        $prefix = trim($prefix, '/');
+
+        if( strlen($prefix) > 0 ) {
+            $this->prefix .= '/' . $prefix;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $namespace
+     * @return Route
+     */
+    public function namespace( ?string $namespace ): self
+    {
+        $namespace = trim($namespace, '/');
+
+        if( strlen($namespace) > 0 ) {
+            $this->namespace .= '/' . $namespace;
+        }
+
+        return $this;
     }
 
     /**

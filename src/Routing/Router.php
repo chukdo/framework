@@ -2,6 +2,7 @@
 
 namespace Chukdo\Routing;
 
+use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
 use Chukdo\Http\HttpException;
 use Chukdo\Http\Response;
 use Chukdo\Middleware\AppMiddleware;
@@ -16,7 +17,7 @@ use Chukdo\Http\Request;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class Router extends RouteAttribute
+class Router
 {
     /**
      * @var App
@@ -39,14 +40,14 @@ class Router extends RouteAttribute
     protected $stack = [];
 
     /**
+     * @var array
+     */
+    protected $attributes = [];
+
+    /**
      * @var Closure
      */
     protected $fallback = null;
-
-    /**
-     * @var array
-     */
-    protected $group = [];
 
     /**
      * Router constructor.
@@ -59,14 +60,109 @@ class Router extends RouteAttribute
         $this->app      = $app;
         $this->request  = $app->make('Chukdo\Http\Request');
         $this->response = $this->app->make('Chukdo\Http\Response');
+
+        $this->resetAttributes();
+    }
+
+    public function resetAttributes(): self
+    {
+        $this->attributes = [
+            'middleware'      => [],
+            'validator'       => [],
+            'errorMiddleware' => null,
+            'prefix'          => '',
+            'namespace'       => '',
+        ];
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttributes(): array
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * @param array $attributes
+     * @return Router
+     */
+    public function setAttributes( array $attributes ): self
+    {
+        $initAttributes = [
+            'middleware'      => [],
+            'validator'       => [],
+            'errorMiddleware' => null,
+            'prefix'          => '',
+            'namespace'       => '',
+        ];
+
+        // ici plus subtil !!!
+
+        $this->attributes = array_merge($initAttributes, $attributes);
+
+        return $this;
+    }
+
+    /**
+     * @param array $middlewares
+     * @return RouteGroup
+     */
+    public function middleware( array $middlewares ): RouteGroup
+    {
+        return (new RouteGroup($this))->middleware($middlewares);
+    }
+
+    /**
+     * @param array                         $validators
+     * @param ErrorMiddlewareInterface|null $errorMiddleware
+     * @return RouteGroup
+     */
+    public function validator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): RouteGroup
+    {
+        return (new RouteGroup($this))->validator($validators, $errorMiddleware);
+    }
+
+    /**
+     * @param string|null $prefix
+     * @return RouteGroup
+     */
+    public function prefix( ?string $prefix ): RouteGroup
+    {
+        return (new RouteGroup($this))->prefix($prefix);
+    }
+
+    /**
+     * @param string|null $namespace
+     * @return RouteGroup
+     */
+    public function namespace( ?string $namespace ): RouteGroup
+    {
+        return (new RouteGroup($this))->namespace($namespace);
+    }
+
+    /**
+     * @return Request
+     */
+    public function request(): Request
+    {
+        return $this->request;
+    }
+
+    /**
+     * @return Response
+     */
+    public function response(): Response
+    {
+        return $this->response;
     }
 
     /**
      * @param string $uri
      * @param        $closure
      * @return Route
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
      */
     public function get( string $uri, $closure ): Route
     {
@@ -78,8 +174,6 @@ class Router extends RouteAttribute
      * @param string $uri
      * @param        $closure
      * @return Route
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
      */
     public function stack( string $method, string $uri, $closure ): Route
     {
@@ -95,10 +189,7 @@ class Router extends RouteAttribute
         }
 
         $route = new Route($method, $uri, $this->request, $appMiddleware);
-        $route->middleware($this->middlewares);
-        $route->validator($this->validators, $this->errorMiddleware);
-        $route->prefix($this->prefix);
-        $route->namespace($this->namespace);
+        $route->attributes($this->attributes);
 
         $this->stack[] = $route;
 
@@ -106,23 +197,9 @@ class Router extends RouteAttribute
     }
 
     /**
-     * @param Closure $closure
-     * @return RouteGroup
-     */
-    public function group( Closure $closure ): RouteGroup
-    {
-        $group         = new RouteGroup($this, $this->request, $closure);
-        $this->group[] = $group;
-
-        return $group;
-    }
-
-    /**
      * @param string $uri
      * @param        $closure
      * @return Route
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
      */
     public function post( string $uri, $closure ): Route
     {
@@ -133,8 +210,6 @@ class Router extends RouteAttribute
      * @param string $uri
      * @param        $closure
      * @return Route
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
      */
     public function put( string $uri, $closure ): Route
     {
@@ -145,8 +220,6 @@ class Router extends RouteAttribute
      * @param string $uri
      * @param        $closure
      * @return Route
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
      */
     public function delete( string $uri, $closure ): Route
     {
@@ -157,8 +230,6 @@ class Router extends RouteAttribute
      * @param string $uri
      * @param        $closure
      * @return Route
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
      */
     public function any( string $uri, $closure ): Route
     {
@@ -169,8 +240,6 @@ class Router extends RouteAttribute
      * @param string $uri
      * @param        $closure
      * @return Route
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
      */
     public function console( string $uri, $closure ): Route
     {
@@ -182,10 +251,6 @@ class Router extends RouteAttribute
      */
     public function route(): Response
     {
-        foreach( $this->group as $group ) {
-            $group->route();
-        }
-
         foreach( $this->stack as $route ) {
             if( $route->match() ) {
                 return $route->dispatcher($this->response)

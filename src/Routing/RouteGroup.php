@@ -2,6 +2,7 @@
 
 namespace Chukdo\Routing;
 
+use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
 use Chukdo\Http\Request;
 use Closure;
 
@@ -12,7 +13,7 @@ use Closure;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class RouteGroup extends RouteAttribute
+class RouteGroup
 {
     /**
      * @var Router
@@ -20,34 +21,89 @@ class RouteGroup extends RouteAttribute
     protected $router;
 
     /**
-     * @var Request
+     * @var array
      */
-    protected $request;
+    protected $middlewares = [];
 
     /**
-     * @var Closure
+     * @var string
      */
-    protected $closure;
+    protected $prefix = '';
+
+    /**
+     * @var string
+     */
+    protected $namespace = '';
+
+    /**
+     * @var ErrorMiddlewareInterface
+     */
+    protected $errorMiddleware = null;
+
+    /**
+     * @var array
+     */
+    protected $validators = [];
 
     /**
      * RouteGroup constructor.
-     * @param Router  $router
-     * @param Request $request
-     * @param Closure $closure
+     * @param Router $router
      */
-    public function __construct( Router $router, Request $request, Closure $closure )
+    public function __construct( Router $router )
     {
         $this->router  = $router;
-        $this->request = $request;
-        $this->closure = $closure;
     }
 
     /**
+     * @param array $middlewares
      * @return RouteGroup
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
      */
-    public function route(): self
+    public function middleware( array $middlewares ): self
+    {
+        $this->middlewares[] = $middlewares;
+
+        return $this;
+    }
+
+    /**
+     * @param array                         $validators
+     * @param ErrorMiddlewareInterface|null $errorMiddleware
+     * @return RouteGroup
+     */
+    public function validator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
+    {
+        $this->validators      = $validators;
+        $this->errorMiddleware = $errorMiddleware;
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $prefix
+     * @return RouteGroup
+     */
+    public function prefix( ?string $prefix ): self
+    {
+        $this->prefix = trim($prefix, '/');
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $namespace
+     * @return RouteGroup
+     */
+    public function namespace( ?string $namespace ): self
+    {
+        $this->namespace = trim($namespace, '/');
+
+        return $this;
+    }
+
+    /**
+     * @param Closure $closure
+     */
+    public function group(Closure $closure)
     {
         $attributes = $this->router->getAttributes();
         $this->router->setAttributes([
@@ -58,11 +114,9 @@ class RouteGroup extends RouteAttribute
             'namespace'       => $this->namespace,
         ]);
 
-        ($this->closure)();
+        ($closure)();
 
         $this->router->resetAttributes()
             ->setAttributes($attributes);
-
-        return $this;
     }
 }
