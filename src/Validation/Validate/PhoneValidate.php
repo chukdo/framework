@@ -37,7 +37,7 @@ class PhoneValidate implements ValidateInterface
      */
     public function validate( $input ): bool
     {
-        if( Str::match('/^[0-9]{8,16}$/', $input) ) {
+        if ( Str::match('/^[0-9]{8,16}$/', $input) ) {
             return true;
         }
 

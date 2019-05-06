@@ -23,7 +23,7 @@ class Lang extends Conf
         $storage = new Storage();
         $name    = basename($file, '.json');
 
-        if( $storage->exists($file) ) {
+        if ( $storage->exists($file) ) {
             $load = new Conf($storage->get($file));
 
             $this->merge($load->toSimpleArray($name),

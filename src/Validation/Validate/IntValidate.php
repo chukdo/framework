@@ -54,8 +54,8 @@ class IntValidate implements ValidateInterface
      */
     public function validate( $input ): bool
     {
-        if( is_int($input) ) {
-            if( $input >= $this->min && $input <= $this->max ) {
+        if ( is_int($input) ) {
+            if ( $input >= $this->min && $input <= $this->max ) {
                 return true;
             }
         }

@@ -91,15 +91,14 @@ class Route
      */
     public function attributes( array $attributes ): self
     {
-        $initAttributes = [
+        $attributes = array_merge([
             'middleware'      => [],
             'validator'       => [],
             'errorMiddleware' => null,
             'prefix'          => '',
             'namespace'       => '',
-        ];
-
-        $attributes = array_merge($initAttributes, $attributes);
+        ],
+            $attributes);
 
         $this->middleware($attributes[ 'middleware' ]);
         $this->validator($attributes[ 'validator' ], $attributes[ 'errorMiddleware' ]);
@@ -115,11 +114,11 @@ class Route
      */
     public function middleware( array $middlewares ): self
     {
-        foreach( $middlewares as $middleware ) {
-            if( substr($middleware, 0, 1) == '@' ) {
+        foreach ( $middlewares as $middleware ) {
+            if ( substr($middleware, 0, 1) == '@' ) {
                 try {
                     $middleware = $this->request->conf(substr($middleware, 1));
-                } catch( \Throwable $e ) {
+                } catch ( \Throwable $e ) {
                 }
 
             }
@@ -151,7 +150,7 @@ class Route
     {
         $prefix = trim($prefix, '/');
 
-        if( strlen($prefix) > 0 ) {
+        if ( strlen($prefix) > 0 ) {
             $this->prefix .= '/' . $prefix;
         }
 
@@ -166,7 +165,7 @@ class Route
     {
         $namespace = trim($namespace, '/');
 
-        if( strlen($namespace) > 0 ) {
+        if ( strlen($namespace) > 0 ) {
             $this->namespace .= '/' . $namespace;
         }
 
@@ -186,11 +185,11 @@ class Route
      */
     public function match(): bool
     {
-        if( $this->matchMethod() ) {
-            if( $this->matchScheme() ) {
-                if( $this->matchDomain() ) {
-                    if( $this->matchSubDomain() ) {
-                        if( $this->matchPath() ) {
+        if ( $this->matchMethod() ) {
+            if ( $this->matchScheme() ) {
+                if ( $this->matchDomain() ) {
+                    if ( $this->matchSubDomain() ) {
+                        if ( $this->matchPath() ) {
                             return true;
                         }
                     }
@@ -208,7 +207,7 @@ class Route
     {
         $method = $this->request->method();
 
-        if( $this->method == $method || $this->method == 'ALL' ) {
+        if ( $this->method == $method || $this->method == 'ALL' ) {
             return true;
         }
 
@@ -225,7 +224,7 @@ class Route
         $routeScheme   = $this->uri()
             ->getScheme();
 
-        if( $requestScheme == $routeScheme || $routeScheme == 'file' ) {
+        if ( $requestScheme == $routeScheme || $routeScheme == 'file' ) {
             return true;
         }
 
@@ -242,7 +241,7 @@ class Route
         $routeDomain   = $this->uri()
             ->getDomain();
 
-        if( $requestDomain == $routeDomain || $routeDomain == null ) {
+        if ( $requestDomain == $routeDomain || $routeDomain == null ) {
             return true;
         }
 
@@ -259,7 +258,7 @@ class Route
         $routeSubDomain   = $this->uri()
             ->getSubDomain();
 
-        if( $requestSubDomain == $routeSubDomain || $routeSubDomain == null ) {
+        if ( $requestSubDomain == $routeSubDomain || $routeSubDomain == null ) {
             return true;
         }
 
@@ -276,7 +275,7 @@ class Route
         $routePath   = $this->prefix . $this->uri()
                 ->getPath();
 
-        if( $requestPath == $routePath ) {
+        if ( $requestPath == $routePath ) {
             return true;
         }
 
@@ -298,8 +297,8 @@ class Route
      */
     protected function matchPattern( string $routePattern, string $requestPattern ): bool
     {
-        if( Str::contain($routePattern, '{') ) {
-            if( $inputs = $this->extractInputs($routePattern, $requestPattern) ) {
+        if ( Str::contain($routePattern, '{') ) {
+            if ( $inputs = $this->extractInputs($routePattern, $requestPattern) ) {
                 $this->request->inputs()
                     ->merge($inputs, true);
                 return true;
@@ -319,17 +318,17 @@ class Route
         $keys      = Str::matchAll('/\{([a-z0-9_]+)\}/', $routePath);
         $countKeys = count($keys);
 
-        foreach( $keys as $key ) {
+        foreach ( $keys as $key ) {
             $routePath = str_replace('{' . $key . '}', '(' . $this->parseWhere($key) . ')', $routePath);
         }
 
         $values      = (array) Str::match('`^' . $routePath . '$`', $requestPath);
         $countValues = count($values);
 
-        if( $countValues > 0 && $countValues == $countKeys ) {
+        if ( $countValues > 0 && $countValues == $countKeys ) {
             $match = [];
 
-            foreach( $keys as $k => $key ) {
+            foreach ( $keys as $k => $key ) {
                 $match[ $key ] = $values[ $k ];
             }
 
@@ -356,7 +355,7 @@ class Route
      */
     public function wheres( array $wheres ): self
     {
-        foreach( $wheres as $key => $regex ) {
+        foreach ( $wheres as $key => $regex ) {
             $this->where($key, $regex);
         }
 
@@ -384,7 +383,7 @@ class Route
         $dispatcher = new Dispatcher($this->request, $response);
         $dispatcher->pipe($this->appMiddleware->validator($this->validators, $this->errorMiddleware));
 
-        foreach( $this->middlewares as $middleware ) {
+        foreach ( $this->middlewares as $middleware ) {
             $dispatcher->pipe(new $middleware());
         }
 

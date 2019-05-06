@@ -43,7 +43,7 @@ class FileUploaded
     {
         $uploadedFiles = $this->normalizeUploadedFiles();
 
-        if( isset($uploadedFiles[ $name ]) ) {
+        if ( isset($uploadedFiles[ $name ]) ) {
             $this->name         = $name;
             $this->uploadedFile = $uploadedFiles[ $name ];
 
@@ -63,10 +63,10 @@ class FileUploaded
     {
         $uploadedFiles = [];
 
-        foreach( $_FILES as $name => $file ) {
-            foreach( $file as $type => $value ) {
-                if( is_array($value) ) {
-                    foreach( self::__normalizeUploadedFiles($value) as $nName => $nValue ) {
+        foreach ( $_FILES as $name => $file ) {
+            foreach ( $file as $type => $value ) {
+                if ( is_array($value) ) {
+                    foreach ( self::__normalizeUploadedFiles($value) as $nName => $nValue ) {
                         $uploadedFiles[ $name . '.' . $nName ][ $type ] = $nValue;
                     }
                 }
@@ -109,9 +109,9 @@ class FileUploaded
     {
         $uploadedFiles = [];
 
-        foreach( $array as $k => $v ) {
-            if( is_array($v) ) {
-                foreach( self::__normalizeUploadedFiles($v) as $_k => $_v ) {
+        foreach ( $array as $k => $v ) {
+            if ( is_array($v) ) {
+                foreach ( self::__normalizeUploadedFiles($v) as $_k => $_v ) {
                     $uploadedFiles[ $k . '.' . $_k ] = $_v;
                 }
             }
@@ -153,8 +153,8 @@ class FileUploaded
      */
     public function store( $path ): bool
     {
-        if( $this->isValid() ) {
-            if( move_uploaded_file($this->path(), $path) ) {
+        if ( $this->isValid() ) {
+            if ( move_uploaded_file($this->path(), $path) ) {
                 return true;
             }
             else {
@@ -189,7 +189,7 @@ class FileUploaded
      */
     public function isValidSize(): bool
     {
-        if( $this->maxFileSize ) {
+        if ( $this->maxFileSize ) {
             return $this->size() < $this->maxFileSize;
         }
 
@@ -201,9 +201,9 @@ class FileUploaded
      */
     public function isValidMimeType(): bool
     {
-        if( $this->allowedMimeTypes ) {
-            foreach( str::split($this->allowedMimeTypes, ',') as $allowedMimeType ) {
-                if( preg_match("#$allowedMimeType#i", $this->mimeType()) ) {
+        if ( $this->allowedMimeTypes ) {
+            foreach ( str::split($this->allowedMimeTypes, ',') as $allowedMimeType ) {
+                if ( preg_match("#$allowedMimeType#i", $this->mimeType()) ) {
                     return true;
                 }
             }

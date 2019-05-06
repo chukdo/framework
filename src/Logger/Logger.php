@@ -70,11 +70,11 @@ class Logger implements LoggerInterface
     {
         $this->name = $name;
 
-        foreach( $handlers as $handler ) {
+        foreach ( $handlers as $handler ) {
             $this->pushHandler($handler);
         }
 
-        foreach( $processors as $processor ) {
+        foreach ( $processors as $processor ) {
             $this->pushProcessor($processor);
         }
     }
@@ -136,11 +136,11 @@ class Logger implements LoggerInterface
      */
     public function log( int $level, string $message, array $context = [] ): bool
     {
-        if( empty($this->handlers) ) {
+        if ( empty($this->handlers) ) {
             throw new LoggerException('You tried to log record from an empty handler stack.');
         }
 
-        if( !isset(self::$levels[ $level ]) ) {
+        if ( !isset(self::$levels[ $level ]) ) {
             throw new LoggerException("You tried to log record with unknown level [$level]");
         }
 
@@ -167,11 +167,11 @@ class Logger implements LoggerInterface
     {
         $replace = [];
 
-        foreach( $context as $key => $val ) {
-            if( !is_array($val)
-                && (!is_object($val)
-                    || method_exists($val,
-                        '__toString')) ) {
+        foreach ( $context as $key => $val ) {
+            if ( !is_array($val)
+                 && ( !is_object($val)
+                      || method_exists($val,
+                        '__toString') ) ) {
                 $replace[ '{' . $key . '}' ] = $val;
             }
         }
@@ -217,7 +217,7 @@ class Logger implements LoggerInterface
     {
         $handle = 0;
 
-        foreach( $this->handlers as $handler ) {
+        foreach ( $this->handlers as $handler ) {
             $handle += (int) $handler->handle($record);
         }
 
@@ -231,7 +231,7 @@ class Logger implements LoggerInterface
      */
     public function processRecord( array $record ): array
     {
-        foreach( $this->processors as $processor ) {
+        foreach ( $this->processors as $processor ) {
             $record = $processor->processRecord($record);
         }
 

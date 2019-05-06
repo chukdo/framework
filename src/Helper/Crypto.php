@@ -48,7 +48,7 @@ final class Crypto
     public static function decodeCsrf( string $token, string $salt ): bool
     {
         /* URI Decode */
-        if( Str::contain($token, '%') ) {
+        if ( Str::contain($token, '%') ) {
             $token = rawurldecode($token);
         }
 
@@ -58,8 +58,8 @@ final class Crypto
             $token);
         $json  = json_decode(self::decrypt($token, $salt));
 
-        if( $json ) {
-            if( $json->time + $json->duration >= time() ) {
+        if ( $json ) {
+            if ( $json->time + $json->duration >= time() ) {
                 return true;
             }
         }
@@ -109,7 +109,7 @@ final class Crypto
             : '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $max          = strlen($codeAlphabet);
 
-        for( $i = 0 ; $i < $length ; ++$i ) {
+        for ( $i = 0 ; $i < $length ; ++$i ) {
             $token .= $codeAlphabet[ random_int(0,
                 $max - 1) ];
         }
@@ -132,7 +132,7 @@ final class Crypto
             2);
 
         /* Hashlevel */
-        for( $i = 0 ; $i < $hashlevel ; ++$i ) {
+        for ( $i = 0 ; $i < $hashlevel ; ++$i ) {
             $path .= $hash[ $i ] . '/';
         }
 

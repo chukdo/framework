@@ -2,9 +2,9 @@
 
 function dd( $data )
 {
-    echo "Dump and Die\n" . (php_sapi_name() == 'cli'
+    echo "Dump and Die\n" . ( php_sapi_name() == 'cli'
             ? ''
-            : '<pre>');
+            : '<pre>' );
     var_dump($data);
     exit;
 }
@@ -80,8 +80,8 @@ class QuoteMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
     {
         $response = $dispatcher->handle();
 
-        if( $response->getHeaders()
-                ->getStatus() == 200 ) {
+        if ( $response->getHeaders()
+                 ->getStatus() == 200 ) {
             $response->prepend('"');
             $response->append('"');
         }
@@ -103,8 +103,8 @@ class UnderscoreMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
     {
         $response = $dispatcher->handle();
 
-        if( $response->getHeaders()
-                ->getStatus() == 200 ) {
+        if ( $response->getHeaders()
+                 ->getStatus() == 200 ) {
             $response->prepend('__');
             $response->append('__');
         }
@@ -125,8 +125,8 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
     {
         $response = $dispatcher->handle();
 
-        if( $response->getHeaders()
-                ->getStatus() == 200 ) {
+        if ( $response->getHeaders()
+                 ->getStatus() == 200 ) {
             $response->prepend('--');
             $response->append('--');
         }
@@ -150,13 +150,16 @@ Router::middleware([
         'csrf' => 'required|csrf:@salt',
     ])
     ->prefix('test')
-    ->group(function() {
+    ->group(function()
+    {
         Router::console('/toto',
-            function( $inputs, $response ) {
+            function( $inputs, $response )
+            {
                 return $response->content('all_toto2');
             });
         Router::get('/user/{a}/test/{comment}',
-            function( $inputs, $response ) {
+            function( $inputs, $response )
+            {
                 return $response->content('toto2');
             })
             ->where('a', '[a-z0-9]+')
@@ -172,15 +175,18 @@ Router::middleware([
         'tel'  => 'required|phone',
         'csrf' => 'required|csrf:@salt',
     ])
-    ->group(function() {
+    ->group(function()
+    {
         Router::get('/user/{a}/test/{comment}',
-            function( $inputs, $response ) {
+            function( $inputs, $response )
+            {
                 return $response->content('toto2-2');
             })
             ->where('a', '[a-z0-9]+');
     });
 
-Router::fallback(function() {
+Router::fallback(function()
+{
     dd('rien de valide');
 });
 Router::route();
@@ -235,7 +241,7 @@ $validator = Request::validate([
 
 //echo '<html><body><form method="POST" action="/index.php" enctype="multipart/form-data"><input type="file" name="dossier"><input type="submit"></form></body>';
 
-if( $validator->fails() ) {
+if ( $validator->fails() ) {
     dd($validator->errors());
 }
 else {

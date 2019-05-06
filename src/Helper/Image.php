@@ -25,7 +25,7 @@ final class Image
      */
     public static function loadImageFromFile( string $file ): ?array
     {
-        if( $string = file_get_contents($file) ) {
+        if ( $string = file_get_contents($file) ) {
             return self::loadImageFromString($string);
         }
 
@@ -41,7 +41,7 @@ final class Image
     {
         $image = imagecreatefromstring($string);
 
-        if( $image !== false ) {
+        if ( $image !== false ) {
             $f        = finfo_open();
             $mimeType = finfo_buffer($f,
                 $string,
@@ -66,7 +66,7 @@ final class Image
     {
         $pattern = '/^data:image\/[a-z]{3,4};base64,/';
 
-        if( $string = base64_decode(preg_replace($pattern,
+        if ( $string = base64_decode(preg_replace($pattern,
             '',
             $base64)) ) {
             return self::loadImageFromString($string);
@@ -96,14 +96,14 @@ final class Image
      */
     public static function convert( array $image, int $format, int $quality = null ): ?string
     {
-        if( $image ) {
+        if ( $image ) {
             $w   = $image[ 'w' ];
             $h   = $image[ 'h' ];
             $src = $image[ 'i' ];
             $dst = imagecreatetruecolor($w,
                 $h);
 
-            if( $src && $dst ) {
+            if ( $src && $dst ) {
                 imagecopy($dst,
                     $src,
                     0,
@@ -137,7 +137,7 @@ final class Image
     {
         ob_start();
 
-        switch( $format ) {
+        switch ( $format ) {
             case 'image/gif':
                 imagegif($image);
                 break;
@@ -148,8 +148,8 @@ final class Image
                         ?: 85);
                 break;
             case 'image/png':
-                $quality = 9 - abs(floor((($quality
-                                ?: 85) - 1) / 10));
+                $quality = 9 - abs(floor(( ( $quality
+                                ?: 85 ) - 1 ) / 10));
                 imagealphablending($image,
                     false);
                 imagesavealpha($image,
@@ -203,7 +203,7 @@ final class Image
         $h  = 0;
         $w  = 0;
 
-        if( $dw > 0 && $dh > 0 ) {
+        if ( $dw > 0 && $dh > 0 ) {
             $rw = $sw / $dw;
             $rh = $sh / $dh;
             $r  = max($rw,
@@ -211,11 +211,11 @@ final class Image
             $w  = $sw / $r;
             $h  = $sh / $r;
         }
-        elseif( $dw > 0 ) {
+        elseif ( $dw > 0 ) {
             $w = $dw;
             $h = $w * $sh / $sw;
         }
-        elseif( $dh > 0 ) {
+        elseif ( $dh > 0 ) {
             $h = $dh;
             $w = $h * $sw / $sh;
         }
@@ -225,12 +225,12 @@ final class Image
         $wd  = $dw > 0 && $dw >= $sw;
         $hd  = $dh > 0 && $dh >= $sh;
 
-        if( $whd || $wd || $hd ) {
+        if ( $whd || $wd || $hd ) {
             return self::getImage($image[ 'i' ],
                 $image[ 't' ]);
         }
 
-        if( $w > 0 && $h > 0 ) {
+        if ( $w > 0 && $h > 0 ) {
             return self::resampleImage($image,
                 0,
                 0,
@@ -267,7 +267,7 @@ final class Image
         $dx   = 0;
         $dy   = 0;
 
-        if( $type == 'image/png' ) {
+        if ( $type == 'image/png' ) {
             imagesavealpha($dst,
                 true);
             $alpha = imagecolorallocatealpha($dst,
@@ -281,7 +281,7 @@ final class Image
                 $alpha);
         }
 
-        if( $src && $dst ) {
+        if ( $src && $dst ) {
             imagecopyresampled($dst,
                 $src,
                 $dx,
@@ -321,7 +321,7 @@ final class Image
         $sh = $image[ 'h' ];
 
         /* Taille finale > taille initiale */
-        if( $dx + $dw > $sw || $dy + $dh > $sh ) {
+        if ( $dx + $dw > $sw || $dy + $dh > $sh ) {
             return false;
         }
 

@@ -59,7 +59,7 @@ class App extends Service
      */
     public function env( string $env = null ): string
     {
-        if( $env != null ) {
+        if ( $env != null ) {
             $this->env = $env;
         }
 
@@ -72,7 +72,7 @@ class App extends Service
      */
     public function channel( string $channel = null ): string
     {
-        if( $channel != null ) {
+        if ( $channel != null ) {
             $this->channel = $channel;
         }
 
@@ -93,19 +93,6 @@ class App extends Service
     }
 
     /**
-     * @param string $key
-     * @param null   $default
-     * @return string|null
-     * @throws ServiceException
-     * @throws \ReflectionException
-     */
-    public function lang( string $key, $default = null  ): ?string
-    {
-        return $this->make('Chukdo\Json\Lang')
-            ->offsetGet($key, $default);
-    }
-
-    /**
      * @param string $name
      * @param bool   $bindInstance
      * @return mixed|object|null
@@ -119,7 +106,7 @@ class App extends Service
 
         $this->resolve($alias, $bindObject);
 
-        if( $bindInstance == true ) {
+        if ( $bindInstance == true ) {
             $this->instance($name, $bindObject);
         }
 
@@ -144,15 +131,28 @@ class App extends Service
      */
     protected function resolve( string $name, $bindObject ): self
     {
-        if( isset($this->resolving[ '__ANY__' ]) ) {
+        if ( isset($this->resolving[ '__ANY__' ]) ) {
             $this->resolving[ '__ANY__' ]($bindObject, $name);
         }
 
-        if( isset($this->resolving[ $name ]) ) {
+        if ( isset($this->resolving[ $name ]) ) {
             $this->resolving[ $name ]($bindObject, $name);
         }
 
         return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param null   $default
+     * @return string|null
+     * @throws ServiceException
+     * @throws \ReflectionException
+     */
+    public function lang( string $key, $default = null ): ?string
+    {
+        return $this->make('Chukdo\Json\Lang')
+            ->offsetGet($key, $default);
     }
 
     /**
@@ -180,7 +180,7 @@ class App extends Service
      */
     public function registerServices( array $services = null ): self
     {
-        foreach ($services as $service) {
+        foreach ( $services as $service ) {
             $this->registerService($service);
         }
 

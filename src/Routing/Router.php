@@ -91,17 +91,27 @@ class Router
      */
     public function setAttributes( array $attributes ): self
     {
-        $initAttributes = [
+        $attributes = array_merge([
             'middleware'      => [],
             'validator'       => [],
             'errorMiddleware' => null,
             'prefix'          => '',
             'namespace'       => '',
-        ];
+        ],
+            $attributes);
 
-        // ici plus subtil !!!
+        $this->attributes[ 'middleware' ]      = array_merge($this->attributes[ 'middleware' ], $attributes[ 'middleware' ]);
+        $this->attributes[ 'validator' ]       = array_merge($this->attributes[ 'validator' ], $attributes[ 'validator' ]);
+        $this->attributes[ 'errorMiddleware' ] = $attributes[ 'errorMiddleware' ]
+            ?: $this->attributes[ 'errorMiddleware' ];
 
-        $this->attributes = array_merge($initAttributes, $attributes);
+        if ( strlen($prefix = trim($attributes[ 'prefix' ], '/')) > 0 ) {
+            $this->attributes[ 'prefix' ] .= '/' . $prefix;
+        }
+
+        if ( strlen($namespace = trim($attributes[ 'namespace' ], '/')) > 0 ) {
+            $this->attributes[ 'namespace' ] .= '/' . $namespace;
+        }
 
         return $this;
     }
@@ -112,7 +122,7 @@ class Router
      */
     public function middleware( array $middlewares ): RouteGroup
     {
-        return (new RouteGroup($this))->middleware($middlewares);
+        return ( new RouteGroup($this) )->middleware($middlewares);
     }
 
     /**
@@ -122,7 +132,7 @@ class Router
      */
     public function validator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): RouteGroup
     {
-        return (new RouteGroup($this))->validator($validators, $errorMiddleware);
+        return ( new RouteGroup($this) )->validator($validators, $errorMiddleware);
     }
 
     /**
@@ -131,7 +141,7 @@ class Router
      */
     public function prefix( ?string $prefix ): RouteGroup
     {
-        return (new RouteGroup($this))->prefix($prefix);
+        return ( new RouteGroup($this) )->prefix($prefix);
     }
 
     /**
@@ -140,7 +150,7 @@ class Router
      */
     public function namespace( ?string $namespace ): RouteGroup
     {
-        return (new RouteGroup($this))->namespace($namespace);
+        return ( new RouteGroup($this) )->namespace($namespace);
     }
 
     /**
@@ -177,10 +187,10 @@ class Router
      */
     public function stack( string $method, string $uri, $closure ): Route
     {
-        if( $closure instanceof Closure ) {
+        if ( $closure instanceof Closure ) {
             $appMiddleware = new AppMiddleware($closure);
         }
-        elseif( is_string($closure) ) {
+        elseif ( is_string($closure) ) {
             // namespace
             // App\Controlers\xxx
         }
@@ -251,15 +261,15 @@ class Router
      */
     public function route(): Response
     {
-        foreach( $this->stack as $route ) {
-            if( $route->match() ) {
+        foreach ( $this->stack as $route ) {
+            if ( $route->match() ) {
                 return $route->dispatcher($this->response)
                     ->send();
             }
         }
 
-        if( $this->fallback instanceof Closure ) {
-            ($this->fallback)($this->request, $this->response);
+        if ( $this->fallback instanceof Closure ) {
+            ( $this->fallback )($this->request, $this->response);
         }
         else {
             throw new HttpException('No valid route');

@@ -45,9 +45,9 @@ class ExceptionHandler implements Handler
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function render(Exception $e): void
+    public function render( Exception $e ): void
     {
-        $message  = new ExceptionMessage($e, $this->app->env());
+        $message = new ExceptionMessage($e, $this->app->env());
 
         die($message->render());
     }

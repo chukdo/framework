@@ -36,7 +36,7 @@ class EmailValidate implements ValidateInterface
      */
     public function validate( $input ): bool
     {
-        if( filter_var($input, FILTER_VALIDATE_EMAIL) ) {
+        if ( filter_var($input, FILTER_VALIDATE_EMAIL) ) {
             return true;
         }
 

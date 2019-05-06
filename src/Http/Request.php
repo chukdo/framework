@@ -70,10 +70,10 @@ class Request
             Http::server('CONTENT_LENGTH',
                 ''));
 
-        foreach( $_SERVER as $key => $value ) {
-            if( $name = Str::match('/^HTTP_(.*)/',
+        foreach ( $_SERVER as $key => $value ) {
+            if ( $name = Str::match('/^HTTP_(.*)/',
                 $key) ) {
-                switch( $name ) {
+                switch ( $name ) {
                     case 'HOST':
                     case 'COOKIE':
                         break;
@@ -239,18 +239,18 @@ class Request
      */
     public function render(): string
     {
-        if (Cli::runningInConsole()) {
+        if ( Cli::runningInConsole() ) {
             return 'cli';
         }
 
         $render = Str::extension($this->url()
             ->getPath());
 
-        if( $render ) {
+        if ( $render ) {
             return $render;
         }
 
-        if( $accept = $this->header()
+        if ( $accept = $this->header()
             ->getHeader('Accepts') ) {
             $renders = [
                 'json' => 'json',
@@ -259,8 +259,8 @@ class Request
                 'zip'  => 'zip',
             ];
 
-            foreach( $renders as $contain => $render ) {
-                if( Str::contain($accept, $contain) ) {
+            foreach ( $renders as $contain => $render ) {
+                if ( Str::contain($accept, $contain) ) {
                     return $render;
                 }
             }

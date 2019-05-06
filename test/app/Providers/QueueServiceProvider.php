@@ -10,7 +10,7 @@ class QueueServiceProvider extends ServiceProvider
     {
         $this->app->singleton('Queue', [
             'class' => '\Chukdo\Db\Redis',
-            'args' => [
+            'args'  => [
                 'redis://127.0.0.1:6379',
             ],
         ]);

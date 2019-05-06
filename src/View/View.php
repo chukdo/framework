@@ -127,11 +127,11 @@ class View
             'exists' => false,
         ];
 
-        if( $name ) {
+        if ( $name ) {
             $r[ 'folder' ] = $folder;
             $r[ 'name' ]   = $name;
 
-            if( isset($this->folders[ $folder ]) ) {
+            if ( isset($this->folders[ $folder ]) ) {
                 $r[ 'file' ]   = $this->folders[ $folder ] . '/' . $name . '.html';
                 $r[ 'exists' ] = file_exists($r[ 'file' ]);
             }
@@ -139,7 +139,7 @@ class View
         else {
             $r[ 'name' ] = $folder;
 
-            if( $this->defaultFolder ) {
+            if ( $this->defaultFolder ) {
                 $r[ 'file' ]   = $this->defaultFolder . '/' . $folder . '.html';
                 $r[ 'exists' ] = file_exists($r[ 'file' ]);
             }
@@ -155,11 +155,11 @@ class View
      */
     public function addData( Iterable $data, $templates = null ): self
     {
-        if( $templates == null ) {
+        if ( $templates == null ) {
             $this->sharedData = $data;
         }
         else {
-            foreach( (array) $templates as $template ) {
+            foreach ( (array) $templates as $template ) {
                 $this->sharedTemplateData[ $template ] = $data;
             }
         }
@@ -173,10 +173,10 @@ class View
      */
     public function getData( string $template = null ): ?iterable
     {
-        if( $template == null ) {
+        if ( $template == null ) {
             return $this->sharedData;
         }
-        elseif( isset($this->sharedTemplateData[ $template ]) ) {
+        elseif ( isset($this->sharedTemplateData[ $template ]) ) {
             return $this->sharedTemplateData[ $template ];
         }
         else {
@@ -218,7 +218,7 @@ class View
      */
     public function callRegisteredFunction( string $function ): Closure
     {
-        if( $this->isRegisteredFunction($function) ) {
+        if ( $this->isRegisteredFunction($function) ) {
             return $this->functions[ $function ];
         }
 

@@ -71,7 +71,7 @@ class ElasticHandler extends AbstractHandler
      */
     protected function init( string $channel ): void
     {
-        if( !$this->elastic->indices()
+        if ( !$this->elastic->indices()
             ->exists([
                 'index' => $channel,
             ]) ) {

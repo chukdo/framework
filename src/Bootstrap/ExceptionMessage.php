@@ -41,11 +41,11 @@ class ExceptionMessage
         $this->env = $env;
         $backTrace = [];
 
-        if( $previous = $e->getPrevious() ) {
+        if ( $previous = $e->getPrevious() ) {
             $e = $previous;
         }
 
-        foreach( $e->getTrace() as $trace ) {
+        foreach ( $e->getTrace() as $trace ) {
             $trace = array_merge([
                 'file'     => null,
                 'line'     => null,
@@ -86,13 +86,13 @@ class ExceptionMessage
         $code = '';
         $spl  = new SplFileObject($file);
 
-        for( $i = -7 ; $i < 3 ; ++$i ) {
+        for ( $i = -7 ; $i < 3 ; ++$i ) {
             try {
                 $spl->seek($line + $i);
-                $code .= ($line + $i + 1) . ($i == -1
+                $code .= ( $line + $i + 1 ) . ( $i == -1
                         ? '> '
-                        : ': ') . $spl->current() . "\n";
-            } catch( Throwable $e ) {
+                        : ': ' ) . $spl->current() . "\n";
+            } catch ( Throwable $e ) {
             }
         }
 
@@ -111,7 +111,7 @@ class ExceptionMessage
      */
     public function render(): void
     {
-        if( Cli::runningInConsole() ) {
+        if ( Cli::runningInConsole() ) {
             $this->renderForConsole();
         }
         else {
@@ -156,7 +156,7 @@ class ExceptionMessage
 
         $backTrace = $this->message[ 'Trace' ];
 
-        if( is_array($backTrace) ) {
+        if ( is_array($backTrace) ) {
             $table = new \cli\Table();
             $table->setHeaders([
                 '%YFile%n',
@@ -164,7 +164,7 @@ class ExceptionMessage
                 '%YCall%n',
             ]);
 
-            foreach( $backTrace as $trace ) {
+            foreach ( $backTrace as $trace ) {
                 $table->addRow([
                     $trace[ 'File' ],
                     $trace[ 'Line' ],
@@ -192,21 +192,21 @@ class ExceptionMessage
         $response = new Response();
 
         /* Dev mode */
-        if( $this->env != 0 ) {
+        if ( $this->env != 0 ) {
             $this->message = [ 'Error' => 'Error happened' ];
         }
 
-        switch( $render ) {
+        switch ( $render ) {
             case 'xml':
                 $contentType = Http::mimeContentType('xml');
-                $content     = (new Xml())->import($this->message)
+                $content     = ( new Xml() )->import($this->message)
                     ->toXml()
                     ->toXmlString();
 
                 break;
             case 'json':
                 $contentType = Http::mimeContentType('json');
-                $content     = (new Json($this->message))->toJson(true);
+                $content     = ( new Json($this->message) )->toJson(true);
                 break;
             case 'html':
             default:

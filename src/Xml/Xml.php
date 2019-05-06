@@ -62,7 +62,7 @@ class Xml extends Node
             $xml->setElement($xml->doc()->documentElement);
 
             return $xml;
-        } catch( Throwable $e ) {
+        } catch ( Throwable $e ) {
             throw new XmlException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -89,7 +89,7 @@ class Xml extends Node
             $value,
             $uri);
 
-        foreach( $childs as $child ) {
+        foreach ( $childs as $child ) {
             $node->appendNode($child->element());
         }
 
@@ -105,8 +105,8 @@ class Xml extends Node
     {
         $dir = dirname($file);
 
-        if( !is_dir($dir) ) {
-            if( !mkdir($dir,
+        if ( !is_dir($dir) ) {
+            if ( !mkdir($dir,
                 0777,
                 true) ) {
                 return false;
@@ -182,7 +182,7 @@ class Xml extends Node
             $xml->setElement($xml->doc()->documentElement);
 
             return $xml;
-        } catch( Exception $e ) {
+        } catch ( Exception $e ) {
             throw new XmlException($e->getMessage(), $e->getCode(), $e);
         }
     }

@@ -24,7 +24,7 @@ final class Stream
      */
     public static function register( string $name, string $class ): void
     {
-        if( self::exists($name) ) {
+        if ( self::exists($name) ) {
             stream_wrapper_unregister($name);
         }
         stream_wrapper_register($name,

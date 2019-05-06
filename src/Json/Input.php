@@ -21,14 +21,15 @@ class Input extends Json
     public function __construct( $data = null )
     {
         $data = $data
-            ?: (Cli::runningInConsole()
+            ?: ( Cli::runningInConsole()
                 ? Cli::inputs()
-                : $_REQUEST);
+                : $_REQUEST );
 
         /* Trim all input */
         array_walk_recursive($data,
-            function( &$v, $k ) {
-                if( is_scalar($v) ) {
+            function( &$v, $k )
+            {
+                if ( is_scalar($v) ) {
                     $v = trim($v);
                 }
             });
@@ -37,16 +38,16 @@ class Input extends Json
     }
 
     /**
-     * @param string $name
+     * @param string      $name
      * @param string|null $allowedMimeTypes
-     * @param int|null $maxFileSize
+     * @param int|null    $maxFileSize
      * @return FileUploaded|null
      */
     public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): ?FileUploaded
     {
         try {
             return new FileUploaded($name, $allowedMimeTypes, $maxFileSize);
-        } catch( \Throwable $e ) {
+        } catch ( \Throwable $e ) {
             return null;
         }
     }

@@ -56,12 +56,12 @@ class AppMiddleware extends ClosureMiddleware
         $validate = $delegate->request()
             ->validate($this->validators);
 
-        if( $validate->fails() ) {
-            return ($this->errorMiddleware
-                ?: new ErrorMiddleware())->errorMessage($validate->errors())
+        if ( $validate->fails() ) {
+            return ( $this->errorMiddleware
+                ?: new ErrorMiddleware() )->errorMessage($validate->errors())
                 ->process($delegate);
         }
 
-        return ($this->closure)($validate->validated(), $delegate->response());
+        return ( $this->closure )($validate->validated(), $delegate->response());
     }
 }

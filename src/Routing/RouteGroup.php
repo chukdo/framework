@@ -51,7 +51,7 @@ class RouteGroup
      */
     public function __construct( Router $router )
     {
-        $this->router  = $router;
+        $this->router = $router;
     }
 
     /**
@@ -103,9 +103,10 @@ class RouteGroup
     /**
      * @param Closure $closure
      */
-    public function group(Closure $closure)
+    public function group( Closure $closure )
     {
         $attributes = $this->router->getAttributes();
+
         $this->router->setAttributes([
             'middleware'      => $this->middlewares,
             'validator'       => $this->validators,
@@ -114,7 +115,7 @@ class RouteGroup
             'namespace'       => $this->namespace,
         ]);
 
-        ($closure)();
+        ( $closure )();
 
         $this->router->resetAttributes()
             ->setAttributes($attributes);

@@ -35,11 +35,11 @@ class ErrorMiddleware implements ErrorMiddlewareInterface
     {
         $response = $delegate->response();
 
-        if( Cli::runningInConsole() ) {
+        if ( Cli::runningInConsole() ) {
             $response->content($this->errors->toConsole());
         }
         else {
-            switch( Str::extension(Http::server('SCRIPT_URI')) ) {
+            switch ( Str::extension(Http::server('SCRIPT_URI')) ) {
                 case 'json' :
                     $response->json($this->errors);
                     break;

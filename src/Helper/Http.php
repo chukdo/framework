@@ -63,7 +63,7 @@ final class Http
 
         $ext = Str::extension($name);
 
-        if( array_key_exists($ext,
+        if ( array_key_exists($ext,
             $mimeTypes) ) {
             return $mimeTypes[ $ext ];
         }
@@ -89,8 +89,9 @@ final class Http
         $ua               = strtolower($ua);
         $browser[ 'bot' ] = Str::match('/baiduspider|googlebot|yandexbot|bingbot|lynx|wget|curl/',
             $ua);
-        $is               = function( $contain, $name = false ) use ( $ua, &$browser ) {
-            if( Str::contain($ua,
+        $is               = function( $contain, $name = false ) use ( $ua, &$browser )
+        {
+            if ( Str::contain($ua,
                 $contain) ) {
                 $browser[ 'browser' ] = $name
                     ?: $contain;
@@ -104,18 +105,18 @@ final class Http
         };
 
         /* Browser & Version */
-        if( !$is('firefox') ) {
-            if( !$is('edge',
+        if ( !$is('firefox') ) {
+            if ( !$is('edge',
                 'msie') ) {
-                if( !$is('msie') ) {
-                    if( !$is('trident',
+                if ( !$is('msie') ) {
+                    if ( !$is('trident',
                         'msie') ) {
-                        if( !$is('opera') ) {
-                            if( !$is('opr',
+                        if ( !$is('opera') ) {
+                            if ( !$is('opr',
                                 'opera') ) {
-                                if( !$is('chromium',
+                                if ( !$is('chromium',
                                     'chrome') ) {
-                                    if( !$is('chrome') ) {
+                                    if ( !$is('chrome') ) {
                                         $is('safari');
                                     }
                                 }
@@ -127,27 +128,27 @@ final class Http
         }
 
         /* Platform */
-        if( Str::contain($ua,
+        if ( Str::contain($ua,
             'windows') ) {
             $browser[ 'platform' ] = 'windows';
         }
-        elseif( Str::contain($ua,
+        elseif ( Str::contain($ua,
             'linux') ) {
             $browser[ 'platform' ] = 'linux';
         }
-        elseif( Str::contain($ua,
+        elseif ( Str::contain($ua,
             'mac') ) {
             $browser[ 'platform' ] = 'osx';
         }
 
         /* Mobile */
-        if( Str::contain($ua,
+        if ( Str::contain($ua,
                 'ipad')
-            || Str::contain($ua,
+             || Str::contain($ua,
                 'iphone') ) {
             $browser[ 'mobile' ] = 'ios';
         }
-        elseif( Str::contain($ua,
+        elseif ( Str::contain($ua,
             'android') ) {
             $browser[ 'mobile' ] = 'android';
         }

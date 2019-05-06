@@ -33,11 +33,11 @@ class Storage
     {
         $dir = opendir($directory);
 
-        while( ($file = readdir($dir)) !== false ) {
-            if( ($file != '.') && ($file != '..') ) {
+        while ( ( $file = readdir($dir) ) !== false ) {
+            if ( ( $file != '.' ) && ( $file != '..' ) ) {
                 $full = $directory . '/' . $file;
 
-                if( is_dir($full) ) {
+                if ( is_dir($full) ) {
                     $this->deleteDirectory($full);
                 }
                 else {
@@ -69,11 +69,11 @@ class Storage
         $list = [];
         $dir  = opendir($directory);
 
-        while( ($file = readdir($dir)) !== false ) {
-            if( ($file != '.') && ($file != '..') ) {
+        while ( ( $file = readdir($dir) ) !== false ) {
+            if ( ( $file != '.' ) && ( $file != '..' ) ) {
                 $full = $directory . '/' . $file;
 
-                if( is_dir($full) ) {
+                if ( is_dir($full) ) {
                     $list[] = $full;
                 }
             }
@@ -94,11 +94,11 @@ class Storage
         $list = [];
         $dir  = opendir($directory);
 
-        while( ($file = readdir($dir)) !== false ) {
-            if( ($file != '.') && ($file != '..') ) {
+        while ( ( $file = readdir($dir) ) !== false ) {
+            if ( ( $file != '.' ) && ( $file != '..' ) ) {
                 $full = $directory . '/' . $file;
 
-                if( is_dir($full) ) {
+                if ( is_dir($full) ) {
                     $list = array_merge($list,
                         $this->allDirectories($full));
                 }
@@ -184,12 +184,12 @@ class Storage
         $list = [];
         $dir  = opendir($directory);
 
-        while( ($file = readdir($dir)) !== false ) {
-            if( ($file != '.') && ($file != '..') ) {
+        while ( ( $file = readdir($dir) ) !== false ) {
+            if ( ( $file != '.' ) && ( $file != '..' ) ) {
                 $full = $directory . '/' . $file;
 
-                if( !is_dir($full)
-                    && Str::match($match,
+                if ( !is_dir($full)
+                     && Str::match($match,
                         $full) ) {
                     $list[] = $full;
                 }
@@ -211,12 +211,12 @@ class Storage
         $list = [];
         $dir  = opendir($directory);
 
-        while( ($file = readdir($dir)) !== false ) {
-            if( ($file != '.') && ($file != '..') ) {
+        while ( ( $file = readdir($dir) ) !== false ) {
+            if ( ( $file != '.' ) && ( $file != '..' ) ) {
                 $full = $directory . '/' . $file;
 
-                if( !is_dir($full)
-                    && Str::match($match,
+                if ( !is_dir($full)
+                     && Str::match($match,
                         $full) ) {
                     $list = array_merge($list,
                         $this->allFiles($full,

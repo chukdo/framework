@@ -53,7 +53,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      */
     public function stream_seek( int $offset, $whence = SEEK_SET ): bool
     {
-        switch( $whence ) {
+        switch ( $whence ) {
             case SEEK_SET:
                 $this->setTell($offset);
                 break;
@@ -141,7 +141,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      */
     public function stream_read( int $count ): ?string
     {
-        switch( $this->getMode() ) {
+        switch ( $this->getMode() ) {
             case 'w':
             case 'a':
             case 'x':
@@ -158,7 +158,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
         $this->appendTell(min(strlen($read),
             $count));
 
-        if( $this->getTell() >= $this->streamSize() ) {
+        if ( $this->getTell() >= $this->streamSize() ) {
             $this->setEof();
         }
 
@@ -205,13 +205,13 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     {
         $size = $this->streamSize();
 
-        if( $new_size > $size ) {
+        if ( $new_size > $size ) {
             return $this->streamSetRange($size,
                 str_repeat(chr(0),
                     $new_size - $size));
         }
-        elseif( $new_size < $size ) {
-            if( $new_size == 0 ) {
+        elseif ( $new_size < $size ) {
+            if ( $new_size == 0 ) {
                 $this->streamSet(null);
             }
             else {
@@ -219,7 +219,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
                     $new_size));
             }
 
-            if( $this->getTell() > $new_size ) {
+            if ( $this->getTell() > $new_size ) {
                 $this->streamSetRange($new_size,
                     str_repeat(chr(0),
                         $this->getTell() - $new_size));
@@ -254,10 +254,10 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
         $this->setMode($mode);
         $exits = $this->streamExists();
 
-        switch( $this->getMode() ) {
+        switch ( $this->getMode() ) {
             case 'r':
             case 'r+':
-                if( !$exits ) {
+                if ( !$exits ) {
                     throw new StreamException(sprintf("File [%s] doesn't exists",
                         $this->getUrl()
                             ->getPath()));
@@ -269,7 +269,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
                 break;
             case 'a':
             case 'a+':
-                if( $tell = $this->streamSize() ) {
+                if ( $tell = $this->streamSize() ) {
                     $this->setTell($tell);
                 }
                 else {
@@ -278,7 +278,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
                 break;
             case 'x':
             case 'x+':
-                if( $exits ) {
+                if ( $exits ) {
                     throw new StreamException(sprintf('Mode X not allow [%s] file exists',
                         $this->getUrl()
                             ->getPath()));
@@ -288,13 +288,13 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
                 break;
             case 'c':
             case 'c+':
-                if( !$exits ) {
+                if ( !$exits ) {
                     $this->streamSet(null);
                 }
                 break;
         }
 
-        if( !$exits ) {
+        if ( !$exits ) {
             $this->streamCreatedTime(true);
         }
 
@@ -338,14 +338,14 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     /**
      * Cette méthode est appelée en réponse à fwrite().
      * @param string $data
-     * @throws StreamException
      * @return int le nombre d'octets qui ont pu être stockés correctement, et 0 si aucun n'a pu être stocké
+     * @throws StreamException
      */
     public function stream_write( string $data ): int
     {
         $strlen = mb_strlen($data);
 
-        switch( $this->getMode() ) {
+        switch ( $this->getMode() ) {
             case 'r':
                 throw new StreamException(sprintf('[%s] is in readonly mode',
                     $this->getUrl()
@@ -393,7 +393,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      */
     public function stream_stat(): ?array
     {
-        if( $size = $this->streamSize() ) {
+        if ( $size = $this->streamSize() ) {
             return [
                 'size'  => $size,
                 'mode'  => $this->streamIsDir()
@@ -444,14 +444,14 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
         $urlTo = new Url($pathTo);
 
         /* Changement de host = Error */
-        if( $this->getHost() != $urlTo->getHost() ) {
+        if ( $this->getHost() != $urlTo->getHost() ) {
             return false;
         }
 
         $rename = trim($urlTo->getPath(),
             '/');
 
-        if( $this->streamRename($rename) ) {
+        if ( $this->streamRename($rename) ) {
             $this->url = $urlTo;
             $this->streamCreatedTime(true);
             $this->streamModifiedTime(true);

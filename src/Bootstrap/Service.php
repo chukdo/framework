@@ -74,7 +74,7 @@ class Service implements ArrayAccess
      */
     public function singleton( string $name, $closure ): bool
     {
-        if( is_string($closure) || $closure instanceof \Closure || is_array($closure) ) {
+        if ( is_string($closure) || $closure instanceof \Closure || is_array($closure) ) {
             $this->singletons[ $this->formatNameSpace($name) ] = $closure;
 
             return true;
@@ -127,10 +127,10 @@ class Service implements ArrayAccess
      */
     public function make( string $name )
     {
-        if( $instance = $this->getInstance($name) ) {
+        if ( $instance = $this->getInstance($name) ) {
             return $instance;
         }
-        elseif( $singleton = $this->getSingleton($name) ) {
+        elseif ( $singleton = $this->getSingleton($name) ) {
             $this->instance($name, $closure = $this->getClosure($name));
 
             return $closure;
@@ -175,7 +175,7 @@ class Service implements ArrayAccess
      */
     public function instance( string $name, $instance ): bool
     {
-        if( is_object($instance) ) {
+        if ( is_object($instance) ) {
             $this->instances[ $this->formatNameSpace($name) ] = $instance;
             return true;
         }
@@ -194,17 +194,17 @@ class Service implements ArrayAccess
         $bind = $this->getBind($name)
             ?: $this->getSingleton($name);
 
-        if( $bind ) {
-            if( $bind instanceof Closure ) {
+        if ( $bind ) {
+            if ( $bind instanceof Closure ) {
                 return $bind();
             }
-            elseif( is_string($bind) ) {
+            elseif ( is_string($bind) ) {
                 return $this->getClosure($bind);
             }
-            elseif( is_array($bind) ) {
-                if( array_key_exists('class',
+            elseif ( is_array($bind) ) {
+                if ( array_key_exists('class',
                         $bind)
-                    && array_key_exists('args',
+                     && array_key_exists('args',
                         $bind) ) {
                     return $this->resolveService($bind[ 'class' ],
                         $bind[ 'args' ]);
@@ -238,9 +238,9 @@ class Service implements ArrayAccess
      */
     private function resolveService( string $class, array $args = [] )
     {
-        foreach( $args as $key => $arg ) {
-            if( is_array($arg) ) {
-                foreach( $arg as $k => $v ) {
+        foreach ( $args as $key => $arg ) {
+            if ( is_array($arg) ) {
+                foreach ( $arg as $k => $v ) {
                     $args[ $key ][ $k ] = $this->resolveServiceArg($v);
                 }
             }
@@ -265,14 +265,14 @@ class Service implements ArrayAccess
         $reflector = new ReflectionClass($class);
 
         /* C'est n'est pas une classe on genere une exception */
-        if( !$reflector->isInstantiable() ) {
+        if ( !$reflector->isInstantiable() ) {
             throw new ServiceException("[$class] is not a class");
         }
 
         $constructor = $reflector->getConstructor();
 
         /* pas de constructeur donc pas de parametres à gerer */
-        if( is_null($constructor) ) {
+        if ( is_null($constructor) ) {
             return new $class();
         }
 
@@ -297,10 +297,10 @@ class Service implements ArrayAccess
         $lastPart  = substr($arg,
             1);
 
-        if( $firstPart == '@' ) {
+        if ( $firstPart == '@' ) {
             return $this->make($lastPart);
         }
-        elseif( $firstPart == '#' ) {
+        elseif ( $firstPart == '#' ) {
             return $this->conf($lastPart);
         }
 
@@ -318,7 +318,7 @@ class Service implements ArrayAccess
         $args       = [];
         $parameters = $constructor->getParameters();
 
-        foreach( $parameters as $parameter ) {
+        foreach ( $parameters as $parameter ) {
             $args[] = $this->resolveArg($parameter);
         }
 
@@ -347,12 +347,12 @@ class Service implements ArrayAccess
         $class = $parameter->getClass();
 
         /* Le parametre est un objet on cherche à le resoudre  */
-        if( $cname = $parameter->getClass() ) {
+        if ( $cname = $parameter->getClass() ) {
             return $this->make($cname->name);
 
             /* Le parametre a une valeur par defaut que l'on injecte */
         }
-        elseif( $parameter->isDefaultValueAvailable() ) {
+        elseif ( $parameter->isDefaultValueAvailable() ) {
             return $parameter->getDefaultValue();
         }
 
@@ -382,7 +382,7 @@ class Service implements ArrayAccess
      */
     public function bind( string $name, $closure ): bool
     {
-        if( is_string($closure) || $closure instanceof \Closure || is_array($closure) ) {
+        if ( is_string($closure) || $closure instanceof \Closure || is_array($closure) ) {
             $this->bindings[ $this->formatNameSpace($name) ] = $closure;
 
             return true;

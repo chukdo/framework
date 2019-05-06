@@ -19,7 +19,7 @@ final class To
      */
     public static function type( string $type, $value )
     {
-        switch( $type ) {
+        switch ( $type ) {
             case 'boolean':
                 return (bool) $value;
                 break;
@@ -49,7 +49,7 @@ final class To
             '_',
             Str::allText($name));
 
-        if( !preg_match('/^[a-z]/',
+        if ( !preg_match('/^[a-z]/',
             $qname) ) {
             $qname = $prefix
                 ?: 'error';
@@ -66,7 +66,7 @@ final class To
      */
     public static function fileName( string $name, string $prefix = null, string $suffix = null ): string
     {
-        if( strlen($name) > 0 ) {
+        if ( strlen($name) > 0 ) {
             return preg_replace('/_{2,}/',
                 '_',
                 $prefix . str_replace(' ',
@@ -85,8 +85,8 @@ final class To
     {
         $value = (string) $value;
 
-        if( $value !== false ) {
-            if( !mb_check_encoding($value,
+        if ( $value !== false ) {
+            if ( !mb_check_encoding($value,
                 'UTF-8') ) {
                 $value = mb_convert_encoding($value,
                     'UTF-8');
@@ -113,15 +113,15 @@ final class To
     {
         $scalar = '';
 
-        if( Is::scalar($value) ) {
+        if ( Is::scalar($value) ) {
             $scalar = $value;
         }
-        elseif( Is::object($value,
+        elseif ( Is::object($value,
             '__toString') ) {
             $scalar = $value->__toString();
         }
-        elseif( Is::traversable($value) ) {
-            foreach( $value as $v ) {
+        elseif ( Is::traversable($value) ) {
+            foreach ( $value as $v ) {
                 $scalar .= self::scalar($v) . ' ';
             }
         }
@@ -142,7 +142,7 @@ final class To
             '',
             self::scalar($value));
 
-        if( Str::contain($value, '.') && Str::contain($value, ',') ) {
+        if ( Str::contain($value, '.') && Str::contain($value, ',') ) {
             $value = str_replace('.', '', $value);
         }
 
@@ -161,7 +161,7 @@ final class To
             ?: 'd/m/Y',
             $value);
 
-        if( $date instanceof \DateTime ) {
+        if ( $date instanceof \DateTime ) {
             return $date;
         }
 
@@ -174,10 +174,10 @@ final class To
      */
     public static function json( $value ): string
     {
-        if( is_scalar($value) ) {
+        if ( is_scalar($value) ) {
             return $value;
         }
-        elseif( Is::object($value,
+        elseif ( Is::object($value,
             'toJson') ) {
             return $value->toJson();
         }
@@ -195,29 +195,29 @@ final class To
     {
         $array = [];
 
-        if( is_array($value) ) {
+        if ( is_array($value) ) {
             $array = $value;
 
             /* La valeur est TRUE | FALSE | NULL | '' */
         }
-        elseif( $value === true || $value === false || $value === null || $value === '' || $value === 0 ) {
+        elseif ( $value === true || $value === false || $value === null || $value === '' || $value === 0 ) {
             $array = [];
 
             /* La valeur est un entier ou une chaine de caractere */
         }
-        elseif( Is::scalar($value) ) {
+        elseif ( Is::scalar($value) ) {
             $array = [ $value ];
 
             /* La valeur est un object avec une fonction de transformation */
         }
-        elseif( Is::object($value,
+        elseif ( Is::object($value,
             'toArray') ) {
             $array = $value->toArray();
 
             /* La valeur est un tableau ou est travsersable */
         }
-        elseif( Is::traversable($value) ) {
-            foreach( $value as $k => $v ) {
+        elseif ( Is::traversable($value) ) {
+            foreach ( $value as $k => $v ) {
                 $array[ $k ] = is_scalar($v)
                     ? $v
                     : self::arr($v);
@@ -240,10 +240,10 @@ final class To
      */
     public static function xml( $value ): \Chukdo\Xml\Xml
     {
-        if( $value instanceof \Chukdo\Xml\Xml ) {
+        if ( $value instanceof \Chukdo\Xml\Xml ) {
             return $value;
         }
-        elseif( Is::object($value,
+        elseif ( Is::object($value,
             'toXml') ) {
             return $value->toXml();
         }
@@ -262,12 +262,12 @@ final class To
      * @param int|null    $widthFirstCol
      * @return string
      */
-    public static function html( $value, string $title = null, string $color = null, int $widthFirstCol = null) : string
+    public static function html( $value, string $title = null, string $color = null, int $widthFirstCol = null ): string
     {
         $html  = '';
         $style = 'border-spacing:0;border-collapse:collapse;font-family:Arial;width:100%;word-break:break-word;';
 
-        if( $title ) {
+        if ( $title ) {
             $color = $color
                 ?: '#499cef';
             $html  .= '<thead style="color: #fff;background: ' . $color
@@ -275,7 +275,7 @@ final class To
                       . "</th></tr></thead>";
         }
 
-        foreach( $value as $k => $v ) {
+        foreach ( $value as $k => $v ) {
             $v = is_iterable($v)
                 ? self::html($v, null,
                     null,

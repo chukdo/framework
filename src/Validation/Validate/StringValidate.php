@@ -54,10 +54,10 @@ class StringValidate implements ValidateInterface
      */
     public function validate( $input ): bool
     {
-        if( is_string($input) ) {
+        if ( is_string($input) ) {
             $len = strlen($input);
 
-            if( $len >= $this->min && $len <= $this->max ) {
+            if ( $len >= $this->min && $len <= $this->max ) {
                 return true;
             }
         }

@@ -42,12 +42,12 @@ final class Is
      */
     public static function object( $value, string $method = '', string $property = '' ): bool
     {
-        if( is_object($value) ) {
-            if( $method != false ) {
+        if ( is_object($value) ) {
+            if ( $method != false ) {
                 return method_exists($value,
                     $method);
             }
-            elseif( $property != false ) {
+            elseif ( $property != false ) {
                 return property_exists($value,
                     $property);
             }
@@ -85,14 +85,14 @@ final class Is
         $min = (int) $min;
         $max = (int) $max;
 
-        if( $min > 0 ) {
-            if( $value < $min ) {
+        if ( $min > 0 ) {
+            if ( $value < $min ) {
                 return false;
             }
         }
 
-        if( $max > 0 ) {
-            if( $value > $max ) {
+        if ( $max > 0 ) {
+            if ( $value > $max ) {
                 return false;
             }
         }
@@ -284,15 +284,15 @@ final class Is
      */
     public function empty( $value ): bool
     {
-        if( self::scalar($value) ) {
+        if ( self::scalar($value) ) {
             $value = trim($value);
 
-            if( $value === '' || $value === null ) {
+            if ( $value === '' || $value === null ) {
                 return true;
             }
         }
-        elseif( self::traversable($value) ) {
-            foreach( $value as $v ) {
+        elseif ( self::traversable($value) ) {
+            foreach ( $value as $v ) {
                 return false;
             }
 

@@ -39,12 +39,12 @@ final class Cli
     {
         $inputs = [];
 
-        foreach( (array) $_SERVER[ 'argv' ] as $k => $arg ) {
+        foreach ( (array) $_SERVER[ 'argv' ] as $k => $arg ) {
             list($key, $value) = array_pad(explode('=', $arg), 2, null);
 
             $key = trim($key, '-');
 
-            if( $k > 0 ) {
+            if ( $k > 0 ) {
                 $inputs[ $key ] = $value;
             }
         }
@@ -59,7 +59,7 @@ final class Cli
     {
         $inputs = self::argv();
 
-        if( isset($inputs[ 'uri' ]) ) {
+        if ( isset($inputs[ 'uri' ]) ) {
             unset($inputs[ 'uri' ]);
         }
 

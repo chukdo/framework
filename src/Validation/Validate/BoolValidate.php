@@ -36,7 +36,7 @@ class BoolValidate implements ValidateInterface
      */
     public function validate( $input ): bool
     {
-        if( is_bool($input) ) {
+        if ( is_bool($input) ) {
             return true;
         }
 

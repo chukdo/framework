@@ -29,11 +29,11 @@ class AzureStream extends AbstractStream
      */
     public function streamGetRange( int $offset, int $length ): ?string
     {
-        if( $this->streamContent == null ) {
+        if ( $this->streamContent == null ) {
             $this->streamGet();
         }
 
-        if( $offset >= $this->streamLenght ) {
+        if ( $offset >= $this->streamLenght ) {
             return null;
         }
         else {
@@ -50,7 +50,7 @@ class AzureStream extends AbstractStream
      */
     public function streamGet()
     {
-        if( $this->streamContent == null ) {
+        if ( $this->streamContent == null ) {
             $this->streamContent = stream_get_contents($this->getStream()
                 ->getBlob($this->getHost(),
                     $this->getPath())
@@ -68,7 +68,7 @@ class AzureStream extends AbstractStream
      */
     protected function getStream(): BlobRestProxy
     {
-        if( $this->stream instanceof BlobRestProxy ) {
+        if ( $this->stream instanceof BlobRestProxy ) {
             return $this->stream;
         }
 
@@ -86,12 +86,12 @@ class AzureStream extends AbstractStream
         try {
             $stream = ServiceLocator::getInstance()
                 ->getResource($scheme);
-        } catch( \Exception $e ) {
+        } catch ( \Exception $e ) {
             throw new StreamException(sprintf('[%s] is not a registred resource',
                 $scheme), $e->getCode(), $e);
         }
 
-        if( !($stream instanceof BlobRestProxy) ) {
+        if ( !( $stream instanceof BlobRestProxy ) ) {
             throw new StreamException(sprintf('service [%s] is not a azure BlobRestProxy instance',
                 $scheme));
         }
@@ -147,7 +147,7 @@ class AzureStream extends AbstractStream
     {
         try {
             return (bool) $this->streamSize() > 0;
-        } catch( \Throwable $e ) {
+        } catch ( \Throwable $e ) {
         }
 
         return false;
@@ -160,7 +160,7 @@ class AzureStream extends AbstractStream
      */
     public function streamSize(): int
     {
-        if( $this->streamLenght == 0 ) {
+        if ( $this->streamLenght == 0 ) {
             $this->streamLenght = (int) $this->getStream()
                 ->getBlob($this->getHost(),
                     $this->getPath())
@@ -246,11 +246,11 @@ class AzureStream extends AbstractStream
             ->getBlobs();
         $list  = [];
 
-        foreach( $blobs as $blob ) {
+        foreach ( $blobs as $blob ) {
             $name = $blob->getName();
 
-            if( $path ) {
-                if( strpos($name, $path) === 0 ) {
+            if ( $path ) {
+                if ( strpos($name, $path) === 0 ) {
                     $list[] = trim(substr($name,
                         strlen($path)),
                         '/');
@@ -294,7 +294,7 @@ class AzureStream extends AbstractStream
      */
     public function streamModifiedTime( $time = false ): int
     {
-        if( $time ) {
+        if ( $time ) {
             return time();
         }
 

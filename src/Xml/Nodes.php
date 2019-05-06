@@ -20,7 +20,7 @@ class Nodes extends Json
      */
     public function __call( string $name, array $params = [] )
     {
-        foreach( $this as $node ) {
+        foreach ( $this as $node ) {
             call_user_func_array([
                 $node,
                 $name,

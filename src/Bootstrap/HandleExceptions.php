@@ -55,7 +55,7 @@ class HandleExceptions
      */
     public function handleError( int $level, string $message, string $file = '', int $line = 0 ): void
     {
-        if( error_reporting() & $level ) {
+        if ( error_reporting() & $level ) {
             throw new ErrorException($message, 0, $level, $file, $line);
         }
     }
@@ -66,7 +66,7 @@ class HandleExceptions
      */
     public function handleShutdown(): void
     {
-        if( !is_null($error = error_get_last()) && $this->isFatal($error[ 'type' ]) ) {
+        if ( !is_null($error = error_get_last()) && $this->isFatal($error[ 'type' ]) ) {
             $this->handleException($this->fatalExceptionFromError($error));
         }
     }
@@ -93,7 +93,7 @@ class HandleExceptions
      */
     public function handleException( Throwable $e )
     {
-        if( !$e instanceof Exception ) {
+        if ( !$e instanceof Exception ) {
             $e = new AppException($e->getMessage(), $e->getCode(), $e);
         }
 
@@ -101,7 +101,7 @@ class HandleExceptions
 
         try {
             $exceptionHandler->report($e);
-        } catch( Throwable $e ) {
+        } catch ( Throwable $e ) {
         }
 
         $exceptionHandler->render($e);

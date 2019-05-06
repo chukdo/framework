@@ -47,7 +47,7 @@ class Singleton
      */
     public static function getInstance()
     {
-        if( is_null(self::$singletonInstance) ) {
+        if ( is_null(self::$singletonInstance) ) {
             self::$singletonInstance = new static();
         }
 

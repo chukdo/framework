@@ -61,7 +61,7 @@ class Dispatcher
      */
     public function pipes( array $middleswares ): self
     {
-        foreach( $middleswares as $middlesware ) {
+        foreach ( $middleswares as $middlesware ) {
             $this->pipe($middlesware);
         }
 
@@ -87,7 +87,7 @@ class Dispatcher
         $middleware = $this->getMiddleware();
         $this->index++;
 
-        if( is_null($middleware) ) {
+        if ( is_null($middleware) ) {
             return $this->response;
         }
 
@@ -99,7 +99,7 @@ class Dispatcher
      */
     private function getMiddleware()
     {
-        if( isset($this->middlewares[ $this->index ]) ) {
+        if ( isset($this->middlewares[ $this->index ]) ) {
             return $this->middlewares[ $this->index ];
         }
 

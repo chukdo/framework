@@ -35,9 +35,9 @@ class Url
      */
     public function __construct( string $url = null, string $defaultScheme = null )
     {
-        if( $url ) {
-            if( $defaultScheme ) {
-                if( !Str::match('/^[a-z0-9]+:\/\//', $url) ) {
+        if ( $url ) {
+            if ( $defaultScheme ) {
+                if ( !Str::match('/^[a-z0-9]+:\/\//', $url) ) {
                     $url = $defaultScheme . '://' . $url;
                 }
             }
@@ -214,6 +214,74 @@ class Url
     }
 
     /**
+     * @return string|null
+     */
+    public function getSubDomain(): ?string
+    {
+        $subDomains = $this->getSubDomains();
+
+        return reset($subDomains);
+    }
+
+    /**
+     * @return array
+     */
+    public function getSubDomains(): array
+    {
+        $domainAndTld = '.' . $this->getDomain() . '.' . $this->getTld();
+        $host         = str_replace('www.', '', $this->getHost());
+
+        if ( Str::contain($host, $domainAndTld) ) {
+            return explode('.', str_replace($domainAndTld, '', $host));
+        }
+
+        return [];
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDomain(): ?string
+    {
+        $tld  = '.' . $this->getTld();
+        $host = $this->getHost();
+
+        if ( Str::contain($host, '.') ) {
+            $domain = explode('.', str_replace($tld, '', $host));
+
+            return end($domain);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTld(): ?string
+    {
+        $tld = explode('.', substr($this->getHost(), strlen($this->getHost()) - 8));
+        array_shift($tld);
+
+        return empty($tld)
+            ? null
+            : implode('.', $tld);
+    }
+
+    /**
+     * @return string
+     */
+    public function getHost(): string
+    {
+        return $this->url[ 'host' ];
+    }
+
+    public function __toString()
+    {
+        return $this->buildUrl();
+    }
+
+    /**
      * @return string
      */
     public function buildUrl(): string
@@ -243,7 +311,7 @@ class Url
      */
     public function buildQuery(): string
     {
-        if( $query = $this->getQuery() ) {
+        if ( $query = $this->getQuery() ) {
             return '?' . $query;
         }
 
@@ -255,7 +323,7 @@ class Url
      */
     public function buildFragment(): string
     {
-        if( $fragment = $this->getFragment() ) {
+        if ( $fragment = $this->getFragment() ) {
             return '#' . $fragment;
         }
 
@@ -267,7 +335,7 @@ class Url
      */
     public function buildScheme(): string
     {
-        if( $scheme = $this->getScheme() ) {
+        if ( $scheme = $this->getScheme() ) {
             return $scheme . '://';
         }
 
@@ -279,8 +347,8 @@ class Url
      */
     public function buildAuth(): string
     {
-        if( $user = $this->getUser() ) {
-            if( $pass = $this->getPass() ) {
+        if ( $user = $this->getUser() ) {
+            if ( $pass = $this->getPass() ) {
                 $pass = ':' . $pass;
             }
 
@@ -303,7 +371,7 @@ class Url
      */
     public function buildPort(): string
     {
-        if( $port = $this->getPort() ) {
+        if ( $port = $this->getPort() ) {
             return ':' . $port;
         }
 
@@ -359,69 +427,6 @@ class Url
     }
 
     /**
-     * @return string|null
-     */
-    public function getTld(): ?string
-    {
-        $tld = explode('.', substr($this->getHost(), strlen($this->getHost()) - 8));
-        array_shift($tld);
-
-        return empty($tld)
-            ? null
-            : implode('.', $tld);
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getDomain(): ?string
-    {
-        $tld  = '.' . $this->getTld();
-        $host = $this->getHost();
-
-        if( Str::contain($host, '.') ) {
-            $domain = explode('.', str_replace($tld, '', $host));
-
-            return end($domain);
-        }
-
-        return null;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getSubDomain(): ?string
-    {
-        $subDomains = $this->getSubDomains();
-
-        return reset($subDomains);
-    }
-
-    /**
-     * @return array
-     */
-    public function getSubDomains(): array
-    {
-        $domainAndTld = '.' . $this->getDomain() . '.' . $this->getTld();
-        $host         = str_replace('www.', '', $this->getHost());
-
-        if( Str::contain($host, $domainAndTld) ) {
-            return explode('.', str_replace($domainAndTld, '', $host));
-        }
-
-        return [];
-    }
-
-    /**
-     * @return string
-     */
-    public function getHost(): string
-    {
-        return $this->url[ 'host' ];
-    }
-
-    /**
      * @return string
      */
     public function getPort(): String
@@ -443,10 +448,5 @@ class Url
     public function getFile(): string
     {
         return $this->url[ 'file' ];
-    }
-
-    public function __toString()
-    {
-        return $this->buildUrl();
     }
 }

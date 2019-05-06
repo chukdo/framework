@@ -81,7 +81,7 @@ class Arr implements \Iterator
      */
     public function merge( Iterable $merge ): self
     {
-        foreach( $merge as $append ) {
+        foreach ( $merge as $append ) {
             $this->append($append);
         }
 
@@ -164,7 +164,7 @@ class Arr implements \Iterator
         $offset = $this->offset;
         $next   = $this->getNext();
 
-        if( $next !== null ) {
+        if ( $next !== null ) {
             unset($this->arr[ $offset ]);
 
             return $next;
@@ -178,7 +178,7 @@ class Arr implements \Iterator
      */
     public function getNext()
     {
-        if( isset($this->arr[ $this->offset ]) ) {
+        if ( isset($this->arr[ $this->offset ]) ) {
             return $this->arr[ $this->offset++ ];
         }
 

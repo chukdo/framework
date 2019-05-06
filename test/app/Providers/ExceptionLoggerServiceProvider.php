@@ -10,11 +10,12 @@ class ExceptionLoggerServiceProvider extends ServiceProvider
     {
         $this->app->singleton('ExceptionLogger', [
             'class' => \Chukdo\Logger\Logger::class,
-            'args' => [
-                'exception_'.$this->app->channel().'_'.$this->app->env(),
+            'args'  => [
+                'exception_' . $this->app->channel() . '_' . $this->app->env(),
                 [
                     '@LoggerHandler',
-                ], [
+                ],
+                [
                     '@\Chukdo\Logger\Processors\RequestProcessor',
                     '@\Chukdo\Logger\Processors\BacktraceProcessor',
                 ],

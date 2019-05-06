@@ -84,10 +84,10 @@ class Rule
         $rules = explode('|',
             $rule);
 
-        foreach( $rules as $rule ) {
+        foreach ( $rules as $rule ) {
             list($rule, $attrs) = $this->parseAttributes($rule);
 
-            switch( $rule ) {
+            switch ( $rule ) {
                 case 'form':
                     $this->isForm = true;
                     break;
@@ -121,11 +121,12 @@ class Rule
         $attrs = new Json(Str::explode(',', $attrs));
 
         /* Recherche d'attributs faisant référence à un chemin de configuration (commence par @) */
-        $attrs->filter(function($k, $v) {
+        $attrs->filter(function( $k, $v )
+        {
             $isConf = substr($v, 0, 1) == '@';
             $conf   = substr($v, 1);
 
-            if( $isConf ) {
+            if ( $isConf ) {
                 return $this->validator->request()
                     ->conf($conf);
             }
@@ -146,8 +147,8 @@ class Rule
      */
     public function validate(): bool
     {
-        if( $this->inputRequired() ) {
-            if( $this->inputScalarOrArray() ) {
+        if ( $this->inputRequired() ) {
+            if ( $this->inputScalarOrArray() ) {
                 $this->inputFilters();
                 return $this->validateRule();
             }
@@ -163,8 +164,8 @@ class Rule
      */
     protected function inputRequired(): bool
     {
-        if( $this->input() === null ) {
-            if( $this->isRequired ) {
+        if ( $this->input() === null ) {
+            if ( $this->isRequired ) {
                 $this->error('required');
                 return false;
             }
@@ -182,11 +183,11 @@ class Rule
     {
         $input = $this->input();
 
-        if( $this->type[ 'array' ] ) {
-            if( $input instanceof Input ) {
+        if ( $this->type[ 'array' ] ) {
+            if ( $input instanceof Input ) {
                 $countInput = count($input->toSimpleArray());
 
-                if( $countInput >= $this->type[ 'min' ] && $countInput <= $this->type[ 'max' ] ) {
+                if ( $countInput >= $this->type[ 'min' ] && $countInput <= $this->type[ 'max' ] ) {
                     return true;
                 }
             }
@@ -194,7 +195,7 @@ class Rule
             $this->error('array');
             return false;
         }
-        elseif( $input instanceof Input ) {
+        elseif ( $input instanceof Input ) {
             $this->error('scalar');
             return false;
         }
@@ -207,8 +208,8 @@ class Rule
      */
     protected function inputFilters(): void
     {
-        foreach( $this->rules as $name => $attrs ) {
-            if( $filter = $this->validator->filter($name) ) {
+        foreach ( $this->rules as $name => $attrs ) {
+            if ( $filter = $this->validator->filter($name) ) {
                 $filter->attributes($attrs);
                 $this->inputFilter($filter);
             }
@@ -224,8 +225,8 @@ class Rule
     {
         $validated = true;
 
-        foreach( $this->rules as $name => $attrs ) {
-            if( $validate = $this->validator->validator($name) ) {
+        foreach ( $this->rules as $name => $attrs ) {
+            if ( $validate = $this->validator->validator($name) ) {
                 $validate->attributes($attrs);
                 $validated .= $this->validateInput($validate, $name);
             }
@@ -248,7 +249,7 @@ class Rule
                 ->get($this->path);
 
         /* Recherche dans file */
-        if( $input === null ) {
+        if ( $input === null ) {
             $input = $this->validator->inputs()
                 ->file($this->path);
         }
@@ -264,8 +265,8 @@ class Rule
      */
     protected function error( string $key, string $path = null ): void
     {
-        if( $path ) {
-            if( !Str::contain($this->path,
+        if ( $path ) {
+            if ( !Str::contain($this->path,
                 '*') ) {
                 $path = $this->path . '.' . $path;
             }
@@ -285,8 +286,9 @@ class Rule
     {
         $input = $this->input();
 
-        if( $input instanceof Input ) {
-            $input->filterRecursive(function( $k, $v ) use ( $filter ) {
+        if ( $input instanceof Input ) {
+            $input->filterRecursive(function( $k, $v ) use ( $filter )
+            {
                 return $filter->filter($v);
             });
 
@@ -310,7 +312,7 @@ class Rule
     {
         $input = $this->input();
 
-        if( $input instanceof Input ) {
+        if ( $input instanceof Input ) {
             return $this->validateArray($validate, $name);
         }
 
@@ -329,12 +331,12 @@ class Rule
         $validated = true;
         $input     = $this->input();
 
-        foreach( $input->toSimpleArray() as $k => $v ) {
-            if( $validate->validate($v) ) {
+        foreach ( $input->toSimpleArray() as $k => $v ) {
+            if ( $validate->validate($v) ) {
                 $this->validator->validated()
                     ->set($k, $v);
             }
-            elseif( $this->isForm ) {
+            elseif ( $this->isForm ) {
                 $this->error($name, $k);
                 $validated .= false;
             }
@@ -360,7 +362,7 @@ class Rule
         $validated = true;
         $input     = $this->input();
 
-        if( $validate->validate($input) ) {
+        if ( $validate->validate($input) ) {
             $this->validator->validated()
                 ->set($this->path, $input);
         }

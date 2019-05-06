@@ -33,7 +33,7 @@ class CsrfValidate implements ValidateInterface
      */
     public function attributes( array $attributes ): ValidateInterface
     {
-        foreach( $attributes as $attr ) {
+        foreach ( $attributes as $attr ) {
             $this->salt = $attr;
         }
 

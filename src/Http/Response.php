@@ -253,7 +253,7 @@ class Response
         $this->header->setHeader('Content-Type',
             'text/plain; charset=utf-8');
 
-        $this->content((new Json($content))->toJson());
+        $this->content(( new Json($content) )->toJson());
 
         return $this;
     }
@@ -267,7 +267,7 @@ class Response
         $this->header->setHeader('Content-Type',
             'application/json; charset=utf-8');
 
-        $this->content((new Json($content))->toJson());
+        $this->content(( new Json($content) )->toJson());
 
         return $this;
     }
@@ -282,7 +282,7 @@ class Response
         $this->header->setHeader('Content-Type',
             'text/xml; charset=utf-8');
 
-        $this->content((new Xml())->import($content)
+        $this->content(( new Xml() )->import($content)
             ->toXmlString($html,
                 true));
 
@@ -306,24 +306,24 @@ class Response
      */
     public function send(): self
     {
-        if( headers_sent($filename, $linenum) ) {
+        if ( headers_sent($filename, $linenum) ) {
             throw new HttpException("Headers already sent from file $filename at line $linenum");
         }
 
         $hasContent = $this->content != null;
         $hasFile    = $this->file != null;
 
-        if( $hasContent ) {
+        if ( $hasContent ) {
             $this->sendContentResponse();
         }
-        elseif( $hasFile ) {
+        elseif ( $hasFile ) {
             $this->sendDownloadResponse();
         }
         else {
             $this->sendHeaderResponse();
         }
 
-        if( $this->deleteFileAfterSend ) {
+        if ( $this->deleteFileAfterSend ) {
             unlink($this->file);
         }
 
@@ -337,23 +337,23 @@ class Response
     {
         $content = $this->content;
 
-        if( Str::contain(Http::server('HTTP_ACCEPT_ENCODING'),
+        if ( Str::contain(Http::server('HTTP_ACCEPT_ENCODING'),
             'deflate') ) {
             $this->header->setHeader('Content-Encoding',
                 'deflate');
             $content = gzdeflate($this->content);
         }
-        elseif( Str::contain(Http::server('HTTP_ACCEPT_ENCODING'),
+        elseif ( Str::contain(Http::server('HTTP_ACCEPT_ENCODING'),
             'gzip') ) {
             $this->header->setHeader('Content-Encoding',
                 'gzip');
             $content = gzencode($this->content);
         }
 
-        if( $this->header->getHeader('Transfer-Encoding') == 'chunked' ) {
+        if ( $this->header->getHeader('Transfer-Encoding') == 'chunked' ) {
             $this->sendHeaderResponse();
 
-            foreach( str_split($content,
+            foreach ( str_split($content,
                 4096) as $c ) {
                 $l = dechex(strlen($c));
 
@@ -378,13 +378,13 @@ class Response
      */
     protected function sendDownloadResponse(): self
     {
-        if( $this->header->getHeader('Transfer-Encoding') == 'chunked' ) {
+        if ( $this->header->getHeader('Transfer-Encoding') == 'chunked' ) {
             $this->sendHeaderResponse();
 
             $f = fopen($this->file,
                 'rb');
 
-            while( !feof($f) ) {
+            while ( !feof($f) ) {
                 $c = fread($f,
                     131072);
                 $l = dechex(strlen($c));
@@ -413,7 +413,7 @@ class Response
     {
         header_remove();
 
-        foreach( explode("\n",
+        foreach ( explode("\n",
             $this->header->send()) as $header ) {
             header($header, true);
         }

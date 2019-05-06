@@ -35,7 +35,7 @@ class RedisStream extends AbstractStream
      */
     protected function getStream(): RedisInterface
     {
-        if( $this->stream instanceof RedisInterface ) {
+        if ( $this->stream instanceof RedisInterface ) {
             return $this->stream;
         }
 
@@ -55,12 +55,12 @@ class RedisStream extends AbstractStream
             $stream = ServiceLocator::getInstance()
                 ->getResource($scheme);
             $stream->select($host);
-        } catch( \Exception $e ) {
+        } catch ( \Exception $e ) {
             throw new StreamException(sprintf('[%s] is not a registred resource',
                 $scheme), $e->getCode(), $e);
         }
 
-        if( !($stream instanceof RedisInterface) ) {
+        if ( !( $stream instanceof RedisInterface ) ) {
             throw new StreamException(sprintf('service [%s] is not a redis interface',
                 $scheme));
         }
@@ -77,7 +77,7 @@ class RedisStream extends AbstractStream
      */
     public function streamGetRange( int $offset, int $length ): ?string
     {
-        if( $length > 0 ) {
+        if ( $length > 0 ) {
             return $this->getStream()
                 ->getRange($this->getPath(),
                     $offset,
@@ -170,7 +170,7 @@ class RedisStream extends AbstractStream
      */
     public function streamRename( string $path ): bool
     {
-        if( (bool) $this->getStream()
+        if ( (bool) $this->getStream()
             ->rename($this->getPath(),
                 $path) ) {
             return true;
@@ -219,7 +219,7 @@ class RedisStream extends AbstractStream
         $list = $this->getStream()
             ->keys($path . '/*');
 
-        foreach( $list as $k => $v ) {
+        foreach ( $list as $k => $v ) {
             $list[ $k ] = trim(str_replace($path,
                 '',
                 $v),
@@ -258,7 +258,7 @@ class RedisStream extends AbstractStream
     {
         $path = 'info::' . $path;
 
-        if( $value !== null ) {
+        if ( $value !== null ) {
             $this->getStream()
                 ->hset($path,
                     $name,

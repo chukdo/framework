@@ -70,7 +70,7 @@ class Validator
      */
     public function registerRules( array $rules ): self
     {
-        foreach( $rules as $path => $rule ) {
+        foreach ( $rules as $path => $rule ) {
             $this->rules[] = new Rule($this, $path, $rule);
         }
 
@@ -83,7 +83,7 @@ class Validator
      */
     public function registerValidators( array $validators ): self
     {
-        foreach ($validators as $validator) {
+        foreach ( $validators as $validator ) {
             $this->registerValidator($validator);
         }
 
@@ -107,7 +107,7 @@ class Validator
      */
     public function registerFilters( array $filters ): self
     {
-        foreach ($filters as $filter) {
+        foreach ( $filters as $filter ) {
             $this->registerFilter($filter);
         }
 
@@ -140,19 +140,11 @@ class Validator
     {
         $validate = true;
 
-        foreach( $this->rules() as $rule ) {
+        foreach ( $this->rules() as $rule ) {
             $validate .= $rule->validate();
         }
 
         return $validate;
-    }
-
-    /**
-     * @return Request
-     */
-    public function request(): Request
-    {
-        return $this->request;
     }
 
     /**
@@ -164,12 +156,20 @@ class Validator
     }
 
     /**
+     * @return Request
+     */
+    public function request(): Request
+    {
+        return $this->request;
+    }
+
+    /**
      * @param string $filter
      * @return FilterInterface|null
      */
     public function filter( string $filter ): ?FilterInterface
     {
-        if( isset($this->filters[ $filter ]) ) {
+        if ( isset($this->filters[ $filter ]) ) {
             return $this->filters[ $filter ];
         }
 
@@ -190,7 +190,7 @@ class Validator
      */
     public function validator( string $validator ): ?ValidateInterface
     {
-        if( isset($this->validators[ $validator ]) ) {
+        if ( isset($this->validators[ $validator ]) ) {
             return $this->validators[ $validator ];
         }
 

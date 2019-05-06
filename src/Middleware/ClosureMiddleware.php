@@ -33,6 +33,6 @@ class ClosureMiddleware implements MiddlewareInterface
      */
     public function process( Dispatcher $delegate ): Response
     {
-        return ($this->closure)();
+        return ( $this->closure )();
     }
 }

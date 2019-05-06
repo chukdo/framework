@@ -39,7 +39,7 @@ class Template
     {
         $path = $view->path($template);
 
-        if( !$path[ 'exists' ] ) {
+        if ( !$path[ 'exists' ] ) {
             throw new ViewException(sprintf('Template file [%s] does not exist',
                 $template));
         }
@@ -58,7 +58,7 @@ class Template
      */
     public function data( Iterable $data = null ): self
     {
-        if( !$this->data ) {
+        if ( !$this->data ) {
             $this->data = new Json();
         }
 
@@ -86,8 +86,8 @@ class Template
      */
     public function v( $data, string $functions = null )
     {
-        if( $functions ) {
-            foreach( Str::split($functions,
+        if ( $functions ) {
+            foreach ( Str::split($functions,
                 '|') as $function ) {
                 $data = $this->$function($data);
             }
@@ -114,7 +114,7 @@ class Template
      */
     public function __call( string $name, array $arguments )
     {
-        if( is_callable($name) ) {
+        if ( is_callable($name) ) {
             return call_user_func_array($name,
                 $arguments);
         }
@@ -125,7 +125,7 @@ class Template
 
     public function render()
     {
-        if( $responseHandler = $this->view->getResponseHandler() ) {
+        if ( $responseHandler = $this->view->getResponseHandler() ) {
             $responseHandler->header('Content-Type',
                 'text/html; charset=utf-8')
                 ->content($this->__toString())

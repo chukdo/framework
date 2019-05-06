@@ -10,7 +10,7 @@ class LoggerHandlerServiceProvider extends ServiceProvider
     {
         $this->app->singleton('LoggerHandler', [
             'class' => \Chukdo\Logger\Handlers\FileHandler::class,
-            'args' => [
+            'args'  => [
                 '#log.file',
             ],
         ]);

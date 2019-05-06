@@ -74,8 +74,8 @@ class Node implements IteratorAggregate
     {
         $nodes = new Nodes();
 
-        foreach( $this->elements(XML_ELEMENT_NODE) as $child ) {
-            if( $name == '' || $name === $child->prefix || $name === $child->localName || $name === $child->nodeName ) {
+        foreach ( $this->elements(XML_ELEMENT_NODE) as $child ) {
+            if ( $name == '' || $name === $child->prefix || $name === $child->localName || $name === $child->nodeName ) {
                 $nodes->append(new Node($child));
             }
         }
@@ -93,10 +93,10 @@ class Node implements IteratorAggregate
         $nodes = new Nodes();
         $count = count($args);
 
-        foreach( $this->element()->childNodes as $child ) {
-            if( in_array($child->nodeType,
+        foreach ( $this->element()->childNodes as $child ) {
+            if ( in_array($child->nodeType,
                     $args)
-                || $count === 0 ) {
+                 || $count === 0 ) {
                 $nodes->append($child);
             }
         }
@@ -110,7 +110,7 @@ class Node implements IteratorAggregate
      */
     protected function element(): DOMElement
     {
-        if( $this->node instanceof DOMElement ) {
+        if ( $this->node instanceof DOMElement ) {
             return $this->node;
         }
 
@@ -135,9 +135,9 @@ class Node implements IteratorAggregate
     {
         $nodes = new Nodes();
 
-        foreach( $this->element()
+        foreach ( $this->element()
             ->getElementsByTagName($name) as $child ) {
-            if( $child->localName == $name || $name == '*' ) {
+            if ( $child->localName == $name || $name == '*' ) {
                 $nodes->append(new Node($child));
             }
         }
@@ -158,9 +158,9 @@ class Node implements IteratorAggregate
         $node  = null;
 
         /* Recherche du noeud */
-        foreach( $this->elements(XML_ELEMENT_NODE) as $child ) {
-            if( $child->localName == $name ) {
-                if( $index == $indice ) {
+        foreach ( $this->elements(XML_ELEMENT_NODE) as $child ) {
+            if ( $child->localName == $name ) {
+                if ( $index == $indice ) {
                     return new Node($child);
                 }
                 ++$index;
@@ -168,11 +168,11 @@ class Node implements IteratorAggregate
         }
 
         /* Creation d'un nouveau noeud en tenant compte de l'indice */
-        if( $create ) {
+        if ( $create ) {
             $indice = $indice - $index;
 
-            if( $indice > 0 ) {
-                for( $i = 0 ; $i <= $indice ; ++$i ) {
+            if ( $indice > 0 ) {
+                for ( $i = 0 ; $i <= $indice ; ++$i ) {
                     $node = $this->set($name);
                 }
             }
@@ -225,13 +225,13 @@ class Node implements IteratorAggregate
     public function setValue( string $value, bool $append = true, bool $raw = false ): self
     {
         /* Suppression de contenu du noeud */
-        if( $append === false ) {
+        if ( $append === false ) {
             $this->unsetValue();
         }
 
         /* Autodetection des CDATA */
-        if( $value !== '' ) {
-            if( $raw === true ) {
+        if ( $value !== '' ) {
+            if ( $raw === true ) {
                 $this->appendNode(new DOMText($value));
             }
             else {
@@ -264,7 +264,7 @@ class Node implements IteratorAggregate
     {
         $str = '';
 
-        foreach( $this->elements(XML_TEXT_NODE,
+        foreach ( $this->elements(XML_TEXT_NODE,
             XML_CDATA_SECTION_NODE) as $child ) {
             $this->element()
                 ->removeChild($child);
@@ -283,7 +283,7 @@ class Node implements IteratorAggregate
      */
     public function after( string $name, string $value = '', string $uri = 'urn:void' ): Node
     {
-        if( ($ref = $this->element()->nextSibling) !== null ) {
+        if ( ( $ref = $this->element()->nextSibling ) !== null ) {
             $uri    = preg_match('/:/',
                 $name)
                 ? $uri
@@ -310,7 +310,7 @@ class Node implements IteratorAggregate
      */
     public function parent(): ?Node
     {
-        if( ($node = $this->element()->parentNode) instanceof DOMElement ) {
+        if ( ( $node = $this->element()->parentNode ) instanceof DOMElement ) {
             return new Node($node);
         }
         else {
@@ -327,11 +327,11 @@ class Node implements IteratorAggregate
     {
         $str = '';
 
-        foreach( $this->element()->childNodes as $child ) {
-            if( $child->nodeType == XML_TEXT_NODE || $child->nodeType == XML_CDATA_SECTION_NODE ) {
+        foreach ( $this->element()->childNodes as $child ) {
+            if ( $child->nodeType == XML_TEXT_NODE || $child->nodeType == XML_CDATA_SECTION_NODE ) {
                 $str .= $child->nodeValue;
             }
-            elseif( $child->nodeType == XML_ELEMENT_NODE ) {
+            elseif ( $child->nodeType == XML_ELEMENT_NODE ) {
                 $node = new Node($child);
                 $str  .= ' ' . $node->values();
             }
@@ -350,7 +350,7 @@ class Node implements IteratorAggregate
     {
         $attributes = $this->attrs();
 
-        foreach( $attributes as $name => $value ) {
+        foreach ( $attributes as $name => $value ) {
             $this->unsetAttr($name);
         }
 
@@ -365,7 +365,7 @@ class Node implements IteratorAggregate
     {
         $nodes = new Nodes();
 
-        foreach( $this->element()->attributes as $child ) {
+        foreach ( $this->element()->attributes as $child ) {
             $nodes->offsetSet($child->nodeName,
                 $child->nodeValue);
         }
@@ -407,7 +407,7 @@ class Node implements IteratorAggregate
     {
         $attributes = $this->dataAttrs();
 
-        foreach( $attributes as $name => $value ) {
+        foreach ( $attributes as $name => $value ) {
             $this->unsetAttr($name);
         }
 
@@ -422,8 +422,8 @@ class Node implements IteratorAggregate
     {
         $nodes = new Nodes();
 
-        foreach( $this->element()->attributes as $child ) {
-            if( substr($child->nodeName,
+        foreach ( $this->element()->attributes as $child ) {
+            if ( substr($child->nodeName,
                     0,
                     5) == 'data-' ) {
                 $nodes->offsetSet($child->nodeName,
@@ -442,7 +442,7 @@ class Node implements IteratorAggregate
     {
         $str = '';
 
-        foreach( $this->elements(XML_COMMENT_NODE) as $child ) {
+        foreach ( $this->elements(XML_COMMENT_NODE) as $child ) {
             $str .= $child->nodeValue;
         }
 
@@ -472,7 +472,7 @@ class Node implements IteratorAggregate
     {
         $str = '';
 
-        foreach( $this->elements(XML_COMMENT_NODE) as $child ) {
+        foreach ( $this->elements(XML_COMMENT_NODE) as $child ) {
             $this->element()
                 ->removeChild($child);
             $str .= $child->nodeValue;
@@ -493,15 +493,15 @@ class Node implements IteratorAggregate
             ->set($name);
         $append = [];
 
-        foreach( $this->element()->childNodes as $child ) {
+        foreach ( $this->element()->childNodes as $child ) {
             $append[] = $child;
         }
 
-        foreach( $append as $child ) {
+        foreach ( $append as $child ) {
             $node->appendNode($child);
         }
 
-        if( $attr ) {
+        if ( $attr ) {
             $node->setAttrs($this->attrs());
         }
 
@@ -515,7 +515,7 @@ class Node implements IteratorAggregate
      */
     public function setAttrs( array $attributes ): self
     {
-        foreach( $attributes as $name => $value ) {
+        foreach ( $attributes as $name => $value ) {
             $this->setAttr($name,
                 $value);
         }
@@ -565,7 +565,7 @@ class Node implements IteratorAggregate
         $parent = $this->parent()
             ->element();
 
-        if( $next = $this->next() ) {
+        if ( $next = $this->next() ) {
             $node = $parent->insertBefore($clone,
                 $next->element());
         }
@@ -587,10 +587,10 @@ class Node implements IteratorAggregate
         $names = explode(' ',
             $name);
 
-        while( $node = $node->nextSibling ) {
-            if( $node->nodeType === XML_ELEMENT_NODE ) {
-                if( $name == ''
-                    || in_array($node->nodeName,
+        while ( $node = $node->nextSibling ) {
+            if ( $node->nodeType === XML_ELEMENT_NODE ) {
+                if ( $name == ''
+                     || in_array($node->nodeName,
                         $names) ) {
                     return new Node($node);
                 }
@@ -611,11 +611,11 @@ class Node implements IteratorAggregate
             ->element();
         $append = [];
 
-        foreach( $this->element()->childNodes as $child ) {
+        foreach ( $this->element()->childNodes as $child ) {
             $append[] = $child;
         }
 
-        foreach( $append as $child ) {
+        foreach ( $append as $child ) {
             $parent->insertBefore($child,
                 $ref);
         }
@@ -632,12 +632,12 @@ class Node implements IteratorAggregate
      */
     public function unset( string $name = '' ): self
     {
-        if( $name == '' ) {
+        if ( $name == '' ) {
             $this->element()->parentNode->removeChild($this->element());
         }
         else {
-            foreach( $this->elements(XML_ELEMENT_NODE) as $child ) {
-                if( $child->localName == $name ) {
+            foreach ( $this->elements(XML_ELEMENT_NODE) as $child ) {
+                if ( $child->localName == $name ) {
                     $this->element()
                         ->removeChild($child);
                 }
@@ -705,23 +705,23 @@ class Node implements IteratorAggregate
         $node = false;
 
         /* import depuis un objet xml */
-        if( $import instanceof Node ) {
+        if ( $import instanceof Node ) {
             $node = $import->element();
 
             /* import depuis un objet simplexml */
         }
-        elseif( $import instanceof SimpleXMLElement ) {
+        elseif ( $import instanceof SimpleXMLElement ) {
             $node = dom_import_simplexml($import);
 
             /* import depuis un objet domxml */
         }
-        elseif( $import instanceof DOMNode ) {
+        elseif ( $import instanceof DOMNode ) {
             $node = $import;
 
             /* import depuis une chaine de caracteres */
         }
-        elseif( is_string($import) ) {
-            if( substr($import,
+        elseif ( is_string($import) ) {
+            if ( substr($import,
                     0,
                     1) != '<' ) {
                 $import = '<xml>' . $import . '</xml>';
@@ -732,14 +732,14 @@ class Node implements IteratorAggregate
         }
 
         /* importation d'un DOMElement */
-        if( $node instanceof DOMElement ) {
-            if( $parent == true ) {
+        if ( $node instanceof DOMElement ) {
+            if ( $parent == true ) {
                 $this->appendNode($this->doc()
                     ->importNode($node,
                         true));
             }
             else {
-                foreach( $node->childNodes as $child ) {
+                foreach ( $node->childNodes as $child ) {
                     $this->appendNode($this->doc()
                         ->importNode($child,
                             true));
@@ -748,24 +748,24 @@ class Node implements IteratorAggregate
 
             /* importation d'un DOMNode */
         }
-        elseif( $node instanceof DOMNode ) {
+        elseif ( $node instanceof DOMNode ) {
             $this->appendNode($this->doc()
                 ->importNode($node,
                     true));
 
             /* importation d'un tableau */
         }
-        elseif( Is::arr($import) ) {
-            foreach( $import as $k => $v ) {
+        elseif ( Is::arr($import) ) {
+            foreach ( $import as $k => $v ) {
                 /* Index */
-                if( is_int($k) ) {
+                if ( is_int($k) ) {
                     $node = $this->set('item');
                     $node->setAttr('oname',
                         $k);
 
                     /* Noeud invalide */
                 }
-                elseif( !preg_match('/^[a-z_](?:[a-z0-9_-]+)?$/iu',
+                elseif ( !preg_match('/^[a-z_](?:[a-z0-9_-]+)?$/iu',
                     $k) ) {
                     $node = $this->set('item');
                     $node->setAttr('oname',
@@ -778,7 +778,7 @@ class Node implements IteratorAggregate
                 }
 
                 /* gestion de la recursivité */
-                if( Is::traversable($v) ) {
+                if ( Is::traversable($v) ) {
                     $node->import($v);
                 }
                 else {
@@ -796,7 +796,7 @@ class Node implements IteratorAggregate
      */
     protected function doc()
     {
-        if( $doc = $this->element()->ownerDocument ) {
+        if ( $doc = $this->element()->ownerDocument ) {
             return $doc;
         }
 
@@ -820,8 +820,8 @@ class Node implements IteratorAggregate
         $nodes = $this->elements();
         $count = $nodes->count() - 1;
 
-        foreach( $nodes as $k => $child ) {
-            if( $k < $count ) {
+        foreach ( $nodes as $k => $child ) {
+            if ( $k < $count ) {
                 $node->appendNode($child);
             }
         }
@@ -847,7 +847,7 @@ class Node implements IteratorAggregate
     {
         $childs = (array) $this->childs();
 
-        if( count($childs) > 0 ) {
+        if ( count($childs) > 0 ) {
             return end($childs);
         }
 
@@ -865,10 +865,10 @@ class Node implements IteratorAggregate
         $names = explode(' ',
             $name);
 
-        while( $node = $node->previousSibling ) {
-            if( $node->nodeType === XML_ELEMENT_NODE ) {
-                if( $name == ''
-                    || in_array($node->nodeName,
+        while ( $node = $node->previousSibling ) {
+            if ( $node->nodeType === XML_ELEMENT_NODE ) {
+                if ( $name == ''
+                     || in_array($node->nodeName,
                         $names) ) {
                     return new Node($node);
                 }
@@ -885,7 +885,7 @@ class Node implements IteratorAggregate
     {
         try {
             return count($this->elements(XML_ELEMENT_NODE)) > 0;
-        } catch( Exception $e ) {
+        } catch ( Exception $e ) {
             return false;
         }
     }
@@ -919,7 +919,7 @@ class Node implements IteratorAggregate
      */
     public function hasStyle( string $name, string $value = '' ): bool
     {
-        if( preg_match('/' . $name . '\s?:\s?' . $value . '/i',
+        if ( preg_match('/' . $name . '\s?:\s?' . $value . '/i',
             $this->element()
                 ->getAttribute('style')) ) {
             return true;
@@ -975,8 +975,8 @@ class Node implements IteratorAggregate
             $this->element()
                 ->getAttribute('class'));
 
-        foreach( $names as $name ) {
-            if( in_array($name,
+        foreach ( $names as $name ) {
+            if ( in_array($name,
                 $class) ) {
                 return true;
             }
@@ -1013,9 +1013,9 @@ class Node implements IteratorAggregate
             $this->element()
                 ->getAttribute('class'));
 
-        foreach( $names as $name ) {
-            foreach( $class as $k => $v ) {
-                if( $v == $name ) {
+        foreach ( $names as $name ) {
+            foreach ( $class as $k => $v ) {
+                if ( $v == $name ) {
                     unset($class[ $k ]);
                 }
             }
@@ -1040,9 +1040,9 @@ class Node implements IteratorAggregate
         $query = $path . "[contains(@class,'" . implode("') or contains(@class,'",
                 $classes) . "')]";
 
-        foreach( $this->query($query) as $item ) {
-            foreach( $classes as $classe ) {
-                if( $item->hasClass($classe) ) {
+        foreach ( $this->query($query) as $item ) {
+            foreach ( $classes as $classe ) {
+                if ( $item->hasClass($classe) ) {
                     $item->unsetClass($classe);
                 }
             }
@@ -1058,20 +1058,20 @@ class Node implements IteratorAggregate
      */
     public function query( string $query ): Nodes
     {
-        if( !($this->xpath instanceof DOMXPath) ) {
+        if ( !( $this->xpath instanceof DOMXPath ) ) {
             $this->xpath = new DOMXPath($this->doc());
         }
 
         $nodes = new Nodes();
 
         /* Si le noeud n'est pas defini xPath ne fonctionne pas */
-        if( !is_object($this->element()) ) {
+        if ( !is_object($this->element()) ) {
             return $nodes;
         }
 
         /* Enregistre automatiquement l'espace de nom par defaut s'il existe sous le NameSpace: dns */
-        if( ($dns = $this->element()
-                ->lookupnamespaceURI(null)) !== null ) {
+        if ( ( $dns = $this->element()
+                ->lookupnamespaceURI(null) ) !== null ) {
             $this->xpath->registerNamespace('dns',
                 $dns);
         }
@@ -1081,14 +1081,14 @@ class Node implements IteratorAggregate
             $nodesList = $this->xpath->query($query,
                 $this->element());
 
-            foreach( $nodesList as $node ) {
+            foreach ( $nodesList as $node ) {
                 $nodes->append(new Node($node->nodeType == XML_ELEMENT_NODE
                     ? $node
                     : $node->parentNode));
             }
 
             return $nodes;
-        } catch( Throwable $e ) {
+        } catch ( Throwable $e ) {
             throw new NodeException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -1101,7 +1101,7 @@ class Node implements IteratorAggregate
      */
     public function toXmlString( bool $html = false, bool $core = false ): string
     {
-        if( ($doc = $this->doc()) && !$core ) {
+        if ( ( $doc = $this->doc() ) && !$core ) {
             return $html
                 ? $doc->saveHTML($this->element())
                 : $doc->saveXML($this->element());
@@ -1110,12 +1110,12 @@ class Node implements IteratorAggregate
         $a = $c = '';
         $n = $this->element();
 
-        foreach( $n->attributes as $attribute ) {
+        foreach ( $n->attributes as $attribute ) {
             $a .= ' ' . $attribute->nodeName . '="' . $attribute->nodeValue . '"';
         }
 
-        foreach( $n->childNodes as $child ) {
-            switch( $child->nodeType ) {
+        foreach ( $n->childNodes as $child ) {
+            switch ( $child->nodeType ) {
                 case XML_ELEMENT_NODE:
                     $node = new Node($child);
                     $c    .= $node->toXmlString($html,
@@ -1135,7 +1135,7 @@ class Node implements IteratorAggregate
             }
         }
 
-        if( $core ) {
+        if ( $core ) {
             return $c;
         }
         else {
@@ -1162,8 +1162,8 @@ class Node implements IteratorAggregate
     {
         $str = '';
 
-        foreach( $this->element()->childNodes as $child ) {
-            if( $child->nodeType == XML_TEXT_NODE || $child->nodeType == XML_CDATA_SECTION_NODE ) {
+        foreach ( $this->element()->childNodes as $child ) {
+            if ( $child->nodeType == XML_TEXT_NODE || $child->nodeType == XML_CDATA_SECTION_NODE ) {
                 $str .= $child->nodeValue;
             }
         }
@@ -1204,7 +1204,7 @@ class Node implements IteratorAggregate
             : $this;
         $array = [];
 
-        foreach( $value->childs() as $k => $child ) {
+        foreach ( $value->childs() as $k => $child ) {
             $name  = $child->name() == $default
                 ? $k
                 : $child->name();
@@ -1214,10 +1214,10 @@ class Node implements IteratorAggregate
                 : $this->toArray($default,
                     $child);
 
-            if( !Is::empty($value) ) {
-                if( isset($array[ $name ]) ) {
-                    if( is_array($array[ $name ]) ) {
-                        if( key($array[ $name ]) === 0 ) {
+            if ( !Is::empty($value) ) {
+                if ( isset($array[ $name ]) ) {
+                    if ( is_array($array[ $name ]) ) {
+                        if ( key($array[ $name ]) === 0 ) {
                             $array[ $name ][] = $value;
                         }
                         else {

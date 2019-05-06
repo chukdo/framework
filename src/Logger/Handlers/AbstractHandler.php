@@ -54,10 +54,10 @@ abstract class AbstractHandler implements HandlerInterface
      */
     public function handle( array $record ): bool
     {
-        if( $this->isHandling($record) ) {
+        if ( $this->isHandling($record) ) {
             $record = $this->processRecord($record);
 
-            if( !$this->formatter ) {
+            if ( !$this->formatter ) {
                 $this->setFormatter(new JsonStringFormatter());
             }
 
@@ -83,7 +83,7 @@ abstract class AbstractHandler implements HandlerInterface
      */
     public function processRecord( array $record ): array
     {
-        foreach( $this->processors as $processor ) {
+        foreach ( $this->processors as $processor ) {
             $record = $processor->processRecord($record);
         }
 

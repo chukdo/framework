@@ -36,7 +36,7 @@ class UrlValidate implements ValidateInterface
      */
     public function validate( $input ): bool
     {
-        if( filter_var($input, FILTER_VALIDATE_URL) ) {
+        if ( filter_var($input, FILTER_VALIDATE_URL) ) {
             return true;
         }
 

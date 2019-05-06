@@ -24,7 +24,7 @@ final class Str
         $pos  = strrpos($name,
             '.');
 
-        if( $pos !== false ) {
+        if ( $pos !== false ) {
             return substr($name,
                 strrpos($name,
                     '.') + 1);
@@ -69,15 +69,15 @@ final class Str
     {
         $explode = explode($delimiter, $string);
 
-        if( $explode !== false ) {
-            if( count($explode) == 1 ) {
-                if( $explode[ 0 ] === "" ) {
+        if ( $explode !== false ) {
+            if ( count($explode) == 1 ) {
+                if ( $explode[ 0 ] === "" ) {
                     $explode = [];
                 }
             }
         }
 
-        if( $length ) {
+        if ( $length ) {
             return array_pad($explode, $length, null);
         }
 
@@ -92,7 +92,7 @@ final class Str
      */
     public static function charAt( string $string, int $index ): string
     {
-        if( $index < strlen($string) ) {
+        if ( $index < strlen($string) ) {
             return substr($string,
                 $index,
                 1);
@@ -116,8 +116,8 @@ final class Str
             $matches,
             PREG_SET_ORDER);
 
-        foreach( $matches as $k => $array ) {
-            switch( count($array) ) {
+        foreach ( $matches as $k => $array ) {
+            switch ( count($array) ) {
                 case 0:
                     break;
                 case 1:
@@ -147,7 +147,7 @@ final class Str
             $value,
             $match);
 
-        switch( count($match) ) {
+        switch ( count($match) ) {
             case 0:
                 return null;
             case 1:
@@ -172,7 +172,7 @@ final class Str
     {
         $split = explode($delimiter, $value);
 
-        if( $pad ) {
+        if ( $pad ) {
             $split = array_pad($split,
                 $pad,
                 $padValue);
@@ -197,13 +197,13 @@ final class Str
      */
     public static function time( int $time = null ): string
     {
-        if( $time < 0.1 ) {
+        if ( $time < 0.1 ) {
             return round($time * 1000, 3) . ' Micro-secondes';
         }
-        elseif( $time < 1 ) {
+        elseif ( $time < 1 ) {
             return round($time * 1000, 3) . ' Milli-secondes';
         }
-        elseif( $time ) {
+        elseif ( $time ) {
             return round($time, 3) . ' Secondes';
         }
         else {
@@ -217,13 +217,13 @@ final class Str
      */
     public static function memory( int $mem = null ): string
     {
-        if( $mem < 1024 ) {
+        if ( $mem < 1024 ) {
             return $mem . ' Octets';
         }
-        elseif( $mem < 1048576 ) {
+        elseif ( $mem < 1048576 ) {
             return round($mem / 1024, 2) . ' Kilo-octets';
         }
-        elseif( $mem ) {
+        elseif ( $mem ) {
             return round($mem / 1048576, 2) . ' Mega-octets';
         }
         else {
@@ -279,7 +279,7 @@ final class Str
      */
     public static function ellipsis( string $value, int $len ): string
     {
-        if( strlen($value) > $len ) {
+        if ( strlen($value) > $len ) {
             return substr($value, 0, $len) . '...';
         }
 

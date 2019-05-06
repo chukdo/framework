@@ -66,7 +66,7 @@ class Loader
      */
     public function registerNameSpaces( array $namespaces ): self
     {
-        foreach( $namespaces as $ns => $paths ) {
+        foreach ( $namespaces as $ns => $paths ) {
             $this->registerNameSpace($ns,
                 $paths);
         }
@@ -88,18 +88,18 @@ class Loader
         $ns = trim($ns,
             '\\');
 
-        foreach( (array) $paths as $path ) {
+        foreach ( (array) $paths as $path ) {
             /** normalize the base directory with a separator */
             $path = rtrim($path,
                     DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 
             /* initialize the namespace array */
-            if( isset($this->namespaces[ $ns ]) === false ) {
+            if ( isset($this->namespaces[ $ns ]) === false ) {
                 $this->namespaces[ $ns ] = [];
             }
 
             /* retain the base directory for the namespace */
-            if( $prepend ) {
+            if ( $prepend ) {
                 array_unshift($this->namespaces[ $ns ],
                     $path);
             }
@@ -124,8 +124,8 @@ class Loader
         $class   = [];
         $class[] = array_pop($ns);
 
-        while( !empty($ns) ) {
-            if( $this->loadFile(implode('\\',
+        while ( !empty($ns) ) {
+            if ( $this->loadFile(implode('\\',
                 $ns),
                 implode('\\',
                     $class)) ) {
@@ -147,16 +147,16 @@ class Loader
      */
     protected function loadFile( string $ns, string $class ): bool
     {
-        if( !isset($this->namespaces[ $ns ]) ) {
+        if ( !isset($this->namespaces[ $ns ]) ) {
             return false;
         }
 
-        foreach( $this->namespaces[ $ns ] as $path ) {
+        foreach ( $this->namespaces[ $ns ] as $path ) {
             $file = $path . str_replace('\\',
                     DIRECTORY_SEPARATOR,
                     $class) . '.php';
 
-            if( $this->requireFile($file) ) {
+            if ( $this->requireFile($file) ) {
                 $this->log[ $class ] = $file;
 
                 return true;
@@ -173,7 +173,7 @@ class Loader
      */
     protected function requireFile( string $file ): bool
     {
-        if( file_exists($file) ) {
+        if ( file_exists($file) ) {
             require $file;
 
             return true;

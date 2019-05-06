@@ -23,7 +23,7 @@ class Event
      */
     public function flush( string $event ): void
     {
-        if( isset($this->listeners[ $event ]) ) {
+        if ( isset($this->listeners[ $event ]) ) {
             $this->listeners[ $event ] = [];
         }
     }
@@ -35,7 +35,7 @@ class Event
      */
     public function listen( string $event, $listener ): void
     {
-        if( !isset($this->listeners[ $event ]) ) {
+        if ( !isset($this->listeners[ $event ]) ) {
             $this->listeners[ $event ] = [];
         }
 
@@ -50,13 +50,13 @@ class Event
      */
     public function fire( string $event, $payload = [] ): void
     {
-        if( !is_array($payload) ) {
+        if ( !is_array($payload) ) {
             $payload = [ $payload ];
         }
 
-        foreach( $this->getListeners($event) as $listener ) {
+        foreach ( $this->getListeners($event) as $listener ) {
             /* Stop la propagation si une reponse = false */
-            if( call_user_func_array($listener,
+            if ( call_user_func_array($listener,
                     $payload) === false ) {
                 return;
             }
@@ -70,7 +70,7 @@ class Event
      */
     public function getListeners( string $event ): array
     {
-        if( isset($this->listeners[ $event ]) ) {
+        if ( isset($this->listeners[ $event ]) ) {
             return $this->listeners[ $event ];
         }
 

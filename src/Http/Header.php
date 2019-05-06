@@ -121,7 +121,7 @@ class Header
      */
     public function setHeaders( iterable $headers ): self
     {
-        foreach( $headers as $k => $v ) {
+        foreach ( $headers as $k => $v ) {
             $this->setHeader($k,
                 $v);
         }
@@ -145,7 +145,7 @@ class Header
      */
     public function setCookies( iterable $cookies ): self
     {
-        foreach( $cookies as $k => $v ) {
+        foreach ( $cookies as $k => $v ) {
             $this->setCookie($v[ 'name' ],
                 $v[ 'value' ],
                 $v[ 'expires' ],
@@ -185,15 +185,15 @@ class Header
     {
         $cache = [];
 
-        if( $control !== false ) {
+        if ( $control !== false ) {
             $cache[] = $control;
         }
 
-        if( $max !== false ) {
+        if ( $max !== false ) {
             $cache[] = "max-age=$max";
         }
 
-        if( $revalidate !== false ) {
+        if ( $revalidate !== false ) {
             $cache[] = 'must-revalidate';
             $cache[] = 'proxy-revalidate';
         }
@@ -216,14 +216,14 @@ class Header
             'control'    => null,
         ]);
 
-        foreach( explode(', ',
+        foreach ( explode(', ',
             $this->getHeader('Cache-Control')) as $value ) {
-            if( $value == 'must-revalidate' ) {
+            if ( $value == 'must-revalidate' ) {
                 $cache->offsetSet('revalidate',
                     true);
             }
-            elseif( ($age = Str::match('/max-age=([0-9]+)/',
-                    $value)) !== false ) {
+            elseif ( ( $age = Str::match('/max-age=([0-9]+)/',
+                    $value) ) !== false ) {
                 $cache->offsetSet('max',
                     $age);
             }
@@ -297,7 +297,7 @@ class Header
      */
     public function setStatus( int $status ): self
     {
-        if( isset($this->rfc2616[ $status ]) ) {
+        if ( isset($this->rfc2616[ $status ]) ) {
             $this->setHttp($this->rfc2616[ $status ]);
         }
 
@@ -309,7 +309,7 @@ class Header
      */
     public function getAuthorization(): ?string
     {
-        if( ($auth = $this->getHeader('WWW-Authenticate')) !== false ) {
+        if ( ( $auth = $this->getHeader('WWW-Authenticate') ) !== false ) {
             return Str::match('/Basic realm="([^"]+)"/',
                 $auth);
         }
@@ -338,26 +338,26 @@ class Header
      */
     public function setXFrameOptions( string $origin = null ): self
     {
-        if( $origin == '*' ) {
+        if ( $origin == '*' ) {
             return $this;
         }
 
-        if( isset($_SERVER[ 'HTTP_REFERER' ]) ) {
+        if ( isset($_SERVER[ 'HTTP_REFERER' ]) ) {
             $allow   = false;
             $uri     = new Url($_SERVER[ 'HTTP_REFERER' ]);
             $origins = explode(' ',
                 $origin);
 
-            foreach( $origins as $origin ) {
-                if( $origin
-                    && substr($uri->getHost(),
+            foreach ( $origins as $origin ) {
+                if ( $origin
+                     && substr($uri->getHost(),
                         -strlen($origin)) == $origin ) {
                     $allow = true;
                     break;
                 }
             }
 
-            if( $allow ) {
+            if ( $allow ) {
                 $this->setHeader('X-Frame-Options',
                     $uri->getScheme() . '://' . $uri->getHost());
 
@@ -380,7 +380,7 @@ class Header
      */
     public function setAllowAllOrigin( string $origin = null, string $method = null, string $allow = null ): self
     {
-        if( isset($_SERVER[ 'HTTP_ORIGIN' ]) ) {
+        if ( isset($_SERVER[ 'HTTP_ORIGIN' ]) ) {
             $uri     = trim($_SERVER[ 'HTTP_ORIGIN' ],
                 '/');
             $origins = explode(' ',
@@ -391,16 +391,16 @@ class Header
                 ?: 'Content-Type, Content-Range, Content-Disposition, Content-Description, '
                    . 'Accept, Access-Control-Allow-Headers, Authorization, X-Requested-With';
 
-            foreach( $origins as $origin ) {
-                if( $origin
-                    && substr($uri,
+            foreach ( $origins as $origin ) {
+                if ( $origin
+                     && substr($uri,
                         -strlen($origin)) == $origin ) {
                     $allow = true;
                     break;
                 }
             }
 
-            if( $allow || $origin == '*' ) {
+            if ( $allow || $origin == '*' ) {
                 $this->setHeader('Access-Control-Allow-Origin',
                     $_SERVER[ 'HTTP_ORIGIN' ])
                     ->setHeader('X-Origin',
@@ -438,11 +438,11 @@ class Header
         $headers = '';
         $cookies = '';
 
-        foreach( $this->getHeaders() as $name => $header ) {
+        foreach ( $this->getHeaders() as $name => $header ) {
             $headers .= "$name: $header\r\n";
         }
 
-        foreach( $this->getCookies() as $name => $cookie ) {
+        foreach ( $this->getCookies() as $name => $cookie ) {
             $cookies .= $cookie . "\r\n";
         }
 
@@ -464,7 +464,7 @@ class Header
     {
         $cookies = new Json();
 
-        foreach( $this->cookie as $name => $cookie ) {
+        foreach ( $this->cookie as $name => $cookie ) {
             $cookies->append($this->getCookie($name));
         }
 
@@ -477,7 +477,7 @@ class Header
      */
     public function getCookie( string $name ): ?Json
     {
-        if( $cookie = $this->cookie->offsetGet($name) ) {
+        if ( $cookie = $this->cookie->offsetGet($name) ) {
             return Str::match('/([^=]+)=([^;]+)(?:; expires=([^;]+))?(?:; path=([^;]+))?(?:; domain=([^;]+))?/i',
                 $cookie);
         }
@@ -499,16 +499,16 @@ class Header
         $value  = rawurlencode($value);
         $cookie = 'Set-Cookie: ' . $name . '=' . $value;
 
-        if( $expires ) {
+        if ( $expires ) {
             $expires = gmdate(DATE_RFC850,
                 $expires);
             $cookie  .= "; expires=$expires";
         }
 
-        $cookie .= '; path=' . ($path
-                ?: '/');
+        $cookie .= '; path=' . ( $path
+                ?: '/' );
 
-        if( $domain ) {
+        if ( $domain ) {
             $cookie .= '; domain=' . $domain;
         }
 
@@ -628,13 +628,13 @@ class Header
         ];
 
         /* La methode existe */
-        if( isset($method[ $header ]) ) {
+        if ( isset($method[ $header ]) ) {
             $key = $method[ $header ];
 
             /* Gestion des timestamp */
-            if( in_array($header,
+            if ( in_array($header,
                 $date) ) {
-                switch( $action ) {
+                switch ( $action ) {
                     case 'set':
                         return $this->setHeader($key,
                             gmdate(DATE_RFC850,
@@ -656,7 +656,7 @@ class Header
                 /* Gestion des methodes Set || Get */
             }
             else {
-                switch( $action ) {
+                switch ( $action ) {
                     case 'set':
                         return $this->setHeader($key,
                             $value);

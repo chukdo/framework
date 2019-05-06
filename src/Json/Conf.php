@@ -23,12 +23,12 @@ class Conf extends Json
         $files   = $storage->files($dir,
             '/\.json$/');
 
-        if( count($files) == 0 ) {
+        if ( count($files) == 0 ) {
             return false;
         }
 
-        foreach( $files as $file ) {
-            if( !$this->loadFile($file) ) {
+        foreach ( $files as $file ) {
+            if ( !$this->loadFile($file) ) {
                 return false;
             }
         }
@@ -44,7 +44,7 @@ class Conf extends Json
     {
         $storage = new Storage();
 
-        if( $storage->exists($file) ) {
+        if ( $storage->exists($file) ) {
             $load = new Conf($storage->get($file));
 
             $this->merge($load->toSimpleArray(),

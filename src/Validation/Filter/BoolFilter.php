@@ -37,10 +37,10 @@ class BoolFilter implements FilterInterface
      */
     public function filter( $input )
     {
-        if( $input === '0' ) {
+        if ( $input === '0' ) {
             return false;
         }
-        elseif( $input === '1' ) {
+        elseif ( $input === '1' ) {
             return true;
         }
 

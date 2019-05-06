@@ -32,7 +32,7 @@ final class Archive
         $extralen    = 0;
         $filenamelen = 0;
 
-        if( $flags & 4 ) {
+        if ( $flags & 4 ) {
             $extralen  = unpack('v',
                 substr($data,
                     10,
@@ -42,21 +42,21 @@ final class Archive
         }
 
         /* Filename */
-        if( $flags & 8 ) {
+        if ( $flags & 8 ) {
             $headerlen = strpos($data,
                     chr(0),
                     $headerlen) + 1;
         }
 
         /* Comment */
-        if( $flags & 16 ) {
+        if ( $flags & 16 ) {
             $headerlen = strpos($data,
                     chr(0),
                     $headerlen) + 1;
         }
 
         /* CRC at end of file */
-        if( $flags & 2 ) {
+        if ( $flags & 2 ) {
             $headerlen += 2;
         }
 
@@ -126,28 +126,28 @@ final class Archive
             true);
 
         /* Erreur d'ouverture du fichier */
-        if( !is_resource($open) ) {
+        if ( !is_resource($open) ) {
             throw new \Chukdo\Bootstrap\AppException('Zip File Function error: ' . $ziperror[ $open ]);
         }
 
-        while( ($read = zip_read($open)) !== false ) {
+        while ( ( $read = zip_read($open) ) !== false ) {
             /* Erreur d'ouverture du fichier */
-            if( !is_resource($read) ) {
+            if ( !is_resource($read) ) {
                 throw new \Chukdo\Bootstrap\AppException('Zip File Function error: ' . $ziperror[ $read ]);
             }
 
             $name = zip_entry_name($read);
             $dir  = trim(dirname($name),
                     DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-            $file = ($root
+            $file = ( $root
                     ? $path
-                    : $path . $dir) . basename($name);
+                    : $path . $dir ) . basename($name);
             $size = zip_entry_filesize($read);
 
             /* Dossier */
-            if( substr($name,
+            if ( substr($name,
                     -1) == '/' ) {
-                if( !is_dir($path . $dir) ) {
+                if ( !is_dir($path . $dir) ) {
                     mkdir($path . $dir,
                         0777,
                         true);
@@ -156,23 +156,23 @@ final class Archive
                 /* Fichier */
             }
             else {
-                if( !$root ) {
-                    if( !is_dir($path . $dir) ) {
+                if ( !$root ) {
+                    if ( !is_dir($path . $dir) ) {
                         mkdir($path . $dir,
                             0777,
                             true);
                     }
                 }
-                if( ($fp = fopen($file,
-                        'wb')) !== false ) {
-                    while( $size > 0 ) {
+                if ( ( $fp = fopen($file,
+                        'wb') ) !== false ) {
+                    while ( $size > 0 ) {
                         $block   = min($size,
                             10240);
                         $size    -= $block;
                         $content = zip_entry_read($read,
                             $block);
 
-                        if( $content !== false ) {
+                        if ( $content !== false ) {
                             fwrite($fp,
                                 $content);
                         }

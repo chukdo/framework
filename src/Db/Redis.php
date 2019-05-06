@@ -63,12 +63,12 @@ class Redis implements RedisInterface
             $timeout
                 ?: 5);
 
-        if( $this->sock === null ) {
+        if ( $this->sock === null ) {
             throw new RedisException("[$errno $errstr]");
         }
 
-        if( isset($dsn[ 'pass' ]) ) {
-            if( !$this->__call('AUTH',
+        if ( isset($dsn[ 'pass' ]) ) {
+            if ( !$this->__call('AUTH',
                 [ $dsn[ 'pass' ] ]) ) {
                 throw new RedisException('Wrong password');
             }
@@ -113,12 +113,12 @@ class Redis implements RedisInterface
      */
     public function write( string $c ): void
     {
-        for( $written = 0 ; $written < mb_strlen($c) ; $written += $fwrite ) {
+        for ( $written = 0 ; $written < mb_strlen($c) ; $written += $fwrite ) {
             $fwrite = fwrite($this->sock,
                 mb_substr($c,
                     $written));
 
-            if( $fwrite === false || $fwrite <= 0 ) {
+            if ( $fwrite === false || $fwrite <= 0 ) {
                 throw new RedisException('Stream write error');
             }
         }
@@ -133,7 +133,7 @@ class Redis implements RedisInterface
     {
         $c = '*' . count($args) . "\r\n";
 
-        foreach( $args as $arg ) {
+        foreach ( $args as $arg ) {
             $c .= '$' . mb_strlen($arg) . "\r\n" . $arg . "\r\n";
         }
 
@@ -142,8 +142,8 @@ class Redis implements RedisInterface
 
     /**
      * Lecture d'une reponse du serveur.
-     * @throws RedisException
      * @return mixed
+     * @throws RedisException
      */
     public function read()
     {
@@ -153,11 +153,11 @@ class Redis implements RedisInterface
         $reply = substr($get,
             1);
 
-        if( $get === 0 ) {
+        if ( $get === 0 ) {
             throw new RedisException('Failed to read type of response from stream');
         }
 
-        switch( substr($get,
+        switch ( substr($get,
             0,
             1) ) {
             /* Error */
@@ -169,7 +169,7 @@ class Redis implements RedisInterface
             case '+':
                 $s = $reply;
 
-                if( $s == 'OK' ) {
+                if ( $s == 'OK' ) {
                     $s = true;
                 }
                 break;
@@ -183,21 +183,21 @@ class Redis implements RedisInterface
             case '$':
                 $s = null;
 
-                if( $reply == '-1' ) {
+                if ( $reply == '-1' ) {
                     break;
                 }
 
                 $size = intval($reply);
                 $read = 0;
 
-                if( $size > 0 ) {
-                    while( $read < $size ) {
+                if ( $size > 0 ) {
+                    while ( $read < $size ) {
                         $len  = min(1024,
                             $size - $read);
                         $read += $len;
 
-                        if( ($r = stream_get_line($this->sock,
-                                $len)) !== 0 ) {
+                        if ( ( $r = stream_get_line($this->sock,
+                                $len) ) !== 0 ) {
                             $s .= $r;
                         }
                         else {
@@ -215,14 +215,14 @@ class Redis implements RedisInterface
             case '*':
                 $s = null;
 
-                if( $reply == '*-1' ) {
+                if ( $reply == '*-1' ) {
                     break;
                 }
 
                 $c = intval($reply);
                 $s = [];
 
-                for( $i = 0 ; $i < $c ; ++$i ) {
+                for ( $i = 0 ; $i < $c ; ++$i ) {
                     $s[] = $this->read();
                 }
                 break;
@@ -269,7 +269,7 @@ class Redis implements RedisInterface
         /** command SCAN */
         $scan = $this->getIterator($this->pointer);
 
-        if( count($scan) == 2 ) {
+        if ( count($scan) == 2 ) {
             $this->pointer = (int) $scan[ 0 ];
             $this->stack   = (array) $scan[ 1 ];
         }
@@ -301,10 +301,10 @@ class Redis implements RedisInterface
     {
         $current = false;
 
-        if( isset($this->stack[ 0 ]) ) {
+        if ( isset($this->stack[ 0 ]) ) {
             $key = $this->stack[ 0 ];
 
-            switch( $this->__call('TYPE',
+            switch ( $this->__call('TYPE',
                 [ $key ]) ) {
                 case 'string':
                 case 'set':
@@ -364,14 +364,14 @@ class Redis implements RedisInterface
      */
     public function next()
     {
-        if( !empty($this->stack) ) {
+        if ( !empty($this->stack) ) {
             array_shift($this->stack);
         }
-        elseif( $this->pointer !== 0 ) {
+        elseif ( $this->pointer !== 0 ) {
             /** command SCAN */
             $scan = $this->getIterator($this->pointer);
 
-            if( count($scan) == 2 ) {
+            if ( count($scan) == 2 ) {
                 $this->pointer = (int) $scan[ 0 ];
                 $this->stack   = (array) $scan[ 1 ];
             }
@@ -410,7 +410,7 @@ class Redis implements RedisInterface
         $c = '';
         $i = 0;
 
-        foreach( $commands as $command ) {
+        foreach ( $commands as $command ) {
             $args = str_getcsv($command,
                 ' ',
                 '"');
@@ -420,7 +420,7 @@ class Redis implements RedisInterface
 
         $this->write($c);
 
-        for( $j = 0 ; $j < $i ; ++$j ) {
+        for ( $j = 0 ; $j < $i ; ++$j ) {
             $s[ $j ] = $this->read();
         }
 
@@ -440,16 +440,16 @@ class Redis implements RedisInterface
             $this->__call('info',
                 []));
 
-        foreach( $items as $item ) {
+        foreach ( $items as $item ) {
             $item = explode(':',
                 $item);
 
-            if( isset($item[ 1 ]) ) {
+            if ( isset($item[ 1 ]) ) {
                 $info[ $item[ 0 ] ] = $item[ 1 ];
             }
         }
 
-        if( $key ) {
+        if ( $key ) {
             return isset($info[ $key ])
                 ? $info[ $key ]
                 : false;
