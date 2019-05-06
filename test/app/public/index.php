@@ -149,12 +149,12 @@ Router::group(function() {
         function( $inputs, $response ) {
             return $response->content('toto2');
         })
-        ->where('a', '[a-z0-9]+');
+        ->where('a', '[a-z0-9]+')
+        ->middleware([ TraitMiddleWare::class ]);
 })
     ->middleware([
         QuoteMiddleWare::class,
         UnderscoreMiddleWare::class,
-        TraitMiddleWare::class,
     ])
     ->validator([
         'a'    => 'required|string:3',
@@ -163,6 +163,22 @@ Router::group(function() {
     ])
     ->prefix('test');
 
+Router::group(function() {
+    Router::get('/user/{a}/test/{comment}',
+        function( $inputs, $response ) {
+            return $response->content('toto2-2');
+        })
+        ->where('a', '[a-z0-9]+');
+})
+    ->middleware([
+        QuoteMiddleWare::class,
+        TraitMiddleWare::class,
+    ])
+    ->validator([
+        'a'    => 'required|string:3',
+        'tel'  => 'required|phone',
+        'csrf' => 'required|csrf:@salt',
+    ]);
 
 Router::fallback(function() {
     dd('rien de valide');

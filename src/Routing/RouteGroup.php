@@ -11,7 +11,7 @@ use Closure;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class RouterGroup extends RouteAttribute
+class RouteGroup extends RouteAttribute
 {
     /**
      * @var Router
@@ -24,7 +24,7 @@ class RouterGroup extends RouteAttribute
     protected $closure;
 
     /**
-     * RouterGroup constructor.
+     * RouteGroup constructor.
      * @param Router  $router
      * @param Closure $closure
      */
@@ -35,19 +35,23 @@ class RouterGroup extends RouteAttribute
     }
 
     /**
-     * @return RouterGroup
+     * @return RouteGroup
      */
     public function route(): self
     {
-        $this->router->attributes([
+        $attributes = $this->router->getAttributes();
+        $this->router->setAttributes([
             'middleware'      => $this->middlewares,
             'validator'       => $this->validators,
             'errorMiddleware' => $this->errorMiddleware,
             'prefix'          => $this->prefix,
             'namespace'       => $this->namespace,
         ]);
+
         ($this->closure)();
-        $this->router->attributes([]);
+
+        $this->router->resetAttributes()
+            ->setAttributes($attributes);
 
         return $this;
     }

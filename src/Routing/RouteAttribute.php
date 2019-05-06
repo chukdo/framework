@@ -38,15 +38,51 @@ class RouteAttribute
      */
     protected $validators = [];
 
-    /**
-     * @param array                         $validators
-     * @param ErrorMiddlewareInterface|null $errorMiddleware
-     * @return Router
-     */
-    public function validator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
+    public function resetAttributes(): self
     {
-        $this->validators      = $validators;
-        $this->errorMiddleware = $errorMiddleware;
+        $this->middlewares     = [];
+        $this->validators      = [];
+        $this->errorMiddleware = null;
+        $this->prefix          = '';
+        $this->namespace       = '';
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttributes(): array
+    {
+        return [
+            'middleware'      => $this->middlewares,
+            'validator'       => $this->validators,
+            'errorMiddleware' => $this->errorMiddleware,
+            'prefix'          => $this->prefix,
+            'namespace'       => $this->namespace,
+        ];
+    }
+
+    /**
+     * @param array $attributes
+     * @return RouteAttribute
+     */
+    public function setAttributes( array $attributes ): self
+    {
+        $initAttributes = [
+            'middleware'      => [],
+            'validator'       => [],
+            'errorMiddleware' => null,
+            'prefix'          => '',
+            'namespace'       => '',
+        ];
+
+        $attributes = array_merge($initAttributes, $attributes);
+
+        $this->middleware($attributes[ 'middleware' ]);
+        $this->validator($attributes[ 'validator' ], $attributes[ 'errorMiddleware' ]);
+        $this->prefix($attributes[ 'prefix' ]);
+        $this->namespace($attributes[ 'namespace' ]);
 
         return $this;
     }
@@ -60,6 +96,19 @@ class RouteAttribute
         foreach( $middlewares as $middleware ) {
             $this->middlewares[] = $middleware;
         }
+
+        return $this;
+    }
+
+    /**
+     * @param array                         $validators
+     * @param ErrorMiddlewareInterface|null $errorMiddleware
+     * @return Router
+     */
+    public function validator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
+    {
+        $this->validators      = $validators;
+        $this->errorMiddleware = $errorMiddleware;
 
         return $this;
     }
@@ -90,29 +139,6 @@ class RouteAttribute
         if( strlen($namespace) > 0 ) {
             $this->namespace .= '/' . $namespace;
         }
-
-        return $this;
-    }
-
-    /**
-     * @param array $attributes
-     * @return Route
-     */
-    public function attributes( array $attributes ): self
-    {
-        $attributes = array_merge([
-            'middleware'      => [],
-            'validator'       => [],
-            'errorMiddleware' => null,
-            'prefix'          => '',
-            'namespace'       => '',
-        ],
-            $attributes);
-
-        $this->middleware($attributes[ 'middleware' ]);
-        $this->validator($attributes[ 'validator' ], $attributes[ 'errorMiddleware' ]);
-        $this->prefix($attributes[ 'prefix' ]);
-        $this->namespace($attributes[ 'namespace' ]);
 
         return $this;
     }

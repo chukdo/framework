@@ -2,7 +2,6 @@
 
 namespace Chukdo\Routing;
 
-use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
 use Chukdo\Http\HttpException;
 use Chukdo\Http\Response;
 use Chukdo\Middleware\AppMiddleware;
@@ -17,7 +16,7 @@ use Chukdo\Http\Request;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class Router
+class Router extends RouteAttribute
 {
     /**
      * @var App
@@ -48,11 +47,6 @@ class Router
      * @var array
      */
     protected $group = [];
-
-    /**
-     * @var array
-     */
-    protected $attributes = [];
 
     /**
      * Router constructor.
@@ -97,7 +91,10 @@ class Router
         }
 
         $route = new Route($method, $uri, $this->request, $appMiddleware);
-        $route->attributes($this->attributes);
+        $route->middleware($this->middlewares);
+        $route->validator($this->validators, $this->errorMiddleware);
+        $route->prefix($this->prefix);
+        $route->namespace($this->namespace);
 
         $this->stack[] = $route;
 
@@ -106,25 +103,14 @@ class Router
 
     /**
      * @param Closure $closure
-     * @return RouterGroup
+     * @return RouteGroup
      */
-    public function group( Closure $closure ): RouterGroup
+    public function group( Closure $closure ): RouteGroup
     {
-        $group         = new RouterGroup($this, $closure);
+        $group         = new RouteGroup($this, $closure);
         $this->group[] = $group;
 
         return $group;
-    }
-
-    /**
-     * @param array $attributes
-     * @return Router
-     */
-    public function attributes( array $attributes ): self
-    {
-        $this->attributes = $attributes;
-
-        return $this;
     }
 
     /**
