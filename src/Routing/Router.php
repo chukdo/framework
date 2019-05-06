@@ -2,6 +2,7 @@
 
 namespace Chukdo\Routing;
 
+use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
 use Chukdo\Http\HttpException;
 use Chukdo\Http\Response;
 use Chukdo\Middleware\AppMiddleware;
@@ -39,19 +40,19 @@ class Router
     protected $stack = [];
 
     /**
+     * @var Closure
+     */
+    protected $fallback = null;
+
+    /**
      * @var array
      */
-    protected $middlewares = [];
+    protected $group = [];
 
     /**
-     * @var string
+     * @var array
      */
-    protected $prefix = null;
-
-    /**
-     * @var string
-     */
-    protected $namespace = null;
+    protected $attributes = [];
 
     /**
      * Router constructor.
@@ -89,48 +90,39 @@ class Router
         }
         elseif( is_string($closure) ) {
             // namespace
+            // App\Controlers\xxx
         }
         else {
             throw new HttpException('Router stack need a Closure or a String');
         }
 
-        $route         = new Route($method, $uri, $this->request, $appMiddleware);
+        $route = new Route($method, $uri, $this->request, $appMiddleware);
+        $route->attributes($this->attributes);
+
         $this->stack[] = $route;
 
         return $route;
     }
 
     /**
-     * @param array   $attributes
      * @param Closure $closure
+     * @return RouterGroup
+     */
+    public function group( Closure $closure ): RouterGroup
+    {
+        $group         = new RouterGroup($this, $closure);
+        $this->group[] = $group;
+
+        return $group;
+    }
+
+    /**
+     * @param array $attributes
      * @return Router
      */
-    public function group( array $attributes, Closure $closure ): self
+    public function attributes(array $attributes): self
     {
-        $attributes        = array_merge($attributes,
-            [
-                'middleware' => [],
-                'namespace'  => null,
-                'prefix'     => null,
-            ]);
-        $middlewares       = (array) $attributes[ 'middleware' ];
-        $namespace         = $attributes[ 'namespace' ];
-        $prefix            = $attributes[ 'prefix' ];
-
-        $__middleWares     = $this->middlewares;
-        $this->middlewares = array_merge($this->middlewares, $middlewares);
-
-        $__prefix          = $this->prefix;
-        $this->prefix      = $prefix;
-
-        $__namespace       = $this->namespace;
-        $this->namespace   = $namespace;
-
-        $closure();
-
-        $this->middlewares = $__middleWares;
-        $this->prefix      = $__prefix;
-        $this->namespace   = $__namespace;
+        $this->attributes = $attributes;
 
         return $this;
     }
@@ -190,16 +182,33 @@ class Router
      */
     public function route(): Response
     {
+        foreach( $this->group as $group ) {
+            $group->route();
+        }
+
         foreach( $this->stack as $route ) {
             if( $route->match() ) {
-                $route->middlewares($this->middlewares);
-                $route->prefix($this->prefix);
-
                 return $route->dispatcher($this->response)
                     ->send();
             }
         }
 
-        throw new HttpException('No valid route');
+        if( $this->fallback instanceof Closure ) {
+            ($this->fallback)($this->request, $this->response);
+        }
+        else {
+            throw new HttpException('No valid route');
+        }
+    }
+
+    /**
+     * @param Closure $fallback
+     * @return Router
+     */
+    public function fallback( Closure $fallback ): self
+    {
+        $this->fallback = $fallback;
+
+        return $this;
     }
 }

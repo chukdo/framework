@@ -315,7 +315,7 @@ class Url
      */
     public function getPath(): string
     {
-        return '/' . trim($this->getDir(), '/') . '/' . $this->getFile();
+        return rtrim($this->getDir(), '/') . '/' . $this->getFile();
     }
 
     /**

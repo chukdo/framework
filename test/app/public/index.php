@@ -80,7 +80,8 @@ class QuoteMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
     {
         $response = $dispatcher->handle();
 
-        if ($response->getHeaders()->getStatus() == 200) {
+        if( $response->getHeaders()
+                ->getStatus() == 200 ) {
             $response->prepend('"');
             $response->append('"');
         }
@@ -102,7 +103,8 @@ class UnderscoreMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
     {
         $response = $dispatcher->handle();
 
-        if ($response->getHeaders()->getStatus() == 200) {
+        if( $response->getHeaders()
+                ->getStatus() == 200 ) {
             $response->prepend('__');
             $response->append('__');
         }
@@ -123,7 +125,8 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
     {
         $response = $dispatcher->handle();
 
-        if ($response->getHeaders()->getStatus() == 200) {
+        if( $response->getHeaders()
+                ->getStatus() == 200 ) {
             $response->prepend('--');
             $response->append('--');
         }
@@ -137,33 +140,32 @@ Request::Inputs()
 Request::Inputs()
     ->set('tel', '+33626148328');
 
-Router::middlewares([
-    QuoteMiddleWare::class,
-    UnderscoreMiddleWare::class,
-    TraitMiddleWare::class,
-])->group([], function() {
-    Router::console('/test/toto',
+Router::group(function() {
+    Router::console('/toto',
         function( $inputs, $response ) {
-            dd($inputs);
             return $response->content('all_toto2');
-        })
-        ->validator([
-            'a'     => 'required|string:3',
-            'tel'     => 'required|phone',
-            'csrf'    => 'required|csrf:@salt',
-        ]);
-    Router::get('//{projkey}.modelo.test/user/{id}/test/{comment}',
+        });
+    Router::get('/user/{a}/test/{comment}',
         function( $inputs, $response ) {
             return $response->content('toto2');
         })
-        ->where('id', '[a-z0-9]+')
-        ->where('projkey', '[a-z0-9]+')
-        ->validator([
-            'projkey' => 'required|string',
-            'id'      => 'required|int',
-            'tel'     => 'required|phone',
-            'csrf'    => 'required|csrf:@salt',
-        ]);
+        ->where('a', '[a-z0-9]+');
+})
+    ->middleware([
+        QuoteMiddleWare::class,
+        UnderscoreMiddleWare::class,
+        TraitMiddleWare::class,
+    ])
+    ->validator([
+        'a'    => 'required|string:3',
+        'tel'  => 'required|phone',
+        'csrf' => 'required|csrf:@salt',
+    ])
+    ->prefix('test');
+
+
+Router::fallback(function() {
+    dd('rien de valide');
 });
 Router::route();
 exit;
