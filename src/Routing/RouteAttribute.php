@@ -3,6 +3,7 @@
 namespace Chukdo\Routing;
 
 use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
+use Chukdo\Http\Request;
 
 /**
  * Gestion des groupes de Routes.
@@ -13,6 +14,11 @@ use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
  */
 class RouteAttribute
 {
+    /**
+     * @var Request
+     */
+    protected $request;
+
     /**
      * @var array
      */
@@ -66,6 +72,8 @@ class RouteAttribute
     /**
      * @param array $attributes
      * @return RouteAttribute
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
     public function setAttributes( array $attributes ): self
     {
@@ -89,11 +97,17 @@ class RouteAttribute
 
     /**
      * @param array $middlewares
-     * @return Route
+     * @return RouteAttribute
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
     public function middleware( array $middlewares ): self
     {
         foreach( $middlewares as $middleware ) {
+            if( $isConf = substr($middleware, 0, 1) == '@' ) {
+                $middleware = $this->request->conf(substr($middleware, 1));
+            }
+
             $this->middlewares[] = $middleware;
         }
 

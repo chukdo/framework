@@ -62,9 +62,11 @@ class Router extends RouteAttribute
     }
 
     /**
-     * @param string         $uri
-     * @param Closure|string $closure
+     * @param string $uri
+     * @param        $closure
      * @return Route
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
     public function get( string $uri, $closure ): Route
     {
@@ -72,10 +74,12 @@ class Router extends RouteAttribute
     }
 
     /**
-     * @param string         $method
-     * @param string         $uri
-     * @param Closure|string $closure
+     * @param string $method
+     * @param string $uri
+     * @param        $closure
      * @return Route
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
     public function stack( string $method, string $uri, $closure ): Route
     {
@@ -107,16 +111,18 @@ class Router extends RouteAttribute
      */
     public function group( Closure $closure ): RouteGroup
     {
-        $group         = new RouteGroup($this, $closure);
+        $group         = new RouteGroup($this, $this->request, $closure);
         $this->group[] = $group;
 
         return $group;
     }
 
     /**
-     * @param string         $uri
-     * @param Closure|string $closure
+     * @param string $uri
+     * @param        $closure
      * @return Route
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
     public function post( string $uri, $closure ): Route
     {
@@ -124,9 +130,11 @@ class Router extends RouteAttribute
     }
 
     /**
-     * @param string         $uri
-     * @param Closure|string $closure
+     * @param string $uri
+     * @param        $closure
      * @return Route
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
     public function put( string $uri, $closure ): Route
     {
@@ -134,9 +142,11 @@ class Router extends RouteAttribute
     }
 
     /**
-     * @param string         $uri
-     * @param Closure|string $closure
+     * @param string $uri
+     * @param        $closure
      * @return Route
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
     public function delete( string $uri, $closure ): Route
     {
@@ -144,9 +154,11 @@ class Router extends RouteAttribute
     }
 
     /**
-     * @param string         $uri
-     * @param Closure|string $closure
+     * @param string $uri
+     * @param        $closure
      * @return Route
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
     public function any( string $uri, $closure ): Route
     {
@@ -154,9 +166,11 @@ class Router extends RouteAttribute
     }
 
     /**
-     * @param string         $uri
-     * @param Closure|string $closure
+     * @param string $uri
+     * @param        $closure
      * @return Route
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
     public function console( string $uri, $closure ): Route
     {

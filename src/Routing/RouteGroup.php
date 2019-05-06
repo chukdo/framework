@@ -2,6 +2,7 @@
 
 namespace Chukdo\Routing;
 
+use Chukdo\Http\Request;
 use Closure;
 
 /**
@@ -19,6 +20,11 @@ class RouteGroup extends RouteAttribute
     protected $router;
 
     /**
+     * @var Request
+     */
+    protected $request;
+
+    /**
      * @var Closure
      */
     protected $closure;
@@ -26,16 +32,20 @@ class RouteGroup extends RouteAttribute
     /**
      * RouteGroup constructor.
      * @param Router  $router
+     * @param Request $request
      * @param Closure $closure
      */
-    public function __construct( Router $router, Closure $closure )
+    public function __construct( Router $router, Request $request, Closure $closure )
     {
         $this->router  = $router;
+        $this->request = $request;
         $this->closure = $closure;
     }
 
     /**
      * @return RouteGroup
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
      */
     public function route(): self
     {
