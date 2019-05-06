@@ -61,20 +61,7 @@ class Router
         $this->request  = $app->make('Chukdo\Http\Request');
         $this->response = $this->app->make('Chukdo\Http\Response');
 
-        $this->resetAttributes();
-    }
-
-    public function resetAttributes(): self
-    {
-        $this->attributes = [
-            'middleware'      => [],
-            'validator'       => [],
-            'errorMiddleware' => null,
-            'prefix'          => '',
-            'namespace'       => '',
-        ];
-
-        return $this;
+        $this->setAttributes([]);
     }
 
     /**
@@ -90,6 +77,24 @@ class Router
      * @return Router
      */
     public function setAttributes( array $attributes ): self
+    {
+        $this->attributes = array_merge([
+            'middleware'      => [],
+            'validator'       => [],
+            'errorMiddleware' => null,
+            'prefix'          => '',
+            'namespace'       => '',
+        ],
+            $attributes);
+
+        return $this;
+    }
+
+    /**
+     * @param array $attributes
+     * @return Router
+     */
+    public function addAttributes( array $attributes ): self
     {
         $attributes = array_merge([
             'middleware'      => [],

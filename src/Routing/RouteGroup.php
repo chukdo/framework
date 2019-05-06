@@ -60,7 +60,7 @@ class RouteGroup
      */
     public function middleware( array $middlewares ): self
     {
-        $this->middlewares[] = $middlewares;
+        $this->middlewares = $middlewares;
 
         return $this;
     }
@@ -107,7 +107,7 @@ class RouteGroup
     {
         $attributes = $this->router->getAttributes();
 
-        $this->router->setAttributes([
+        $this->router->addAttributes([
             'middleware'      => $this->middlewares,
             'validator'       => $this->validators,
             'errorMiddleware' => $this->errorMiddleware,
@@ -117,7 +117,6 @@ class RouteGroup
 
         ( $closure )();
 
-        $this->router->resetAttributes()
-            ->setAttributes($attributes);
+        $this->router->setAttributes($attributes);
     }
 }
