@@ -196,7 +196,7 @@ exit;
 //permanentRedirect 301
 
 //Route::namespace('Admin')->group(function () {
-// Controllers Within The "App\Http\Controllers\Admin" Namespace
+// Controllers Within The "App\HttpRequest\Controllers\Admin" Namespace
 //});
 /**Route::domain('{account}.myapp.com')->group(function () {
  * Route::get('user/{id}', function ($account, $id) {

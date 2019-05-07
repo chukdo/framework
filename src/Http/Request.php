@@ -5,7 +5,7 @@ namespace Chukdo\Http;
 use Chukdo\Bootstrap\App;
 use Chukdo\Helper\Cli;
 use Chukdo\Helper\Str;
-use Chukdo\Helper\Http;
+use Chukdo\Helper\HttpRequest;
 use Chukdo\Json\Json;
 use Chukdo\Json\Input;
 use Chukdo\Validation\Validator;
@@ -51,15 +51,15 @@ class Request
         $this->app    = $app;
         $this->inputs = $app->make('Chukdo\Json\Input', true);
         $this->header = new Header();
-        $this->url    = new Url(Http::uri());
+        $this->url    = new Url(HttpRequest::uri());
 
         $this->header->setHeader('Content-Type',
-            Http::server('CONTENT_TYPE',
+            HttpRequest::server('CONTENT_TYPE',
                 ''));
         $this->header->setHeader('Content-Length',
-            Http::server('CONTENT_LENGTH',
+            HttpRequest::server('CONTENT_LENGTH',
                 ''));
-        $this->header->setHeaders(Http::headers());
+        $this->header->setHeaders(HttpRequest::headers());
     }
 
     /**
@@ -205,9 +205,9 @@ class Request
      */
     public function from(): ?string
     {
-        return parse_url(Http::server('HTTP_ORIGIN')
-            ?: Http::server('HTTP_REFERER')
-                ?: Http::server('REMOTE_ADDR'),
+        return parse_url(HttpRequest::server('HTTP_ORIGIN')
+            ?: HttpRequest::server('HTTP_REFERER')
+                ?: HttpRequest::server('REMOTE_ADDR'),
             PHP_URL_HOST);
     }
 
@@ -267,7 +267,7 @@ class Request
      */
     public function ajax(): bool
     {
-        return Http::ajax();
+        return HttpRequest::ajax();
     }
 
     /**
@@ -275,7 +275,7 @@ class Request
      */
     public function userAgent(): string
     {
-        return Http::userAgent();
+        return HttpRequest::userAgent();
     }
 
     /**
@@ -283,7 +283,7 @@ class Request
      */
     public function method(): ?string
     {
-        return Http::method();
+        return HttpRequest::method();
     }
 
     /**
@@ -291,6 +291,6 @@ class Request
      */
     public function secured(): bool
     {
-        return Http::secured();
+        return HttpRequest::secured();
     }
 }

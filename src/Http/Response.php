@@ -3,6 +3,7 @@
 namespace Chukdo\Http;
 
 use Chukdo\Helper\Http;
+use Chukdo\Helper\HttpRequest;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
 use Chukdo\Xml\Xml;
@@ -337,13 +338,13 @@ class Response
     {
         $content = $this->content;
 
-        if ( Str::contain(Http::server('HTTP_ACCEPT_ENCODING'),
+        if ( Str::contain(HttpRequest::server('HTTP_ACCEPT_ENCODING'),
             'deflate') ) {
             $this->header->setHeader('Content-Encoding',
                 'deflate');
             $content = gzdeflate($this->content);
         }
-        elseif ( Str::contain(Http::server('HTTP_ACCEPT_ENCODING'),
+        elseif ( Str::contain(HttpRequest::server('HTTP_ACCEPT_ENCODING'),
             'gzip') ) {
             $this->header->setHeader('Content-Encoding',
                 'gzip');

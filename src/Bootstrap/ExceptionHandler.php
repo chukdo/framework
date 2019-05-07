@@ -3,7 +3,7 @@
 namespace Chukdo\Bootstrap;
 
 use Chukdo\Contracts\Exception\Handler;
-use Chukdo\Helper\Http;
+use Chukdo\Helper\HttpRequest;
 use Exception;
 
 /**

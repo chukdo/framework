@@ -3,6 +3,7 @@
 namespace Chukdo\Bootstrap;
 
 use Chukdo\Helper\Http;
+use Chukdo\Helper\HttpRequest;
 use Chukdo\Helper\To;
 use Chukdo\Http\Response;
 use Chukdo\Json\Json;
@@ -110,7 +111,7 @@ class ExceptionMessage
      */
     public function render(): void
     {
-        $render   = Http::render();
+        $render   = HttpRequest::render();
         $response = new Response();
 
         /* Dev mode */

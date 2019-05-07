@@ -4,6 +4,7 @@ namespace Chukdo\Logger\Processors;
 
 use Chukdo\Contracts\Logger\Processor as ProcessorInterface;
 use Chukdo\Helper\Http;
+use Chukdo\Helper\HttpRequest;
 
 /**
  * Ajoute la request HTTP au log.
@@ -21,15 +22,15 @@ class RequestProcessor implements ProcessorInterface
      */
     public function processRecord( array $record ): array
     {
-        $browser = Http::browser(Http::userAgent());
+        $browser = Http::browser(HttpRequest::userAgent());
 
         $record[ 'extra' ][ 'request' ] = [
-            'uri'       => Http::uri()
+            'uri'       => HttpRequest::uri()
                 ?: implode(' ',
-                    Http::argv()),
-            'remote'    => Http::server('REMOTE_ADDR'),
-            'referer'   => Http::server('HTTP_REFERER'),
-            'method'    => Http::method(),
+                    HttpRequest::argv()),
+            'remote'    => HttpRequest::server('REMOTE_ADDR'),
+            'referer'   => HttpRequest::server('HTTP_REFERER'),
+            'method'    => HttpRequest::method(),
             'useragent' => [
                 'platform' => $browser[ 'platform' ]
                     ?: 'Cli',

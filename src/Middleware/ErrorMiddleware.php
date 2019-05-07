@@ -3,7 +3,7 @@
 namespace Chukdo\Middleware;
 
 use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
-use Chukdo\Helper\Http;
+use Chukdo\Helper\HttpRequest;
 use Chukdo\Http\Response;
 use Chukdo\Json\Message;
 
@@ -33,7 +33,7 @@ class ErrorMiddleware implements ErrorMiddlewareInterface
     {
         $response = $delegate->response();
 
-        switch ( Http::render() ) {
+        switch ( HttpRequest::render() ) {
             case 'cli' :
                 $response->content($this->errors->toConsole(null, 'red'));
                 break;
