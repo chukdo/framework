@@ -41,11 +41,6 @@ class Request
     protected $url;
 
     /**
-     * @param string
-     */
-    protected $method;
-
-    /**
      * Request constructor.
      * @param App $app
      * @throws \Chukdo\Bootstrap\ServiceException
@@ -57,7 +52,6 @@ class Request
         $this->inputs = $app->make('Chukdo\Json\Input', true);
         $this->header = new Header();
         $this->url    = new Url(Http::uri());
-        $this->method = Http::method();
 
         $this->header->setHeader('Content-Type',
             Http::server('CONTENT_TYPE',
@@ -273,7 +267,15 @@ class Request
      */
     public function ajax(): bool
     {
-        return $this->header->getHeader('X-Requested-with') === 'XMLHttpRequest';
+        return Http::ajax();
+    }
+
+    /**
+     * @return string
+     */
+    public function userAgent(): string
+    {
+        return Http::userAgent();
     }
 
     /**
@@ -281,15 +283,7 @@ class Request
      */
     public function method(): ?string
     {
-        return $this->method;
-    }
-
-    /**
-     * @return array
-     */
-    public function userAgent(): array
-    {
-        return Http::getUserAgent(Http::server('HTTP_USER_AGENT'));
+        return Http::method();
     }
 
     /**
@@ -297,7 +291,6 @@ class Request
      */
     public function secured(): bool
     {
-        return Http::server('HTTPS') || Http::server('SERVER_PORT') == '443'
-               || Http::server('REQUEST_SCHEME') == 'https';
+        return Http::secured();
     }
 }

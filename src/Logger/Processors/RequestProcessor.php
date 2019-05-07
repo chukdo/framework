@@ -21,15 +21,15 @@ class RequestProcessor implements ProcessorInterface
      */
     public function processRecord( array $record ): array
     {
-        $browser = Http::getUserAgent(Http::server('HTTP_USER_AGENT'));
+        $browser = Http::browser(Http::userAgent());
 
         $record[ 'extra' ][ 'request' ] = [
-            'uri'       => Http::server('REQUEST_URI')
+            'uri'       => Http::uri()
                 ?: implode(' ',
                     Http::argv()),
             'remote'    => Http::server('REMOTE_ADDR'),
             'referer'   => Http::server('HTTP_REFERER'),
-            'method'    => Http::server('REQUEST_METHOD'),
+            'method'    => Http::method(),
             'useragent' => [
                 'platform' => $browser[ 'platform' ]
                     ?: 'Cli',

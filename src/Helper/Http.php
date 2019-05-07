@@ -76,7 +76,7 @@ final class Http
      * @param string|null $ua
      * @return array
      */
-    public static function getUserAgent( string $ua = null ): array
+    public static function browser( string $ua = null ): array
     {
         $browser = [
             'platform' => null,
@@ -200,6 +200,34 @@ final class Http
             : $default;
     }
 
+    /**
+     * @return bool
+     */
+    public static function secured(): bool
+    {
+        return self::server('HTTPS') || self::server('SERVER_PORT') == '443'
+        || self::server('REQUEST_SCHEME') == 'https';
+    }
+
+    /**
+     * @return bool
+     */
+    public static function ajax(): bool
+    {
+        return self::server('HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest';
+    }
+
+    /**
+     * @return string
+     */
+    public static function userAgent(): string
+    {
+        return self::server('HTTP_USER_AGENT');
+    }
+
+    /**
+     * @return string|null
+     */
     public static function render(): ?string
     {
         return Cli::runningInConsole()
