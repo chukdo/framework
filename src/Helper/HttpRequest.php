@@ -25,7 +25,19 @@ final class HttpRequest
     {
         return Cli::runningInConsole()
             ? Cli::argv()
-            : (array) self::server( 'argv');
+            : (array) self::server('argv');
+    }
+
+    /**
+     * @param             $name
+     * @param string|null $default
+     * @return string|null
+     */
+    public static function server( $name, string $default = null ): ?string
+    {
+        return isset($_SERVER[ $name ])
+            ? $_SERVER[ $name ]
+            : $default;
     }
 
     /**
@@ -45,20 +57,12 @@ final class HttpRequest
      */
     public static function request( $name, string $default = null ): ?string
     {
-        return isset($_REQUEST[ $name ])
-            ? $_REQUEST[ $name ]
-            : $default;
-    }
+        $request = Cli::runningInConsole()
+            ? Cli::inputs()
+            : $_REQUEST;
 
-    /**
-     * @param             $name
-     * @param string|null $default
-     * @return string|null
-     */
-    public static function server( $name, string $default = null ): ?string
-    {
-        return isset($_SERVER[ $name ])
-            ? $_SERVER[ $name ]
+        return isset($request[ $name ])
+            ? $request[ $name ]
             : $default;
     }
 
@@ -68,7 +72,7 @@ final class HttpRequest
     public static function secured(): bool
     {
         return self::server('HTTPS') || self::server('SERVER_PORT') == '443'
-        || self::server('REQUEST_SCHEME') == 'https';
+               || self::server('REQUEST_SCHEME') == 'https';
     }
 
     /**

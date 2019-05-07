@@ -39,7 +39,7 @@ final class Cli
     {
         $inputs = [];
 
-        foreach ( (array) $_SERVER[ 'argv' ] as $k => $arg ) {
+        foreach ( (array) HttpRequest::server( 'argv' ) as $k => $arg ) {
             list($key, $value) = array_pad(explode('=', $arg), 2, null);
 
             $key = trim($key, '-');

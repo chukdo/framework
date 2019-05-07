@@ -63,6 +63,16 @@ class Request
     }
 
     /**
+     * @param             $name
+     * @param string|null $default
+     * @return string|null
+     */
+    public function server( $name, string $default = null ): ?string
+    {
+        return HttpRequest::server($name, $default);
+    }
+
+    /**
      * @return Request
      */
     public function instance(): self
