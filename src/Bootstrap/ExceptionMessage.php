@@ -9,6 +9,7 @@ use Chukdo\Helper\To;
 use Chukdo\Http\Response;
 use Chukdo\Json\Json;
 use Chukdo\Xml\Xml;
+use League\CLImate\CLImate;
 use SplFileObject;
 use Throwable;
 
@@ -124,60 +125,31 @@ class ExceptionMessage
      */
     public function renderForConsole(): void
     {
-        $table = new \cli\Table();
-        $table->setHeaders([
-            '%R' . strtoupper($this->message[ 'Call' ]
-                ?: 'Exception') . '%n',
-        ]);
-        $table->setRenderer(new \cli\table\Ascii([ 89 ]));
-        $table->display();
-
-        $table = new \cli\Table();
-        $table->setHeaders([
-            '%YCode%n',
-            '%YMessage%n',
-            '%YFile%n',
-            '%YLine%n',
-        ]);
-        $table->addRow([
-            $this->message[ 'Code' ],
-            $this->message[ 'Error' ],
-            $this->message[ 'File' ],
-            $this->message[ 'Line' ],
-        ]);
-
-        $table->setRenderer(new \cli\table\Ascii([
-            5,
-            30,
-            40,
-            5,
-        ]));
-        $table->display();
+        $climate = new CLImate();
+        $climate->border();
+        $climate->red()
+            ->out(strtoupper($this->message[ 'Call' ]
+                ?: 'Exception'));
+        $climate->border();
+        $padding = $climate->padding(7);
+        $padding->label('Code')
+            ->result($this->message[ 'Code' ]);
+        $padding->label('Message')
+            ->result($this->message[ 'Error' ]);
+        $padding->label('File')
+            ->result($this->message[ 'File' ]);
+        $padding->label('Line')
+            ->result($this->message[ 'Line' ]);
 
         $backTrace = $this->message[ 'Trace' ];
 
         if ( is_array($backTrace) ) {
-            $table = new \cli\Table();
-            $table->setHeaders([
-                '%YFile%n',
-                '%YLine%n',
-                '%YCall%n',
-            ]);
-
-            foreach ( $backTrace as $trace ) {
-                $table->addRow([
-                    $trace[ 'File' ],
-                    $trace[ 'Line' ],
-                    $trace[ 'Call' ],
-                ]);
+            foreach ( $backTrace as $k => $trace ) {
+                unset($backTrace[ $k ][ 'Php' ]);
             }
-
-            $table->setRenderer(new \cli\table\Ascii([
-                40,
-                5,
-                38,
-            ]));
-            $table->display();
+            $padding->label('Trace');
+            $climate->json($backTrace);
+            $climate->border();
         }
 
         exit;

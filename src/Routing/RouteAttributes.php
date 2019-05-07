@@ -3,7 +3,6 @@
 namespace Chukdo\Routing;
 
 use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
-use Chukdo\Http\HttpException;
 use Chukdo\Http\Request;
 
 /**
@@ -53,6 +52,20 @@ class RouteAttributes
     {
         $this->request = $request;
         $this->reset();
+    }
+
+    /**
+     * @return RouteAttributes
+     */
+    public function reset(): self
+    {
+        $this->middlewares     = [];
+        $this->validators      = [];
+        $this->errorMiddleware = null;
+        $this->prefix          = '';
+        $this->namespace       = '';
+
+        return $this;
     }
 
     /**
@@ -181,20 +194,6 @@ class RouteAttributes
         $this->setValidator($attributes[ 'validator' ], $attributes[ 'errorMiddleware' ]);
         $this->setPrefix($attributes[ 'prefix' ]);
         $this->setNamespace($attributes[ 'namespace' ]);
-
-        return $this;
-    }
-
-    /**
-     * @return RouteAttributes
-     */
-    public function reset(): self
-    {
-        $this->middlewares     = [];
-        $this->validators      = [];
-        $this->errorMiddleware = null;
-        $this->prefix          = '';
-        $this->namespace       = '';
 
         return $this;
     }

@@ -8,6 +8,7 @@ use Chukdo\Helper\Str;
 use Chukdo\Helper\To;
 use Chukdo\Xml\Xml;
 use Closure;
+use League\CLImate\CLImate;
 
 /**
  * Manipulation des données.
@@ -677,15 +678,18 @@ class Json extends \ArrayObject
      */
     public function toConsole( string $title = null ): string
     {
-        ob_start();
-        $tree = new \cli\Tree();
-        $tree->setData($this->toArray());
-        $tree->setRenderer(new \cli\tree\Ascii());
-        $tree->display();
-        $stdout = ob_get_contents();
-        ob_end_clean();
+        $climate = new CLImate();
+        $climate->output->defaultTo('buffer');
 
-        return $stdout;
+        if ($title) {
+            $climate->border();
+            $climate->blue()->out(ucfirst($title));
+            $climate->border();
+        }
+
+        $climate->json($this->toArray());
+
+        return $climate->output->get('buffer')->get();
     }
 
     /**

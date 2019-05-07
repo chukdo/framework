@@ -54,6 +54,23 @@ class Message extends Json
     }
 
     /**
+     * @param string|null $title
+     * @return string
+     */
+    public function toConsole( string $title = null ): string
+    {
+        ob_start();
+        $tree = new \cli\Tree();
+        $tree->setData($this->toArray());
+        $tree->setRenderer(new \cli\tree\Ascii());
+        $tree->display();
+        $stdout = ob_get_contents();
+        ob_end_clean();
+
+        return $stdout;
+    }
+
+    /**
      * @return array
      */
     public function toArray(): array

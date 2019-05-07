@@ -32,7 +32,7 @@
     "microsoft/azure-storage-blob": "~1.2.0",
     "guzzlehttp/guzzle": "~6.0",
     "elasticsearch/elasticsearch": "~6.0",
-    "wp-cli/php-cli-tools": "^0.11.11"
+    "league/climate": "^3.5"
   },
   "autoload": {
     "psr-4": {
