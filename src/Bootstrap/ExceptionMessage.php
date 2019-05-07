@@ -2,9 +2,7 @@
 
 namespace Chukdo\Bootstrap;
 
-use Chukdo\Helper\Cli;
 use Chukdo\Helper\Http;
-use Chukdo\Helper\Str;
 use Chukdo\Helper\To;
 use Chukdo\Http\Response;
 use Chukdo\Json\Json;
@@ -112,36 +110,96 @@ class ExceptionMessage
      */
     public function render(): void
     {
-        if ( Cli::runningInConsole() ) {
-            $this->renderForConsole();
+        $render   = Http::render();
+        $response = new Response();
+
+        /* Dev mode */
+        if ( $this->env != 0 ) {
+            $this->message = [ 'Error' => 'Error happened' ];
         }
-        else {
-            $this->renderForResponse();
+
+        switch ( $render ) {
+            case 'cli':
+                $contentType = Http::mimeContentType('text');
+                $content     = $this->renderCli($this->message);
+                break;
+            case 'xml':
+                $contentType = Http::mimeContentType('xml');
+                $content     = $this->renderXml($this->message);
+                break;
+            case 'json':
+                $contentType = Http::mimeContentType('json');
+                $content     = $this->renderJson($this->message);
+                break;
+            case 'html':
+            default:
+                $contentType = Http::mimeContentType('html');
+                $content     = $this->renderHtml($this->message);;
         }
+
+        $response->status(500)
+            ->header('Content-Type', $contentType . '; charset=utf-8')
+            ->content($content)
+            ->send()
+            ->end();
     }
 
     /**
-     * @param string $title
+     * @param array $message
+     * @return string
      */
-    public function renderForConsole(): void
+    protected function renderXml(array $message): string
+    {
+        return ( new Xml() )->import($message)
+            ->toXml()
+            ->toXmlString();
+    }
+
+    /**
+     * @param array $message
+     * @return string
+     */
+    protected function renderJson(array $message): string
+    {
+        return ( new Json($message) )->toJson(true);
+    }
+
+    /**
+     * @param array $message
+     * @return string
+     */
+    protected function renderHtml(array $message): string
+    {
+        $title = $message[ 'Call' ];
+        unset($message[ 'Call' ]);
+
+        return To::html($message, $title, '#B30000');
+    }
+
+    /**
+     * @param array $message
+     * @return string
+     */
+    protected function renderCli(array $message): string
     {
         $climate = new CLImate();
+        $climate->output->defaultTo('buffer');
         $climate->border();
         $climate->red()
-            ->out(strtoupper($this->message[ 'Call' ]
+            ->out(strtoupper($message[ 'Call' ]
                 ?: 'Exception'));
         $climate->border();
         $padding = $climate->padding(7);
         $padding->label('Code')
-            ->result($this->message[ 'Code' ]);
+            ->result($message[ 'Code' ]);
         $padding->label('Message')
-            ->result($this->message[ 'Error' ]);
+            ->result($message[ 'Error' ]);
         $padding->label('File')
-            ->result($this->message[ 'File' ]);
+            ->result($message[ 'File' ]);
         $padding->label('Line')
-            ->result($this->message[ 'Line' ]);
+            ->result($message[ 'Line' ]);
 
-        $backTrace = $this->message[ 'Trace' ];
+        $backTrace = $message[ 'Trace' ];
 
         if ( is_array($backTrace) ) {
             foreach ( $backTrace as $k => $trace ) {
@@ -152,47 +210,7 @@ class ExceptionMessage
             $climate->border();
         }
 
-        exit;
-    }
-
-    /**
-     *
-     */
-    public function renderForResponse(): void
-    {
-        $render   = Str::extension(Http::server('SCRIPT_URI'));
-        $response = new Response();
-
-        /* Dev mode */
-        if ( $this->env != 0 ) {
-            $this->message = [ 'Error' => 'Error happened' ];
-        }
-
-        switch ( $render ) {
-            case 'xml':
-                $contentType = Http::mimeContentType('xml');
-                $content     = ( new Xml() )->import($this->message)
-                    ->toXml()
-                    ->toXmlString();
-
-                break;
-            case 'json':
-                $contentType = Http::mimeContentType('json');
-                $content     = ( new Json($this->message) )->toJson(true);
-                break;
-            case 'html':
-            default:
-                $title = $this->message[ 'Call' ];
-                unset($this->message[ 'Call' ]);
-
-                $contentType = Http::mimeContentType('html');
-                $content     = To::html($this->message, $title, '#B30000');
-        }
-
-        $response->status(500)
-            ->header('Content-Type', $contentType . '; charset=utf-8')
-            ->content($content)
-            ->send()
-            ->end();
+        return $climate->output->get('buffer')
+            ->get();
     }
 }

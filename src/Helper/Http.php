@@ -161,9 +161,31 @@ final class Http
      */
     public static function argv(): array
     {
-        return isset($_SERVER[ 'argv' ])
-            ? $_SERVER[ 'argv' ]
-            : [];
+        return Cli::runningInConsole()
+            ? Cli::argv()
+            : (array) self::server( 'argv');
+    }
+
+    /**
+     * @return string|null
+     */
+    public static function method(): ?string
+    {
+        return Cli::runningInConsole()
+            ? 'CLI'
+            : self::request('httpverb', self::server('REQUEST_METHOD'));
+    }
+
+    /**
+     * @param             $name
+     * @param string|null $default
+     * @return string|null
+     */
+    public static function request( $name, string $default = null ): ?string
+    {
+        return isset($_REQUEST[ $name ])
+            ? $_REQUEST[ $name ]
+            : $default;
     }
 
     /**
@@ -178,15 +200,59 @@ final class Http
             : $default;
     }
 
+    public static function render(): ?string
+    {
+        return Cli::runningInConsole()
+            ? 'cli'
+            : Str::extension(self::uri());
+    }
+
     /**
-     * @param             $name
-     * @param string|null $default
      * @return string|null
      */
-    public static function request( $name, string $default = null ): ?string
+    public static function uri(): ?string
     {
-        return isset($_REQUEST[ $name ])
-            ? $_REQUEST[ $name ]
-            : $default;
+        return Cli::runningInConsole()
+            ? Cli::uri()
+            : self::server('SCRIPT_URI');
+    }
+
+    /**
+     * @return array
+     */
+    public static function host(): array
+    {
+        return (array) self::server('HTTP_HOST');
+    }
+
+    /**
+     * @return array
+     */
+    public static function cookies(): array
+    {
+        return (array) self::server('HTTP_COOKIE');
+    }
+
+    /**
+     * @return array
+     */
+    public static function headers(): array
+    {
+        $headers = [];
+
+        foreach ( $_SERVER as $key => $value ) {
+            if ( $name = Str::match('/^HTTP_(.*)/',
+                $key) ) {
+                switch ( $name ) {
+                    case 'HOST':
+                    case 'COOKIE':
+                        break;
+                    default:
+                        $headers[ $name ] = $value;
+                }
+            }
+        }
+
+        return $headers;
     }
 }

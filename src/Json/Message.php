@@ -62,24 +62,30 @@ class Message extends Json
      */
     public function toConsole( string $title = null, string $color = null ): string
     {
-        if (!Cli::runningInConsole()) {
+        if ( !Cli::runningInConsole() ) {
             throw new JsonException('You can call json::toConsole only in CLI mode.');
         }
 
         $climate = new CLImate();
         $climate->output->defaultTo('buffer');
         $climate->border();
-        $climate->style->addCommand('colored', $color ?: 'green');
-        $climate->colored(ucfirst($title ?: $this->name));
+        $climate->style->addCommand('colored', $color
+            ?: 'green');
+        $climate->colored(ucfirst($title
+            ?: $this->name));
         $climate->border();
 
         $padding = $climate->padding(15);
 
-        foreach ($this as $k => $v) {
-            $padding->label($k)->result($v);
+        foreach ( $this as $k => $v ) {
+            $padding->label($k)
+                ->result($v);
         }
 
-        return $climate->output->get('buffer')->get();
+        $climate->border();
+
+        return $climate->output->get('buffer')
+            ->get();
     }
 
     /**

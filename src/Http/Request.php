@@ -56,12 +56,8 @@ class Request
         $this->app    = $app;
         $this->inputs = $app->make('Chukdo\Json\Input', true);
         $this->header = new Header();
-        $this->url    = new Url(Cli::runningInConsole()
-            ? Cli::uri()
-            : Http::server('SCRIPT_URI'));
-        $this->method = Cli::runningInConsole()
-            ? 'CLI'
-            : Http::request('httpverb', Http::server('REQUEST_METHOD'));
+        $this->url    = new Url(Http::uri());
+        $this->method = Http::method();
 
         $this->header->setHeader('Content-Type',
             Http::server('CONTENT_TYPE',
@@ -69,20 +65,7 @@ class Request
         $this->header->setHeader('Content-Length',
             Http::server('CONTENT_LENGTH',
                 ''));
-
-        foreach ( $_SERVER as $key => $value ) {
-            if ( $name = Str::match('/^HTTP_(.*)/',
-                $key) ) {
-                switch ( $name ) {
-                    case 'HOST':
-                    case 'COOKIE':
-                        break;
-                    default:
-                        $this->header->setHeader($name,
-                            $value);
-                }
-            }
-        }
+        $this->header->setHeaders(Http::headers());
     }
 
     /**
