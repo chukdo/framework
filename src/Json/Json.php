@@ -3,6 +3,7 @@
 namespace Chukdo\Json;
 
 use ArrayObject;
+use Chukdo\Helper\Cli;
 use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
 use Chukdo\Helper\To;
@@ -674,16 +675,22 @@ class Json extends \ArrayObject
 
     /**
      * @param string|null $title
+     * @param string|null $color
      * @return string
      */
-    public function toConsole( string $title = null ): string
+    public function toConsole( string $title = null, string $color = null ): string
     {
+        if (!Cli::runningInConsole()) {
+            throw new JsonException('You can call json::toConsole only in CLI mode.');
+        }
+
         $climate = new CLImate();
         $climate->output->defaultTo('buffer');
 
         if ($title) {
             $climate->border();
-            $climate->blue()->out(ucfirst($title));
+            $climate->style->addCommand('colored', $color ?: 'green');
+            $climate->colored(ucfirst($title ?: $this->name));
             $climate->border();
         }
 

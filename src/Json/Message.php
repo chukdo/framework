@@ -2,7 +2,9 @@
 
 namespace Chukdo\Json;
 
+use Chukdo\Helper\Cli;
 use Chukdo\Helper\To;
+use League\CLImate\CLImate;
 
 /**
  * Gestion des messages.
@@ -55,19 +57,29 @@ class Message extends Json
 
     /**
      * @param string|null $title
+     * @param string|null $color
      * @return string
      */
-    public function toConsole( string $title = null ): string
+    public function toConsole( string $title = null, string $color = null ): string
     {
-        ob_start();
-        $tree = new \cli\Tree();
-        $tree->setData($this->toArray());
-        $tree->setRenderer(new \cli\tree\Ascii());
-        $tree->display();
-        $stdout = ob_get_contents();
-        ob_end_clean();
+        if (!Cli::runningInConsole()) {
+            throw new JsonException('You can call json::toConsole only in CLI mode.');
+        }
 
-        return $stdout;
+        $climate = new CLImate();
+        $climate->output->defaultTo('buffer');
+        $climate->border();
+        $climate->style->addCommand('colored', $color ?: 'green');
+        $climate->colored(ucfirst($title ?: $this->name));
+        $climate->border();
+
+        $padding = $climate->padding(15);
+
+        foreach ($this as $k => $v) {
+            $padding->label($k)->result($v);
+        }
+
+        return $climate->output->get('buffer')->get();
     }
 
     /**
