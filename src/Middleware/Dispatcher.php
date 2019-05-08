@@ -3,7 +3,6 @@
 namespace Chukdo\Middleware;
 
 use Chukdo\Contracts\Middleware\Middleware as MiddlewareInterface;
-use Chukdo\Http\HttpException;
 use Chukdo\Http\Request;
 use Chukdo\Http\Response;
 
@@ -93,7 +92,7 @@ class Dispatcher
             return $this;
         }
 
-        throw new HttpException('Dispatcher::pipe need Middleware or Middleware string representation');
+        throw new MiddlewareException('Dispatcher::pipe need Middleware or Middleware string representation');
     }
 
     /**

@@ -53,15 +53,20 @@ class AppMiddleware extends ClosureMiddleware
      */
     public function process( Dispatcher $delegate ): Response
     {
-        $validate = $delegate->request()
-            ->validate($this->validators);
-
-        if ( $validate->fails() ) {
-            return ( $this->errorMiddleware
-                ?: new ErrorMiddleware() )->errorMessage($validate->errors())
-                ->process($delegate);
+        if ( empty($this->validators) ) {
+            return ( $this->closure )($delegate->request()->inputs(), $delegate->response());
         }
+        else {
+            $validate = $delegate->request()
+                ->validate($this->validators);
 
-        return ( $this->closure )($validate->validated(), $delegate->response());
+            if ( $validate->fails() ) {
+                return ( $this->errorMiddleware
+                    ?: new ErrorMiddleware() )->errorMessage($validate->errors())
+                    ->process($delegate);
+            }
+
+            return ( $this->closure )($validate->validated(), $delegate->response());
+        }
     }
 }

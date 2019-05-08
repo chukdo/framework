@@ -3,7 +3,6 @@
 namespace Chukdo\Routing;
 
 use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
-use Chukdo\Http\HttpException;
 use Chukdo\Http\Response;
 use Chukdo\Middleware\AppMiddleware;
 use Closure;
@@ -61,14 +60,10 @@ class Router
         $this->request    = $app->make('Chukdo\Http\Request');
         $this->response   = $this->app->make('Chukdo\Http\Response');
         $this->attributes = new RouteAttributes();
-    }
-
-    /**
-     * @return RouteAttributes
-     */
-    public function attributes(): RouteAttributes
-    {
-        return $this->attributes;
+        $this->fallback   = function()
+        {
+            throw new RouteException('No valid route');
+        };
     }
 
     /**
@@ -146,20 +141,32 @@ class Router
             $appMiddleware = new AppMiddleware($closure);
         }
         elseif ( is_string($closure) ) {
+            // appel controler $this->>request
+            // mettre dans une closure
             // namespace
             // App\Controler\xxx
             // place midleware > controler > action() sous forme de closure ?!
         }
         else {
-            throw new HttpException('Router stack need a Closure or a String');
+            throw new RouteException('Router stack need a Closure or a String');
         }
 
         $route = new Route($method, $uri, $this->request, $appMiddleware);
-        $route->attributes()->set($this->attributes()->get());
+        $route->attributes()
+            ->set($this->attributes()
+                ->get());
 
         $this->stack[] = $route;
 
         return $route;
+    }
+
+    /**
+     * @return RouteAttributes
+     */
+    public function attributes(): RouteAttributes
+    {
+        return $this->attributes;
     }
 
     /**
@@ -224,12 +231,7 @@ class Router
             }
         }
 
-        if ( $this->fallback instanceof Closure ) {
-            ( $this->fallback )($this->request, $this->response);
-        }
-        else {
-            throw new HttpException('No valid route');
-        }
+        ( $this->fallback )($this->request, $this->response);
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Chukdo\Controler;
+namespace Chukdo\Routing;
 
 use Chukdo\Bootstrap\AppException;
 
@@ -11,6 +11,6 @@ use Chukdo\Bootstrap\AppException;
  * @since         08/01/2019
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class ControlerException extends AppException
+class RouteException extends AppException
 {
 }

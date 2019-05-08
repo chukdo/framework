@@ -3,8 +3,6 @@
 namespace Chukdo\Contracts\Controler;
 
 use Chukdo\Http\Request;
-use Chukdo\Http\Response;
-use Chukdo\View\View;
 
 /**
  * Interface des controlers
@@ -17,24 +15,12 @@ interface Controler
 {
     /**
      * Controler constructor.
-     * @param Request  $request
-     * @param Response $response
-     * @param View     $view
+     * @param Request $request
      */
-    public function __construct(Request $request, Response $response, View $view);
+    public function __construct(Request $request);
 
     /**
      * @return Request
      */
     public function request(): Request;
-
-    /**
-     * @return Response
-     */
-    public function response(): Response;
-
-    /**
-     * @return View
-     */
-    public function view(): View;
 }
