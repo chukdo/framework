@@ -147,7 +147,8 @@ class Router
         }
         elseif ( is_string($closure) ) {
             // namespace
-            // App\Controlers\xxx
+            // App\Controler\xxx
+            // place midleware > controler > action() sous forme de closure ?!
         }
         else {
             throw new HttpException('Router stack need a Closure or a String');

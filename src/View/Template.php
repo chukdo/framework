@@ -3,6 +3,7 @@
 namespace Chukdo\View;
 
 use Chukdo\Helper\Str;
+use Chukdo\Http\Response;
 use Chukdo\Json\Json;
 
 /**
@@ -22,7 +23,7 @@ class Template
     /**
      * @var Json
      */
-    protected $data = null;
+    protected $data;
 
     /**
      * @var View
@@ -31,13 +32,14 @@ class Template
 
     /**
      * Template constructor.
-     * @param string $template
-     * @param Json   $data
-     * @param View   $view
+     * @param string   $template
+     * @param iterable $data
+     * @param View     $view
      */
-    public function __construct( string $template, Json $data, View $view )
+    public function __construct( string $template, Iterable $data, View $view )
     {
-        $path = $view->path($template);
+        $path       = $view->path($template);
+        $this->data = new Json();
 
         if ( !$path[ 'exists' ] ) {
             throw new ViewException(sprintf('Template file [%s] does not exist',
@@ -58,12 +60,7 @@ class Template
      */
     public function data( Iterable $data = null ): self
     {
-        if ( !$this->data ) {
-            $this->data = new Json();
-        }
-
-        $this->data->mergeRecursive($data,
-            true);
+        $this->data->mergeRecursive($data, true);
 
         return $this;
     }
@@ -75,8 +72,7 @@ class Template
      */
     public function j( string $key, string $functions = null )
     {
-        return $this->v($this->data->get($key),
-            $functions);
+        return $this->v($this->data->get($key), $functions);
     }
 
     /**
@@ -103,8 +99,7 @@ class Template
      */
     public function w( string $key, string $functions = null )
     {
-        return $this->v($this->data->wildcard($key),
-            $functions);
+        return $this->v($this->data->wildcard($key), $functions);
     }
 
     /**
@@ -115,25 +110,30 @@ class Template
     public function __call( string $name, array $arguments )
     {
         if ( is_callable($name) ) {
-            return call_user_func_array($name,
-                $arguments);
+            return call_user_func_array($name, $arguments);
         }
 
-        return call_user_func_array($this->view->callRegisteredFunction($name),
-            $arguments);
+        return call_user_func_array($this->view->callRegisteredFunction($name), $arguments);
     }
 
-    public function render()
+    /**
+     * @return Response
+     */
+    public function render(): Response
     {
-        if ( $responseHandler = $this->view->getResponseHandler() ) {
-            $responseHandler->header('Content-Type',
-                'text/html; charset=utf-8')
-                ->content($this->__toString())
-                ->send();
-        }
-        else {
-            echo $this->__toString();
-        }
+        return $this->view()
+            ->getResponseHandler()
+            ->header('Content-Type', 'text/html; charset=utf-8')
+            ->content($this->__toString())
+            ->send();
+    }
+
+    /**
+     * @return View
+     */
+    public function view(): View
+    {
+        return $this->view;
     }
 
     /**

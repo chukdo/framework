@@ -249,8 +249,7 @@ class Service implements ArrayAccess
             }
         }
 
-        return $this->resolveClass($class,
-            $args);
+        return $this->resolveClass($class, $args);
     }
 
     /**

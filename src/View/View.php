@@ -70,7 +70,7 @@ class View
      */
     public function setResponseHandler( Response $response = null )
     {
-        $this->response = $response;
+        $this->response = $response ?: new Response();
     }
 
     /**
@@ -238,10 +238,21 @@ class View
     /**
      * @param string        $template
      * @param iterable|null $data
+     * @return string
      */
-    public function render( string $template, iterable $data = null )
+    public function renderToString( string $template, iterable $data = null ): string
     {
-        $this->make($template, $data)
+        return (string) $this->make($template, $data);
+    }
+
+    /**
+     * @param string        $template
+     * @param iterable|null $data
+     * @return Response
+     */
+    public function render( string $template, iterable $data = null ) : Response
+    {
+        return $this->make($template, $data)
             ->render();
     }
 

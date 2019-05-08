@@ -140,6 +140,23 @@ Request::Inputs()
 Request::Inputs()
     ->set('tel', '+33626148328');
 
+$json = new \Chukdo\Json\Json([
+    'title'    => 'Liste des voitures',
+    'articles' => [
+        'auto' => [
+            'bmw',
+            'audi',
+            'mercédes',
+            'peugeot',
+        ],
+    ],
+]);
+
+Response::header('X-jpd', 'de la balle');
+View::setDefaultFolder(TPL_PATH);
+View::loadFunction(new \Chukdo\View\Functions\Basic());
+View::render('info', $json)->end();
+
 Router::middleware([
     '@middleware.quote',
     '@middleware.under',
