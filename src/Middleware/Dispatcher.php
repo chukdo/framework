@@ -3,6 +3,7 @@
 namespace Chukdo\Middleware;
 
 use Chukdo\Contracts\Middleware\Middleware as MiddlewareInterface;
+use Chukdo\Http\HttpException;
 use Chukdo\Http\Request;
 use Chukdo\Http\Response;
 
@@ -56,27 +57,43 @@ class Dispatcher
     }
 
     /**
-     * @param array $middleswares
+     * @param array $middlewares
      * @return Dispatcher
      */
-    public function pipes( array $middleswares ): self
+    public function pipes( array $middlewares ): self
     {
-        foreach ( $middleswares as $middlesware ) {
-            $this->pipe($middlesware);
+        foreach ( $middlewares as $middleware ) {
+            $this->pipe($middleware);
         }
 
         return $this;
     }
 
     /**
-     * @param MiddlewareInterface $middleware
+     * @param string|MiddlewareInterface $middleware
      * @return Dispatcher
      */
-    public function pipe( MiddlewareInterface $middleware ): self
+    public function pipe( $middleware ): self
     {
-        array_unshift($this->middlewares, $middleware);
+        if (is_string($middleware)) {
+            if ( substr($middleware, 0, 1) == '@' ) {
 
-        return $this;
+                try {
+                    $confMiddleware = $this->request()->conf(substr($middleware, 1));
+                    $middleware = new $confMiddleware();
+                } catch ( \Throwable $e ) {
+                }
+            } else {
+                $middleware = new $middleware;
+            }
+        }
+
+        if ( $middleware instanceof MiddlewareInterface ) {
+            array_unshift($this->middlewares, $middleware);
+            return $this;
+        }
+
+        throw new HttpException('Dispatcher::pipe need Middleware or Middleware string representation');
     }
 
     /**

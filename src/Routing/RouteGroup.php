@@ -31,7 +31,7 @@ class RouteGroup
     public function __construct( Router $router )
     {
         $this->router     = $router;
-        $this->attributes = new RouteAttributes($router->request());
+        $this->attributes = new RouteAttributes();
     }
 
     /**

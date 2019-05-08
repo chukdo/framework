@@ -141,8 +141,8 @@ Request::Inputs()
     ->set('tel', '+33626148328');
 
 Router::middleware([
-    QuoteMiddleWare::class,
-    UnderscoreMiddleWare::class,
+    '@middleware.quote',
+    '@middleware.under',
 ])
     ->validator([
         'a'    => 'required|string:3',

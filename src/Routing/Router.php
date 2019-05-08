@@ -60,7 +60,7 @@ class Router
         $this->app        = $app;
         $this->request    = $app->make('Chukdo\Http\Request');
         $this->response   = $this->app->make('Chukdo\Http\Response');
-        $this->attributes = new RouteAttributes($this->request);
+        $this->attributes = new RouteAttributes();
     }
 
     /**

@@ -63,7 +63,7 @@ class Route
         $this->uri           = new Url($uri);
         $this->appMiddleware = $appMiddleware;
         $this->request       = $request;
-        $this->attributes    = new RouteAttributes($request);
+        $this->attributes    = new RouteAttributes();
     }
 
     /**
@@ -344,7 +344,7 @@ class Route
 
         foreach ( $this->attributes()
             ->getMiddleware() as $middleware ) {
-            $dispatcher->pipe(new $middleware());
+            $dispatcher->pipe($middleware);
         }
 
         return $dispatcher->handle();

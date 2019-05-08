@@ -3,7 +3,6 @@
 namespace Chukdo\Routing;
 
 use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
-use Chukdo\Http\Request;
 
 /**
  * Gestion des attributs d'une Route.
@@ -14,11 +13,6 @@ use Chukdo\Http\Request;
  */
 class RouteAttributes
 {
-    /**
-     * @var Request
-     */
-    protected $request;
-
     /**
      * @var string
      */
@@ -46,11 +40,9 @@ class RouteAttributes
 
     /**
      * RouteAttributes constructor.
-     * @param Request $request
      */
-    public function __construct( Request $request )
+    public function __construct()
     {
-        $this->request = $request;
         $this->reset();
     }
 
@@ -205,14 +197,6 @@ class RouteAttributes
     public function setMiddleware( array $middlewares ): self
     {
         foreach ( $middlewares as $middleware ) {
-            if ( substr($middleware, 0, 1) == '@' ) {
-                try {
-                    $middleware = $this->request->conf(substr($middleware, 1));
-                } catch ( \Throwable $e ) {
-                }
-
-            }
-
             $this->middlewares[] = $middleware;
         }
 
@@ -226,8 +210,11 @@ class RouteAttributes
      */
     public function setValidator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
     {
-        $this->validators      = $validators;
         $this->errorMiddleware = $errorMiddleware;
+
+        foreach ( $validators as $key => $validator ) {
+            $this->validators[$key] = $validator;
+        }
 
         return $this;
     }
