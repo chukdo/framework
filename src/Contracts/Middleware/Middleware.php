@@ -15,8 +15,8 @@ use Chukdo\Middleware\Dispatcher;
 interface Middleware
 {
     /**
-     * @param Dispatcher $delegate
+     * @param Dispatcher $dispatcher
      * @return Response
      */
-    public function process( Dispatcher $delegate ): Response;
+    public function process( Dispatcher $dispatcher ): Response;
 }

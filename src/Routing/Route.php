@@ -8,8 +8,9 @@ use Chukdo\Helper\Str;
 use Chukdo\Http\Request;
 use Chukdo\Http\Response;
 use Chukdo\Http\Url;
-use Chukdo\Middleware\AppMiddleware;
+use Chukdo\Middleware\ClosureMiddleware;
 use Chukdo\Middleware\Dispatcher;
+use Chukdo\Middleware\ValidatorMiddleware;
 
 /**
  * Gestion d'une Route.
@@ -36,7 +37,7 @@ class Route
     protected $request;
 
     /**
-     * @var AppMiddleware
+     * @var ClosureMiddleware
      */
     protected $appMiddleware;
 
@@ -67,14 +68,6 @@ class Route
     }
 
     /**
-     * @return RouteAttributes
-     */
-    public function attributes(): RouteAttributes
-    {
-        return $this->attributes;
-    }
-
-    /**
      * @param array $middlewares
      * @return Route
      */
@@ -84,6 +77,14 @@ class Route
             ->setMiddleware($middlewares);
 
         return $this;
+    }
+
+    /**
+     * @return RouteAttributes
+     */
+    public function attributes(): RouteAttributes
+    {
+        return $this->attributes;
     }
 
     /**
@@ -333,14 +334,11 @@ class Route
     public function dispatcher( Response $response ): Response
     {
         $dispatcher = new Dispatcher($this->request, $response);
-        $dispatcher->pipe(
-            $this->appMiddleware->validator(
-                $this->attributes()
-                    ->getValidator(),
-                $this->attributes()
-                    ->getErrorMiddleware()
-            )
-        );
+
+        $dispatcher->pipe($this->appMiddleware);
+        $dispatcher->pipe(new ValidatorMiddleware($this->attributes()
+            ->getValidator(), $this->attributes()
+            ->getErrorMiddleware()));
 
         foreach ( $this->attributes()
             ->getMiddleware() as $middleware ) {

@@ -26,12 +26,12 @@ class ErrorMiddleware implements ErrorMiddlewareInterface
     }
 
     /**
-     * @param Dispatcher $delegate
+     * @param Dispatcher $dispatcher
      * @return Response
      */
-    public function process( Dispatcher $delegate ): Response
+    public function process( Dispatcher $dispatcher ): Response
     {
-        $response = $delegate->response();
+        $response = $dispatcher->response();
 
         switch ( HttpRequest::render() ) {
             case 'cli' :

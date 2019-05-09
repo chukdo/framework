@@ -4,7 +4,7 @@ namespace Chukdo\Routing;
 
 use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
 use Chukdo\Http\Response;
-use Chukdo\Middleware\AppMiddleware;
+use Chukdo\Middleware\ClosureMiddleware;
 use Closure;
 use Chukdo\Bootstrap\App;
 use Chukdo\Http\Request;
@@ -138,9 +138,15 @@ class Router
     public function stack( string $method, string $uri, $closure ): Route
     {
         if ( $closure instanceof Closure ) {
-            $appMiddleware = new AppMiddleware($closure);
+            $appMiddleware = new ClosureMiddleware($closure);
         }
         elseif ( is_string($closure) ) {
+
+            // isole controler action :
+              //  $closure = function($input, $response) {
+                //    return (new controler($this->request))->action($input, $response);
+                //};
+
             // appel controler $this->>request
             // mettre dans une closure
             // namespace

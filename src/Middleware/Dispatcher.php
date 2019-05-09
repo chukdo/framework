@@ -14,6 +14,11 @@ class Dispatcher
     private $middlewares = [];
 
     /**
+     * @var array
+     */
+    private $attributes = [];
+
+    /**
      * @var int
      */
     private $index = 0;
@@ -40,11 +45,19 @@ class Dispatcher
     }
 
     /**
-     * @return Request
+     * @param string $name
+     * @param null   $value
+     * @return mixed
      */
-    public function request(): Request
+    public function attribute( string $name, $value = null )
     {
-        return $this->request;
+        if ( $value === null ) {
+            return isset($this->attributes[ $name ])
+                ? $this->attributes[ $name ]
+                : null;
+        }
+
+        $this->attributes[ $name ] = $value;
     }
 
     /**
@@ -74,16 +87,18 @@ class Dispatcher
      */
     public function pipe( $middleware ): self
     {
-        if (is_string($middleware)) {
+        if ( is_string($middleware) ) {
             if ( substr($middleware, 0, 1) == '@' ) {
 
                 try {
-                    $confMiddleware = $this->request()->conf(substr($middleware, 1));
-                    $middleware = new $confMiddleware();
+                    $confMiddleware = $this->request()
+                        ->conf(substr($middleware, 1));
+                    $middleware     = new $confMiddleware();
                 } catch ( \Throwable $e ) {
                 }
-            } else {
-                $middleware = new $middleware;
+            }
+            else {
+                $middleware = new $middleware();
             }
         }
 
@@ -96,11 +111,19 @@ class Dispatcher
     }
 
     /**
+     * @return Request
+     */
+    public function request(): Request
+    {
+        return $this->request;
+    }
+
+    /**
      * @return Response
      */
     public function handle(): Response
     {
-        $middleware = $this->getMiddleware();
+        $middleware = $this->middleware();
         $this->index++;
 
         if ( is_null($middleware) ) {
@@ -113,7 +136,7 @@ class Dispatcher
     /**
      * @return callable|null
      */
-    private function getMiddleware()
+    private function middleware()
     {
         if ( isset($this->middlewares[ $this->index ]) ) {
             return $this->middlewares[ $this->index ];

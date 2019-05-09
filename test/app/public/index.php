@@ -160,7 +160,7 @@ Router::middleware([
         Router::get('/user/{a}/test/{comment}',
             function( $inputs, $response )
             {
-                return $response->content('toto222');
+                return $response->content((string) $inputs);
             })
             ->where('a', '[a-z0-9]+')
             ->middleware([ TraitMiddleWare::class ]);
