@@ -19,11 +19,6 @@ class RouteAttributes
     protected $prefix = '';
 
     /**
-     * @var string
-     */
-    protected $namespace = '';
-
-    /**
      * @var ErrorMiddlewareInterface
      */
     protected $errorMiddleware = null;
@@ -55,7 +50,6 @@ class RouteAttributes
         $this->validators      = [];
         $this->errorMiddleware = null;
         $this->prefix          = '';
-        $this->namespace       = '';
 
         return $this;
     }
@@ -70,7 +64,6 @@ class RouteAttributes
             'validator'       => $this->getValidator(),
             'errorMiddleware' => $this->getErrorMiddleware(),
             'prefix'          => $this->getPrefix(),
-            'namespace'       => $this->getNamespace(),
         ];
     }
 
@@ -133,29 +126,6 @@ class RouteAttributes
     }
 
     /**
-     * @return string
-     */
-    public function getNamespace(): string
-    {
-        return $this->namespace;
-    }
-
-    /**
-     * @param string|null $namespace
-     * @return RouteAttributes
-     */
-    public function setNamespace( ?string $namespace ): self
-    {
-        $namespace = trim($namespace, '/');
-
-        if ( strlen($namespace) > 0 ) {
-            $this->namespace .= '/' . $namespace;
-        }
-
-        return $this;
-    }
-
-    /**
      * @param array $attributes
      * @return RouteAttributes
      */
@@ -178,14 +148,12 @@ class RouteAttributes
             'validator'       => [],
             'errorMiddleware' => null,
             'prefix'          => '',
-            'namespace'       => '',
         ],
             $attributes);
 
         $this->setMiddleware($attributes[ 'middleware' ]);
         $this->setValidator($attributes[ 'validator' ], $attributes[ 'errorMiddleware' ]);
         $this->setPrefix($attributes[ 'prefix' ]);
-        $this->setNamespace($attributes[ 'namespace' ]);
 
         return $this;
     }

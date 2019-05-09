@@ -157,11 +157,7 @@ Router::middleware([
             {
                 return $response->content('all_toto2');
             });
-        Router::get('/user/{a}/test/{comment}',
-            function( $inputs, $response )
-            {
-                return $response->content((string) $inputs);
-            })
+        Router::get('/user/{a}/test/{comment}', 'App\Controlers\Test@index')
             ->where('a', '[a-z0-9]+')
             ->middleware([ TraitMiddleWare::class ]);
     });

@@ -5,6 +5,7 @@ namespace Chukdo\Routing;
 use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
 use Chukdo\Http\Response;
 use Chukdo\Middleware\ClosureMiddleware;
+use Chukdo\Middleware\ControlerMiddleware;
 use Closure;
 use Chukdo\Bootstrap\App;
 use Chukdo\Http\Request;
@@ -141,17 +142,7 @@ class Router
             $appMiddleware = new ClosureMiddleware($closure);
         }
         elseif ( is_string($closure) ) {
-
-            // isole controler action :
-              //  $closure = function($input, $response) {
-                //    return (new controler($this->request))->action($input, $response);
-                //};
-
-            // appel controler $this->>request
-            // mettre dans une closure
-            // namespace
-            // App\Controler\xxx
-            // place midleware > controler > action() sous forme de closure ?!
+            $appMiddleware = new ControlerMiddleware($closure);
         }
         else {
             throw new RouteException('Router stack need a Closure or a String');

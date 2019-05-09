@@ -2,8 +2,6 @@
 
 namespace Chukdo\Contracts\Controler;
 
-use Chukdo\Http\Request;
-
 /**
  * Interface des controlers
  * @version       1.0.0
@@ -13,14 +11,5 @@ use Chukdo\Http\Request;
  */
 interface Controler
 {
-    /**
-     * Controler constructor.
-     * @param Request $request
-     */
-    public function __construct(Request $request);
 
-    /**
-     * @return Request
-     */
-    public function request(): Request;
 }

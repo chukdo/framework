@@ -4,7 +4,6 @@ namespace Chukdo\Middleware;
 
 use Chukdo\Contracts\Middleware\Middleware as MiddlewareInterface;
 use Chukdo\Http\Response;
-use Chukdo\Json\Input;
 use Closure;
 
 class ClosureMiddleware implements MiddlewareInterface
@@ -29,8 +28,10 @@ class ClosureMiddleware implements MiddlewareInterface
      */
     public function process( Dispatcher $dispatcher ): Response
     {
-        return ( $this->closure )($dispatcher->attribute('inputs')
+        $inputs = $dispatcher->attribute('inputs')
             ?: $dispatcher->request()
-                ->inputs(), $dispatcher->response());
+                ->inputs();
+
+        return ( $this->closure )($inputs, $dispatcher->response());
     }
 }

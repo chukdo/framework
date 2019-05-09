@@ -11,25 +11,5 @@ namespace Chukdo\Http;
  */
 class Controler implements \Chukdo\Contracts\Controler\Controler
 {
-    /**
-     * @var Request
-     */
-    protected $request;
 
-    /**
-     * Controler constructor.
-     * @param Request $request
-     */
-    public function __construct( Request $request )
-    {
-        $this->request = $request;
-    }
-
-    /**
-     * @return Request
-     */
-    public function request(): Request
-    {
-        return $this->request;
-    }
 }
