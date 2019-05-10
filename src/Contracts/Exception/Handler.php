@@ -2,7 +2,7 @@
 
 namespace Chukdo\Contracts\Exception;
 
-use Exception;
+use Throwable;
 
 /**
  * Interface de Gestionnaires des exception.
@@ -14,12 +14,12 @@ use Exception;
 interface Handler
 {
     /**
-     * @param Exception $e
+     * @param Throwable $e
      */
-    public function report( Exception $e ): void;
+    public function report( Throwable $e ): void;
 
     /**
-     * @param Exception $e
+     * @param Throwable $e
      */
-    public function render( Exception $e ): void;
+    public function render( Throwable $e ): void;
 }

@@ -34,9 +34,9 @@ class ExceptionMessage
     /**
      * ExceptionMessage constructor.
      * @param Throwable $e
-     * @param int       $env
+     * @param string    $env
      */
-    public function __construct( Throwable $e, int $env = 0 )
+    public function __construct( Throwable $e, string $env = '0' )
     {
         $this->env = $env;
         $backTrace = [];

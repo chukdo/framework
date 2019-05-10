@@ -19,28 +19,6 @@ final class HttpRequest
     }
 
     /**
-     * @return array
-     */
-    public static function argv(): array
-    {
-        return Cli::runningInConsole()
-            ? Cli::argv()
-            : (array) self::server('argv');
-    }
-
-    /**
-     * @param             $name
-     * @param string|null $default
-     * @return string|null
-     */
-    public static function server( $name, string $default = null ): ?string
-    {
-        return isset($_SERVER[ $name ])
-            ? $_SERVER[ $name ]
-            : $default;
-    }
-
-    /**
      * @return string|null
      */
     public static function method(): ?string
@@ -67,6 +45,18 @@ final class HttpRequest
     }
 
     /**
+     * @param string      $name
+     * @param string|null $default
+     * @return string|null
+     */
+    public static function server( string $name, string $default = null ): ?string
+    {
+        return isset($_SERVER[ $name ])
+            ? $_SERVER[ $name ]
+            : $default;
+    }
+
+    /**
      * @return bool
      */
     public static function secured(): bool
@@ -84,9 +74,9 @@ final class HttpRequest
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public static function userAgent(): string
+    public static function userAgent(): ?string
     {
         return self::server('HTTP_USER_AGENT');
     }

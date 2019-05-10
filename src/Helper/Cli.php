@@ -38,8 +38,11 @@ final class Cli
     public static function argv(): array
     {
         $inputs = [];
+        $argv   = isset($_SERVER[ 'argv' ])
+            ? $_SERVER[ 'argv' ]
+            : [];
 
-        foreach ( (array) HttpRequest::server( 'argv' ) as $k => $arg ) {
+        foreach ( $argv as $k => $arg ) {
             list($key, $value) = array_pad(explode('=', $arg), 2, null);
 
             $key = trim($key, '-');

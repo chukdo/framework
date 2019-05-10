@@ -4,7 +4,7 @@ namespace Chukdo\Bootstrap;
 
 use Chukdo\Contracts\Exception\Handler;
 use Chukdo\Helper\HttpRequest;
-use Exception;
+use Throwable;
 
 /**
  * Gestionnaire par défauts des exceptions.
@@ -30,22 +30,20 @@ class ExceptionHandler implements Handler
     }
 
     /**
-     * @param Exception $e
+     * @param Throwable $e
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function report( Exception $e ): void
+    public function report( Throwable $e ): void
     {
         $this->app->make('ExceptionLogger')
             ->emergency('#' . $e->getCode() . ' ' . $e->getMessage() . ' ' . $e->getFile() . '(' . $e->getLine() . ')');
     }
 
     /**
-     * @param Exception $e
-     * @throws ServiceException
-     * @throws \ReflectionException
+     * @param \Throwable $e
      */
-    public function render( Exception $e ): void
+    public function render( Throwable $e ): void
     {
         $message = new ExceptionMessage($e, $this->app->env());
 
