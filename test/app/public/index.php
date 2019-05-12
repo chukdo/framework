@@ -135,6 +135,13 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
     }
 }
 
+$mongodb = new \Chukdo\DB\Mongodb\Mongodb();
+$db = $mongodb->database('doc');
+$col = $db->collection('contrat');
+
+dd($col->name());
+
+
 Request::Inputs()
     ->set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, Conf::get('salt')));
 Request::Inputs()

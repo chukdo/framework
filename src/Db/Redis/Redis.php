@@ -1,6 +1,6 @@
 <?php
 
-namespace Chukdo\Db;
+namespace Chukdo\Db\Redis;
 
 use Chukdo\Contracts\Db\Redis as RedisInterface;
 
