@@ -35,30 +35,22 @@ $loader->registerNameSpace('\Chukdo', CHUKDO_PATH)
 
 /* App */
 $app = new Bootstrap\App();
-$app->registerHandleExceptions()
-    ->registerServices([
-        Providers\ServiceLocatorServiceProvider::class,
-        Providers\LoggerHandlerServiceProvider::class,
-        Providers\ExceptionLoggerServiceProvider::class,
-        Providers\ValidatorServiceProvider::class,
-        Providers\AppServiceProvider::class,
-    ]);
 
 /* Facades */
 Facades\Facade::setFacadeApplication($app,
     [
         'Facade'     => Facades\Facade::class,
         'App'        => Facades\App::class,
-        'Redis'      => Facades\Redis::class,
+        'Storage'    => Facades\Storage::class,
         'Conf'       => Facades\Conf::class,
         'Lang'       => Facades\Lang::class,
         'Event'      => Facades\Event::class,
         'Request'    => Facades\Request::class,
-        'Validator'  => Facades\Validator::class,
         'Response'   => Facades\Response::class,
         'Dispatcher' => Facades\Dispatcher::class,
         'View'       => Facades\View::class,
         'Router'     => Facades\Router::class,
+        'Redis'      => Facades\Redis::class,
     ]);
 
 /* Configuration */
@@ -66,6 +58,16 @@ Lang::loadDir(LANG_PATH);
 Conf::loadFile(CONF_PATH . 'Conf.json');
 App::env(App::conf('env'));
 App::channel('orpi');
+
+$app->registerHandleExceptions()
+    ->registerServices([
+        Providers\AppServiceProvider::class,
+        Providers\ServiceLocatorServiceProvider::class,
+        Providers\LoggerHandlerServiceProvider::class,
+        Providers\ExceptionLoggerServiceProvider::class,
+        Providers\ValidatorServiceProvider::class,
+        Providers\DbServiceProvider::class,
+    ]);
 
 /**
  * Class QuoteMiddleWare
@@ -135,12 +137,10 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
     }
 }
 
-$mongodb = new \Chukdo\DB\Mongodb\Mongodb();
-$db = $mongodb->database('doc');
-$col = $db->collection('contrat');
 
-dd($col->name());
-
+dd(Db::database('doc')
+    ->collection('contrat')
+    ->name());
 
 Request::Inputs()
     ->set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, Conf::get('salt')));

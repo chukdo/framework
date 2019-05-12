@@ -11,6 +11,6 @@ class Redis extends Facade
 {
     public static function name(): string
     {
-        return \Chukdo\Db\Redis::class;
+        return \Chukdo\Db\Redis\Redis::class;
     }
 }

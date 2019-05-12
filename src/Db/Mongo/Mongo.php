@@ -1,18 +1,17 @@
 <?php
 
-Namespace Chukdo\DB\Mongodb;
+Namespace Chukdo\DB\Mongo;
 
-use MongoDB\Driver\Manager as MongoDbManager;
 use MongoDB\Driver\Manager;
 
 /**
- * Mongodb Mongodb.
+ * Mongo Mongo.
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Mongodb
+Class Mongo
 {
     /**
      * @var string|null
@@ -20,26 +19,26 @@ Class Mongodb
     protected $dsn = null;
 
     /**
-     * @var MongoDbManager
+     * @var Manager
      */
-    protected $mongoDbManager;
+    protected $manager;
 
     /**
-     * Mongodb constructor.
+     * Mongo constructor.
      * @param string|null $dsn
      */
     public function __construct( string $dsn = null )
     {
         $this->dsn            = $dsn;
-        $this->mongoDbManager = new Manager($dsn);
+        $this->manager = new Manager($dsn);
     }
 
     /**
-     * @return MongoDbManager
+     * @return Manager
      */
-    public function mongoDbManager(): MongoDbManager
+    public function manager(): Manager
     {
-        return $this->mongoDbManager;
+        return $this->manager;
     }
 
     /**

@@ -28,5 +28,7 @@ class ValidatorServiceProvider extends ServiceProvider
                 new \Chukdo\Validation\Validate\UrlValidate(),
                 new \Chukdo\Validation\Validate\ZipcodeValidate(),
             ]);
+
+        $this->setClassAlias('\Chukdo\Facades\Validator', 'Validator');
     }
 }

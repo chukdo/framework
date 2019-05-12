@@ -290,16 +290,13 @@ class Service implements ArrayAccess
      */
     private function resolveServiceArg( string $arg )
     {
-        $firstPart = substr($arg,
-            0,
-            1);
-        $lastPart  = substr($arg,
-            1);
+        $firstPart = substr($arg, 0, 1);
+        $lastPart  = substr($arg, 1);
 
-        if ( $firstPart == '@' ) {
+        if ( $firstPart == '&' ) {
             return $this->make($lastPart);
         }
-        elseif ( $firstPart == '#' ) {
+        elseif ( $firstPart == '@' ) {
             return $this->conf($lastPart);
         }
 

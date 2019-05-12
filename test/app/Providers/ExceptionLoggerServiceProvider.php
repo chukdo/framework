@@ -13,11 +13,11 @@ class ExceptionLoggerServiceProvider extends ServiceProvider
             'args'  => [
                 'exception_' . $this->app->channel() . '_' . $this->app->env(),
                 [
-                    '@LoggerHandler',
+                    '&LoggerHandler',
                 ],
                 [
-                    '@\Chukdo\Logger\Processors\RequestProcessor',
-                    '@\Chukdo\Logger\Processors\BacktraceProcessor',
+                    '&\Chukdo\Logger\Processors\RequestProcessor',
+                    '&\Chukdo\Logger\Processors\BacktraceProcessor',
                 ],
             ],
         ]);
