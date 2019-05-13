@@ -74,6 +74,51 @@ Class Mongo
     }
 
     /**
+     * @param string $name
+     * @param array  $hosts array of hosts
+     * @return bool
+     */
+    public function ReplicatSetInitiate( string $name, array $hosts ): bool
+    {
+        $members = [];
+
+        foreach ( $hosts as $index => $host ) {
+            $members[] = [
+                '_id'  => $index,
+                'host' => $host,
+            ];
+        }
+
+        return $this->command([
+                'replSetInitiate' => [
+                    '_id'     => $name,
+                    'members' => $members,
+                ],
+            ])
+                   ->get('ok') == 1;
+    }
+
+    /**
+     * @return Json
+     */
+    public function ReplicatSetStatus(): Json
+    {
+        $status = $this->command([ 'replSetGetStatus' => 1 ])
+            ->getIndex('0', new Json())
+            ->filter(function( $k, $v )
+            {
+                if ( is_scalar($v) ) {
+                    return $v;
+                }
+
+                return false;
+            })
+            ->clean();
+
+        return $status;
+    }
+
+    /**
      * @return Json
      */
     public function status(): Json
