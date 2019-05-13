@@ -2,7 +2,6 @@
 
 Namespace Chukdo\DB\Mongo;
 
-use Chukdo\Db\Mongo\MongoException;
 use Chukdo\Json\Json;
 use MongoDB\Collection as MongoDbCollection;
 use MongoDB\Driver\Command;
@@ -42,7 +41,60 @@ Class Collection
     {
         $this->mongo      = $mongo;
         $this->database   = $database;
-        $this->collection = new MongoDbCollection($mongo->manager(), $database, $collection);
+        $this->collection = new MongoDbCollection($mongo->mongo(), $database, $collection);
+    }
+
+    /**
+     * @return Json
+     */
+    public function stat(): Json
+    {
+        $stats = $this->mongo()
+            ->command([ 'collStats' => $this->name() ], $this->databaseName())
+            ->getIndex(0, new Json())
+            ->filter(function( $k, $v )
+            {
+                if ( is_scalar($v) ) {
+                    return $v;
+                }
+
+                return false;
+            })
+            ->clean();
+
+        return $stats;
+    }
+
+    /**
+     * @return Mongo
+     */
+    public function mongo(): Mongo
+    {
+        return $this->mongo;
+    }
+
+    /**
+     * @return MongoDbCollection
+     */
+    public function collection(): MongoDbCollection
+    {
+        return $this->collection;
+    }
+
+    /**
+     * @return string
+     */
+    public function name(): string
+    {
+        return $this->collection()->getCollectionName();
+    }
+
+    /**
+     * @return string
+     */
+    public function databaseName(): string
+    {
+        return $this->collection()->getDatabaseName();
     }
 
     /**
@@ -56,7 +108,8 @@ Class Collection
                 'renameCollection' => $this->databaseName() . '.' . $this->name(),
                 'to'               => $this->databaseName() . '.' . $newName,
             ]);
-            $query   = new Json($this->mongo->manager()->executeCommand('admin', $command));
+            $query   = new Json($this->mongo->mongo()
+                ->executeCommand('admin', $command));
             $ok      = $query->offsetGet('ok');
 
             if ( $ok == 1 ) {
@@ -69,22 +122,12 @@ Class Collection
         return false;
     }
 
-
-
     /**
-     * @return string
+     * @return Json
      */
-    public function databaseName(): string
+    public function index(): Index
     {
-        return $this->collection->getDatabaseName();
-    }
-
-    /**
-     * @return string
-     */
-    public function name(): string
-    {
-        return $this->collection->getCollectionName();
+        return new Index($this);
     }
 
     /**
@@ -92,14 +135,6 @@ Class Collection
      */
     public function database(): Database
     {
-        new Database($this->mongo, $this->databaseName());
-    }
-
-    /**
-     * @return Mongo
-     */
-    public function mongo(): Mongo
-    {
-        return $this->mongo;
+        new Database($this->mongo(), $this->databaseName());
     }
 }

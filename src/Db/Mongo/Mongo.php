@@ -2,11 +2,9 @@
 
 Namespace Chukdo\DB\Mongo;
 
-use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
 use MongoDB\Driver\Manager;
 use MongoDB\Driver\Command;
-use MongoDB\Driver\Query;
 use MongoDB\Driver\Exception\Exception;
 
 /**
@@ -26,7 +24,7 @@ Class Mongo
     /**
      * @var Manager
      */
-    protected $manager;
+    protected $mongo;
 
     /**
      * Mongo constructor.
@@ -34,16 +32,16 @@ Class Mongo
      */
     public function __construct( string $dsn = null )
     {
-        $this->dsn     = $dsn;
-        $this->manager = new Manager($dsn);
+        $this->dsn   = $dsn;
+        $this->mongo = new Manager($dsn);
     }
 
     /**
      * @return Manager
      */
-    public function manager(): Manager
+    public function mongo(): Manager
     {
-        return $this->manager;
+        return $this->mongo;
     }
 
     /**
@@ -64,7 +62,7 @@ Class Mongo
     {
         try {
             $command = new Command($command);
-            $json    = new Json($this->manager->executeCommand($db, $command));
+            $json    = new Json($this->mongo()->executeCommand($db, $command));
 
             return $json;
         } catch ( Exception $e ) {
@@ -170,7 +168,7 @@ Class Mongo
             ->get('0.databases');
 
         foreach ( $databases as $database ) {
-            $list->offsetSet($database->offsetGet('name'), $database->offsetGet('sizeOnDisk'));
+            $list->append($database->offsetGet('name'));
         }
 
         return $list;

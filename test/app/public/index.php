@@ -138,7 +138,7 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 }
 
 
-dd(Db::ReplicatSetStatus());
+dd(Db::database('doc')->collection('contrat')->index()->indexes());
 
 Request::Inputs()
     ->set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, Conf::get('salt')));
