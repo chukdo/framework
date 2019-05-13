@@ -74,11 +74,32 @@ Class Mongo
     }
 
     /**
+     * @return Json
+     */
+    public function status(): Json
+    {
+        $status = $this->command([ 'serverStatus' => 1 ])
+            ->getIndex('0', new Json())
+            ->filter(function( $k, $v )
+            {
+                if ( is_scalar($v) ) {
+                    return $v;
+                }
+
+                return false;
+            })
+            ->clean();
+
+        return $status;
+    }
+
+    /**
      * @return string|null
      */
     public function version(): ?string
     {
-        return $this->command([ 'buildInfo' => 1 ])->get('0.version');
+        return $this->command([ 'buildInfo' => 1 ])
+            ->get('0.version');
     }
 
     /**
