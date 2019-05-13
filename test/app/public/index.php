@@ -138,7 +138,7 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 }
 
 
-dd(Db::databases()->toJson(true));
+dd(Db::database('toto')->stat()->toJson(true));
 
 Request::Inputs()
     ->set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, Conf::get('salt')));

@@ -78,6 +78,36 @@ class Json extends \ArrayObject
     }
 
     /**
+     * @return Json
+     */
+    public function clean(): self
+    {
+        foreach ( $this->getArrayCopy() as $k => $v ) {
+            if ( $v === false ) {
+                $this->offsetUnset($k);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param mixed $key
+     * @return mixed|null
+     */
+    public function offsetUnset( $key )
+    {
+        if ( $this->offsetExists($key) ) {
+            $offset = parent::offsetGet($key);
+            parent::offsetUnset($key);
+
+            return $offset;
+        }
+
+        return null;
+    }
+
+    /**
      * @return $this
      */
     public function all()
@@ -523,22 +553,6 @@ class Json extends \ArrayObject
 
         if ( $this->instanceOfJson($get) ) {
             return $get->unset($endPath);
-        }
-
-        return null;
-    }
-
-    /**
-     * @param mixed $key
-     * @return mixed|null
-     */
-    public function offsetUnset( $key )
-    {
-        if ( $this->offsetExists($key) ) {
-            $offset = parent::offsetGet($key);
-            parent::offsetUnset($key);
-
-            return $offset;
         }
 
         return null;

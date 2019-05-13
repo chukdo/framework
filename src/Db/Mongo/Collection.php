@@ -2,7 +2,11 @@
 
 Namespace Chukdo\DB\Mongo;
 
+use Chukdo\Db\Mongo\MongoException;
+use Chukdo\Json\Json;
 use MongoDB\Collection as MongoDbCollection;
+use MongoDB\Driver\Command;
+use MongoDB\Driver\Exception\Exception;
 
 /**
  * Mongo Mongo Collection.
@@ -42,6 +46,40 @@ Class Collection
     }
 
     /**
+     * @param string $newName
+     * @return bool
+     */
+    public function rename( string $newName ): bool
+    {
+        try {
+            $command = new Command([
+                'renameCollection' => $this->databaseName() . '.' . $this->name(),
+                'to'               => $this->databaseName() . '.' . $newName,
+            ]);
+            $query   = new Json($this->mongo->manager()->executeCommand('admin', $command));
+            $ok      = $query->offsetGet('ok');
+
+            if ( $ok == 1 ) {
+                return true;
+            }
+        } catch ( Exception $e ) {
+            throw new MongoException($e->getMessage(), $e->getCode(), $e);
+        }
+
+        return false;
+    }
+
+
+
+    /**
+     * @return string
+     */
+    public function databaseName(): string
+    {
+        return $this->collection->getDatabaseName();
+    }
+
+    /**
      * @return string
      */
     public function name(): string
@@ -55,14 +93,6 @@ Class Collection
     public function database(): Database
     {
         new Database($this->mongo, $this->databaseName());
-    }
-
-    /**
-     * @return string
-     */
-    public function databaseName(): string
-    {
-        return $this->collection->getDatabaseName();
     }
 
     /**

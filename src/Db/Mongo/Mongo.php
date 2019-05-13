@@ -2,6 +2,7 @@
 
 Namespace Chukdo\DB\Mongo;
 
+use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
 use MongoDB\Driver\Manager;
 use MongoDB\Driver\Command;
@@ -50,19 +51,47 @@ Class Mongo
      */
     public function ping(): bool
     {
-        try {
-            $command = new Command([ 'ping' => 1 ]);
-            $query   = new Json($this->manager->executeCommand('admin', $command));
-            $first   = $query->getIndex(0, new Json());
-            $ok      = $first->offsetGet('ok');
+        return $this->command([ 'ping' => 1 ])
+                   ->get('0.ok') == 1;
+    }
 
-            if ( $ok == 1 ) {
-                return true;
-            }
+    /**
+     * @param array  $command
+     * @param string $db
+     * @return Json
+     */
+    public function command( array $command, string $db = 'admin' ): Json
+    {
+        try {
+            $command = new Command($command);
+            $json    = new Json($this->manager->executeCommand($db, $command));
+
+            return $json;
         } catch ( Exception $e ) {
         }
 
-        return false;
+        return new Json();
+    }
+
+    /**
+     * @return string|null
+     */
+    public function version(): ?string
+    {
+        return $this->command([ 'buildInfo' => 1 ])->get('0.version');
+    }
+
+    /**
+     * @param int $op
+     * @return bool
+     */
+    public function kill( int $op ): bool
+    {
+        return $this->command([
+                'killOp' => 1,
+                'op'     => $op,
+            ])
+                   ->get('ok') == 1;
     }
 
     /**
@@ -70,19 +99,12 @@ Class Mongo
      */
     public function databases(): Json
     {
-        $list    = new Json();
+        $list      = new Json();
+        $databases = $this->command([ 'listDatabases' => 1 ])
+            ->get('0.databases');
 
-        try {
-            $command = new Command([ 'listDatabases' => 1 ]);
-            $query   = new Json($this->manager->executeCommand('admin', $command));
-            $first   = $query->getIndex(0, new Json());
-
-            $databases = $first->offsetGet('databases', new Json());
-
-            foreach ( $databases as $database ) {
-                $list->offsetSet($database->offsetGet('name'), $database->offsetGet('sizeOnDisk'));
-            }
-        } catch ( Exception $e ) {
+        foreach ( $databases as $database ) {
+            $list->offsetSet($database->offsetGet('name'), $database->offsetGet('sizeOnDisk'));
         }
 
         return $list;

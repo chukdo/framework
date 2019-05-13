@@ -2,6 +2,7 @@
 
 Namespace Chukdo\DB\Mongo;
 
+use Chukdo\Json\Json;
 use MongoDB\Database as MongoDbDatabase;
 
 /**
@@ -35,12 +36,23 @@ Class Database
     }
 
     /**
-     * @param string $collection
-     * @return Collection
+     * @return bool
      */
-    public function collection( string $collection ): Collection
+    public function drop(): bool
     {
-        return new Collection($this->mongo(), $this->name(), $collection);
+        return ( new Json($this->database->drop()) )->offsetGet('ok') == 1;
+    }
+
+    /**
+     * @return bool
+     */
+    public function repair(): bool
+    {
+        return $this->mongo()
+                   ->command([
+                       'repairDatabase' => 1,
+                   ], $this->name())
+                   ->get('0.ok') == 1;
     }
 
     /**
@@ -57,5 +69,48 @@ Class Database
     public function name(): string
     {
         return $this->database->getDatabaseName();
+    }
+
+    /**
+     * @return Json
+     */
+    public function stat(): Json
+    {
+        $stats = $this->mongo()
+            ->command([ 'dbStats' => 1 ], $this->name())
+            ->getIndex(0, new Json())
+            ->filter(function( $k, $v )
+            {
+                if ( is_scalar($v) ) {
+                    return $v;
+                }
+
+                return false;
+            })->clean();
+
+        return $stats;
+    }
+
+    /**
+     * @return Json
+     */
+    public function collections(): Json
+    {
+        $list = new Json();
+
+        foreach ( $this->database->listCollections() as $collection ) {
+            $list->append($collection->getName());
+        }
+
+        return $list;
+    }
+
+    /**
+     * @param string $collection
+     * @return Collection
+     */
+    public function collection( string $collection ): Collection
+    {
+        return new Collection($this->mongo(), $this->name(), $collection);
     }
 }
