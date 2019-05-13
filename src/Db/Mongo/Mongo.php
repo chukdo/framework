@@ -2,7 +2,11 @@
 
 Namespace Chukdo\DB\Mongo;
 
+use Chukdo\Json\Json;
 use MongoDB\Driver\Manager;
+use MongoDB\Driver\Command;
+use MongoDB\Driver\Query;
+use MongoDB\Driver\Exception\Exception;
 
 /**
  * Mongo Mongo.
@@ -29,7 +33,7 @@ Class Mongo
      */
     public function __construct( string $dsn = null )
     {
-        $this->dsn            = $dsn;
+        $this->dsn     = $dsn;
         $this->manager = new Manager($dsn);
     }
 
@@ -42,11 +46,64 @@ Class Mongo
     }
 
     /**
+     * @return bool
+     */
+    public function ping(): bool
+    {
+        try {
+            $command = new Command([ 'ping' => 1 ]);
+            $query   = new Json($this->manager->executeCommand('admin', $command));
+            $first   = $query->getIndex(0, new Json());
+            $ok      = $first->offsetGet('ok');
+
+            if ( $ok == 1 ) {
+                return true;
+            }
+        } catch ( Exception $e ) {
+        }
+
+        return false;
+    }
+
+    /**
+     * @return Json
+     */
+    public function databases(): Json
+    {
+        $list    = new Json();
+
+        try {
+            $command = new Command([ 'listDatabases' => 1 ]);
+            $query   = new Json($this->manager->executeCommand('admin', $command));
+            $first   = $query->getIndex(0, new Json());
+
+            $databases = $first->offsetGet('databases', new Json());
+
+            foreach ( $databases as $database ) {
+                $list->offsetSet($database->offsetGet('name'), $database->offsetGet('sizeOnDisk'));
+            }
+        } catch ( Exception $e ) {
+        }
+
+        return $list;
+    }
+
+    /**
      * @param string $database
      * @return Database
      */
-    public function database(string $database): Database
+    public function database( string $database ): Database
     {
         return new Database($this, $database);
+    }
+
+    /**
+     * @param string $database
+     * @param string $collection
+     * @return Collection
+     */
+    public function collection( string $database, string $collection ): Collection
+    {
+        return new Collection($this, $database, $collection);
     }
 }

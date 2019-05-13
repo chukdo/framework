@@ -28,17 +28,15 @@ class Json extends \ArrayObject
     {
         parent::__construct([]);
 
-        if ( Is::arr($data) ) {
+        if ( Is::iterable($data) ) {
             foreach ( $data as $k => $v ) {
-                $this->offsetSet($k,
-                    $v);
+                $this->offsetSet($k, $v);
             }
         }
         elseif ( Is::json($data) ) {
             foreach ( json_decode($data,
                 true) as $k => $v ) {
-                $this->offsetSet($k,
-                    $v);
+                $this->offsetSet($k, $v);
             }
         }
     }
@@ -50,13 +48,11 @@ class Json extends \ArrayObject
      */
     public function offsetSet( $key, $value ): self
     {
-        if ( Is::arr($value) ) {
-            parent::offsetSet($key,
-                $this->newParentClass($value));
+        if ( Is::iterable($value) ) {
+            parent::offsetSet($key, $this->newParentClass($value));
         }
         else {
-            parent::offsetSet($key,
-                $value);
+            parent::offsetSet($key, $value);
         }
 
         return $this;
@@ -680,23 +676,26 @@ class Json extends \ArrayObject
      */
     public function toConsole( string $title = null, string $color = null ): string
     {
-        if (!Cli::runningInConsole()) {
+        if ( !Cli::runningInConsole() ) {
             throw new JsonException('You can call json::toConsole only in CLI mode.');
         }
 
         $climate = new CLImate();
         $climate->output->defaultTo('buffer');
 
-        if ($title) {
+        if ( $title ) {
             $climate->border();
-            $climate->style->addCommand('colored', $color ?: 'green');
-            $climate->colored(ucfirst($title ?: $this->name));
+            $climate->style->addCommand('colored', $color
+                ?: 'green');
+            $climate->colored(ucfirst($title
+                ?: $this->name));
             $climate->border();
         }
 
         $climate->json($this->toArray());
 
-        return $climate->output->get('buffer')->get();
+        return $climate->output->get('buffer')
+            ->get();
     }
 
     /**

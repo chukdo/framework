@@ -15,14 +15,27 @@ use Chukdo\Json\Arr;
 final class Is
 {
     /**
-     * @param $value
+     * @param string|null $value
      * @return bool
      */
-    public static function json( $value ): bool
+    public static function json( string $value = null ): bool
     {
+        if ( substr($value, 0, 1) !== '{' ) {
+            return false;
+        }
+
         $json = json_decode($value);
 
         return $json && $value != $json;
+    }
+
+    /**
+     * @param $value
+     * @return bool
+     */
+    public static function iterable( $value ): bool
+    {
+        return is_iterable($value) || $value instanceof \stdClass || self::arr($value);
     }
 
     /**
