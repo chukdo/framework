@@ -38,14 +38,6 @@ Class Database
     /**
      * @return bool
      */
-    public function drop(): bool
-    {
-        return ( new Json($this->database()->drop()) )->offsetGet('ok') == 1;
-    }
-
-    /**
-     * @return bool
-     */
     public function repair(): bool
     {
         return $this->mongo()
@@ -97,6 +89,16 @@ Class Database
             })->clean();
 
         return $stats;
+    }
+
+    /**
+     * @return bool
+     */
+    public function drop(): bool
+    {
+        $drop = $this->database()->drop();
+
+        return $drop['ok'] == 1;
     }
 
     /**

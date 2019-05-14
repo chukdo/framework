@@ -13,7 +13,7 @@ class ServiceLocatorServiceProvider extends ServiceProvider
     public function register(): void
     {
         $serviceLocator = ServiceLocator::getInstance();
-        $this->app->instance('\Chukdo\Storage\ServiceLocator', $serviceLocator);
+        $this->app->instance(ServiceLocator::class, $serviceLocator);
         Stream::register('azure', AzureStream::class);
         $serviceLocator->setService('azure', function()
         {

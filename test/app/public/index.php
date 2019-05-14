@@ -136,9 +136,13 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
         return $response;
     }
 }
-
-
-dd(Db::database('doc')->collection('contrat')->index()->indexes());
+//dd(Conf::offsetGet('db.mongo.dsn'));
+dd(Db::collection('contrat')
+    ->index()
+    ->create([
+        'reference' => 1,
+        'pdfsize'   => 1,
+    ], false, 'toto'));
 
 Request::Inputs()
     ->set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, Conf::get('salt')));

@@ -123,6 +123,17 @@ Class Collection
     }
 
     /**
+     * @return bool
+     */
+    public function drop(): bool
+    {
+        $drop = $this->collection()
+            ->drop();
+
+        return $drop[ 'ok' ] == 1;
+    }
+
+    /**
      * @return Json
      */
     public function index(): Index

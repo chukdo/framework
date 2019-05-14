@@ -21,6 +21,22 @@ Class Index
     }
 
     /**
+     * @return Json
+     */
+    public function indexes(): Json
+    {
+        $indexes = new Json();
+
+        foreach ( $this->collection()
+            ->collection()
+            ->listIndexes() as $index ) {
+            $indexes->offsetSet($index[ 'name' ], $index[ 'key' ]);
+        }
+
+        return $indexes;
+    }
+
+    /**
      * @return Collection
      */
     protected function collection(): Collection
@@ -29,36 +45,43 @@ Class Index
     }
 
     /**
-     * @return Json
+     * @param array       $fields
+     * @param bool        $unique
+     * @param string|null $name
+     * @return string
      */
-    public function indexes(): Json
+    public function create( array $fields, bool $unique = false, string $name = null ): string
     {
-        $indexes = new Json();
+        return $this->collection()
+            ->collection()
+            ->createIndex($fields, [
+                'name'   => $name,
+                'unique' => $unique,
+            ]);
+    }
 
-        foreach ($this->collection()->collection()->listIndexes() as $index) {
-            $indexes->offsetSet($index['name'], $index['key']);
-        }
+    /**
+     * @return bool
+     */
+    public function drop(): bool
+    {
+        $drop = $this->collection()
+            ->collection()
+            ->dropIndexes();
 
-        return $indexes;
+        return $drop[ 'ok' ] == 1;
     }
 
     /**
      * @param string $name
-     * @param array  $fields [key => 1 or -1], 1 = ASC, -1 = DESC
-     * @param bool   $unique
      * @return bool
      */
-    public function add( string $name, array $fields, bool $unique = false ): bool
+    public function delete( string $name ): bool
     {
+        $drop = $this->collection()
+            ->collection()
+            ->dropIndex($name);
 
-    }
-
-    /**
-     * @param string $name
-     * @return bool
-     */
-    public function drop( string $name ): bool
-    {
-
+        return $drop[ 'ok' ] == 1;
     }
 }

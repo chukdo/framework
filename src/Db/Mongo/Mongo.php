@@ -27,21 +27,20 @@ Class Mongo
     protected $mongo;
 
     /**
-     * Mongo constructor.
-     * @param string|null $dsn
+     * @var string|null
      */
-    public function __construct( string $dsn = null )
-    {
-        $this->dsn   = $dsn;
-        $this->mongo = new Manager($dsn);
-    }
+    protected $database = null;
 
     /**
-     * @return Manager
+     * Mongo constructor.
+     * @param string      $dsn
+     * @param string|null $database
      */
-    public function mongo(): Manager
+    public function __construct( string $dsn, string $database = null )
     {
-        return $this->mongo;
+        $this->dsn      = $dsn;
+        $this->mongo    = new Manager($dsn);
+        $this->database = $database;
     }
 
     /**
@@ -62,13 +61,22 @@ Class Mongo
     {
         try {
             $command = new Command($command);
-            $json    = new Json($this->mongo()->executeCommand($db, $command));
+            $json    = new Json($this->mongo()
+                ->executeCommand($db, $command));
 
             return $json;
         } catch ( Exception $e ) {
         }
 
         return new Json();
+    }
+
+    /**
+     * @return Manager
+     */
+    public function mongo(): Manager
+    {
+        return $this->mongo;
     }
 
     /**
@@ -175,21 +183,21 @@ Class Mongo
     }
 
     /**
-     * @param string $database
+     * @param string|null $database
      * @return Database
      */
-    public function database( string $database ): Database
+    public function database( string $database = null ): Database
     {
-        return new Database($this, $database);
+        return new Database($this, $database ?: $this->database);
     }
 
     /**
-     * @param string $database
-     * @param string $collection
+     * @param string      $collection
+     * @param string|null $database
      * @return Collection
      */
-    public function collection( string $database, string $collection ): Collection
+    public function collection( string $collection, string $database = null ): Collection
     {
-        return new Collection($this, $database, $collection);
+        return new Collection($this, $database ?: $this->database, $collection);
     }
 }

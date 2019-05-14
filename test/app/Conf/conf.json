@@ -10,7 +10,8 @@
       "dsn" : "redis://127.0.0.1:6379"
     },
     "mongo": {
-      "dsn": "mongodb:\/\/127.0.0.1:27017\/?replicaSet=rs0&readPreference=primaryPreferred"
+      "dsn": "mongodb:\/\/127.0.0.1:27017\/?replicaSet=rs0&readPreference=primaryPreferred",
+      "dbname": "doc"
     },
     "elastic": {
       "host": "localhost:9200"

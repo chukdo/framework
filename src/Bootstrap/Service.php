@@ -202,12 +202,8 @@ class Service implements ArrayAccess
                 return $this->getClosure($bind);
             }
             elseif ( is_array($bind) ) {
-                if ( array_key_exists('class',
-                        $bind)
-                     && array_key_exists('args',
-                        $bind) ) {
-                    return $this->resolveService($bind[ 'class' ],
-                        $bind[ 'args' ]);
+                if ( array_key_exists('class', $bind) && array_key_exists('args', $bind) ) {
+                    return $this->resolveService($bind[ 'class' ], $bind[ 'args' ]);
                 }
             }
         }

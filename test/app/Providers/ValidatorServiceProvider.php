@@ -3,32 +3,35 @@
 namespace App\Providers;
 
 use Chukdo\Bootstrap\ServiceProvider;
+use Chukdo\Validation\Validator;
+use Chukdo\Validation\Filter;
+use Chukdo\Validation\Validate;
 
 class ValidatorServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->make('\Chukdo\Validation\Validator', true)
+        $this->app->make(Validator::class, true)
             ->registerFilters([
-                new \Chukdo\Validation\Filter\BoolFilter(),
-                new \Chukdo\Validation\Filter\FloatFilter(),
-                new \Chukdo\Validation\Filter\IntFilter(),
-                new \Chukdo\Validation\Filter\PhoneFilter(),
-                new \Chukdo\Validation\Filter\StriptagsFilter(),
+                new Filter\BoolFilter(),
+                new Filter\FloatFilter(),
+                new Filter\IntFilter(),
+                new Filter\PhoneFilter(),
+                new Filter\StriptagsFilter(),
             ])
             ->registerValidators([
-                new \Chukdo\Validation\Validate\BoolValidate(),
-                new \Chukdo\Validation\Validate\CsrfValidate(),
-                new \Chukdo\Validation\Validate\EmailValidate(),
-                new \Chukdo\Validation\Validate\FileValidate(),
-                new \Chukdo\Validation\Validate\FloatValidate(),
-                new \Chukdo\Validation\Validate\IntValidate(),
-                new \Chukdo\Validation\Validate\PhoneValidate(),
-                new \Chukdo\Validation\Validate\StringValidate(),
-                new \Chukdo\Validation\Validate\UrlValidate(),
-                new \Chukdo\Validation\Validate\ZipcodeValidate(),
+                new Validate\BoolValidate(),
+                new Validate\CsrfValidate(),
+                new Validate\EmailValidate(),
+                new Validate\FileValidate(),
+                new Validate\FloatValidate(),
+                new Validate\IntValidate(),
+                new Validate\PhoneValidate(),
+                new Validate\StringValidate(),
+                new Validate\UrlValidate(),
+                new Validate\ZipcodeValidate(),
             ]);
 
-        $this->setClassAlias('\Chukdo\Facades\Validator', 'Validator');
+        $this->setClassAlias(Validator::class, 'Validator');
     }
 }
