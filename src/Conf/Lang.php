@@ -1,6 +1,6 @@
 <?php
 
-namespace Chukdo\Json;
+namespace Chukdo\Conf;
 
 use Chukdo\Storage\Storage;
 use Chukdo\Helper\Is;

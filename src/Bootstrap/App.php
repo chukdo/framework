@@ -88,7 +88,7 @@ class App extends Service
      */
     public function conf( string $key, $default = null ): ?string
     {
-        return $this->make('Chukdo\Json\Conf')
+        return $this->make('Chukdo\Conf\Conf')
             ->offsetGet($key, $default);
     }
 
@@ -151,7 +151,7 @@ class App extends Service
      */
     public function lang( string $key, $default = null ): ?string
     {
-        return $this->make('Chukdo\Json\Lang')
+        return $this->make('Chukdo\Conf\Lang')
             ->offsetGet($key, $default);
     }
 

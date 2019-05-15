@@ -74,19 +74,12 @@ Class Collection
     }
 
     /**
-     * @return MongoDbCollection
-     */
-    public function collection(): MongoDbCollection
-    {
-        return $this->collection;
-    }
-
-    /**
      * @return string
      */
     public function name(): string
     {
-        return $this->collection()->getCollectionName();
+        return $this->collection()
+            ->getCollectionName();
     }
 
     /**
@@ -94,7 +87,16 @@ Class Collection
      */
     public function databaseName(): string
     {
-        return $this->collection()->getDatabaseName();
+        return $this->collection()
+            ->getDatabaseName();
+    }
+
+    /**
+     * @return MongoDbCollection
+     */
+    public function collection(): MongoDbCollection
+    {
+        return $this->collection;
     }
 
     /**
@@ -147,5 +149,13 @@ Class Collection
     public function database(): Database
     {
         new Database($this->mongo(), $this->databaseName());
+    }
+
+    /**
+     * @return Query
+     */
+    public function query(): Query
+    {
+        return new Query($this);
     }
 }

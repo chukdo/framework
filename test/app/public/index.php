@@ -47,11 +47,19 @@ Facades\Facade::setFacadeApplication($app,
         'Event'      => Facades\Event::class,
         'Request'    => Facades\Request::class,
         'Response'   => Facades\Response::class,
-        'Dispatcher' => Facades\Dispatcher::class,
         'View'       => Facades\View::class,
         'Router'     => Facades\Router::class,
         'Redis'      => Facades\Redis::class,
     ]);
+
+use \Chukdo\Facades\App;
+use \Chukdo\Facades\Storage;
+use \Chukdo\Facades\Conf;
+use \Chukdo\Facades\Lang;
+use \Chukdo\Facades\Event;
+use \Chukdo\Facades\Request;
+use \Chukdo\Facades\Response;
+use \Chukdo\Facades\Router;
 
 /* Configuration */
 Lang::loadDir(LANG_PATH);
@@ -137,12 +145,7 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
     }
 }
 //dd(Conf::offsetGet('db.mongo.dsn'));
-dd(Db::collection('contrat')
-    ->index()
-    ->create([
-        'reference' => 1,
-        'pdfsize'   => 1,
-    ], false, 'toto'));
+dd(Db::collection('contrat'));
 
 Request::Inputs()
     ->set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, Conf::get('salt')));

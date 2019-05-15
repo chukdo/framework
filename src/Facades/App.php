@@ -8,6 +8,7 @@ namespace Chukdo\Facades;
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
  * @since         08/01/2019
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
+ * @mixin \Chukdo\Bootstrap\App
  */
 class App extends Facade
 {

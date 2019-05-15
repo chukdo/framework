@@ -183,21 +183,34 @@ Class Mongo
     }
 
     /**
-     * @param string|null $database
-     * @return Database
-     */
-    public function database( string $database = null ): Database
-    {
-        return new Database($this, $database ?: $this->database);
-    }
-
-    /**
      * @param string      $collection
      * @param string|null $database
      * @return Collection
      */
     public function collection( string $collection, string $database = null ): Collection
     {
-        return new Collection($this, $database ?: $this->database, $collection);
+        return new Collection($this, $database
+            ?: $this->database, $collection);
+    }
+
+    /**
+     * @param string      $collection
+     * @param string|null $database
+     * @return Query
+     */
+    public function query( string $collection, string $database = null ): Query
+    {
+        return $this->database($database)
+            ->query($collection);
+    }
+
+    /**
+     * @param string|null $database
+     * @return Database
+     */
+    public function database( string $database = null ): Database
+    {
+        return new Database($this, $database
+            ?: $this->database);
     }
 }

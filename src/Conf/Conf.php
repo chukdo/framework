@@ -1,7 +1,8 @@
 <?php
 
-namespace Chukdo\Json;
+namespace Chukdo\Conf;
 
+use Chukdo\Json\Json;
 use Chukdo\Storage\Storage;
 
 /**

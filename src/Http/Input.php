@@ -1,7 +1,8 @@
 <?php
 
-namespace Chukdo\Json;
+namespace Chukdo\Http;
 
+use Chukdo\Json\Json;
 use Chukdo\Helper\Cli;
 use Chukdo\Storage\FileUploaded;
 

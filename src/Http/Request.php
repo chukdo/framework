@@ -7,7 +7,6 @@ use Chukdo\Helper\Cli;
 use Chukdo\Helper\Str;
 use Chukdo\Helper\HttpRequest;
 use Chukdo\Json\Json;
-use Chukdo\Json\Input;
 use Chukdo\Validation\Validator;
 use Chukdo\Storage\FileUploaded;
 
@@ -49,7 +48,7 @@ class Request
     public function __construct( App $app )
     {
         $this->app    = $app;
-        $this->inputs = $app->make('Chukdo\Json\Input', true);
+        $this->inputs = $app->make('Chukdo\Http\Input', true);
         $this->header = new Header();
         $this->url    = new Url(HttpRequest::uri());
 

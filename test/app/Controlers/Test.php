@@ -4,7 +4,7 @@ namespace App\Controlers;
 
 use Chukdo\Http\Controler;
 use Chukdo\Http\Response;
-use Chukdo\Json\Input;
+use Chukdo\Http\Input;
 
 class test extends Controler
 {

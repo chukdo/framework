@@ -48,14 +48,6 @@ Class Database
     }
 
     /**
-     * @return MongoDbDatabase
-     */
-    public function database(): MongoDbDatabase
-    {
-        return $this->database;
-    }
-
-    /**
      * @return Mongo
      */
     public function mongo(): Mongo
@@ -68,7 +60,16 @@ Class Database
      */
     public function name(): string
     {
-        return $this->database()->getDatabaseName();
+        return $this->database()
+            ->getDatabaseName();
+    }
+
+    /**
+     * @return MongoDbDatabase
+     */
+    public function database(): MongoDbDatabase
+    {
+        return $this->database;
     }
 
     /**
@@ -86,7 +87,8 @@ Class Database
                 }
 
                 return false;
-            })->clean();
+            })
+            ->clean();
 
         return $stats;
     }
@@ -96,9 +98,10 @@ Class Database
      */
     public function drop(): bool
     {
-        $drop = $this->database()->drop();
+        $drop = $this->database()
+            ->drop();
 
-        return $drop['ok'] == 1;
+        return $drop[ 'ok' ] == 1;
     }
 
     /**
@@ -108,11 +111,22 @@ Class Database
     {
         $list = new Json();
 
-        foreach ( $this->database()->listCollections() as $collection ) {
+        foreach ( $this->database()
+            ->listCollections() as $collection ) {
             $list->append($collection->getName());
         }
 
         return $list;
+    }
+
+    /**
+     * @param string $collection
+     * @return Query
+     */
+    public function query( string $collection ): Query
+    {
+        return $this->collection($collection)
+            ->query();
     }
 
     /**

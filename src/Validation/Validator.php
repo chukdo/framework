@@ -5,7 +5,7 @@ namespace Chukdo\Validation;
 use Chukdo\Contracts\Validation\Filter as FilterInterface;
 use Chukdo\Contracts\Validation\Validate as ValidateInterface;
 use Chukdo\Http\Request;
-use Chukdo\Json\Input;
+use Chukdo\Http\Input;
 use Chukdo\Json\Message;
 
 /**
