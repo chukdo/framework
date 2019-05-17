@@ -121,9 +121,9 @@ Class Database
 
     /**
      * @param string $collection
-     * @return Query
+     * @return QueryBuilder
      */
-    public function query( string $collection ): Query
+    public function query( string $collection ): QueryBuilder
     {
         return $this->collection($collection)
             ->query();

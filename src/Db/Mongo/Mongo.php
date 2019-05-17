@@ -196,9 +196,9 @@ Class Mongo
     /**
      * @param string      $collection
      * @param string|null $database
-     * @return Query
+     * @return QueryBuilder
      */
-    public function query( string $collection, string $database = null ): Query
+    public function query( string $collection, string $database = null ): QueryBuilder
     {
         return $this->database($database)
             ->query($collection);

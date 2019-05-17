@@ -147,6 +147,18 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 //dd(Conf::offsetGet('db.mongo.dsn'));
 dd(Db::collection('contrat'));
 
+$contrat = Db::collection('contrat');
+$contrat->or()->field('qty')->exists()->notIn([1,5,9]);
+$contrat->or()->field('price')->not()->gt(13);
+
+$contrat->field('qty')->exists()->notIn([1,5,9]);
+$contrat->field('price')->not()->gt(13);
+$contrat->field('agences')->match(
+    $contrat->field('production')->equal('xyz'),
+    $contrat->field('score')->gt(8)
+);
+$contrat->set()->push()->where()->update();
+
 Request::Inputs()
     ->set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, Conf::get('salt')));
 Request::Inputs()

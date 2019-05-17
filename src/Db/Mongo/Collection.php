@@ -152,10 +152,10 @@ Class Collection
     }
 
     /**
-     * @return Query
+     * @return QueryBuilder
      */
-    public function query(): Query
+    public function query(): QueryBuilder
     {
-        return new Query($this);
+        return new QueryBuilder($this);
     }
 }
