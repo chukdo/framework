@@ -27,6 +27,26 @@ Class QueryBuilder
     protected $or = [];
 
     /**
+     * @var array
+     */
+    protected $projection = [];
+
+    /**
+     * @var array
+     */
+    protected $order = [];
+
+    /**
+     * @var int
+     */
+    protected $skip = 0;
+
+    /**
+     * @var int
+     */
+    protected $take = 1000;
+
+    /**
      * QueryBuilder constructor.
      * @param Collection $collection
      */
@@ -41,7 +61,7 @@ Class QueryBuilder
      */
     public function and( string $name ): QueryField
     {
-        return $this->and[$name] = $this->field($name);
+        return $this->and[ $name ] = $this->field($name);
     }
 
     /**
@@ -59,7 +79,7 @@ Class QueryBuilder
      */
     public function or( string $name ): QueryField
     {
-        return $this->or[$name] = $this->field($name);
+        return $this->or[ $name ] = $this->field($name);
     }
 
     /**
@@ -91,22 +111,57 @@ Class QueryBuilder
     }
 
     /**
+     * @param array|string $fields
+     * @return QueryBuilder
+     */
+    public function with($fields): self
+    {
+        $fields = (array) $fields;
+
+        foreach ($fields as $field) {
+            $this->projection[$field] = 1;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array|string $fields
+     * @return QueryBuilder
+     */
+    public function without($fields): self
+    {
+        $fields = (array) $fields;
+
+        foreach ($fields as $field) {
+            $this->projection[$field] = -1;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return QueryBuilder
+     */
+    public function withoutId(): self
+    {
+        $this->projection['_id'] = 0;
+
+        return $this;
+    }
+
+    /**
      * @param string $field
      * @param string $sort
      * @return QueryBuilder
      */
     public function orderBy( string $field, string $sort ): self
     {
+        $this->order[ $field ] = $sort === 'asc' || $sort === 'ASC'
+            ? 1
+            : -1;
 
-    }
-
-    /**
-     * @param string $field
-     * @return QueryBuilder
-     */
-    public function groupBy( string $field ): self
-    {
-
+        return $this;
     }
 
     /**
@@ -115,7 +170,9 @@ Class QueryBuilder
      */
     public function skip( int $skip ): self
     {
+        $this->skip = $skip;
 
+        return $this;
     }
 
     /**
@@ -123,6 +180,44 @@ Class QueryBuilder
      * @return QueryBuilder
      */
     public function take( int $take ): self
+    {
+        $this->take = $take;
+
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     * @return QueryBuilder
+     */
+    public function groupBy( string $field ): self
+    {
+        return $this;
+    }
+
+    /**
+     * @param array $values
+     * @return QueryBuilder
+     */
+    public function set( array $values ): self
+    {
+
+    }
+
+    /**
+     * @param array $values
+     * @return QueryBuilder
+     */
+    public function unset( array $values ): self
+    {
+
+    }
+
+    /**
+     * @param array $values
+     * @return QueryBuilder
+     */
+    public function push( array $values ): self
     {
 
     }
@@ -149,33 +244,6 @@ Class QueryBuilder
      * @return string
      */
     public function insertGetId( array $values ): string
-    {
-
-    }
-
-    /**
-     * @param array $values
-     * @return QueryBuilder
-     */
-    public function set( array $values ): self
-    {
-
-    }
-
-    /**
-     * @param array $values
-     * @return QueryBuilder
-     */
-    public function unset( array $values ): self
-    {
-
-    }
-
-    /**
-     * @param array $values
-     * @return QueryBuilder
-     */
-    public function push( array $values ): self
     {
 
     }

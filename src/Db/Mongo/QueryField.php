@@ -2,6 +2,8 @@
 
 Namespace Chukdo\DB\Mongo;
 
+use MongoDB\BSON\Regex;
+
 /**
  * QueryBuilder Field Builder.
  * @version      1.0.0
@@ -168,11 +170,12 @@ Class QueryField
 
     /**
      * @param string $pattern
+     * @param string $options
      * @return QueryField
      */
-    public function regex( string $pattern ): self
+    public function regex( string $pattern, string $options = 'i' ): self
     {
-        $this->query[ '$regex' ] = $pattern;
+        $this->query[ '$regex' ] = new Regex($pattern, $options);
 
         return $this;
     }
@@ -188,7 +191,7 @@ Class QueryField
         }
 
         foreach ( $queryFields as $queryField ) {
-            $this->query[ '$elemMatch' ][$queryField->name()] = $queryField->query();
+            $this->query[ '$elemMatch' ][ $queryField->name() ] = $queryField->query();
         }
 
         return $this;
@@ -221,7 +224,7 @@ Class QueryField
         }
 
         foreach ( $queryFields as $queryField ) {
-            $this->query[ '$all' ][$queryField->name()] = $queryField->query();
+            $this->query[ '$all' ][ $queryField->name() ] = $queryField->query();
         }
 
         return $this;
