@@ -17,6 +17,16 @@ Class QueryBuilder
     protected $collection;
 
     /**
+     * @var array
+     */
+    protected $and = [];
+
+    /**
+     * @var array
+     */
+    protected $or = [];
+
+    /**
      * QueryBuilder constructor.
      * @param Collection $collection
      */
@@ -26,118 +36,58 @@ Class QueryBuilder
     }
 
     /**
-     * @param string ...$fields
-     * @return QueryBuilder
+     * @param string $name
+     * @return QueryField
      */
-    public function select( string ...$fields ): self
+    public function and( string $name ): QueryField
     {
-
+        return $this->and[$name] = $this->field($name);
     }
 
     /**
-     * @param string $field
-     * @param string $operator
-     * @param        $value
-     * @return QueryBuilder
+     * @param string $name
+     * @return QueryField
      */
-    public function where( string $field, string $operator, $value ): self
+    public function field( string $name ): QueryField
     {
-
+        return new QueryField($name);
     }
 
     /**
-     * @param string $field
-     * @param        $value
-     * @return QueryBuilder
+     * @param string $name
+     * @return QueryField
      */
-    public function equal( string $field, $value ): self
+    public function or( string $name ): QueryField
     {
-
+        return $this->or[$name] = $this->field($name);
     }
 
     /**
-     * @param string $field
-     * @param        $value
-     * @return QueryBuilder
+     * @return array
      */
-    public function greaterThan( string $field, $value ): self
+    public function getQuery(): array
     {
+        $query = [];
+        $and   = array_map(function( QueryField $query )
+        {
+            return $query->query();
+        }, $this->and);
 
-    }
 
-    /**
-     * @param string $field
-     * @param        $value
-     * @return QueryBuilder
-     */
-    public function greaterThanOrEqual( string $field, $value ): self
-    {
+        $or = array_map(function( QueryField $query )
+        {
+            return $query->query();
+        }, $this->or);
 
-    }
+        if ( !empty($and) ) {
+            $query[ '$and' ] = $and;
+        }
 
-    /**
-     * @param string $field
-     * @param        $value
-     * @return QueryBuilder
-     */
-    public function lowerThan( string $field, $value ): self
-    {
+        if ( !empty($or) ) {
+            $query[ '$or' ] = $or;
+        }
 
-    }
-
-    /**
-     * @param string $field
-     * @param        $value
-     * @return QueryBuilder
-     */
-    public function lowerThanOrEqual( string $field, $value ): self
-    {
-
-    }
-
-    public function orWhere(): self
-    {
-
-    }
-
-    /**
-     * @param string $field
-     * @param array  $in
-     * @return QueryBuilder
-     */
-    public function whereIn( string $field, array $in ): self
-    {
-
-    }
-
-    /**
-     * @param string $field
-     * @param array  $in
-     * @return QueryBuilder
-     */
-    public function whereNotIn( string $field, array $in ): self
-    {
-
-    }
-
-    public function whereBetween(): self
-    {
-
-    }
-
-    public function whereNotBetween(): self
-    {
-
-    }
-
-    public function whereNull(): self
-    {
-
-    }
-
-    public function exists(): self
-    {
-
+        return $query;
     }
 
     /**
@@ -185,29 +135,6 @@ Class QueryBuilder
 
     }
 
-    public function get()
-    {
-
-    }
-
-    /**
-     * @param string $field
-     * @return int
-     */
-    public function increment( string $field ): int
-    {
-
-    }
-
-    /**
-     * @param string $field
-     * @return int
-     */
-    public function decrement( string $field ): int
-    {
-
-    }
-
     /**
      * @param array $values
      * @return int
@@ -222,24 +149,6 @@ Class QueryBuilder
      * @return string
      */
     public function insertGetId( array $values ): string
-    {
-
-    }
-
-    /**
-     * @param array $values
-     * @return QueryBuilder
-     */
-    public function max( array $values ): self
-    {
-
-    }
-
-    /**
-     * @param array $values
-     * @return QueryBuilder
-     */
-    public function min( array $values ): self
     {
 
     }

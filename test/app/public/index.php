@@ -60,6 +60,7 @@ use \Chukdo\Facades\Event;
 use \Chukdo\Facades\Request;
 use \Chukdo\Facades\Response;
 use \Chukdo\Facades\Router;
+use \Chukdo\Facades\Db;
 
 /* Configuration */
 Lang::loadDir(LANG_PATH);
@@ -145,19 +146,20 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
     }
 }
 //dd(Conf::offsetGet('db.mongo.dsn'));
-dd(Db::collection('contrat'));
+//dd(Db::collection('contrat'));
 
-$contrat = Db::collection('contrat');
-$contrat->or()->field('qty')->exists()->notIn([1,5,9]);
-$contrat->or()->field('price')->not()->gt(13);
+$contrat = Db::collection('contrat')->query();
+$contrat->or('qty')->exists()->nin([1,5,9]);
+$contrat->or('price')->gte(20)->lt(10);
+$contrat->and('qty')->exists()->nin([1,5,9]);
 
-$contrat->field('qty')->exists()->notIn([1,5,9]);
-$contrat->field('price')->not()->gt(13);
-$contrat->field('agences')->match(
-    $contrat->field('production')->equal('xyz'),
+$contrat->and('agences')->match(
+    $contrat->field('production')->eq('xyz'),
     $contrat->field('score')->gt(8)
 );
-$contrat->set()->push()->where()->update();
+
+dd($contrat->getQuery());
+//$contrat->set()->push()->where()->update();
 
 Request::Inputs()
     ->set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, Conf::get('salt')));
