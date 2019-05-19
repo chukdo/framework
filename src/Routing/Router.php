@@ -96,15 +96,6 @@ class Router
     }
 
     /**
-     * @param string|null $namespace
-     * @return RouteGroup
-     */
-    public function namespace( ?string $namespace ): RouteGroup
-    {
-        return ( new RouteGroup($this) )->namespace($namespace);
-    }
-
-    /**
      * @return Request
      */
     public function request(): Request

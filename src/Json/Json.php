@@ -21,12 +21,27 @@ use League\CLImate\CLImate;
 class Json extends \ArrayObject
 {
     /**
-     * json constructor.
-     * @param mixed $data
+     * @var Closure
      */
-    public function __construct( $data = null )
+    protected $setFilter;
+
+    /**
+     * @var Closure
+     */
+    protected $getFilter;
+
+    /**
+     * Json constructor.
+     * @param array|iterable|null $data
+     * @param Closure|null $setFilter
+     * @param Closure|null $getFilter
+     */
+    public function __construct( $data = null, $setFilter = null, $getFilter = null )
     {
         parent::__construct([]);
+
+        $this->setFilter = $setFilter;
+        $this->getFilter = $getFilter;
 
         if ( Is::iterable($data) ) {
             foreach ( $data as $k => $v ) {
@@ -52,7 +67,7 @@ class Json extends \ArrayObject
             parent::offsetSet($key, $this->newParentClass($value));
         }
         else {
-            parent::offsetSet($key, $value);
+            parent::offsetSet($key, $this->setFilter($value));
         }
 
         return $this;
@@ -78,6 +93,32 @@ class Json extends \ArrayObject
     }
 
     /**
+     * @param $value
+     * @return mixed
+     */
+    protected function setFilter( $value )
+    {
+        if ( $this->setFilter instanceof Closure ) {
+            return ( $this->setFilter )($value);
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param $value
+     * @return mixed
+     */
+    protected function getFilter( $value )
+    {
+        if ( $this->getFilter instanceof Closure ) {
+            return ( $this->getFilter )($value);
+        }
+
+        return $value;
+    }
+
+    /**
      * @return Json
      */
     public function clean(): self
@@ -89,6 +130,24 @@ class Json extends \ArrayObject
         }
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getArrayCopy(): array
+    {
+        $array = parent::getArrayCopy();
+
+        /* Iteration de l'objet pour convertir
+         * les sous elements data_array en array */
+        foreach ( $array as $k => $v ) {
+            if ( $v instanceof arrayObject ) {
+                $array[ $k ] = $v->getArrayCopy();
+            }
+        }
+
+        return $array;
     }
 
     /**
@@ -121,24 +180,6 @@ class Json extends \ArrayObject
     public function clone(): Json
     {
         return $this->newParentClass($this->getArrayCopy());
-    }
-
-    /**
-     * @return array
-     */
-    public function getArrayCopy(): array
-    {
-        $array = parent::getArrayCopy();
-
-        /* Iteration de l'objet pour convertir
-         * les sous elements data_array en array */
-        foreach ( $array as $k => $v ) {
-            if ( $v instanceof arrayObject ) {
-                $array[ $k ] = $v->getArrayCopy();
-            }
-        }
-
-        return $array;
     }
 
     /**
@@ -277,7 +318,7 @@ class Json extends \ArrayObject
     public function offsetGet( $key, $default = null )
     {
         if ( $this->offsetExists($key) ) {
-            return parent::offsetGet($key);
+            return $this->getFilter(parent::offsetGet($key));
         }
 
         return $default;

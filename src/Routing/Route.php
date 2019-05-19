@@ -113,18 +113,6 @@ class Route
     }
 
     /**
-     * @param string|null $namespace
-     * @return Route
-     */
-    public function namespace( ?string $namespace ): self
-    {
-        $this->attributes()
-            ->setNamespace($namespace);
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function method(): string

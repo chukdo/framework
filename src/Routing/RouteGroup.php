@@ -80,18 +80,6 @@ class RouteGroup
     }
 
     /**
-     * @param string|null $namespace
-     * @return RouteGroup
-     */
-    public function namespace( ?string $namespace ): self
-    {
-        $this->attributes()
-            ->setNamespace($namespace);
-
-        return $this;
-    }
-
-    /**
      * @param Closure $closure
      */
     public function group( Closure $closure )
