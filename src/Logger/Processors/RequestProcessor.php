@@ -27,7 +27,7 @@ class RequestProcessor implements ProcessorInterface
         $record[ 'extra' ][ 'request' ] = [
             'uri'       => HttpRequest::uri()
                 ?: implode(' ',
-                    HttpRequest::argv()),
+                    HttpRequest::request()),
             'remote'    => HttpRequest::server('REMOTE_ADDR'),
             'referer'   => HttpRequest::server('HTTP_REFERER'),
             'method'    => HttpRequest::method(),

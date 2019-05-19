@@ -3,10 +3,15 @@
 
 namespace Chukdo\Db\Mongo;
 
+use Chukdo\Json\Json;
 use MongoDB\Collection as MongoDbCollection;
 use MongoDB\Driver\Cursor as MongoDbCursor;
+use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\Timestamp;
+use MongoDB\BSON\UTCDateTime;
 use Iterator;
 use IteratorIterator;
+use Closure;
 
 /**
  * Mongodb cursor.
@@ -33,6 +38,11 @@ class Cursor implements Iterator
     protected $iterator;
 
     /**
+     * @var Closure
+     */
+    protected $closure;
+
+    /**
      * Cursor constructor.
      * @param QueryBuilder $querybuilder
      */
@@ -40,10 +50,28 @@ class Cursor implements Iterator
     {
         $this->collection = $querybuilder->collection();
         $this->cursor     = $this->collection->find($querybuilder->query(), $querybuilder->projection());
+        $this->closure    = function( $key, $value )
+        {
+            if ( $value instanceof ObjectId ) {
+                return $value->__toString();
+            }
+            elseif ( $value instanceof Timestamp ) {
+                return $value->getTimestamp();
+            }
+            elseif ( $value instanceof UTCDateTime ) {
+                return $value->toDateTime();
+            }
 
-        //$this->cursor->setTypeMap(['root' => 'array', 'document' => 'array', 'array' => 'array']);
+            return $value;
+        };
 
-        $this->iterator   = new IteratorIterator($this->cursor);
+        $this->cursor->setTypeMap([
+            'root'     => 'array',
+            'document' => 'array',
+            'array'    => 'array',
+        ]);
+
+        $this->iterator = new IteratorIterator($this->cursor);
 
         $this->iterator->rewind();
     }
@@ -65,6 +93,20 @@ class Cursor implements Iterator
     }
 
     /**
+     * @return Json
+     */
+    public function all()
+    {
+        $json = new Json([], $this->closure);
+
+        foreach ( $this->iterator as $key => $value ) {
+            $json->offsetSet($key, $value);
+        }
+
+        return $json;
+    }
+
+    /**
      * Return the current element
      * @link  https://php.net/manual/en/iterator.current.php
      * @return mixed Can return any type.
@@ -72,10 +114,7 @@ class Cursor implements Iterator
      */
     public function current()
     {
-        // retouche en Json
-        // _id => string
-        // mongodate => DateTime()
-        return $this->iterator->current();
+        return new Json($this->iterator->current(), $this->closure);
     }
 
     /**
@@ -120,6 +159,6 @@ class Cursor implements Iterator
      */
     public function rewind()
     {
-        // TODO: Implement rewind() method.
+        $this->iterator->rewind();
     }
 }

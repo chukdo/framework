@@ -34,6 +34,21 @@ final class Str
     }
 
     /**
+     * @param $value
+     * @return string
+     */
+    public static function type( $value): string
+    {
+        $type = gettype($value);
+
+        if ($type == 'object') {
+            return get_class($value);
+        }
+
+        return $type;
+    }
+
+    /**
      * Verifie si une chaine de caractere ne contient pas une autre chaine de caractere.
      * @param string|null $haystack La chaîne dans laquelle on doit chercher
      * @param string|null $needle   valeur recherché

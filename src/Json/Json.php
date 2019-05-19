@@ -10,6 +10,7 @@ use Chukdo\Helper\To;
 use Chukdo\Xml\Xml;
 use Closure;
 use League\CLImate\CLImate;
+use Throwable;
 
 /**
  * Manipulation des données.
@@ -21,20 +22,20 @@ use League\CLImate\CLImate;
 class Json extends \ArrayObject
 {
     /**
-     * @var Closure
+     * @var Closure|null
      */
-    protected $setFilter;
+    protected $setFilter = null;
 
     /**
-     * @var Closure
+     * @var Closure|null
      */
-    protected $getFilter;
+    protected $getFilter = null;
 
     /**
      * Json constructor.
      * @param array|iterable|null $data
-     * @param Closure|null $setFilter
-     * @param Closure|null $getFilter
+     * @param Closure|null        $setFilter
+     * @param Closure|null        $getFilter
      */
     public function __construct( $data = null, $setFilter = null, $getFilter = null )
     {
@@ -67,18 +68,24 @@ class Json extends \ArrayObject
             parent::offsetSet($key, $this->newParentClass($value));
         }
         else {
-            parent::offsetSet($key, $this->setFilter($value));
+            parent::offsetSet($key, $this->setFilter($key, $value));
         }
 
         return $this;
     }
 
     /**
-     * @param mixed ...$params
+     * @param $param
      * @return mixed
      */
-    protected function newParentClass( ... $params )
+    protected function newParentClass( $param )
     {
+        $params = [
+            $param,
+            $this->setFilter,
+            $this->getFilter,
+        ];
+
         try {
             $rc = new \ReflectionClass(get_called_class());
             $rc->newInstanceArgs($params);
@@ -88,31 +95,19 @@ class Json extends \ArrayObject
                 'newInstance',
             ],
                 $params);
-        } catch ( \Throwable $e ) {
+        } catch ( Throwable $e ) {
         }
     }
 
     /**
+     * @param $key
      * @param $value
      * @return mixed
      */
-    protected function setFilter( $value )
+    protected function setFilter( $key, $value )
     {
         if ( $this->setFilter instanceof Closure ) {
-            return ( $this->setFilter )($value);
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param $value
-     * @return mixed
-     */
-    protected function getFilter( $value )
-    {
-        if ( $this->getFilter instanceof Closure ) {
-            return ( $this->getFilter )($value);
+            return ( $this->setFilter )($key, $value);
         }
 
         return $value;
@@ -318,10 +313,24 @@ class Json extends \ArrayObject
     public function offsetGet( $key, $default = null )
     {
         if ( $this->offsetExists($key) ) {
-            return $this->getFilter(parent::offsetGet($key));
+            return $this->getFilter($key, parent::offsetGet($key));
         }
 
         return $default;
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @return mixed
+     */
+    protected function getFilter( $key, $value )
+    {
+        if ( $this->getFilter instanceof Closure ) {
+            return ( $this->getFilter )($key, $value);
+        }
+
+        return $value;
     }
 
     /**
@@ -716,12 +725,11 @@ class Json extends \ArrayObject
     /**
      * @param string|null $title
      * @param string|null $color
-     * @param string|null $widthFirstCol
      * @return string
      */
-    public function toHtml( string $title = null, string $color = null, string $widthFirstCol = null ): string
+    public function toHtml( string $title = null, string $color = null): string
     {
-        return To::html($this, $title, $color, $widthFirstCol);
+        return To::html($this, $title, $color, true);
     }
 
     /**

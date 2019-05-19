@@ -149,8 +149,10 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 //dd(Conf::offsetGet('db.mongo.dsn'));
 //dd(Db::collection('contrat'));
 
+
 $contrat = Db::collection('contrat')
     ->query();
+dd($contrat->limit(3)->get()->all()->toHtml());
 $contrat->or('qty')
     ->exists()
     ->nin([

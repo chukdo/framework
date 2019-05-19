@@ -2,6 +2,9 @@
 
 namespace Chukdo\Helper;
 
+use Chukdo\Xml\Xml;
+use DateTime;
+
 /**
  * Classe To
  * Fonctionnalités de converstion des données.
@@ -116,8 +119,7 @@ final class To
         if ( Is::scalar($value) ) {
             $scalar = $value;
         }
-        elseif ( Is::object($value,
-            '__toString') ) {
+        elseif ( Is::object($value, '__toString') ) {
             $scalar = $value->__toString();
         }
         elseif ( Is::traversable($value) ) {
@@ -138,9 +140,7 @@ final class To
      */
     public static function float( $value ): float
     {
-        $value = str_replace(' ',
-            '',
-            self::scalar($value));
+        $value = str_replace(' ', '', self::scalar($value));
 
         if ( Str::contain($value, '.') && Str::contain($value, ',') ) {
             $value = str_replace('.', '', $value);
@@ -152,20 +152,20 @@ final class To
     /**
      * @param string      $value
      * @param string|null $format
-     * @return \DateTime
+     * @return DateTime
      * @throws \Exception
      */
-    public static function date( string $value, string $format = null ): \DateTime
+    public static function date( string $value, string $format = null ): DateTime
     {
-        $date = \DateTime::createFromFormat($format
+        $date = DateTime::createFromFormat($format
             ?: 'd/m/Y',
             $value);
 
-        if ( $date instanceof \DateTime ) {
+        if ( $date instanceof DateTime ) {
             return $date;
         }
 
-        return new \DateTime();
+        return new DateTime();
     }
 
     /**
@@ -177,13 +177,11 @@ final class To
         if ( is_scalar($value) ) {
             return $value;
         }
-        elseif ( Is::object($value,
-            'toJson') ) {
+        elseif ( Is::object($value, 'toJson') ) {
             return $value->toJson();
         }
         else {
-            return json_encode(self::arr($value),
-                JSON_PRETTY_PRINT);
+            return json_encode(self::arr($value), JSON_PRETTY_PRINT);
         }
     }
 
@@ -234,21 +232,18 @@ final class To
 
     /**
      * @param $value
-     * @return \Chukdo\Xml\Xml
-     * @throws \Chukdo\Xml\NodeException
-     * @throws \Chukdo\Xml\XmlException
+     * @return Xml
      */
-    public static function xml( $value ): \Chukdo\Xml\Xml
+    public static function xml( $value ): Xml
     {
-        if ( $value instanceof \Chukdo\Xml\Xml ) {
+        if ( $value instanceof Xml ) {
             return $value;
         }
-        elseif ( Is::object($value,
-            'toXml') ) {
+        elseif ( Is::object($value, 'toXml') ) {
             return $value->toXml();
         }
         else {
-            $xml = new \Chukdo\Xml\Xml();
+            $xml = new Xml();
             $xml->import($value);
 
             return $xml;
@@ -259,30 +254,37 @@ final class To
      * @param             $value
      * @param string|null $title
      * @param string|null $color
-     * @param int|null    $widthFirstCol
+     * @param bool        $type
      * @return string
      */
-    public static function html( $value, string $title = null, string $color = null, int $widthFirstCol = null ): string
+    public static function html( $value, string $title = null, string $color = null, bool $type = false ): string
     {
         $html  = '';
         $style = 'border-spacing:0;border-collapse:collapse;font-family:Arial;width:100%;word-break:break-word;';
+        $title = $title
+            ?: ( $type
+                ? Str::type($value)
+                : null );
 
         if ( $title ) {
             $color = $color
                 ?: '#499cef';
             $html  .= '<thead style="color: #fff;background: ' . $color
-                      . ';"><tr><th colspan="2" style="padding:20px;font-size:30px;">' . ucfirst($title)
+                      . ';"><tr><th colspan="2" style="padding:10px;font-size:20px;">' . ucfirst($title)
                       . "</th></tr></thead>";
         }
 
         foreach ( $value as $k => $v ) {
-            $v = is_iterable($v)
-                ? self::html($v, null,
-                    null,
-                    $widthFirstCol)
-                : $v;
+            if ( is_iterable($v) ) {
+                $v = self::html($v, $type
+                    ? Str::type($v)
+                    : null, null, $type);
+            }
+            elseif ( $v instanceof \DateTime ) {
+                $v = $v->format('d-m-Y H:i:s');
+            }
 
-            $html .= '<tr><td style="background:#eee;padding:6px;border:1px solid #eee;width:' . $widthFirstCol . ';">'
+            $html .= '<tr><td style="background:#eee;padding:6px;border:1px solid #eee;width:' . strlen($k) * 9 . 'px;">'
                      . $k . '</td><td  style="padding:6px;border:1px solid #eee;">' . $v . '</td></tr>';
         }
 
