@@ -317,8 +317,11 @@ Class Collection
      */
     public function one(): Json
     {
-        return $this->collection()
-            ->one($this->query(), $this->projection());
+        foreach ( $this->get() as $key => $value ) {
+            return $value;
+        }
+
+        return new Json();
     }
 
     /**
