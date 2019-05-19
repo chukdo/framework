@@ -44,12 +44,12 @@ class Cursor implements Iterator
 
     /**
      * Cursor constructor.
-     * @param QueryBuilder $querybuilder
+     * @param QueryBuilder $collection
      */
-    public function __construct( QueryBuilder $querybuilder )
+    public function __construct( Collection $collection )
     {
-        $this->collection = $querybuilder->collection();
-        $this->cursor     = $this->collection->find($querybuilder->query(), $querybuilder->projection());
+        $this->collection = $collection->collection();
+        $this->cursor     = $this->collection->find($collection->query(), $collection->projection());
         $this->closure    = function( $key, $value )
         {
             if ( $value instanceof ObjectId ) {
@@ -93,14 +93,20 @@ class Cursor implements Iterator
     }
 
     /**
+     * @param int|null $limit
      * @return Json
      */
-    public function all()
+    public function all( int $limit = null ): Json
     {
-        $json = new Json([], $this->closure);
+        $json  = new Json([], $this->closure);
+        $index = 0;
 
         foreach ( $this->iterator as $key => $value ) {
-            $json->offsetSet($key, $value);
+            if ( $limit === null || ( $limit !== null && $index < $limit ) ) {
+                $json->offsetSet($key, $value);
+            }
+
+            $index++;
         }
 
         return $json;

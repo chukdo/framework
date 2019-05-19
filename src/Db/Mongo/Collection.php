@@ -32,6 +32,36 @@ Class Collection
     protected $collection;
 
     /**
+     * @var array
+     */
+    protected $and = [];
+
+    /**
+     * @var array
+     */
+    protected $or = [];
+
+    /**
+     * @var array
+     */
+    protected $projection = [];
+
+    /**
+     * @var array
+     */
+    protected $sort = [];
+
+    /**
+     * @var int
+     */
+    protected $skip = 0;
+
+    /**
+     * @var int
+     */
+    protected $limit = 0;
+
+    /**
      * Collection constructor.
      * @param Mongo  $mongo
      * @param string $database
@@ -152,10 +182,247 @@ Class Collection
     }
 
     /**
-     * @return QueryBuilder
+     * @param string $name
+     * @return Field
      */
-    public function query(): QueryBuilder
+    public function and( string $name ): Field
     {
-        return new QueryBuilder($this);
+        return $this->and[] = $this->field($name);
+    }
+
+    /**
+     * @param string $name
+     * @return Field
+     */
+    public function field( string $name ): Field
+    {
+        return new Field($name);
+    }
+
+    /**
+     * @param string $name
+     * @return Field
+     */
+    public function or( string $name ): Field
+    {
+        return $this->or[] = $this->field($name);
+    }
+
+    /**
+     * @param $fields
+     * @return Collection
+     */
+    public function with( $fields ): self
+    {
+        $fields = (array) $fields;
+
+        foreach ( $fields as $field ) {
+            $this->projection[ $field ] = 1;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param $fields
+     * @return Collection
+     */
+    public function without( $fields ): self
+    {
+        $fields = (array) $fields;
+
+        foreach ( $fields as $field ) {
+            $this->projection[ $field ] = -1;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function withoutId(): self
+    {
+        $this->projection[ '_id' ] = 0;
+
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     * @param string $sort
+     * @return Collection
+     */
+    public function sort( string $field, string $sort ): self
+    {
+        $this->sort[ $field ] = $sort === 'asc' || $sort === 'ASC'
+            ? 1
+            : -1;
+
+        return $this;
+    }
+
+    /**
+     * @param int $skip
+     * @return Collection
+     */
+    public function skip( int $skip ): self
+    {
+        $this->skip = $skip;
+
+        return $this;
+    }
+
+    /**
+     * @param int $limit
+     * @return Collection
+     */
+    public function limit( int $limit ): self
+    {
+        $this->limit = $limit;
+
+        return $this;
+    }
+
+    /**
+     * @return Cursor
+     */
+    public function get(): Cursor
+    {
+        return new Cursor($this);
+    }
+
+    /**
+     * @return array
+     */
+    public function query(): array
+    {
+        $query = [];
+        $and   = array_map(function( Field $query )
+        {
+            return [ $query->name() => $query->query() ];
+        }, $this->and);
+
+
+        $or = array_map(function( Field $query )
+        {
+            return [ $query->name() => $query->query() ];
+        }, $this->or);
+
+        if ( !empty($and) ) {
+            $query[ '$and' ] = $and;
+        }
+
+        if ( !empty($or) ) {
+            $query[ '$or' ] = $or;
+        }
+
+        return $query;
+    }
+
+    /**
+     * @return array
+     */
+    public function projection(): array
+    {
+        $projection = [
+            'projection'      => $this->projection,
+            'noCursorTimeout' => false,
+        ];
+
+        if ( !empty($this->sort) ) {
+            $projection[ 'sort' ] = $this->sort;
+        }
+
+        if ( $this->skip > 0 ) {
+            $projection[ 'skip' ] = $this->skip;
+        }
+
+        if ( $this->limit > 0 ) {
+            $projection[ 'limit' ] = $this->limit;
+        }
+
+        return $projection;
+    }
+
+    public function one()
+    {
+        return $this->collection()
+            ->one($this->query(), $this->projection());
+    }
+
+    /**
+     * @param string $field
+     * @return Collection
+     */
+    public function groupBy( string $field ): self
+    {
+        return $this;
+    }
+
+    /**
+     * @param array $values
+     * @return Collection
+     */
+    public function set( array $values ): self
+    {
+
+    }
+
+    /**
+     * @param array $values
+     * @return Collection
+     */
+    public function unset( array $values ): self
+    {
+
+    }
+
+    /**
+     * @param array $values
+     * @return Collection
+     */
+    public function push( array $values ): self
+    {
+
+    }
+
+    /**
+     * @return int
+     */
+    public function count(): int
+    {
+
+    }
+
+    /**
+     * @param array $values
+     * @return int
+     */
+    public function insert( array $values ): int
+    {
+
+    }
+
+    /**
+     * @param array $values
+     * @return string
+     */
+    public function insertGetId( array $values ): string
+    {
+
+    }
+
+    /**
+     * @return int
+     */
+    public function update(): int
+    {
+
+    }
+
+    public function delete(): int
+    {
+
     }
 }

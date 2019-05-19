@@ -11,7 +11,7 @@ use MongoDB\BSON\Regex;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class QueryField
+Class Field
 {
     /**
      * @var array
@@ -24,7 +24,7 @@ Class QueryField
     protected $name;
 
     /**
-     * QueryField constructor.
+     * Field constructor.
      * @param string $name
      */
     public function __construct( string $name )
@@ -34,7 +34,7 @@ Class QueryField
 
     /**
      * @param $value
-     * @return QueryField
+     * @return Field
      */
     public function eq( $value ): self
     {
@@ -45,7 +45,7 @@ Class QueryField
 
     /**
      * @param $value
-     * @return QueryField
+     * @return Field
      */
     public function neq( $value ): self
     {
@@ -56,7 +56,7 @@ Class QueryField
 
     /**
      * @param $value
-     * @return QueryField
+     * @return Field
      */
     public function gt( $value ): self
     {
@@ -67,7 +67,7 @@ Class QueryField
 
     /**
      * @param $value
-     * @return QueryField
+     * @return Field
      */
     public function gte( $value ): self
     {
@@ -78,7 +78,7 @@ Class QueryField
 
     /**
      * @param $value
-     * @return QueryField
+     * @return Field
      */
     public function lt( $value ): self
     {
@@ -89,7 +89,7 @@ Class QueryField
 
     /**
      * @param $value
-     * @return QueryField
+     * @return Field
      */
     public function lte( $value ): self
     {
@@ -100,7 +100,7 @@ Class QueryField
 
     /**
      * @param array $in
-     * @return QueryField
+     * @return Field
      */
     public function in( array $in ): self
     {
@@ -111,7 +111,7 @@ Class QueryField
 
     /**
      * @param array $in
-     * @return QueryField
+     * @return Field
      */
     public function nin( array $in ): self
     {
@@ -122,7 +122,7 @@ Class QueryField
 
     /**
      * @param bool $exists
-     * @return QueryField
+     * @return Field
      */
     public function exists( bool $exists = true ): self
     {
@@ -133,7 +133,7 @@ Class QueryField
 
     /**
      * @param string $type
-     * @return QueryField
+     * @return Field
      */
     public function type( string $type ): self
     {
@@ -144,7 +144,7 @@ Class QueryField
 
     /**
      * @param int $size
-     * @return QueryField
+     * @return Field
      */
     public function size( int $size ): self
     {
@@ -156,7 +156,7 @@ Class QueryField
     /**
      * @param int $divisor
      * @param int $remainder
-     * @return QueryField
+     * @return Field
      */
     public function mod( int $divisor, int $remainder ): self
     {
@@ -171,7 +171,7 @@ Class QueryField
     /**
      * @param string $pattern
      * @param string $options
-     * @return QueryField
+     * @return Field
      */
     public function regex( string $pattern, string $options = 'i' ): self
     {
@@ -181,10 +181,10 @@ Class QueryField
     }
 
     /**
-     * @param QueryField ...$queryFields
-     * @return QueryField
+     * @param Field ...$queryFields
+     * @return Field
      */
-    public function match( QueryField ...$queryFields ): self
+    public function match( Field ...$queryFields ): self
     {
         if ( !isset($this->query[ '$elemMatch' ]) ) {
             $this->query[ '$elemMatch' ] = [];
@@ -214,10 +214,10 @@ Class QueryField
     }
 
     /**
-     * @param QueryField ...$queryFields
-     * @return QueryField
+     * @param Field ...$queryFields
+     * @return Field
      */
-    public function matchAll( QueryField ...$queryFields ): self
+    public function matchAll( Field ...$queryFields ): self
     {
         if ( !isset($this->query[ '$all' ]) ) {
             $this->query[ '$all' ] = [];

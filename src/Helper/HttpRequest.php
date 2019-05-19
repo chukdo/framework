@@ -29,15 +29,23 @@ final class HttpRequest
     }
 
     /**
+     * @return array
+     */
+    public static function all(): array
+    {
+        return Cli::runningInConsole()
+            ? Cli::inputs()
+            : $_REQUEST;
+    }
+
+    /**
      * @param             $name
      * @param string|null $default
      * @return string|null
      */
     public static function request( $name, string $default = null ): ?string
     {
-        $request = Cli::runningInConsole()
-            ? Cli::inputs()
-            : $_REQUEST;
+        $request = self::all();
 
         return isset($request[ $name ])
             ? $request[ $name ]

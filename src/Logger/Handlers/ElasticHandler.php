@@ -15,7 +15,7 @@ use Elasticsearch\ClientBuilder;
 class ElasticHandler extends AbstractHandler
 {
     /**
-     * @var \Elasticsearch\ClientBuilder
+     * @var ClientBuilder
      */
     protected $elastic;
 

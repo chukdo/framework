@@ -61,6 +61,7 @@ use \Chukdo\Facades\Request;
 use \Chukdo\Facades\Response;
 use \Chukdo\Facades\Router;
 use \Chukdo\Facades\Db;
+use Chukdo\Helper\HttpRequest;
 
 /* Configuration */
 Lang::loadDir(LANG_PATH);
@@ -149,10 +150,8 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 //dd(Conf::offsetGet('db.mongo.dsn'));
 //dd(Db::collection('contrat'));
 
-
-$contrat = Db::collection('contrat')
-    ->query();
-dd($contrat->limit(3)->get()->all()->toHtml());
+$contrat = Db::collection('contrat');
+dd($contrat->limit(11)->get()->all(2)->toHtml());
 $contrat->or('qty')
     ->exists()
     ->nin([
