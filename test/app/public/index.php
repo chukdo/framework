@@ -39,17 +39,17 @@ $app = new Bootstrap\App();
 /* Facades */
 Facades\Facade::setFacadeApplication($app,
     [
-        'Facade'     => Facades\Facade::class,
-        'App'        => Facades\App::class,
-        'Storage'    => Facades\Storage::class,
-        'Conf'       => Facades\Conf::class,
-        'Lang'       => Facades\Lang::class,
-        'Event'      => Facades\Event::class,
-        'Request'    => Facades\Request::class,
-        'Response'   => Facades\Response::class,
-        'View'       => Facades\View::class,
-        'Router'     => Facades\Router::class,
-        'Redis'      => Facades\Redis::class,
+        'Facade'   => Facades\Facade::class,
+        'App'      => Facades\App::class,
+        'Storage'  => Facades\Storage::class,
+        'Conf'     => Facades\Conf::class,
+        'Lang'     => Facades\Lang::class,
+        'Event'    => Facades\Event::class,
+        'Request'  => Facades\Request::class,
+        'Response' => Facades\Response::class,
+        'View'     => Facades\View::class,
+        'Router'   => Facades\Router::class,
+        'Redis'    => Facades\Redis::class,
     ]);
 
 use \Chukdo\Facades\App;
@@ -145,20 +145,39 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
         return $response;
     }
 }
+
 //dd(Conf::offsetGet('db.mongo.dsn'));
 //dd(Db::collection('contrat'));
 
-$contrat = Db::collection('contrat')->query();
-$contrat->or('qty')->exists()->nin([1,5,9]);
-$contrat->or('price')->gte(20)->lt(10);
-$contrat->and('qty')->exists()->nin([1,5,9]);
+$contrat = Db::collection('contrat')
+    ->query();
+$contrat->or('qty')
+    ->exists()
+    ->nin([
+        1,
+        5,
+        9,
+    ]);
+$contrat->or('price')
+    ->gte(20)
+    ->lt(10);
+$contrat->and('qty')
+    ->exists()
+    ->nin([
+        1,
+        5,
+        9,
+    ]);
 
-$contrat->and('agences')->match(
-    $contrat->field('production')->eq('xyz'),
-    $contrat->field('score')->gt(8)
-);
+$contrat->and('agences')
+    ->match(
+        $contrat->field('production')
+            ->eq('xyz'),
+        $contrat->field('score')
+            ->gt(8)
+    );
 
-dd($contrat->getQuery());
+dd($contrat->get());
 //$contrat->set()->push()->where()->update();
 
 Request::Inputs()

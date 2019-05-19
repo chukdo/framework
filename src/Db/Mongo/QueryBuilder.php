@@ -2,6 +2,8 @@
 
 Namespace Chukdo\DB\Mongo;
 
+use MongoDB\Collection as MongoDbCollection;
+
 /**
  * QueryBuilder Builder.
  * @version      1.0.0
@@ -12,7 +14,7 @@ Namespace Chukdo\DB\Mongo;
 Class QueryBuilder
 {
     /**
-     * @var Collection
+     * @var MongoDbCollection
      */
     protected $collection;
 
@@ -34,7 +36,7 @@ Class QueryBuilder
     /**
      * @var array
      */
-    protected $order = [];
+    protected $sort = [];
 
     /**
      * @var int
@@ -44,7 +46,7 @@ Class QueryBuilder
     /**
      * @var int
      */
-    protected $take = 1000;
+    protected $limit = 0;
 
     /**
      * QueryBuilder constructor.
@@ -52,7 +54,7 @@ Class QueryBuilder
      */
     public function __construct( Collection $collection )
     {
-        $this->collection = $collection;
+        $this->collection = $collection->collection();
     }
 
     /**
@@ -61,7 +63,7 @@ Class QueryBuilder
      */
     public function and( string $name ): QueryField
     {
-        return $this->and[ $name ] = $this->field($name);
+        return $this->and[] = $this->field($name);
     }
 
     /**
@@ -79,47 +81,19 @@ Class QueryBuilder
      */
     public function or( string $name ): QueryField
     {
-        return $this->or[ $name ] = $this->field($name);
-    }
-
-    /**
-     * @return array
-     */
-    public function getQuery(): array
-    {
-        $query = [];
-        $and   = array_map(function( QueryField $query )
-        {
-            return $query->query();
-        }, $this->and);
-
-
-        $or = array_map(function( QueryField $query )
-        {
-            return $query->query();
-        }, $this->or);
-
-        if ( !empty($and) ) {
-            $query[ '$and' ] = $and;
-        }
-
-        if ( !empty($or) ) {
-            $query[ '$or' ] = $or;
-        }
-
-        return $query;
+        return $this->or[] = $this->field($name);
     }
 
     /**
      * @param array|string $fields
      * @return QueryBuilder
      */
-    public function with($fields): self
+    public function with( $fields ): self
     {
         $fields = (array) $fields;
 
-        foreach ($fields as $field) {
-            $this->projection[$field] = 1;
+        foreach ( $fields as $field ) {
+            $this->projection[ $field ] = 1;
         }
 
         return $this;
@@ -129,12 +103,12 @@ Class QueryBuilder
      * @param array|string $fields
      * @return QueryBuilder
      */
-    public function without($fields): self
+    public function without( $fields ): self
     {
         $fields = (array) $fields;
 
-        foreach ($fields as $field) {
-            $this->projection[$field] = -1;
+        foreach ( $fields as $field ) {
+            $this->projection[ $field ] = -1;
         }
 
         return $this;
@@ -145,7 +119,7 @@ Class QueryBuilder
      */
     public function withoutId(): self
     {
-        $this->projection['_id'] = 0;
+        $this->projection[ '_id' ] = 0;
 
         return $this;
     }
@@ -155,9 +129,9 @@ Class QueryBuilder
      * @param string $sort
      * @return QueryBuilder
      */
-    public function orderBy( string $field, string $sort ): self
+    public function sort( string $field, string $sort ): self
     {
-        $this->order[ $field ] = $sort === 'asc' || $sort === 'ASC'
+        $this->sort[ $field ] = $sort === 'asc' || $sort === 'ASC'
             ? 1
             : -1;
 
@@ -176,14 +150,89 @@ Class QueryBuilder
     }
 
     /**
-     * @param int $take
+     * @param int $limit
      * @return QueryBuilder
      */
-    public function take( int $take ): self
+    public function limit( int $limit ): self
     {
-        $this->take = $take;
+        $this->limit = $limit;
 
         return $this;
+    }
+
+    /**
+     * @return Cursor
+     */
+    public function get(): Cursor
+    {
+        return new Cursor($this);
+    }
+
+    /**
+     * @return MongoDbCollection
+     */
+    public function collection(): MongoDbCollection
+    {
+        return $this->collection;
+    }
+
+    /**
+     * @return array
+     */
+    public function query(): array
+    {
+        $query = [];
+        $and   = array_map(function( QueryField $query )
+        {
+            return [ $query->name() => $query->query() ];
+        }, $this->and);
+
+
+        $or = array_map(function( QueryField $query )
+        {
+            return [ $query->name() => $query->query() ];
+        }, $this->or);
+
+        if ( !empty($and) ) {
+            $query[ '$and' ] = $and;
+        }
+
+        if ( !empty($or) ) {
+            $query[ '$or' ] = $or;
+        }
+
+        return $query;
+    }
+
+    /**
+     * @return array
+     */
+    public function projection(): array
+    {
+        $projection = [
+            'projection'      => $this->projection,
+            'noCursorTimeout' => false,
+        ];
+
+        if ( !empty($this->sort) ) {
+            $projection[ 'sort' ] = $this->sort;
+        }
+
+        if ( $this->skip > 0 ) {
+            $projection[ 'skip' ] = $this->skip;
+        }
+
+        if ( $this->limit > 0 ) {
+            $projection[ 'limit' ] = $this->limit;
+        }
+
+        return $projection;
+    }
+
+    public function one()
+    {
+        return $this->collection()
+            ->one($this->query(), $this->projection());
     }
 
     /**
