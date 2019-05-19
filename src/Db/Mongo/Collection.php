@@ -293,6 +293,35 @@ Class Collection
     }
 
     /**
+     * @param int|null $limit
+     * @return Json
+     */
+    public function all( int $limit = null ): Json
+    {
+        $json  = new Json([]);
+        $index = 0;
+
+        foreach ( $this->get() as $key => $value ) {
+            if ( $limit === null || ( $limit !== null && $index < $limit ) ) {
+                $json->offsetSet($key, $value);
+            }
+
+            $index++;
+        }
+
+        return $json;
+    }
+
+    /**
+     * @return Json
+     */
+    public function one(): Json
+    {
+        return $this->collection()
+            ->one($this->query(), $this->projection());
+    }
+
+    /**
      * @return array
      */
     public function query(): array
@@ -343,12 +372,6 @@ Class Collection
         }
 
         return $projection;
-    }
-
-    public function one()
-    {
-        return $this->collection()
-            ->one($this->query(), $this->projection());
     }
 
     /**
