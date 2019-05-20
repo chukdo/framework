@@ -85,27 +85,6 @@ Class Collection
     }
 
     /**
-     * @return Closure
-     */
-    public function filterOut()
-    {
-        return function( $field, $value )
-        {
-            if ( $value instanceof ObjectId ) {
-                return $value->__toString();
-            }
-            elseif ( $value instanceof Timestamp ) {
-                return $value->getTimestamp();
-            }
-            elseif ( $value instanceof UTCDateTime ) {
-                return $value->toDateTime();
-            }
-
-            return $value;
-        };
-    }
-
-    /**
      * @return Collection
      */
     public function reset(): self
@@ -160,20 +139,20 @@ Class Collection
     }
 
     /**
+     * @return MongoDbCollection
+     */
+    public function collection(): MongoDbCollection
+    {
+        return $this->collection;
+    }
+
+    /**
      * @return string
      */
     public function databaseName(): string
     {
         return $this->collection()
             ->getDatabaseName();
-    }
-
-    /**
-     * @return MongoDbCollection
-     */
-    public function collection(): MongoDbCollection
-    {
-        return $this->collection;
     }
 
     /**
@@ -205,29 +184,32 @@ Class Collection
 
     /**
      * @param string $name
-     * @return Filter
+     * @param null   $value
+     * @return QueryFilter
      */
-    public function and( string $name ): Filter
+    public function and( string $name, $value = null ): QueryFilter
     {
-        return $this->and[] = $this->filter($name);
+        return $this->and[] = $this->queryFilter($name, $value);
     }
 
     /**
      * @param string $name
-     * @return Filter
+     * @param null   $value
+     * @return QueryFilter
      */
-    public function filter( string $name ): Filter
+    public function queryFilter( string $name, $value = null ): QueryFilter
     {
-        return new Filter($name);
+        return new QueryFilter($this, $name, $value);
     }
 
     /**
      * @param string $name
-     * @return Filter
+     * @param null   $value
+     * @return QueryFilter
      */
-    public function or( string $name ): Filter
+    public function or( string $name, $value = null ): QueryFilter
     {
-        return $this->or[] = $this->filter($name);
+        return $this->or[] = $this->queryFilter($name, $value);
     }
 
     /**
@@ -296,17 +278,6 @@ Class Collection
     }
 
     /**
-     * @param int $limit
-     * @return Collection
-     */
-    public function limit( int $limit ): self
-    {
-        $this->limit = $limit;
-
-        return $this;
-    }
-
-    /**
      * @param int|null $limit
      * @return Json
      */
@@ -339,11 +310,23 @@ Class Collection
      */
     public function findOne(): Json
     {
-        foreach ( $this->limit(1)->cursor() as $key => $value ) {
+        foreach ( $this->limit(1)
+            ->cursor() as $key => $value ) {
             return $value;
         }
 
         return new Json();
+    }
+
+    /**
+     * @param int $limit
+     * @return Collection
+     */
+    public function limit( int $limit ): self
+    {
+        $this->limit = $limit;
+
+        return $this;
     }
 
     /**
@@ -352,22 +335,113 @@ Class Collection
     public function findOneAndDelete(): Json
     {
         return new Json($this->collection()
-            ->findOneAndDelete($this->query()), $this->filterOut());
+            ->findOneAndDelete($this->filter()), $this->closureFilterOut());
+    }
+
+    /**
+     * @return array
+     */
+    public function filter(): array
+    {
+        $filter = [];
+        $and    = array_map(function( QueryFilter $query )
+        {
+            return [ $query->name() => $query->query() ];
+        }, $this->and);
+
+
+        $or = array_map(function( QueryFilter $query )
+        {
+            return [ $query->name() => $query->query() ];
+        }, $this->or);
+
+        if ( !empty($and) ) {
+            $filter[ '$and' ] = $and;
+        }
+
+        if ( !empty($or) ) {
+            $filter[ '$or' ] = $or;
+        }
+
+        return $filter;
+    }
+
+    /**
+     * @return Closure
+     */
+    public function closureFilterOut()
+    {
+        return function( $field, $value )
+        {
+            if ( $value instanceof ObjectId ) {
+                return $value->__toString();
+            }
+            elseif ( $value instanceof Timestamp ) {
+                return $value->getTimestamp();
+            }
+            elseif ( $value instanceof UTCDateTime ) {
+                return $value->toDateTime();
+            }
+
+            return $value;
+        };
     }
 
     /**
      * @param bool $before
      * @return Json
      */
-    public function findOneAndUpdate(bool $before = false) : Json
+    public function findOneAndUpdate( bool $before = false ): Json
     {
-        $projection = $this->projection();
-        $projection['returnDocument'] = $before ?
-            FindOneAndUpdate::RETURN_DOCUMENT_BEFORE :
+        $projection                     = $this->projection();
+        $projection[ 'returnDocument' ] = $before
+            ?
+            FindOneAndUpdate::RETURN_DOCUMENT_BEFORE
+            :
             FindOneAndUpdate::RETURN_DOCUMENT_AFTER;
 
         return new Json($this->collection()
-            ->findOneAndUpdate($this->query(), $this->fields(), $projection), $this->filterOut());
+            ->findOneAndUpdate($this->filter(), $this->fields(), $projection), $this->closureFilterOut());
+    }
+
+    /**
+     * @return array
+     */
+    public function projection(): array
+    {
+        $projection = [
+            'projection'      => $this->projection,
+            'noCursorTimeout' => false,
+        ];
+
+        if ( !empty($this->sort) ) {
+            $projection[ 'sort' ] = $this->sort;
+        }
+
+        if ( $this->skip > 0 ) {
+            $projection[ 'skip' ] = $this->skip;
+        }
+
+        if ( $this->limit > 0 ) {
+            $projection[ 'limit' ] = $this->limit;
+        }
+
+        return $projection;
+    }
+
+    /**
+     * @param string|null $keyword
+     * @return array
+     */
+    public function fields( string $keyword = null ): array
+    {
+        if ( $keyword ) {
+            return isset($this->fields[ '$' . $keyword ])
+                ? $this->fields[ '$' . $keyword ]
+                : [];
+        }
+
+        return $this->fields;
     }
 
     /**
@@ -419,13 +493,13 @@ Class Collection
      */
     public function setOnInsert( string $field, $value ): self
     {
-        return $this->field('setOnInsert', $field, $this->filterIn()($field, $value));
+        return $this->field('setOnInsert', $field, $this->closureFilterIn()($field, $value));
     }
 
     /**
      * @return Closure
      */
-    public function filterIn()
+    public function closureFilterIn()
     {
         return function( $field, $value )
         {
@@ -466,7 +540,7 @@ Class Collection
      */
     public function min( string $field, $value ): self
     {
-        return $this->field('min', $field, $this->filterIn()($field, $value));
+        return $this->field('min', $field, $this->closureFilterIn()($field, $value));
     }
 
     /**
@@ -476,7 +550,7 @@ Class Collection
      */
     public function max( string $field, $value ): self
     {
-        return $this->field('max', $field, $this->filterIn()($field, $value));
+        return $this->field('max', $field, $this->closureFilterIn()($field, $value));
     }
 
     /**
@@ -504,7 +578,8 @@ Class Collection
      */
     public function count(): int
     {
-
+        return (int) $this->collection()
+            ->countDocuments($this->filter());
     }
 
     /**
@@ -522,90 +597,13 @@ Class Collection
     }
 
     /**
-     * @param string|null $keyword
-     * @return array
-     */
-    public function fields( string $keyword = null ): array
-    {
-        if ( $keyword ) {
-            return isset($this->fields[ '$' . $keyword ])
-                ? $this->fields[ '$' . $keyword ]
-                : [];
-        }
-
-        return $this->fields;
-    }
-
-    /**
-     * @param array $values
-     * @return string
-     */
-    public function insertGetId( array $values ): string
-    {
-
-    }
-
-    /**
      * @return int
      */
     public function update(): int
     {
         return (int) $this->collection()
-            ->updateMany($this->query(), $this->fields())
+            ->updateMany($this->filter(), $this->fields())
             ->getModifiedCount();
-    }
-
-    /**
-     * @return array
-     */
-    public function query(): array
-    {
-        $query = [];
-        $and   = array_map(function( Filter $query )
-        {
-            return [ $query->name() => $query->query() ];
-        }, $this->and);
-
-
-        $or = array_map(function( Filter $query )
-        {
-            return [ $query->name() => $query->query() ];
-        }, $this->or);
-
-        if ( !empty($and) ) {
-            $query[ '$and' ] = $and;
-        }
-
-        if ( !empty($or) ) {
-            $query[ '$or' ] = $or;
-        }
-
-        return $query;
-    }
-
-    /**
-     * @return array
-     */
-    public function projection(): array
-    {
-        $projection = [
-            'projection'      => $this->projection,
-            'noCursorTimeout' => false,
-        ];
-
-        if ( !empty($this->sort) ) {
-            $projection[ 'sort' ] = $this->sort;
-        }
-
-        if ( $this->skip > 0 ) {
-            $projection[ 'skip' ] = $this->skip;
-        }
-
-        if ( $this->limit > 0 ) {
-            $projection[ 'limit' ] = $this->limit;
-        }
-
-        return $projection;
     }
 
     /**
@@ -614,7 +612,7 @@ Class Collection
     public function updateOrInsert(): ?string
     {
         return (string) $this->collection()
-            ->updateOne($this->query(), $this->fields(), [ 'upsert' => true ])
+            ->updateOne($this->filter(), $this->fields(), [ 'upsert' => true ])
             ->getUpsertedId();
     }
 
@@ -624,7 +622,7 @@ Class Collection
     public function updateOne(): int
     {
         return (int) $this->collection()
-            ->updateOne($this->query(), $this->fields())
+            ->updateOne($this->filter(), $this->fields())
             ->getModifiedCount();
     }
 
@@ -634,7 +632,7 @@ Class Collection
     public function delete(): int
     {
         return (int) $this->collection()
-            ->deleteMany($this->query())
+            ->deleteMany($this->filter())
             ->getDeletedCount();
     }
 
@@ -644,7 +642,7 @@ Class Collection
     public function deleteOne(): int
     {
         return (int) $this->collection()
-            ->deleteOne($this->query())
+            ->deleteOne($this->filter())
             ->getDeletedCount();
     }
 }

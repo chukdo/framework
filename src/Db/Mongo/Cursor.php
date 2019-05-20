@@ -42,7 +42,7 @@ class Cursor implements Iterator
     {
         $this->collection = $collection;
         $this->cursor     = $this->collection()
-            ->find($collection->query(), $collection->projection());
+            ->find($collection->filter(), $collection->projection());
 
         $this->cursor->setTypeMap([
             'root'     => 'array',
@@ -79,7 +79,7 @@ class Cursor implements Iterator
      */
     public function current()
     {
-        return new Json($this->iterator->current(), $this->collection->filterOut());
+        return new Json($this->iterator->current(), $this->collection->closureFilterOut());
     }
 
     /**

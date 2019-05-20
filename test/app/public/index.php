@@ -151,7 +151,11 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 //dd(Db::collection('contrat'));
 
 $contrat = Db::collection('contrat');
-dd($contrat->limit(111111)->findOne()->toHtml());
+$contrat->and('_id' , '58480bf374d55826ad37fc3a');
+dd($contrat->findOne()->toHtml());
+
+
+
 $contrat->or('qty')
     ->exists()
     ->nin([
@@ -172,9 +176,9 @@ $contrat->and('qty')
 
 $contrat->and('agences')
     ->match(
-        $contrat->filter('production')
+        $contrat->queryFilter('production')
             ->eq('xyz'),
-        $contrat->filter('score')
+        $contrat->queryFilter('score')
             ->gt(8)
     );
 
