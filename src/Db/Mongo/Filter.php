@@ -5,13 +5,13 @@ Namespace Chukdo\DB\Mongo;
 use MongoDB\BSON\Regex;
 
 /**
- * QueryBuilder Field Builder.
+ * QueryBuilder Filter Builder.
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Field
+Class Filter
 {
     /**
      * @var array
@@ -24,7 +24,7 @@ Class Field
     protected $name;
 
     /**
-     * Field constructor.
+     * Filter constructor.
      * @param string $name
      */
     public function __construct( string $name )
@@ -34,7 +34,7 @@ Class Field
 
     /**
      * @param $value
-     * @return Field
+     * @return Filter
      */
     public function eq( $value ): self
     {
@@ -45,7 +45,7 @@ Class Field
 
     /**
      * @param $value
-     * @return Field
+     * @return Filter
      */
     public function neq( $value ): self
     {
@@ -56,7 +56,7 @@ Class Field
 
     /**
      * @param $value
-     * @return Field
+     * @return Filter
      */
     public function gt( $value ): self
     {
@@ -67,7 +67,7 @@ Class Field
 
     /**
      * @param $value
-     * @return Field
+     * @return Filter
      */
     public function gte( $value ): self
     {
@@ -78,7 +78,7 @@ Class Field
 
     /**
      * @param $value
-     * @return Field
+     * @return Filter
      */
     public function lt( $value ): self
     {
@@ -89,7 +89,7 @@ Class Field
 
     /**
      * @param $value
-     * @return Field
+     * @return Filter
      */
     public function lte( $value ): self
     {
@@ -100,7 +100,7 @@ Class Field
 
     /**
      * @param array $in
-     * @return Field
+     * @return Filter
      */
     public function in( array $in ): self
     {
@@ -111,7 +111,7 @@ Class Field
 
     /**
      * @param array $in
-     * @return Field
+     * @return Filter
      */
     public function nin( array $in ): self
     {
@@ -122,7 +122,7 @@ Class Field
 
     /**
      * @param bool $exists
-     * @return Field
+     * @return Filter
      */
     public function exists( bool $exists = true ): self
     {
@@ -133,7 +133,7 @@ Class Field
 
     /**
      * @param string $type
-     * @return Field
+     * @return Filter
      */
     public function type( string $type ): self
     {
@@ -144,7 +144,7 @@ Class Field
 
     /**
      * @param int $size
-     * @return Field
+     * @return Filter
      */
     public function size( int $size ): self
     {
@@ -156,7 +156,7 @@ Class Field
     /**
      * @param int $divisor
      * @param int $remainder
-     * @return Field
+     * @return Filter
      */
     public function mod( int $divisor, int $remainder ): self
     {
@@ -171,7 +171,7 @@ Class Field
     /**
      * @param string $pattern
      * @param string $options
-     * @return Field
+     * @return Filter
      */
     public function regex( string $pattern, string $options = 'i' ): self
     {
@@ -181,10 +181,10 @@ Class Field
     }
 
     /**
-     * @param Field ...$queryFields
-     * @return Field
+     * @param Filter ...$queryFields
+     * @return Filter
      */
-    public function match( Field ...$queryFields ): self
+    public function match( Filter ...$queryFields ): self
     {
         if ( !isset($this->query[ '$elemMatch' ]) ) {
             $this->query[ '$elemMatch' ] = [];
@@ -214,10 +214,10 @@ Class Field
     }
 
     /**
-     * @param Field ...$queryFields
-     * @return Field
+     * @param Filter ...$queryFields
+     * @return Filter
      */
-    public function matchAll( Field ...$queryFields ): self
+    public function matchAll( Filter ...$queryFields ): self
     {
         if ( !isset($this->query[ '$all' ]) ) {
             $this->query[ '$all' ] = [];

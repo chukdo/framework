@@ -120,13 +120,23 @@ Class Database
     }
 
     /**
-     * @param string $collection
-     * @return QueryBuilder
+     * @param string $oldName
+     * @param string $newName
+     * @return bool
      */
-    public function query( string $collection ): QueryBuilder
+    public function renameCollection( string $oldName, string $newName ): bool
     {
-        return $this->collection($collection)
-            ->query();
+        $rename = $this->mongo()
+            ->command([
+                'renameCollection' => $this->name() . '.' . $oldName,
+                'to'               => $this->name() . '.' . $newName,
+            ])->offsetGet('ok');
+
+        if ( $rename == 1 ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

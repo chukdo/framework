@@ -172,9 +172,9 @@ $contrat->and('qty')
 
 $contrat->and('agences')
     ->match(
-        $contrat->field('production')
+        $contrat->filter('production')
             ->eq('xyz'),
-        $contrat->field('score')
+        $contrat->filter('score')
             ->gt(8)
     );
 

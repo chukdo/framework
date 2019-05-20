@@ -2,10 +2,14 @@
 
 Namespace Chukdo\DB\Mongo;
 
+use Closure;
+use DateTime;
+use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
+use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\Timestamp;
+use MongoDB\BSON\UTCDateTime;
 use MongoDB\Collection as MongoDbCollection;
-use MongoDB\Driver\Command;
-use MongoDB\Driver\Exception\Exception;
 
 /**
  * Mongo Mongo Collection.
@@ -49,6 +53,11 @@ Class Collection
     /**
      * @var array
      */
+    protected $fields = [];
+
+    /**
+     * @var array
+     */
     protected $sort = [];
 
     /**
@@ -72,6 +81,43 @@ Class Collection
         $this->mongo      = $mongo;
         $this->database   = $database;
         $this->collection = new MongoDbCollection($mongo->mongo(), $database, $collection);
+    }
+
+    /**
+     * @return Closure
+     */
+    public function filterOut()
+    {
+        return function( $field, $value )
+        {
+            if ( $value instanceof ObjectId ) {
+                return $value->__toString();
+            }
+            elseif ( $value instanceof Timestamp ) {
+                return $value->getTimestamp();
+            }
+            elseif ( $value instanceof UTCDateTime ) {
+                return $value->toDateTime();
+            }
+
+            return $value;
+        };
+    }
+
+    /**
+     * @return Collection
+     */
+    public function reset(): self
+    {
+        $this->and        = [];
+        $this->or         = [];
+        $this->projection = [];
+        $this->fields     = [];
+        $this->sort       = [];
+        $this->skip       = 0;
+        $this->limit      = 0;
+
+        return $this;
     }
 
     /**
@@ -130,31 +176,6 @@ Class Collection
     }
 
     /**
-     * @param string $newName
-     * @return bool
-     */
-    public function rename( string $newName ): bool
-    {
-        try {
-            $command = new Command([
-                'renameCollection' => $this->databaseName() . '.' . $this->name(),
-                'to'               => $this->databaseName() . '.' . $newName,
-            ]);
-            $query   = new Json($this->mongo->mongo()
-                ->executeCommand('admin', $command));
-            $ok      = $query->offsetGet('ok');
-
-            if ( $ok == 1 ) {
-                return true;
-            }
-        } catch ( Exception $e ) {
-            throw new MongoException($e->getMessage(), $e->getCode(), $e);
-        }
-
-        return false;
-    }
-
-    /**
      * @return bool
      */
     public function drop(): bool
@@ -183,29 +204,29 @@ Class Collection
 
     /**
      * @param string $name
-     * @return Field
+     * @return Filter
      */
-    public function and( string $name ): Field
+    public function and( string $name ): Filter
     {
-        return $this->and[] = $this->field($name);
+        return $this->and[] = $this->filter($name);
     }
 
     /**
      * @param string $name
-     * @return Field
+     * @return Filter
      */
-    public function field( string $name ): Field
+    public function filter( string $name ): Filter
     {
-        return new Field($name);
+        return new Filter($name);
     }
 
     /**
      * @param string $name
-     * @return Field
+     * @return Filter
      */
-    public function or( string $name ): Field
+    public function or( string $name ): Filter
     {
-        return $this->or[] = $this->field($name);
+        return $this->or[] = $this->filter($name);
     }
 
     /**
@@ -325,18 +346,203 @@ Class Collection
     }
 
     /**
+     * @param array $values
+     * @return Collection
+     */
+    public function setMultiple( array $values ): self
+    {
+        foreach ( $values as $field => $value ) {
+            $this->set($field, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     * @param        $value
+     * @return Collection
+     */
+    public function set( string $field, $value ): self
+    {
+        return $this->field('set', $field, $value);
+    }
+
+    /**
+     * @param string $keyword
+     * @param string $field
+     * @param        $value
+     * @return Collection
+     */
+    protected function field( string $keyword, string $field, $value ): self
+    {
+        $keyword = '$' . $keyword;
+
+        if ( !isset($this->fields[ $keyword ]) ) {
+            $this->fields[ $keyword ] = [];
+        }
+
+        $this->fields[ $keyword ][ $field ] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     * @param        $value
+     * @return Collection
+     */
+    public function setOnInsert( string $field, $value ): self
+    {
+        return $this->field('setOnInsert', $field, $this->filterIn()($field, $value));
+    }
+
+    /**
+     * @return Closure
+     */
+    public function filterIn()
+    {
+        return function( $field, $value )
+        {
+            if ( $field === '_id' && Is::string($value) ) {
+                $value = new ObjectId($value);
+            }
+            elseif ( $value instanceof DateTime ) {
+                $value = new UTCDateTime($value->getTimestamp());
+            }
+
+            return $value;
+        };
+    }
+
+    /**
+     * @param string $field
+     * @return Collection
+     */
+    public function unset( string $field ): self
+    {
+        return $this->field('unset', $field, '');
+    }
+
+    /**
+     * @param string $field
+     * @param int    $value
+     * @return Collection
+     */
+    public function inc( string $field, int $value ): self
+    {
+        return $this->field('inc', $field, $value);
+    }
+
+    /**
+     * @param string $field
+     * @param        $value
+     * @return Collection
+     */
+    public function min( string $field, $value ): self
+    {
+        return $this->field('min', $field, $this->filterIn()($field, $value));
+    }
+
+    /**
+     * @param string $field
+     * @param        $value
+     * @return Collection
+     */
+    public function max( string $field, $value ): self
+    {
+        return $this->field('max', $field, $this->filterIn()($field, $value));
+    }
+
+    /**
+     * @param string $field
+     * @param int    $value
+     * @return Collection
+     */
+    public function mul( string $field, int $value ): self
+    {
+        return $this->field('mul', $field, $value);
+    }
+
+    /**
+     * @param string $oldName
+     * @param string $newName
+     * @return Collection
+     */
+    public function rename( string $oldName, string $newName ): self
+    {
+        return $this->field('rename', $oldName, $newName);
+    }
+
+    /**
+     * @return int
+     */
+    public function count(): int
+    {
+
+    }
+
+    /**
+     * @param array|null $values
+     * @return string|null
+     */
+    public function insert( array $values = null ): ?string
+    {
+        $values = $values
+            ?: $this->fields('set');
+
+        return (string) $this->collection()
+            ->insertOne($values)
+            ->getInsertedId();
+    }
+
+    /**
+     * @param string|null $keyword
+     * @return array
+     */
+    public function fields( string $keyword = null ): array
+    {
+        if ( $keyword ) {
+            return isset($this->fields[ '$' . $keyword ])
+                ? $this->fields[ '$' . $keyword ]
+                : [];
+        }
+
+        return $this->fields;
+    }
+
+    /**
+     * @param array $values
+     * @return string
+     */
+    public function insertGetId( array $values ): string
+    {
+
+    }
+
+    /**
+     * @return int
+     */
+    public function update(): int
+    {
+        return (int) $this->collection()
+            ->updateMany($this->query(), $this->fields())
+            ->getModifiedCount();
+    }
+
+    /**
      * @return array
      */
     public function query(): array
     {
         $query = [];
-        $and   = array_map(function( Field $query )
+        $and   = array_map(function( Filter $query )
         {
             return [ $query->name() => $query->query() ];
         }, $this->and);
 
 
-        $or = array_map(function( Field $query )
+        $or = array_map(function( Filter $query )
         {
             return [ $query->name() => $query->query() ];
         }, $this->or);
@@ -378,77 +584,42 @@ Class Collection
     }
 
     /**
-     * @param string $field
-     * @return Collection
+     * @return string|null
      */
-    public function groupBy( string $field ): self
+    public function updateOrInsert(): ?string
     {
-        return $this;
-    }
-
-    /**
-     * @param array $values
-     * @return Collection
-     */
-    public function set( array $values ): self
-    {
-
-    }
-
-    /**
-     * @param array $values
-     * @return Collection
-     */
-    public function unset( array $values ): self
-    {
-
-    }
-
-    /**
-     * @param array $values
-     * @return Collection
-     */
-    public function push( array $values ): self
-    {
-
+        return (string) $this->collection()
+            ->updateOne($this->query(), $this->fields(), [ 'upsert' => true ])
+            ->getUpsertedId();
     }
 
     /**
      * @return int
      */
-    public function count(): int
+    public function updateOne(): int
     {
-
-    }
-
-    /**
-     * @param array $values
-     * @return int
-     */
-    public function insert( array $values ): int
-    {
-
-    }
-
-    /**
-     * @param array $values
-     * @return string
-     */
-    public function insertGetId( array $values ): string
-    {
-
+        return (int) $this->collection()
+            ->updateOne($this->query(), $this->fields())
+            ->getModifiedCount();
     }
 
     /**
      * @return int
      */
-    public function update(): int
-    {
-
-    }
-
     public function delete(): int
     {
+        return (int) $this->collection()
+            ->deleteMany($this->query())
+            ->getDeletedCount();
+    }
 
+    /**
+     * @return int
+     */
+    public function deleteOne(): int
+    {
+        return (int) $this->collection()
+            ->deleteOne($this->query())
+            ->getDeletedCount();
     }
 }

@@ -6,9 +6,6 @@ namespace Chukdo\Db\Mongo;
 use Chukdo\Json\Json;
 use MongoDB\Collection as MongoDbCollection;
 use MongoDB\Driver\Cursor as MongoDbCursor;
-use MongoDB\BSON\ObjectId;
-use MongoDB\BSON\Timestamp;
-use MongoDB\BSON\UTCDateTime;
 use Iterator;
 use IteratorIterator;
 use Closure;
@@ -38,32 +35,14 @@ class Cursor implements Iterator
     protected $iterator;
 
     /**
-     * @var Closure
-     */
-    protected $closure;
-
-    /**
      * Cursor constructor.
      * @param Collection $collection
      */
     public function __construct( Collection $collection )
     {
-        $this->collection = $collection->collection();
-        $this->cursor     = $this->collection->find($collection->query(), $collection->projection());
-        $this->closure    = function( $key, $value )
-        {
-            if ( $value instanceof ObjectId ) {
-                return $value->__toString();
-            }
-            elseif ( $value instanceof Timestamp ) {
-                return $value->getTimestamp();
-            }
-            elseif ( $value instanceof UTCDateTime ) {
-                return $value->toDateTime();
-            }
-
-            return $value;
-        };
+        $this->collection = $collection;
+        $this->cursor     = $this->collection()
+            ->find($collection->query(), $collection->projection());
 
         $this->cursor->setTypeMap([
             'root'     => 'array',
@@ -81,7 +60,7 @@ class Cursor implements Iterator
      */
     public function collection(): MongoDbCollection
     {
-        return $this->collection;
+        return $this->collection->collection();
     }
 
     /**
@@ -100,7 +79,7 @@ class Cursor implements Iterator
      */
     public function current()
     {
-        return new Json($this->iterator->current(), $this->closure);
+        return new Json($this->iterator->current(), $this->collection->filterOut());
     }
 
     /**
