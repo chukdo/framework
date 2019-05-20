@@ -346,13 +346,13 @@ Class Collection
         $filter = [];
         $and    = array_map(function( QueryFilter $query )
         {
-            return [ $query->name() => $query->query() ];
+            return $query->filter();
         }, $this->and);
 
 
         $or = array_map(function( QueryFilter $query )
         {
-            return [ $query->name() => $query->query() ];
+            return $query->filter();
         }, $this->or);
 
         if ( !empty($and) ) {
@@ -524,6 +524,38 @@ Class Collection
     public function unset( string $field ): self
     {
         return $this->field('unset', $field, '');
+    }
+
+    /**
+     * @param string $field
+     * @return Collection
+     */
+    public function removeFirst(string $field): self
+    {
+        return $this->field('pop', $field, -1);
+    }
+
+    /**
+     * @param string $field
+     * @return Collection
+     */
+    public function removeLast(string $field): self
+    {
+        return $this->field('pop', $field, 1);
+    }
+
+    /**
+     * @param string $field
+     * @param        $value
+     * @return Collection
+     */
+    public function pull(string $field, $value): self
+    {
+        if ($value instanceof QueryFilter) {
+            $value = $value->filter();
+        }
+
+        return $this->field('pull', $field, $value);
     }
 
     /**

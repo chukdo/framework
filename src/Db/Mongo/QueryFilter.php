@@ -118,8 +118,8 @@ Class QueryFilter
     {
         $inArray = [];
 
-        foreach ($in as $k => $v) {
-            $inArray[$k] = $this->collection->closureFilterIn()($this->name, $v);
+        foreach ( $in as $k => $v ) {
+            $inArray[ $k ] = $this->collection->closureFilterIn()($this->name, $v);
         }
 
         $this->filter[ '$in' ] = $inArray;
@@ -135,8 +135,8 @@ Class QueryFilter
     {
         $ninArray = [];
 
-        foreach ($nin as $k => $v) {
-            $ninArray[$k] = $this->collection->closureFilterIn()($this->name, $v);
+        foreach ( $nin as $k => $v ) {
+            $ninArray[ $k ] = $this->collection->closureFilterIn()($this->name, $v);
         }
 
         $this->filter[ '$nin' ] = $ninArray;
@@ -235,6 +235,13 @@ Class QueryFilter
     public function query(): array
     {
         return $this->filter;
+    }
+
+    public function filter(): array
+    {
+        return [
+            $this->name() => $this->query(),
+        ];
     }
 
     /**
