@@ -120,26 +120,6 @@ Class Database
     }
 
     /**
-     * @param string $oldName
-     * @param string $newName
-     * @return bool
-     */
-    public function renameCollection( string $oldName, string $newName ): bool
-    {
-        $rename = $this->mongo()
-            ->command([
-                'renameCollection' => $this->name() . '.' . $oldName,
-                'to'               => $this->name() . '.' . $newName,
-            ])->offsetGet('ok');
-
-        if ( $rename == 1 ) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * @param string $collection
      * @return Collection
      */

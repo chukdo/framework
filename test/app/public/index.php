@@ -151,9 +151,17 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 //dd(Db::collection('contrat'));
 
 $contrat = Db::collection('contrat');
-$contrat->and('_id' , '58480bf374d55826ad37fc3a');
-dd($contrat->findOne()->toHtml());
+$find = $contrat->find();
+dd($find
+    ->limit(4)
+    ->where('version', '=', '2')
+    ->where('state', '=', '1')
+    ->where('history', 'size', 4)
+    ->one()
+    ->toHtml());
 
+
+//where('price', '>', 20)->where('price', 'size', 4)->where('price', 'type', bool)
 
 
 $contrat->or('qty')
@@ -163,6 +171,9 @@ $contrat->or('qty')
         5,
         9,
     ]);
+
+//->orWhere('price', '>=', 20)->orWhere('price', '<=', 100);
+
 $contrat->or('price')
     ->gte(20)
     ->lt(10);

@@ -3,14 +3,14 @@
 Namespace Chukdo\DB\Mongo;
 
 use Closure;
-use DateTime;
-use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
-use MongoDB\BSON\ObjectId;
-use MongoDB\BSON\Timestamp;
-use MongoDB\BSON\UTCDateTime;
+use Chukdo\Helper\Is;
+use MongoDB\BSON\Regex;
 use MongoDB\Collection as MongoDbCollection;
-use MongoDB\Operation\FindOneAndUpdate;
+use DateTime;
+use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\UTCDateTime;
+use MongoDB\BSON\Timestamp;
 
 /**
  * Mongo Mongo Collection.
@@ -37,41 +37,6 @@ Class Collection
     protected $collection;
 
     /**
-     * @var array
-     */
-    protected $and = [];
-
-    /**
-     * @var array
-     */
-    protected $or = [];
-
-    /**
-     * @var array
-     */
-    protected $projection = [];
-
-    /**
-     * @var array
-     */
-    protected $fields = [];
-
-    /**
-     * @var array
-     */
-    protected $sort = [];
-
-    /**
-     * @var int
-     */
-    protected $skip = 0;
-
-    /**
-     * @var int
-     */
-    protected $limit = 0;
-
-    /**
      * Collection constructor.
      * @param Mongo  $mongo
      * @param string $database
@@ -82,22 +47,6 @@ Class Collection
         $this->mongo      = $mongo;
         $this->database   = $database;
         $this->collection = new MongoDbCollection($mongo->mongo(), $database, $collection);
-    }
-
-    /**
-     * @return Collection
-     */
-    public function reset(): self
-    {
-        $this->and        = [];
-        $this->or         = [];
-        $this->projection = [];
-        $this->fields     = [];
-        $this->sort       = [];
-        $this->skip       = 0;
-        $this->limit      = 0;
-
-        return $this;
     }
 
     /**
@@ -183,193 +132,146 @@ Class Collection
     }
 
     /**
-     * @param string $name
-     * @param null   $value
-     * @return QueryFilter
+     * @param string $newName
+     * @return bool
      */
-    public function and( string $name, $value = null ): QueryFilter
+    public function rename( string $newName ): bool
     {
-        return $this->and[] = $this->queryFilter($name, $value);
-    }
+        $rename = $this->mongo()
+            ->command([
+                'renameCollection' => $this->databaseName() . '.' . $this->name(),
+                'to'               => $this->databaseName() . '.' . $newName,
+            ])
+            ->offsetGet('ok');
 
-    /**
-     * @param string $name
-     * @param null   $value
-     * @return QueryFilter
-     */
-    public function queryFilter( string $name, $value = null ): QueryFilter
-    {
-        return new QueryFilter($this, $name, $value);
-    }
-
-    /**
-     * @param string $name
-     * @param null   $value
-     * @return QueryFilter
-     */
-    public function or( string $name, $value = null ): QueryFilter
-    {
-        return $this->or[] = $this->queryFilter($name, $value);
-    }
-
-    /**
-     * @param $fields
-     * @return Collection
-     */
-    public function with( $fields ): self
-    {
-        $fields = (array) $fields;
-
-        foreach ( $fields as $field ) {
-            $this->projection[ $field ] = 1;
+        if ( $rename == 1 ) {
+            return true;
         }
 
-        return $this;
+        return false;
     }
 
     /**
-     * @param $fields
-     * @return Collection
+     * @return Update
      */
-    public function without( $fields ): self
+    public function update(): Update
     {
-        $fields = (array) $fields;
-
-        foreach ( $fields as $field ) {
-            $this->projection[ $field ] = -1;
-        }
-
-        return $this;
+        return new Update($this);
     }
 
     /**
-     * @return Collection
+     * @return Insert
      */
-    public function withoutId(): self
+    public function insert(): Insert
     {
-        $this->projection[ '_id' ] = 0;
+        return new Insert($this);
+    }
 
-        return $this;
+    /**
+     * @return Delete
+     */
+    public function delete(): Delete
+    {
+        return new Delete($this);
+    }
+
+    /**
+     * @return Find
+     */
+    public function find(): Find
+    {
+        return new Find($this);
     }
 
     /**
      * @param string $field
-     * @param string $sort
-     * @return Collection
-     */
-    public function sort( string $field, string $sort ): self
-    {
-        $this->sort[ $field ] = $sort === 'asc' || $sort === 'ASC'
-            ? 1
-            : -1;
-
-        return $this;
-    }
-
-    /**
-     * @param int $skip
-     * @return Collection
-     */
-    public function skip( int $skip ): self
-    {
-        $this->skip = $skip;
-
-        return $this;
-    }
-
-    /**
-     * @param int|null $limit
-     * @return Json
-     */
-    public function find( int $limit = null ): Json
-    {
-        $json  = new Json([]);
-        $index = 0;
-
-        foreach ( $this->cursor() as $key => $value ) {
-            if ( $limit === null || ( $limit !== null && $index < $limit ) ) {
-                $json->offsetSet($key, $value);
-            }
-
-            $index++;
-        }
-
-        return $json;
-    }
-
-    /**
-     * @return Cursor
-     */
-    public function cursor(): Cursor
-    {
-        return new Cursor($this);
-    }
-
-    /**
-     * @return Json
-     */
-    public function findOne(): Json
-    {
-        foreach ( $this->limit(1)
-            ->cursor() as $key => $value ) {
-            return $value;
-        }
-
-        return new Json();
-    }
-
-    /**
-     * @param int $limit
-     * @return Collection
-     */
-    public function limit( int $limit ): self
-    {
-        $this->limit = $limit;
-
-        return $this;
-    }
-
-    /**
-     * @return Json
-     */
-    public function findOneAndDelete(): Json
-    {
-        return new Json($this->collection()
-            ->findOneAndDelete($this->filter()), $this->closureFilterOut());
-    }
-
-    /**
+     * @param string $operator
+     * @param        $value
+     * @param null   $value2
      * @return array
      */
-    public function filter(): array
+    public static function query( string $field, string $operator, $value, $value2 = null ): array
     {
-        $filter = [];
-        $and    = array_map(function( QueryFilter $query )
-        {
-            return $query->filter();
-        }, $this->and);
+        switch ( $operator ) {
+            case '=' :
+                return [ '$eq' => self::closureIn()($field, $value) ];
+                break;
+            case '!=' :
+                return [ '$ne' => self::closureIn()($field, $value) ];
+                break;
+            case '>' :
+                return [ '$gt' => self::closureIn()($field, $value) ];
+                break;
+            case '>=':
+                return [ '$gte' => self::closureIn()($field, $value) ];
+                break;
+            case '<':
+                return [ '$lt' => self::closureIn()($field, $value) ];
+                break;
+            case '<=':
+                return [ '$lte' => self::closureIn()($field, $value) ];
+                break;
+            case '<>' :
+                return [
+                    '$gt' => self::closureIn()($field, $value),
+                    '$lt' => self::closureIn()($field, $value2),
+                ];
+            case '<=>' :
+                return [
+                    '$gte' => self::closureIn()($field, $value),
+                    '$lte' => self::closureIn()($field, $value2),
+                ];
+            case 'in':
+                $in = [];
 
+                foreach ( $value as $k => $v ) {
+                    $in[ $k ] = self::closureIn()($field, $v);
+                }
 
-        $or = array_map(function( QueryFilter $query )
-        {
-            return $query->filter();
-        }, $this->or);
+                return [ '$in' => $in ];
+                break;
+            case '!in':
+                $nin = [];
 
-        if ( !empty($and) ) {
-            $filter[ '$and' ] = $and;
+                foreach ( $value as $k => $v ) {
+                    $nin[ $k ] = self::closureIn()($field, $v);
+                }
+
+                return [ '$nin' => $nin ];
+                break;
+            case 'type':
+                return [ '$type' => self::closureIn()($field, $value) ];
+                break;
+            case '%':
+                return [
+                    '$mod' => [
+                        $value,
+                        $value2,
+                    ],
+                ];
+            case 'size':
+                return [ '$size' => $value ];
+            case 'exist':
+                return [ '$exists' => $value ];
+            case 'regex':
+                return [
+                    '$regex' => new Regex($value, $value2
+                        ?: 'i'),
+                ];
+                break;
+            case 'match':
+                return [ '$elemMatch' => $value ];
+                break;
+            case 'all':
+                return [ '$all' => $value ];
+                break;
         }
-
-        if ( !empty($or) ) {
-            $filter[ '$or' ] = $or;
-        }
-
-        return $filter;
     }
 
     /**
      * @return Closure
      */
-    public function closureFilterOut()
+    public static function closureOut()
     {
         return function( $field, $value )
         {
@@ -388,118 +290,9 @@ Class Collection
     }
 
     /**
-     * @param bool $before
-     * @return Json
-     */
-    public function findOneAndUpdate( bool $before = false ): Json
-    {
-        $projection                     = $this->projection();
-        $projection[ 'returnDocument' ] = $before
-            ?
-            FindOneAndUpdate::RETURN_DOCUMENT_BEFORE
-            :
-            FindOneAndUpdate::RETURN_DOCUMENT_AFTER;
-
-        return new Json($this->collection()
-            ->findOneAndUpdate($this->filter(), $this->fields(), $projection), $this->closureFilterOut());
-    }
-
-    /**
-     * @return array
-     */
-    public function projection(): array
-    {
-        $projection = [
-            'projection'      => $this->projection,
-            'noCursorTimeout' => false,
-        ];
-
-        if ( !empty($this->sort) ) {
-            $projection[ 'sort' ] = $this->sort;
-        }
-
-        if ( $this->skip > 0 ) {
-            $projection[ 'skip' ] = $this->skip;
-        }
-
-        if ( $this->limit > 0 ) {
-            $projection[ 'limit' ] = $this->limit;
-        }
-
-        return $projection;
-    }
-
-    /**
-     * @param string|null $keyword
-     * @return array
-     */
-    public function fields( string $keyword = null ): array
-    {
-        if ( $keyword ) {
-            return isset($this->fields[ '$' . $keyword ])
-                ? $this->fields[ '$' . $keyword ]
-                : [];
-        }
-
-        return $this->fields;
-    }
-
-    /**
-     * @param array $values
-     * @return Collection
-     */
-    public function setMultiple( array $values ): self
-    {
-        foreach ( $values as $field => $value ) {
-            $this->set($field, $value);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param string $field
-     * @param        $value
-     * @return Collection
-     */
-    public function set( string $field, $value ): self
-    {
-        return $this->field('set', $field, $value);
-    }
-
-    /**
-     * @param string $keyword
-     * @param string $field
-     * @param        $value
-     * @return Collection
-     */
-    protected function field( string $keyword, string $field, $value ): self
-    {
-        $keyword = '$' . $keyword;
-
-        if ( !isset($this->fields[ $keyword ]) ) {
-            $this->fields[ $keyword ] = [];
-        }
-
-        $this->fields[ $keyword ][ $field ] = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param string $field
-     * @param        $value
-     * @return Collection
-     */
-    public function setOnInsert( string $field, $value ): self
-    {
-        return $this->field('setOnInsert', $field, $this->closureFilterIn()($field, $value));
-    }
-
-    /**
      * @return Closure
      */
-    public function closureFilterIn()
+    public static function closureIn()
     {
         return function( $field, $value )
         {
@@ -509,175 +302,11 @@ Class Collection
             elseif ( $value instanceof DateTime ) {
                 $value = new UTCDateTime($value->getTimestamp());
             }
-            elseif (substr($field, 0, 5) === '_date') {
+            elseif ( substr($field, 0, 5) === '_date' ) {
                 $value = new UTCDateTime((int) $value);
             }
 
             return $value;
         };
-    }
-
-    /**
-     * @param string $field
-     * @return Collection
-     */
-    public function unset( string $field ): self
-    {
-        return $this->field('unset', $field, '');
-    }
-
-    /**
-     * @param string $field
-     * @return Collection
-     */
-    public function removeFirst(string $field): self
-    {
-        return $this->field('pop', $field, -1);
-    }
-
-    /**
-     * @param string $field
-     * @return Collection
-     */
-    public function removeLast(string $field): self
-    {
-        return $this->field('pop', $field, 1);
-    }
-
-    /**
-     * @param string $field
-     * @param        $value
-     * @return Collection
-     */
-    public function pull(string $field, $value): self
-    {
-        if ($value instanceof QueryFilter) {
-            $value = $value->filter();
-        }
-
-        return $this->field('pull', $field, $value);
-    }
-
-    /**
-     * @param string $field
-     * @param int    $value
-     * @return Collection
-     */
-    public function inc( string $field, int $value ): self
-    {
-        return $this->field('inc', $field, $value);
-    }
-
-    /**
-     * @param string $field
-     * @param        $value
-     * @return Collection
-     */
-    public function min( string $field, $value ): self
-    {
-        return $this->field('min', $field, $this->closureFilterIn()($field, $value));
-    }
-
-    /**
-     * @param string $field
-     * @param        $value
-     * @return Collection
-     */
-    public function max( string $field, $value ): self
-    {
-        return $this->field('max', $field, $this->closureFilterIn()($field, $value));
-    }
-
-    /**
-     * @param string $field
-     * @param int    $value
-     * @return Collection
-     */
-    public function mul( string $field, int $value ): self
-    {
-        return $this->field('mul', $field, $value);
-    }
-
-    /**
-     * @param string $oldName
-     * @param string $newName
-     * @return Collection
-     */
-    public function rename( string $oldName, string $newName ): self
-    {
-        return $this->field('rename', $oldName, $newName);
-    }
-
-    /**
-     * @return int
-     */
-    public function count(): int
-    {
-        return (int) $this->collection()
-            ->countDocuments($this->filter());
-    }
-
-    /**
-     * @param array|null $values
-     * @return string|null
-     */
-    public function insert( array $values = null ): ?string
-    {
-        $values = $values
-            ?: $this->fields('set');
-
-        return (string) $this->collection()
-            ->insertOne($values)
-            ->getInsertedId();
-    }
-
-    /**
-     * @return int
-     */
-    public function update(): int
-    {
-        return (int) $this->collection()
-            ->updateMany($this->filter(), $this->fields())
-            ->getModifiedCount();
-    }
-
-    /**
-     * @return string|null
-     */
-    public function updateOrInsert(): ?string
-    {
-        return (string) $this->collection()
-            ->updateOne($this->filter(), $this->fields(), [ 'upsert' => true ])
-            ->getUpsertedId();
-    }
-
-    /**
-     * @return int
-     */
-    public function updateOne(): int
-    {
-        return (int) $this->collection()
-            ->updateOne($this->filter(), $this->fields())
-            ->getModifiedCount();
-    }
-
-    /**
-     * @return int
-     */
-    public function delete(): int
-    {
-        return (int) $this->collection()
-            ->deleteMany($this->filter())
-            ->getDeletedCount();
-    }
-
-    /**
-     * @return int
-     */
-    public function deleteOne(): int
-    {
-        return (int) $this->collection()
-            ->deleteOne($this->filter())
-            ->getDeletedCount();
     }
 }

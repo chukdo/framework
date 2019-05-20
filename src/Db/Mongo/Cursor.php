@@ -4,11 +4,9 @@
 namespace Chukdo\Db\Mongo;
 
 use Chukdo\Json\Json;
-use MongoDB\Collection as MongoDbCollection;
 use MongoDB\Driver\Cursor as MongoDbCursor;
 use Iterator;
 use IteratorIterator;
-use Closure;
 
 /**
  * Mongodb cursor.
@@ -20,9 +18,9 @@ use Closure;
 class Cursor implements Iterator
 {
     /**
-     * @var Collection
+     * @var Find
      */
-    protected $collection;
+    protected $find;
 
     /**
      * @var MongoDbCursor
@@ -36,13 +34,13 @@ class Cursor implements Iterator
 
     /**
      * Cursor constructor.
-     * @param Collection $collection
+     * @param Find $find
      */
-    public function __construct( Collection $collection )
+    public function __construct( Find $find )
     {
-        $this->collection = $collection;
-        $this->cursor     = $this->collection()
-            ->find($collection->filter(), $collection->projection());
+        $this->find   = $find;
+        $this->cursor = $find->collection()
+            ->find($find->filter(), $find->projection());
 
         $this->cursor->setTypeMap([
             'root'     => 'array',
@@ -53,14 +51,6 @@ class Cursor implements Iterator
         $this->iterator = new IteratorIterator($this->cursor);
 
         $this->iterator->rewind();
-    }
-
-    /**
-     * @return MongoDbCollection
-     */
-    public function collection(): MongoDbCollection
-    {
-        return $this->collection->collection();
     }
 
     /**
@@ -79,18 +69,7 @@ class Cursor implements Iterator
      */
     public function current()
     {
-        return new Json($this->iterator->current(), $this->collection->closureFilterOut());
-    }
-
-    /**
-     * Move forward to next element
-     * @link  https://php.net/manual/en/iterator.next.php
-     * @return void Any returned value is ignored.
-     * @since 5.0.0
-     */
-    public function next()
-    {
-        $this->iterator->next();
+        return new Json($this->iterator->current(), Collection::closureOut());
     }
 
     /**
@@ -105,15 +84,14 @@ class Cursor implements Iterator
     }
 
     /**
-     * Checks if current position is valid
-     * @link  https://php.net/manual/en/iterator.valid.php
-     * @return boolean The return value will be casted to boolean and then evaluated.
-     * Returns true on success or false on failure.
+     * Move forward to next element
+     * @link  https://php.net/manual/en/iterator.next.php
+     * @return void Any returned value is ignored.
      * @since 5.0.0
      */
-    public function valid()
+    public function next()
     {
-        return $this->iterator->valid();
+        $this->iterator->next();
     }
 
     /**
@@ -125,5 +103,17 @@ class Cursor implements Iterator
     public function rewind()
     {
         $this->iterator->rewind();
+    }
+
+    /**
+     * Checks if current position is valid
+     * @link  https://php.net/manual/en/iterator.valid.php
+     * @return boolean The return value will be casted to boolean and then evaluated.
+     * Returns true on success or false on failure.
+     * @since 5.0.0
+     */
+    public function valid()
+    {
+        return $this->iterator->valid();
     }
 }
