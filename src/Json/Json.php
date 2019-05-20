@@ -19,30 +19,23 @@ use Throwable;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class Json extends \ArrayObject
+class Json extends ArrayObject
 {
     /**
      * @var Closure|null
      */
-    protected $setFilter = null;
-
-    /**
-     * @var Closure|null
-     */
-    protected $getFilter = null;
+    protected $preFilter = null;
 
     /**
      * Json constructor.
-     * @param array|iterable|null $data
-     * @param Closure|null        $setFilter
-     * @param Closure|null        $getFilter
+     * @param null $data
+     * @param null $preFilter
      */
-    public function __construct( $data = null, $setFilter = null, $getFilter = null )
+    public function __construct( $data = null, $preFilter = null )
     {
         parent::__construct([]);
 
-        $this->setFilter = $setFilter;
-        $this->getFilter = $getFilter;
+        $this->preFilter = $preFilter;
 
         if ( Is::iterable($data) ) {
             foreach ( $data as $k => $v ) {
@@ -68,7 +61,9 @@ class Json extends \ArrayObject
             parent::offsetSet($key, $this->newParentClass($value));
         }
         else {
-            parent::offsetSet($key, $this->setFilter($key, $value));
+            parent::offsetSet($key, $this->preFilter instanceof Closure
+                ? ( $this->preFilter )($key, $value)
+                : $value);
         }
 
         return $this;
@@ -82,8 +77,7 @@ class Json extends \ArrayObject
     {
         $params = [
             $param,
-            $this->setFilter,
-            $this->getFilter,
+            $this->preFilter,
         ];
 
         try {
@@ -97,20 +91,6 @@ class Json extends \ArrayObject
                 $params);
         } catch ( Throwable $e ) {
         }
-    }
-
-    /**
-     * @param $key
-     * @param $value
-     * @return mixed
-     */
-    protected function setFilter( $key, $value )
-    {
-        if ( $this->setFilter instanceof Closure ) {
-            return ( $this->setFilter )($key, $value);
-        }
-
-        return $value;
     }
 
     /**
@@ -313,24 +293,10 @@ class Json extends \ArrayObject
     public function offsetGet( $key, $default = null )
     {
         if ( $this->offsetExists($key) ) {
-            return $this->getFilter($key, parent::offsetGet($key));
+            return parent::offsetGet($key);
         }
 
         return $default;
-    }
-
-    /**
-     * @param $key
-     * @param $value
-     * @return mixed
-     */
-    protected function getFilter( $key, $value )
-    {
-        if ( $this->getFilter instanceof Closure ) {
-            return ( $this->getFilter )($key, $value);
-        }
-
-        return $value;
     }
 
     /**
@@ -727,7 +693,7 @@ class Json extends \ArrayObject
      * @param string|null $color
      * @return string
      */
-    public function toHtml( string $title = null, string $color = null): string
+    public function toHtml( string $title = null, string $color = null ): string
     {
         return To::html($this, $title, $color, true);
     }

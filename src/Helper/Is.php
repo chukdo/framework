@@ -3,6 +3,9 @@
 namespace Chukdo\Helper;
 
 use Chukdo\Json\Arr;
+use stdClass;
+use ArrayObject;
+use Traversable;
 
 /**
  * Classe Is
@@ -35,7 +38,7 @@ final class Is
      */
     public static function iterable( $value ): bool
     {
-        return is_iterable($value) || $value instanceof \stdClass || self::arr($value);
+        return is_iterable($value) || $value instanceof stdClass || self::arr($value);
     }
 
     /**
@@ -44,7 +47,7 @@ final class Is
      */
     public static function arr( $value ): bool
     {
-        return is_array($value) || $value instanceof \ArrayObject || $value instanceof Arr;
+        return is_array($value) || $value instanceof ArrayObject || $value instanceof Arr;
     }
 
     /**
@@ -330,6 +333,6 @@ final class Is
      */
     public static function traversable( $value ): bool
     {
-        return is_array($value) || $value instanceof \Traversable;
+        return is_array($value) || $value instanceof Traversable;
     }
 }

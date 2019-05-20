@@ -285,14 +285,6 @@ Class Collection
     }
 
     /**
-     * @return Cursor
-     */
-    public function get(): Cursor
-    {
-        return new Cursor($this);
-    }
-
-    /**
      * @param int|null $limit
      * @return Json
      */
@@ -310,6 +302,14 @@ Class Collection
         }
 
         return $json;
+    }
+
+    /**
+     * @return Cursor
+     */
+    public function get(): Cursor
+    {
+        return new Cursor($this);
     }
 
     /**
