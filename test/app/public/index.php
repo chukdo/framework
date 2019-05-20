@@ -151,7 +151,7 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 //dd(Db::collection('contrat'));
 
 $contrat = Db::collection('contrat');
-dd($contrat->limit(111111)->one()->toHtml());
+dd($contrat->limit(111111)->findOne()->toHtml());
 $contrat->or('qty')
     ->exists()
     ->nin([
@@ -178,7 +178,7 @@ $contrat->and('agences')
             ->gt(8)
     );
 
-dd($contrat->get());
+dd($contrat->cursor());
 //$contrat->set()->push()->where()->update();
 
 Request::Inputs()

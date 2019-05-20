@@ -10,6 +10,7 @@ use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\Timestamp;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Collection as MongoDbCollection;
+use MongoDB\Operation\FindOneAndUpdate;
 
 /**
  * Mongo Mongo Collection.
@@ -309,12 +310,12 @@ Class Collection
      * @param int|null $limit
      * @return Json
      */
-    public function all( int $limit = null ): Json
+    public function find( int $limit = null ): Json
     {
         $json  = new Json([]);
         $index = 0;
 
-        foreach ( $this->get() as $key => $value ) {
+        foreach ( $this->cursor() as $key => $value ) {
             if ( $limit === null || ( $limit !== null && $index < $limit ) ) {
                 $json->offsetSet($key, $value);
             }
@@ -328,7 +329,7 @@ Class Collection
     /**
      * @return Cursor
      */
-    public function get(): Cursor
+    public function cursor(): Cursor
     {
         return new Cursor($this);
     }
@@ -336,13 +337,37 @@ Class Collection
     /**
      * @return Json
      */
-    public function one(): Json
+    public function findOne(): Json
     {
-        foreach ( $this->get() as $key => $value ) {
+        foreach ( $this->limit(1)->cursor() as $key => $value ) {
             return $value;
         }
 
         return new Json();
+    }
+
+    /**
+     * @return Json
+     */
+    public function findOneAndDelete(): Json
+    {
+        return new Json($this->collection()
+            ->findOneAndDelete($this->query()), $this->filterOut());
+    }
+
+    /**
+     * @param bool $before
+     * @return Json
+     */
+    public function findOneAndUpdate(bool $before = false) : Json
+    {
+        $projection = $this->projection();
+        $projection['returnDocument'] = $before ?
+            FindOneAndUpdate::RETURN_DOCUMENT_BEFORE :
+            FindOneAndUpdate::RETURN_DOCUMENT_AFTER;
+
+        return new Json($this->collection()
+            ->findOneAndUpdate($this->query(), $this->fields(), $projection), $this->filterOut());
     }
 
     /**
