@@ -509,6 +509,9 @@ Class Collection
             elseif ( $value instanceof DateTime ) {
                 $value = new UTCDateTime($value->getTimestamp());
             }
+            elseif (substr($field, 0, 5) === '_date') {
+                $value = new UTCDateTime((int) $value);
+            }
 
             return $value;
         };
