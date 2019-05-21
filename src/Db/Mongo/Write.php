@@ -2,41 +2,27 @@
 
 namespace Chukdo\Db\Mongo;
 
+use Chukdo\Json\Json;
 use MongoDB\Collection as MongoDbCollection;
+use MongoDB\Operation\FindOneAndUpdate;
 
 /**
- * Mongo Update.
+ * Mongo Write.
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Update
+Class Write extends Where
 {
-    use WhereTrait;
-
-    /**
-     * @var Collection
-     */
-    protected $collection;
-
     /**
      * @var array
      */
     protected $fields = [];
 
     /**
-     * Index constructor.
-     * @param Collection $collection
-     */
-    public function __construct( Collection $collection )
-    {
-        $this->collection = $collection;
-    }
-
-    /**
      * @param array $values
-     * @return Update
+     * @return Write
      */
     public function setMultiple( array $values ): self
     {
@@ -50,7 +36,7 @@ Class Update
     /**
      * @param string $field
      * @param        $value
-     * @return Update
+     * @return Write
      */
     public function set( string $field, $value ): self
     {
@@ -61,7 +47,7 @@ Class Update
      * @param string $keyword
      * @param string $field
      * @param        $value
-     * @return Update
+     * @return Write
      */
     protected function field( string $keyword, string $field, $value ): self
     {
@@ -78,7 +64,7 @@ Class Update
 
     /**
      * @param string $field
-     * @return Update
+     * @return Write
      */
     public function unset( string $field ): self
     {
@@ -88,17 +74,17 @@ Class Update
     /**
      * @param string $field
      * @param        $value
-     * @return Update
+     * @return Write
      */
     public function setOnInsert( string $field, $value ): self
     {
-        return $this->field('setOnInsert', $field, $this->collection->closureIn()($field, $value));
+        return $this->field('setOnInsert', $field, Collection::closureIn()($field, $value));
     }
 
     /**
      * @param string $field
      * @param int    $value
-     * @return Update
+     * @return Write
      */
     public function inc( string $field, int $value ): self
     {
@@ -108,27 +94,27 @@ Class Update
     /**
      * @param string $field
      * @param        $value
-     * @return Update
+     * @return Write
      */
     public function min( string $field, $value ): self
     {
-        return $this->field('min', $field, $this->collection->closureIn()($field, $value));
+        return $this->field('min', $field, Collection::closureIn()($field, $value));
     }
 
     /**
      * @param string $field
      * @param        $value
-     * @return Update
+     * @return Write
      */
     public function max( string $field, $value ): self
     {
-        return $this->field('max', $field, $this->collection->closureIn()($field, $value));
+        return $this->field('max', $field, Collection::closureIn()($field, $value));
     }
 
     /**
      * @param string $field
      * @param int    $value
-     * @return Update
+     * @return Write
      */
     public function mul( string $field, int $value ): self
     {
@@ -138,21 +124,11 @@ Class Update
     /**
      * @param string $oldName
      * @param string $newName
-     * @return Update
+     * @return Write
      */
     public function rename( string $oldName, string $newName ): self
     {
         return $this->field('rename', $oldName, $newName);
-    }
-
-    /**
-     * @return int
-     */
-    public function update(): int
-    {
-        return (int) $this->collection()
-            ->updateMany($this->filter(), $this->fields())
-            ->getModifiedCount();
     }
 
     /**
@@ -169,6 +145,27 @@ Class Update
     public function fields(): array
     {
         return $this->fields;
+    }
+
+    /**
+     * @param array $values
+     * @return string|null
+     */
+    public function insert( array $values ): ?string
+    {
+        return (string) $this->collection()
+            ->insertOne($values)
+            ->getInsertedId();
+    }
+
+    /**
+     * @return int
+     */
+    public function update(): int
+    {
+        return (int) $this->collection()
+            ->updateMany($this->filter(), $this->fields())
+            ->getModifiedCount();
     }
 
     /**
@@ -189,5 +186,51 @@ Class Update
         return (int) $this->collection()
             ->updateOne($this->filter(), $this->fields())
             ->getModifiedCount();
+    }
+
+    /**
+     * @param bool $before
+     * @return Json
+     */
+    public function updateOneAndGet( bool $before = false ): Json
+    {
+        $projection = [
+            'projection'     => [],
+            'returnDocument' => $before
+                ? FindOneAndUpdate::RETURN_DOCUMENT_BEFORE
+                : FindOneAndUpdate::RETURN_DOCUMENT_AFTER,
+        ];
+
+        return new Json($this->collection()
+            ->findOneAndUpdate($this->filter(), $this->fields(), $projection), Collection::closureOut());
+    }
+
+    /**
+     * @return int
+     */
+    public function delete(): int
+    {
+        return (int) $this->collection()
+            ->deleteMany($this->filter())
+            ->getDeletedCount();
+    }
+
+    /**
+     * @return int
+     */
+    public function deleteOne(): int
+    {
+        return (int) $this->collection()
+            ->deleteOne($this->filter())
+            ->getDeletedCount();
+    }
+
+    /**
+     * @return Json
+     */
+    public function deleteOneAndGet(): Json
+    {
+        return new Json($this->collection()
+            ->findOneAndDelete($this->filter()), Collection::closureOut());
     }
 }

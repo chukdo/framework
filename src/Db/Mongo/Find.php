@@ -12,15 +12,8 @@ use MongoDB\Collection as MongoDbCollection;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Find
+Class Find extends Where
 {
-    use WhereTrait;
-
-    /**
-     * @var Collection
-     */
-    protected $collection;
-
     /**
      * @var array
      */
@@ -40,15 +33,6 @@ Class Find
      * @var int
      */
     protected $limit = 0;
-
-    /**
-     * Index constructor.
-     * @param Collection $collection
-     */
-    public function __construct( Collection $collection )
-    {
-        $this->collection = $collection;
-    }
 
     /**
      * @param string ...$fields

@@ -160,6 +160,8 @@ dd($find
     ->one()
     ->toHtml());
 
+$contrat->write()->insert();
+$contrat->write()->set()->set()->where()->updateOne();
 
 //where('price', '>', 20)->where('price', 'size', 4)->where('price', 'type', bool)
 

@@ -152,27 +152,11 @@ Class Collection
     }
 
     /**
-     * @return Update
+     * @return Write
      */
-    public function update(): Update
+    public function write(): Write
     {
-        return new Update($this);
-    }
-
-    /**
-     * @return Insert
-     */
-    public function insert(): Insert
-    {
-        return new Insert($this);
-    }
-
-    /**
-     * @return Delete
-     */
-    public function delete(): Delete
-    {
-        return new Delete($this);
+        return new Write($this);
     }
 
     /**
@@ -265,6 +249,9 @@ Class Collection
             case 'all':
                 return [ '$all' => $value ];
                 break;
+                default :
+                    throw new MongoException("Unknown operator [$operator]");
+
         }
     }
 

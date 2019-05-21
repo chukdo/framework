@@ -9,7 +9,12 @@ namespace Chukdo\Db\Mongo;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-trait WhereTrait {
+Class Where {
+
+    /**
+     * @var Collection
+     */
+    protected $collection;
 
     /**
      * @var array
@@ -20,6 +25,15 @@ trait WhereTrait {
      * @var array
      */
     protected $orWhere = [];
+
+    /**
+     * Index constructor.
+     * @param Collection $collection
+     */
+    public function __construct( Collection $collection )
+    {
+        $this->collection = $collection;
+    }
 
     /**
      * @param string $field
