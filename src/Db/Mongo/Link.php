@@ -14,9 +14,14 @@ use Chukdo\Json\Json;
 Class Link
 {
     /**
-     * @var Mongo
+     * @var Database
      */
-    protected $mongo;
+    protected $database;
+
+    /**
+     * @var string
+     */
+    protected $collection = null;
 
     /**
      * @var string
@@ -35,13 +40,21 @@ Class Link
 
     /**
      * Link constructor.
-     * @param Mongo  $mongo
-     * @param string $field
+     * @param Database $database
+     * @param string   $field
      */
-    public function __construct( Mongo $mongo, string $field)
+    public function __construct( Database $database, string $field)
     {
-        $this->mongo   = $mongo;
-        $this->field   = $field;
+        $this->database = $database;
+
+        $path = explode('.', $field);
+
+        if (count($path) > 1) {
+            $this->database = $database->mongo()->database($path[0]);
+            $this->field = $path[1];
+        } else {
+            $this->field = $field;
+        }
     }
 
     /**
@@ -72,6 +85,7 @@ Class Link
      */
     public function hydrate(Json $json): Json
     {
-
+        // loop recursif
+        // recherche field => find->all() => map
     }
 }

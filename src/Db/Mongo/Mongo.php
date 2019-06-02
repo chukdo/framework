@@ -44,20 +44,6 @@ Class Mongo
     }
 
     /**
-     * @param string $field
-     * @param array  $with
-     * @param array  $without
-     * @return Link
-     */
-    public function link( string $field, array $with = [], array $without = [] ): Link
-    {
-        $link = new Link($this, $field);
-
-        return $link->with($with)
-            ->without($without);
-    }
-
-    /**
      * @return bool
      */
     public function ping(): bool

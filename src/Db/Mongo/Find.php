@@ -48,7 +48,10 @@ Class Find extends Where
      */
     public function link( string $field, array $with = [], array $without = []  ): self
     {
-        $this->link[] = $this->collection->mongo()->link($field, $with, $without);
+        $link = new Link($this->collection->database(), $field);
+
+        $this->link[] = $link->with($with)
+            ->without($without);
 
         return $this;
     }

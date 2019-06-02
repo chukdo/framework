@@ -128,7 +128,7 @@ Class Collection
      */
     public function database(): Database
     {
-        new Database($this->mongo(), $this->databaseName());
+        return new Database($this->mongo(), $this->databaseName());
     }
 
     /**
