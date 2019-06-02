@@ -78,7 +78,7 @@ Class Write extends Where
      */
     public function setOnInsert( string $field, $value ): self
     {
-        return $this->field('setOnInsert', $field, Collection::closureIn()($field, $value));
+        return $this->field('setOnInsert', $field, Collection::filterIn()($field, $value));
     }
 
     /**
@@ -98,7 +98,7 @@ Class Write extends Where
      */
     public function min( string $field, $value ): self
     {
-        return $this->field('min', $field, Collection::closureIn()($field, $value));
+        return $this->field('min', $field, Collection::filterIn()($field, $value));
     }
 
     /**
@@ -108,7 +108,7 @@ Class Write extends Where
      */
     public function max( string $field, $value ): self
     {
-        return $this->field('max', $field, Collection::closureIn()($field, $value));
+        return $this->field('max', $field, Collection::filterIn()($field, $value));
     }
 
     /**
@@ -202,7 +202,7 @@ Class Write extends Where
         ];
 
         return new Json($this->collection()
-            ->findOneAndUpdate($this->filter(), $this->fields(), $projection), Collection::closureOut());
+            ->findOneAndUpdate($this->filter(), $this->fields(), $projection), Collection::filterOut());
     }
 
     /**
@@ -231,6 +231,6 @@ Class Write extends Where
     public function deleteOneAndGet(): Json
     {
         return new Json($this->collection()
-            ->findOneAndDelete($this->filter()), Collection::closureOut());
+            ->findOneAndDelete($this->filter()), Collection::filterOut());
     }
 }

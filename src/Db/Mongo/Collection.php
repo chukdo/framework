@@ -168,97 +168,9 @@ Class Collection
     }
 
     /**
-     * @param string $field
-     * @param string $operator
-     * @param        $value
-     * @param null   $value2
-     * @return array
-     */
-    public static function query( string $field, string $operator, $value, $value2 = null ): array
-    {
-        switch ( $operator ) {
-            case '=' :
-                return [ '$eq' => self::closureIn()($field, $value) ];
-                break;
-            case '!=' :
-                return [ '$ne' => self::closureIn()($field, $value) ];
-                break;
-            case '>' :
-                return [ '$gt' => self::closureIn()($field, $value) ];
-                break;
-            case '>=':
-                return [ '$gte' => self::closureIn()($field, $value) ];
-                break;
-            case '<':
-                return [ '$lt' => self::closureIn()($field, $value) ];
-                break;
-            case '<=':
-                return [ '$lte' => self::closureIn()($field, $value) ];
-                break;
-            case '<>' :
-                return [
-                    '$gt' => self::closureIn()($field, $value),
-                    '$lt' => self::closureIn()($field, $value2),
-                ];
-            case '<=>' :
-                return [
-                    '$gte' => self::closureIn()($field, $value),
-                    '$lte' => self::closureIn()($field, $value2),
-                ];
-            case 'in':
-                $in = [];
-
-                foreach ( $value as $k => $v ) {
-                    $in[ $k ] = self::closureIn()($field, $v);
-                }
-
-                return [ '$in' => $in ];
-                break;
-            case '!in':
-                $nin = [];
-
-                foreach ( $value as $k => $v ) {
-                    $nin[ $k ] = self::closureIn()($field, $v);
-                }
-
-                return [ '$nin' => $nin ];
-                break;
-            case 'type':
-                return [ '$type' => self::closureIn()($field, $value) ];
-                break;
-            case '%':
-                return [
-                    '$mod' => [
-                        $value,
-                        $value2,
-                    ],
-                ];
-            case 'size':
-                return [ '$size' => $value ];
-            case 'exist':
-                return [ '$exists' => $value ];
-            case 'regex':
-                return [
-                    '$regex' => new Regex($value, $value2
-                        ?: 'i'),
-                ];
-                break;
-            case 'match':
-                return [ '$elemMatch' => $value ];
-                break;
-            case 'all':
-                return [ '$all' => $value ];
-                break;
-                default :
-                    throw new MongoException("Unknown operator [$operator]");
-
-        }
-    }
-
-    /**
      * @return Closure
      */
-    public static function closureOut()
+    public static function filterOut()
     {
         return function( $field, $value )
         {
@@ -279,7 +191,7 @@ Class Collection
     /**
      * @return Closure
      */
-    public static function closureIn()
+    public static function filterIn()
     {
         return function( $field, $value )
         {

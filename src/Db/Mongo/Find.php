@@ -22,6 +22,11 @@ Class Find extends Where
     /**
      * @var array
      */
+    protected $link = [];
+
+    /**
+     * @var array
+     */
     protected $sort = [];
 
     /**
@@ -33,6 +38,20 @@ Class Find extends Where
      * @var int
      */
     protected $limit = 0;
+
+
+    /**
+     * @param string $field
+     * @param array  $with
+     * @param array  $without
+     * @return Find
+     */
+    public function link( string $field, array $with = [], array $without = []  ): self
+    {
+        $this->link[] = $this->collection->mongo()->link($field, $with, $without);
+
+        return $this;
+    }
 
     /**
      * @param string ...$fields
@@ -127,7 +146,7 @@ Class Find extends Where
      */
     public function all(): Json
     {
-        $json  = new Json();
+        $json = new Json();
 
         foreach ( $this->cursor() as $key => $value ) {
             $json->offsetSet($key, $value);

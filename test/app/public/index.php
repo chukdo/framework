@@ -153,50 +153,23 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 $contrat = Db::collection('contrat');
 $find = $contrat->find();
 dd($find
+    ->without('_id')
+    ->with('_agence', '_modele', 'history')
     ->limit(4)
     ->where('version', '=', '2')
     ->where('state', '=', '1')
     ->where('history', 'size', 4)
-    ->one()
+    ->where('history._version', '=', '5a3c37db3fcd9e16e21fe0b5')
+    ->link('_modele', ['titre'])
+    ->link('_rubrique', ['titre'])
+    ->all()
     ->toHtml());
-
-$contrat->write()->insert();
-$contrat->write()->set()->set()->where()->updateOne();
-
-//where('price', '>', 20)->where('price', 'size', 4)->where('price', 'type', bool)
+// join
+// group or aggregate
 
 
-$contrat->or('qty')
-    ->exists()
-    ->nin([
-        1,
-        5,
-        9,
-    ]);
-
-//->orWhere('price', '>=', 20)->orWhere('price', '<=', 100);
-
-$contrat->or('price')
-    ->gte(20)
-    ->lt(10);
-$contrat->and('qty')
-    ->exists()
-    ->nin([
-        1,
-        5,
-        9,
-    ]);
-
-$contrat->and('agences')
-    ->match(
-        $contrat->queryFilter('production')
-            ->eq('xyz'),
-        $contrat->queryFilter('score')
-            ->gt(8)
-    );
-
-dd($contrat->cursor());
-//$contrat->set()->push()->where()->update();
+//$contrat->write()->insert();
+//$contrat->write()->set()->set()->where()->updateOne();
 
 Request::Inputs()
     ->set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, Conf::get('salt')));

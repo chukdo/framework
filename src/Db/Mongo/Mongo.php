@@ -44,6 +44,20 @@ Class Mongo
     }
 
     /**
+     * @param string $field
+     * @param array  $with
+     * @param array  $without
+     * @return Link
+     */
+    public function link( string $field, array $with = [], array $without = [] ): Link
+    {
+        $link = new Link($this, $field);
+
+        return $link->with($with)
+            ->without($without);
+    }
+
+    /**
      * @return bool
      */
     public function ping(): bool
@@ -191,17 +205,6 @@ Class Mongo
     {
         return new Collection($this, $database
             ?: $this->database, $collection);
-    }
-
-    /**
-     * @param string      $collection
-     * @param string|null $database
-     * @return QueryBuilder
-     */
-    public function query( string $collection, string $database = null ): QueryBuilder
-    {
-        return $this->database($database)
-            ->query($collection);
     }
 
     /**

@@ -69,7 +69,7 @@ class Cursor implements Iterator
      */
     public function current()
     {
-        return new Json($this->iterator->current(), Collection::closureOut());
+        return new Json($this->iterator->current(), Collection::filterOut());
     }
 
     /**
