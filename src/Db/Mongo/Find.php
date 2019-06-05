@@ -39,19 +39,25 @@ Class Find extends Where
      */
     protected $limit = 0;
 
+    /**
+     * @var bool
+     */
+    protected $hiddenId = false;
 
     /**
-     * @param string $field
-     * @param array  $with
-     * @param array  $without
+     * @param string      $field
+     * @param array       $with
+     * @param array       $without
+     * @param string|null $linked
      * @return Find
      */
-    public function link( string $field, array $with = [], array $without = []  ): self
+    public function link( string $field, array $with = [], array $without = [], string $linked = null ): self
     {
         $link = new Link($this->collection->database(), $field);
 
-        $this->link[] = $link->with($with)
-            ->without($without);
+        $this->link[] = $link->withFields($with)
+            ->withoutFields($without)
+            ->setLinkedName($linked);
 
         return $this;
     }
@@ -61,6 +67,15 @@ Class Find extends Where
      * @return Find
      */
     public function with( string ...$fields ): self
+    {
+        return $this->withFields($fields);
+    }
+
+    /**
+     * @param array $fields
+     * @return Find
+     */
+    public function withFields( array $fields ): self
     {
         foreach ( $fields as $field ) {
             $this->projection[ $field ] = 1;
@@ -75,12 +90,21 @@ Class Find extends Where
      */
     public function without( string ...$fields ): self
     {
+        return $this->withoutFields($fields);
+    }
+
+    /**
+     * @param array $fields
+     * @return Find
+     */
+    public function withoutFields( array $fields ): self
+    {
         foreach ( $fields as $field ) {
             if ( $field == '_id' ) {
-                $this->projection[ $field ] = 0;
+                $this->hiddenId = true;
             }
             else {
-                $this->projection[ $field ] = -1;
+                $this->projection[ $field ] = 0;
             }
         }
 
@@ -145,14 +169,31 @@ Class Find extends Where
     }
 
     /**
+     * @param bool $idAsKey
      * @return Json
      */
-    public function all(): Json
+    public function all( bool $idAsKey = false ): Json
     {
         $json = new Json();
 
         foreach ( $this->cursor() as $key => $value ) {
-            $json->offsetSet($key, $value);
+            if ( $idAsKey ) {
+                $json->offsetSet($value->offsetGet('_id'), $value);
+            }
+            else {
+                $json->offsetSet($key, $value);
+            }
+        }
+
+        foreach ( $this->link as $link ) {
+            $json = $link->hydrate($json);
+        }
+
+        /** Suppression des ID defini par without */
+        if ( $this->hiddenId ) {
+            foreach ( $json as $key => $value ) {
+                $value->offsetUnset('_id');
+            }
         }
 
         return $json;

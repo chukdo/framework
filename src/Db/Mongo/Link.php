@@ -20,14 +20,19 @@ Class Link
     protected $database;
 
     /**
-     * @var string
+     * @var Collection
      */
-    protected $collection = null;
+    protected $collection;
 
     /**
      * @var string
      */
     protected $field = null;
+
+    /**
+     * @var string
+     */
+    protected $linked = null;
 
     /**
      * @var array
@@ -47,37 +52,48 @@ Class Link
     public function __construct( Database $database, string $field )
     {
         $this->database = $database;
-        $dbName = $database->name();
+        $dbName         = $database->name();
 
         list($db, $field) = array_pad(explode('.', $field), -2, $dbName);
 
-        if ($db != $dbName) {
-            $this->database   = $database->mongo()
+        if ( !Str::match('/^_[a-z0-9]+$/i', $field) ) {
+            throw new MongoException(sprintf('Field [%s] has not a valid format.', $field));
+        }
+
+        if ( $db != $dbName ) {
+            $this->database = $database->mongo()
                 ->database($db);
         }
 
-        if (!Str::match('/^_[a-z]+$/i', $field)) {
-            throw new MongoException('');
-        }
+        $this->collection = $this->database->collection(substr($field, 1));
+        $this->field      = $field;
+    }
 
+    /**
+     * @param string|null $linked
+     * @return Link
+     */
+    public function setLinkedName( string $linked = null ): self
+    {
+        $this->linked = $linked;
 
-        if ( count($path) > 1 ) {
-            $this->database   = $database->mongo()
-                ->database($path[ 0 ]);
-            $this->collection = substr($path[ 1 ], 1);
-            $this->field      = $path[ 1 ];
-        }
-        else {
-            $this->collection = substr($field, 1);
-            $this->field      = $field;
-        }
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLinkedName(): string
+    {
+        return $this->linked
+            ?: 'linked' . $this->field;
     }
 
     /**
      * @param array $fields
      * @return Link
      */
-    public function with( array $fields = [] ): self
+    public function withFields( array $fields = [] ): self
     {
         $this->with = $fields;
 
@@ -88,7 +104,7 @@ Class Link
      * @param array $fields
      * @return Link
      */
-    public function without( array $fields = [] ): self
+    public function withoutFields( array $fields = [] ): self
     {
         $this->without = $fields;
 
@@ -101,7 +117,80 @@ Class Link
      */
     public function hydrate( Json $json ): Json
     {
-        // loop recursif
-        // recherche field => find->all() => map
+        return $this->hydrateIds($json, $this->findIds($this->extractIds($json)));
+    }
+
+    /**
+     * @param Json $json
+     * @param Json $find
+     * @return Json
+     */
+    protected function hydrateIds( Json $json, Json $find ): Json
+    {
+        foreach ( $json as $key => $value ) {
+            if ( $key === $this->field ) {
+
+                /** Multiple ids */
+                if ( $value instanceof Json ) {
+                    $list = [];
+
+                    foreach ( (array) $value as $id ) {
+                        if ( $get = $find->offsetGet($id) ) {
+                            $list[] = $get;
+                        }
+                    }
+
+                    if (!empty($list)) {
+                        $json->offsetSet($this->getLinkedName(), $list);
+                    }
+                }
+
+                /** Single id */
+                else {
+                    if ( $get = $find->offsetGet($value) ) {
+                        $json->offsetSet($this->getLinkedName(), $get);
+                    }
+                }
+            }
+            elseif ( $value instanceof Json ) {
+                $this->hydrateIds($value, $find);
+            }
+        }
+
+        return $json;
+    }
+
+    /**
+     * @param array $ids
+     * @return Json
+     */
+    protected function findIds( array $ids ): Json
+    {
+        $find = new Find($this->collection);
+
+        return $find->withFields($this->with)
+            ->withoutFields($this->without)
+            ->where('_id', 'in', $ids)
+            ->all(true);
+    }
+
+    /**
+     * @param Json $json
+     * @return array
+     */
+    protected function extractIds( Json $json ): array
+    {
+        $extractIds = [];
+
+        foreach ( $json as $key => $value ) {
+            if ( $key === $this->field ) {
+                $extractIds = array_merge($extractIds, (array) $value);
+            }
+            elseif ( $value instanceof Json ) {
+                $extractIds = array_merge($extractIds, $this->extractIds($value));
+            }
+        }
+
+        return $extractIds;
     }
 }

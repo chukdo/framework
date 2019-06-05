@@ -20,7 +20,7 @@ Class Database
     protected $mongo;
 
     /**
-     * @var string
+     * @var MongoDbDatabase
      */
     protected $database;
 

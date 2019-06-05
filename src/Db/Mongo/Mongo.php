@@ -29,7 +29,7 @@ Class Mongo
     /**
      * @var string|null
      */
-    protected $database = null;
+    protected $databaseName = null;
 
     /**
      * Mongo constructor.
@@ -38,9 +38,9 @@ Class Mongo
      */
     public function __construct( string $dsn, string $database = null )
     {
-        $this->dsn      = $dsn;
-        $this->mongo    = new Manager($dsn);
-        $this->database = $database;
+        $this->dsn          = $dsn;
+        $this->mongo        = new Manager($dsn);
+        $this->databaseName = $database;
     }
 
     /**
@@ -190,7 +190,7 @@ Class Mongo
     public function collection( string $collection, string $database = null ): Collection
     {
         return new Collection($this, $database
-            ?: $this->database, $collection);
+            ?: $this->databaseName, $collection);
     }
 
     /**
@@ -200,6 +200,6 @@ Class Mongo
     public function database( string $database = null ): Database
     {
         return new Database($this, $database
-            ?: $this->database);
+            ?: $this->databaseName);
     }
 }

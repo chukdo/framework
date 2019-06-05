@@ -154,14 +154,16 @@ $contrat = Db::collection('contrat');
 $find = $contrat->find();
 dd($find
     ->without('_id')
-    ->with('_agence', '_modele', 'history')
+    ->with('_agence', '_modele', 'history.id', 'history._version')
     ->limit(4)
     ->where('version', '=', '2')
     ->where('state', '=', '1')
     ->where('history', 'size', 4)
     ->where('history._version', '=', '5a3c37db3fcd9e16e21fe0b5')
-    ->link('_modele', ['titre'])
-    ->link('_rubrique', ['titre'])
+    //->link('_agence', ['agence'])
+    //->link('_modele', ['titre'])
+    //->link('_rubrique', ['titre'])
+    ->link('_version', [], ['template'], 'new_v')
     ->all()
     ->toHtml());
 // join

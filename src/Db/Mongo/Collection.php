@@ -5,7 +5,6 @@ Namespace Chukdo\DB\Mongo;
 use Closure;
 use Chukdo\Json\Json;
 use Chukdo\Helper\Is;
-use MongoDB\BSON\Regex;
 use MongoDB\Collection as MongoDbCollection;
 use DateTime;
 use MongoDB\BSON\ObjectId;
@@ -32,7 +31,7 @@ Class Collection
     protected $database;
 
     /**
-     * @var String
+     * @var MongoDbCollection
      */
     protected $collection;
 
