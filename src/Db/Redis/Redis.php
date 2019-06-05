@@ -227,7 +227,7 @@ class Redis implements RedisInterface
                 }
                 break;
             default:
-                throw new RedisException("Unknow response [$reply]");
+                throw new RedisException(sprintf("Unknow response [%s]", $reply));
                 break;
         }
 

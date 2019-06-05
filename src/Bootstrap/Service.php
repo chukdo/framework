@@ -249,36 +249,6 @@ class Service implements ArrayAccess
     }
 
     /**
-     * @param string $class
-     * @param array  $args
-     * @return object
-     * @throws ServiceException
-     * @throws \ReflectionException
-     */
-    private function resolveClass( string $class, array $args = [] )
-    {
-        $reflector = new ReflectionClass($class);
-
-        /* C'est n'est pas une classe on genere une exception */
-        if ( !$reflector->isInstantiable() ) {
-            throw new ServiceException("[$class] is not a class");
-        }
-
-        $constructor = $reflector->getConstructor();
-
-        /* pas de constructeur donc pas de parametres à gerer */
-        if ( is_null($constructor) ) {
-            return new $class();
-        }
-
-        $args = empty($args)
-            ? $this->resolveArgs($constructor)
-            : $args;
-
-        return $reflector->newInstanceArgs($args);
-    }
-
-    /**
      * @param string $arg
      * @return mixed|object|string
      * @throws ServiceException
@@ -300,6 +270,46 @@ class Service implements ArrayAccess
     }
 
     /**
+     * @param string $key
+     * @param null   $default
+     * @return string|null
+     */
+    public function conf( string $key, $default = null ): ?string
+    {
+        return null;
+    }
+
+    /**
+     * @param string $class
+     * @param array  $args
+     * @return object
+     * @throws ServiceException
+     * @throws \ReflectionException
+     */
+    private function resolveClass( string $class, array $args = [] )
+    {
+        $reflector = new ReflectionClass($class);
+
+        /* C'est n'est pas une classe on genere une exception */
+        if ( !$reflector->isInstantiable() ) {
+            throw new ServiceException(sprintf("[%s] is not a class", $class));
+        }
+
+        $constructor = $reflector->getConstructor();
+
+        /* pas de constructeur donc pas de parametres à gerer */
+        if ( is_null($constructor) ) {
+            return new $class();
+        }
+
+        $args = empty($args)
+            ? $this->resolveArgs($constructor)
+            : $args;
+
+        return $reflector->newInstanceArgs($args);
+    }
+
+    /**
      * @param ReflectionMethod $constructor
      * @return array
      * @throws ServiceException
@@ -315,16 +325,6 @@ class Service implements ArrayAccess
         }
 
         return $args;
-    }
-
-    /**
-     * @param string $key
-     * @param null   $default
-     * @return string|null
-     */
-    public function conf( string $key, $default = null ): ?string
-    {
-        return null;
     }
 
     /**
@@ -349,7 +349,7 @@ class Service implements ArrayAccess
         }
 
         /* On ne peut pas injecter le parametre, cela genere une exception     */
-        throw new ServiceException("Unable to resolve [$name] on class [$class].");
+        throw new ServiceException(sprintf("Unable to resolve [%s] on class [%s].", $name, $class));
     }
 
     /**

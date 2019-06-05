@@ -2,6 +2,8 @@
 
 namespace Chukdo\Helper;
 
+use Chukdo\Bootstrap\AppException;
+
 /**
  * Classe Archive
  * gestion des fichiers compressés.
@@ -127,13 +129,13 @@ final class Archive
 
         /* Erreur d'ouverture du fichier */
         if ( !is_resource($open) ) {
-            throw new \Chukdo\Bootstrap\AppException('Zip File Function error: ' . $ziperror[ $open ]);
+            throw new AppException(sprintf('Zip File Function error: %s', $ziperror[ $open ]));
         }
 
         while ( ( $read = zip_read($open) ) !== false ) {
             /* Erreur d'ouverture du fichier */
             if ( !is_resource($read) ) {
-                throw new \Chukdo\Bootstrap\AppException('Zip File Function error: ' . $ziperror[ $read ]);
+                throw new AppException(sprintf('Zip File Function error: %s', $ziperror[ $read ]));
             }
 
             $name = zip_entry_name($read);
@@ -187,7 +189,7 @@ final class Archive
                     /* Error */
                 }
                 else {
-                    throw new \Chukdo\Bootstrap\AppException('Zip File Function error: can\'t write file ' . $file);
+                    throw new AppException(sprintf('Zip File Function error: can\'t write file %s', $file));
                 }
             }
         }

@@ -524,6 +524,21 @@ class Node implements IteratorAggregate
     }
 
     /**
+     * @param string $name
+     * @param string $value
+     * @return Node
+     * @throws NodeException
+     */
+    public function setAttr( string $name, string $value ): self
+    {
+        $this->element()
+            ->setAttribute($name,
+                $value);
+
+        return $this;
+    }
+
+    /**
      * @param Node $node
      * @return Node
      * @throws NodeException
@@ -535,21 +550,6 @@ class Node implements IteratorAggregate
             ->replaceChild($node->element(),
                 $this->element());
         $this->setElement($node->element());
-
-        return $this;
-    }
-
-    /**
-     * @param string $name
-     * @param string $value
-     * @return Node
-     * @throws NodeException
-     */
-    public function setAttr( string $name, string $value ): self
-    {
-        $this->element()
-            ->setAttribute($name,
-                $value);
 
         return $this;
     }
@@ -1249,7 +1249,7 @@ class Node implements IteratorAggregate
      */
     public function __get( string $name )
     {
-        throw new NodeException("Method $name does not exist");
+        throw new NodeException(sprintf("Method [%s] does not exist", $name));
     }
 
     /**
@@ -1259,7 +1259,7 @@ class Node implements IteratorAggregate
      */
     public function __set( string $name, $value )
     {
-        throw new NodeException("Method $name does not exist");
+        throw new NodeException(sprintf("Method [%s] does not exist", $name));
     }
 
     /**
@@ -1270,6 +1270,6 @@ class Node implements IteratorAggregate
      */
     public function __call( string $name, $params = [] )
     {
-        throw new NodeException("Method $name does not exist");
+        throw new NodeException(sprintf("Method [%s] does not exist", $name));
     }
 }

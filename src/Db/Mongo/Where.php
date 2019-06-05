@@ -134,7 +134,7 @@ Class Where
                 return [ '$all' => $value ];
                 break;
             default :
-                throw new MongoException("Unknown operator [$operator]");
+                throw new MongoException(sprintf("Unknown operator [%s]", $operator));
 
         }
     }

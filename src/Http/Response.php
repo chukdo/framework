@@ -308,7 +308,7 @@ class Response
     public function send(): self
     {
         if ( headers_sent($filename, $linenum) ) {
-            throw new HttpException("Headers already sent from file $filename at line $linenum");
+            throw new HttpException(sprintf("Headers already sent from file %s at line %s", $filename, $linenum));
         }
 
         $hasContent = $this->content != null;

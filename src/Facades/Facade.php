@@ -115,7 +115,7 @@ class Facade
         if ( !method_exists($instance, $method) && !method_exists($instance, '__call') ) {
             $class = get_called_class();
 
-            throw new FacadeException("[$class] does not implement [$method] method.");
+            throw new FacadeException(sprintf("[%s] does not implement [%s] method.", $class, $method));
         }
 
         return call_user_func_array([

@@ -2,6 +2,7 @@
 
 namespace Chukdo\Db\Mongo;
 
+use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
 
 /**
@@ -41,19 +42,34 @@ Class Link
     /**
      * Link constructor.
      * @param Database $database
-     * @param string   $field
+     * @param string   $field db._collection ou _collection = _id of collection
      */
-    public function __construct( Database $database, string $field)
+    public function __construct( Database $database, string $field )
     {
         $this->database = $database;
+        $dbName = $database->name();
 
-        $path = explode('.', $field);
+        list($db, $field) = array_pad(explode('.', $field), -2, $dbName);
 
-        if (count($path) > 1) {
-            $this->database = $database->mongo()->database($path[0]);
-            $this->field = $path[1];
-        } else {
-            $this->field = $field;
+        if ($db != $dbName) {
+            $this->database   = $database->mongo()
+                ->database($db);
+        }
+
+        if (!Str::match('/^_[a-z]+$/i', $field)) {
+            throw new MongoException('');
+        }
+
+
+        if ( count($path) > 1 ) {
+            $this->database   = $database->mongo()
+                ->database($path[ 0 ]);
+            $this->collection = substr($path[ 1 ], 1);
+            $this->field      = $path[ 1 ];
+        }
+        else {
+            $this->collection = substr($field, 1);
+            $this->field      = $field;
         }
     }
 
@@ -83,7 +99,7 @@ Class Link
      * @param Json $json
      * @return Json
      */
-    public function hydrate(Json $json): Json
+    public function hydrate( Json $json ): Json
     {
         // loop recursif
         // recherche field => find->all() => map

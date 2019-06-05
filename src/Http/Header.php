@@ -668,7 +668,7 @@ class Header
             }
         }
 
-        throw new HttpException("Method \Chukdo\Http\Header::$name doesn't exists");
+        throw new HttpException(sprintf("Method \Chukdo\Http\Header::%s doesn't exists", $name));
     }
 
     /**

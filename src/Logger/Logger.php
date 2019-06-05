@@ -141,7 +141,7 @@ class Logger implements LoggerInterface
         }
 
         if ( !isset(self::$levels[ $level ]) ) {
-            throw new LoggerException("You tried to log record with unknown level [$level]");
+            throw new LoggerException(sprintf("You tried to log record with unknown level [%s]", $level));
         }
 
         $record = [
@@ -257,6 +257,19 @@ class Logger implements LoggerInterface
      * @return bool
      * @throws LoggerException
      */
+    public function debug( string $message, array $context = [] ): bool
+    {
+        return $this->log(self::DEBUG,
+            $message,
+            $context);
+    }
+
+    /**
+     * @param string $message
+     * @param array  $context
+     * @return bool
+     * @throws LoggerException
+     */
     public function emergency( string $message, array $context = [] ): bool
     {
         return $this->log(self::EMERGENCY,
@@ -283,9 +296,9 @@ class Logger implements LoggerInterface
      * @return bool
      * @throws LoggerException
      */
-    public function warning( string $message, array $context = [] ): bool
+    public function info( string $message, array $context = [] ): bool
     {
-        return $this->log(self::WARNING,
+        return $this->log(self::INFO,
             $message,
             $context);
     }
@@ -309,22 +322,9 @@ class Logger implements LoggerInterface
      * @return bool
      * @throws LoggerException
      */
-    public function info( string $message, array $context = [] ): bool
+    public function warning( string $message, array $context = [] ): bool
     {
-        return $this->log(self::INFO,
-            $message,
-            $context);
-    }
-
-    /**
-     * @param string $message
-     * @param array  $context
-     * @return bool
-     * @throws LoggerException
-     */
-    public function debug( string $message, array $context = [] ): bool
-    {
-        return $this->log(self::DEBUG,
+        return $this->log(self::WARNING,
             $message,
             $context);
     }
