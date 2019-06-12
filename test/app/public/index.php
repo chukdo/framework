@@ -150,6 +150,15 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 //dd(Conf::offsetGet('db.mongo.dsn'));
 //dd(Db::collection('contrat'));
 
+use Chukdo\Db\Mongo\Aggregate\Expr;
+
+dd(Expr::split(Expr::multiply(['price', 'quantity']))->get());
+
+$m = new \Chukdo\Db\Mongo\Aggregate\Expression('multiply', ['price', 'quantity']);
+$s = new \Chukdo\Db\Mongo\Aggregate\Expression('sum', $m);
+
+dd($s->get());
+
 $contrat = Db::collection('contrat');
 $find = $contrat->find();
 dd($find
@@ -168,6 +177,7 @@ dd($find
     ->toHtml());
 // join
 // group or aggregate
+//
 
 
 //$contrat->write()->insert();

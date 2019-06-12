@@ -1,0 +1,71 @@
+<?php
+
+namespace Chukdo\Db\Mongo\Aggregate;
+
+use Chukdo\Helper\Is;
+
+/**
+ * Mongo Aggregate Expression.
+ * @version      1.0.0
+ * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @since        08/01/2019
+ * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
+ */
+Class Expression
+{
+
+    /**
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * @var mixed
+     */
+    protected $expression;
+
+    /**
+     * Expression constructor.
+     * @param string                  $name
+     * @param Expression|string|array $expression
+     */
+    public function __construct( string $name, $expression )
+    {
+        $this->name       = $name;
+        $this->expression = $expression;
+    }
+
+    /**
+     * @param Expression|string|array $expression
+     * @return string|array|null
+     */
+    protected function parseExpression( $expression )
+    {
+        $parsed = null;
+
+        if ( $expression instanceof Expression ) {
+            $parsed = $expression->get();
+        }
+        elseif ( Is::arr($expression) ) {
+            $parsed = [];
+
+            foreach ( $this->expression as $exp ) {
+                $parsed[] = $this->parseExpression($exp);
+            }
+        }
+        elseif ( Is::string($expression) ) {
+            $parsed = '$' . $expression;
+        }
+
+        return $parsed;
+    }
+
+    /**
+     * @return array
+     */
+    public function get(): array
+    {
+        return [ '$' . $this->name => $this->parseExpression($this->expression) ];
+    }
+
+}

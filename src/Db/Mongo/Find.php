@@ -217,6 +217,16 @@ Class Find extends Where
     }
 
     /**
+     * @param string $field
+     * @return Json
+     */
+    public function distinct( string $field ): json
+    {
+        return new Json($this->collection()
+            ->distinct($field, $this->filter()));
+    }
+
+    /**
      * @return array
      */
     public function projection(): array
