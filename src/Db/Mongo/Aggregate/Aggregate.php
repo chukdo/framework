@@ -165,26 +165,33 @@ Class Aggregate
 
     /**
      * https://docs.mongodb.com/manual/reference/operator/aggregation/geoNear/
-     * @param float  $lon
-     * @param float  $lat
-     * @param int    $distance
-     * @param int    $limit
-     * @param string $as
+     * @param float      $lon
+     * @param float      $lat
+     * @param int        $distance
+     * @param int        $limit
+     * @param string     $as
+     * @param Where|null $where
      * @return Aggregate
      */
-    public function near(float $lon, float $lat, int $distance, int $limit = 20, string $as = 'distance'): self
+    public function near( float $lon, float $lat, int $distance, int $limit = 20, string $as = 'distance', Where $where = null ): self
     {
         $this->pipe[] = [
             '$geoNear' => [
                 'near' => [
-                    'type' => 'Point',
-                    'coordinates' => [$lon, $lat],
+                    'type'          => 'Point',
+                    'coordinates'   => [
+                        $lon,
+                        $lat,
+                    ],
                     'distanceField' => $as,
-                    'maxDistance' => $distance,
-                    'spherical' => true,
-                    'num' => $limit
-                ]
-            ]
+                    'maxDistance'   => $distance,
+                    'spherical'     => true,
+                    'query'         => $where
+                        ? $where->filter()
+                        : [],
+                    'num'           => $limit,
+                ],
+            ],
         ];
 
         return $this;
@@ -265,9 +272,13 @@ Class Aggregate
      */
     public function pipe(): array
     {
-        // each group > projection
-        // each match > projection
-        // each addfield > projection
+        $pipes = $this->pipe;
+
+        foreach ( $pipes as $key => $pipe ) {
+            if ( $pipe instanceof Group || $pipe instanceof Where || $pipe instanceof AddFields ) {
+                $pipes[$key] = $pipe->projection();
+            }
+        }
 
         return $this->pipe;
     }
