@@ -44,7 +44,7 @@ Class Expression
         $parsed = null;
 
         if ( $expression instanceof Expression ) {
-            $parsed = $expression->get();
+            $parsed = $expression->projection();
         }
         elseif ( Is::arr($expression) ) {
             $parsed = [];
@@ -66,7 +66,7 @@ Class Expression
     /**
      * @return array
      */
-    public function get(): array
+    public function projection(): array
     {
         return [ '$' . $this->name => $this->parseExpression($this->expression) ];
     }

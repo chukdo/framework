@@ -32,6 +32,15 @@ class Expr
      * @param $expression
      * @return Expression
      */
+    public static function add($expression): Expression
+    {
+        return new Expression('add', $expression);
+    }
+
+    /**
+     * @param $expression
+     * @return Expression
+     */
     public static function sum($expression): Expression
     {
         return new Expression('sum', $expression);

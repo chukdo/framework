@@ -13,7 +13,6 @@ use MongoDB\BSON\Regex;
  */
 Class Where
 {
-
     /**
      * @var Collection
      */

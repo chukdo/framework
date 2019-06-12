@@ -63,6 +63,19 @@ Class Find extends Where
     }
 
     /**
+     * @param array $with
+     * @param array $without
+     * @return Find
+     */
+    public function project(array $with = [], array $without = []): self
+    {
+        $this->withFields($with);
+        $this->withFields($without);
+
+        return $this;
+    }
+
+    /**
      * @param string ...$fields
      * @return Find
      */
@@ -137,6 +150,17 @@ Class Find extends Where
     }
 
     /**
+     * @param int $limit
+     * @return Find
+     */
+    public function limit( int $limit ): self
+    {
+        $this->limit = $limit;
+
+        return $this;
+    }
+
+    /**
      * @return Json
      */
     public function one(): Json
@@ -155,17 +179,6 @@ Class Find extends Where
     public function cursor(): Cursor
     {
         return new Cursor($this);
-    }
-
-    /**
-     * @param int $limit
-     * @return Find
-     */
-    public function limit( int $limit ): self
-    {
-        $this->limit = $limit;
-
-        return $this;
     }
 
     /**
