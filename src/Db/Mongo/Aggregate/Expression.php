@@ -39,7 +39,7 @@ Class Expression
      * @param Expression|string|array $expression
      * @return string|array|null
      */
-    protected function parseExpression( $expression )
+    public static function parseExpression( $expression )
     {
         $parsed = null;
 
@@ -49,12 +49,15 @@ Class Expression
         elseif ( Is::arr($expression) ) {
             $parsed = [];
 
-            foreach ( $this->expression as $exp ) {
-                $parsed[] = $this->parseExpression($exp);
+            foreach ( $expression as $key => $exp ) {
+                $parsed[ $key ] = self::parseExpression($exp);
             }
         }
         elseif ( Is::string($expression) ) {
             $parsed = '$' . $expression;
+        }
+        else {
+            $parsed = $expression;
         }
 
         return $parsed;

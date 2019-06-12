@@ -152,15 +152,31 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 
 use Chukdo\Db\Mongo\Aggregate\Expr;
 
-dd(Expr::split(Expr::multiply(['price', 'quantity']))->get());
+$group = new \Chukdo\Db\Mongo\Aggregate\Group([
+    'month' => Expr::month('date'),
+    'day'   => Expr::day('date'),
+    'year'  => Expr::year('date'),
+]);
 
-$m = new \Chukdo\Db\Mongo\Aggregate\Expression('multiply', ['price', 'quantity']);
+$group->calculate('totalprice', Expr::sum(Expr::multiply([
+    'price',
+    'quantity',
+])))
+    ->calculate('averageQuantity', Expr::avg('quantity'))
+    ->calculate('count', Expr::sum(1));
+
+dd($group->get());
+
+$m = new \Chukdo\Db\Mongo\Aggregate\Expression('multiply', [
+    'price',
+    'quantity',
+]);
 $s = new \Chukdo\Db\Mongo\Aggregate\Expression('sum', $m);
 
 dd($s->get());
 
 $contrat = Db::collection('contrat');
-$find = $contrat->find();
+$find    = $contrat->find();
 dd($find
     ->without('_id')
     ->with('_agence', '_modele', 'history.id', 'history._version')
@@ -172,7 +188,7 @@ dd($find
     //->link('_agence', ['agence'])
     //->link('_modele', ['titre'])
     //->link('_rubrique', ['titre'])
-    ->link('_version', [], ['template'], 'new_v')
+    ->link('_version', [], [ 'template' ], 'new_v')
     ->all()
     ->toHtml());
 // join
@@ -276,7 +292,7 @@ $json = new \Chukdo\Json\Json([
 Request::Inputs()
     ->set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, Conf::get('salt')));
 Request::Inputs()
-    ->set('tel', '+33626148328');
+    ->set('tel', '+33626148368');
 
 $validator = Request::validate([
     'tel'  => 'required|phone',
@@ -296,7 +312,3 @@ Response::header('X-jpd', 'de la balle');
 View::setDefaultFolder(TPL_PATH);
 View::loadFunction(new \Chukdo\View\Functions\Basic());
 View::render('info', $json);
-
-//ExceptionLogger::emergency('coucou les loulous');
-//Response::file('azure://files-dev/566170fe8bc5d2cf3d000000/5948da9a28b8b.pdf')->send()->end();
-//Response::json($json)->send()->end();

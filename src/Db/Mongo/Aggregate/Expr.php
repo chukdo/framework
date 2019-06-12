@@ -41,6 +41,33 @@ class Expr
      * @param $expression
      * @return Expression
      */
+    public static function year($expression): Expression
+    {
+        return new Expression('year', $expression);
+    }
+
+    /**
+     * @param $expression
+     * @return Expression
+     */
+    public static function month($expression): Expression
+    {
+        return new Expression('month', $expression);
+    }
+
+    /**
+     * @param $expression
+     * @return Expression
+     */
+    public static function day($expression): Expression
+    {
+        return new Expression('dayOfMonth', $expression);
+    }
+
+    /**
+     * @param $expression
+     * @return Expression
+     */
     public static function last($expression): Expression
     {
         return new Expression('last', $expression);
