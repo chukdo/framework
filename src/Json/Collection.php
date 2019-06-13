@@ -8,7 +8,7 @@ use Closure;
 
 /**
  * Manipulation de collection de données.
- * @todo a implementer : https://laravel.com/docs/5.8/collections
+ * @todo         a implementer : https://laravel.com/docs/5.8/collections
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -33,6 +33,23 @@ class Collection
         elseif ( Is::arr($json) ) {
             $this->collection = $json;
         }
+    }
+
+    /**
+     * @param string ...$names
+     * @return Collection
+     */
+    public function map( string ... $names ): self
+    {
+        $arr = [];
+
+        foreach ( $this->collection as $k => $v ) {
+            if ( in_array($k, $names) ) {
+                $arr[ $k ] = $v;
+            }
+        }
+
+        return new Collection($arr);
     }
 
     /**
@@ -62,13 +79,23 @@ class Collection
 
         foreach ( $this->collection as $k => $v ) {
             if ( Is::arr($v) ) {
-                $arr[ $k ] = (new Collection($v))->filterRecursive($closure)->values();
-            } else {
+                $arr[ $k ] = ( new Collection($v) )->filterRecursive($closure)
+                    ->values();
+            }
+            else {
                 $arr[ $k ] = $closure($k, $v);
             }
         }
 
         return new Collection($arr);
+    }
+
+    /**
+     * @return Json
+     */
+    public function values(): Json
+    {
+        return new Json($this->collection);
     }
 
     /**
@@ -85,14 +112,6 @@ class Collection
         }
 
         return new Collection($arr);
-    }
-
-    /**
-     * @return Json
-     */
-    public function values(): Json
-    {
-        return new Json($this->collection);
     }
 
     /**
