@@ -121,19 +121,18 @@ class Rule
         $json = new Json(Str::explode(',', $attrs));
 
         /* Recherche d'attributs faisant référence à un chemin de configuration (commence par @) */
-        $filter = $json->collection()
-            ->filter(function( $k, $v )
-            {
-                $isConf = substr($v, 0, 1) == '@';
-                $conf   = substr($v, 1);
+        $filter = $json->filter(function( $k, $v )
+        {
+            $isConf = substr($v, 0, 1) == '@';
+            $conf   = substr($v, 1);
 
-                if ( $isConf ) {
-                    return $this->validator->request()
-                        ->conf($conf);
-                }
+            if ( $isConf ) {
+                return $this->validator->request()
+                    ->conf($conf);
+            }
 
-                return $v;
-            });
+            return $v;
+        });
 
         return [
             $rule,
@@ -269,10 +268,10 @@ class Rule
         $input = $this->input();
 
         if ( $input instanceof InputInterface ) {
-            $inputs = $input->collection()->filterRecursive(function( $k, $v ) use ( $filter )
+            $inputs = $input->filterRecursive(function( $k, $v ) use ( $filter )
             {
                 return $filter->filter($v);
-            })->values();
+            });
 
             $this->validator->inputs()
                 ->mergeRecursive($inputs, true);

@@ -80,7 +80,6 @@ Class Database
         $stats = $this->mongo()
             ->command([ 'dbStats' => 1 ], $this->name())
             ->getIndex(0, new Json())
-            ->collection()
             ->filter(function( $k, $v )
             {
                 if ( is_scalar($v) ) {
@@ -89,8 +88,7 @@ Class Database
 
                 return false;
             })
-            ->clean()
-            ->values();
+            ->clean();
 
         return $stats;
     }

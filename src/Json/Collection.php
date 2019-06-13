@@ -36,6 +36,49 @@ class Collection
     }
 
     /**
+     * @param string $id
+     * @return Collection
+     */
+    public function keyAsId( string $id ): self
+    {
+        $arr = [];
+
+        foreach ( $this->collection as $k => $row ) {
+            if ( Is::arr($row) ) {
+                if ( isset($row[ $id ]) ) {
+                    $key = $row[ $id ];
+                    unset($row[ $id ]);
+                    $arr[ $key ] = $row;
+                }
+            }
+        }
+
+        return new Collection($arr);
+    }
+
+    /**
+     * @param array   $row
+     * @param Closure $closure
+     * @return array|null
+     */
+    protected function rowFilter($row, Closure $closure): ?array
+    {
+        if (!Is::arr($row)) {
+            return null;
+        }
+
+        $arr = [];
+
+        foreach ($row as $key => $value) {
+            if ($r = $closure($key, $value)) {
+                $arr[$key] = $r;
+            }
+        }
+
+        return !empty($arr) ? $arr : null;
+    }
+
+    /**
      * @param string ...$names
      * @return Collection
      */
@@ -43,9 +86,11 @@ class Collection
     {
         $arr = [];
 
-        foreach ( $this->collection as $k => $v ) {
-            if ( in_array($k, $names) ) {
-                $arr[ $k ] = $v;
+        foreach ( $this->collection as $k => $row ) {
+            if ($filter = $this->rowFilter($row, function($key, $value) use ($names) {
+                return in_array($key, $names) ? $value : null;
+            })) {
+                $arr[$k] = $filter;
             }
         }
 
@@ -61,8 +106,10 @@ class Collection
     {
         $arr = [];
 
-        foreach ( $this->collection as $k => $v ) {
-            $arr[ $k ] = $closure($k, $v);
+        foreach ( $this->collection as $k => $row ) {
+            if ($filter = $this->rowFilter($row, $closure)) {
+                $arr[$k] = $filter;
+            }
         }
 
         return new Collection($arr);

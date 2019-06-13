@@ -245,6 +245,92 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
+     * @param string ...$names
+     * @return Json
+     */
+    public function map( string ... $names ): self
+    {
+        $json = new Json();
+
+        foreach ( $this as $k => $v ) {
+            if (in_array($k, $names)) {
+                $json->offsetSet($k, $v);
+            }
+        }
+
+        return $json;
+    }
+
+    /**
+     * @param Closure $closure
+     * @return Json
+     */
+    public function filter( Closure $closure ): self
+    {
+        $json = new Json();
+
+        foreach ( $this as $k => $v ) {
+            $json->offsetSet($k, $closure($k, $v));
+        }
+
+        return $json;
+    }
+
+    /**
+     * @param Closure $closure
+     * @return Json
+     */
+    public function filterRecursive( Closure $closure ): self
+    {
+        $json = new Json();
+
+        foreach ( $this as $k => $v ) {
+            if ( $v instanceof Json) {
+                $json->offsetSet($k, $v->filterRecursive($closure));
+            }
+            else {
+                $json->offsetSet($k, $closure($k, $v));
+            }
+        }
+
+        return $json;
+    }
+
+    /**
+     * @param mixed ...$offsets
+     * @return Json
+     */
+    public function only( ...$offsets ): self
+    {
+        $only = new Json();
+
+        foreach ( $offsets as $offsetList ) {
+            foreach ( (array) $offsetList as $offset ) {
+                $only->offsetSet($offset, $this->offsetGet( $offset ));
+            }
+        }
+
+        return $only;
+    }
+
+    /**
+     * @param mixed ...$offsets
+     * @return Json
+     */
+    public function except( ...$offsets ): self
+    {
+        $except = new Json($this->toArray());
+
+        foreach ( $offsets as $offsetList ) {
+            foreach ( (array) $offsetList as $offset ) {
+                $except->offsetUnset($offset);
+            }
+        }
+
+        return $except;
+    }
+
+    /**
      * @param iterable|null $merge
      * @param bool|null     $overwrite
      * @return Json
