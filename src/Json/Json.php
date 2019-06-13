@@ -231,6 +231,32 @@ class Json extends ArrayObject
     }
 
     /**
+     * @return mixed|null
+     */
+    public function getKeyFirst()
+    {
+        foreach($this as $key => $unused) {
+            return $key;
+        }
+
+        return null;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getKeyLast()
+    {
+        $last = null;
+
+        foreach($this as $key => $unused) {
+            $last = $key;
+        }
+
+        return $last;
+    }
+
+    /**
      * @param int  $index
      * @param null $default
      * @return int|mixed|string|null

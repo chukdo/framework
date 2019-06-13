@@ -39,13 +39,14 @@ Class Where
 
     /**
      * @param string $field
+     * @param string $operator
      * @param        $value
      * @param null   $value2
-     * @return Find
+     * @return Where
      */
-    public function where( string $field, $value, $value2 = null ): self
+    public function where( string $field, string $operator, $value, $value2 = null ): self
     {
-        $this->where[ $field ] = $this->subQuery($field, $value, $value2);
+        $this->where[ $field ] = $this->subQuery($field, $operator, $value, $value2);
 
         return $this;
     }

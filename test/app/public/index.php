@@ -152,20 +152,30 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 
 use Chukdo\Db\Mongo\Aggregate\Expr;
 
-$group = new \Chukdo\Db\Mongo\Aggregate\Group([
+$aggregate = Db::collection('contrat')
+    ->aggregate();
+
+
+$aggregate->group([
     'month' => Expr::month('date'),
     'day'   => Expr::day('date'),
     'year'  => Expr::year('date'),
-]);
-
-$group->calculate('totalprice', Expr::sum(Expr::multiply([
-    'price',
-    'quantity',
-])))
+])
+    ->calculate('totalprice', Expr::sum(Expr::multiply([
+        'price',
+        'quantity',
+    ])))
     ->calculate('averageQuantity', Expr::avg('quantity'))
     ->calculate('count', Expr::sum(1));
-
-dd($group->projection());
+$aggregate->match()
+    ->where('title', '=', 'bonjour');
+$aggregate->addField()->add('totalHomework', Expr::sum('homework'))
+    ->add('totalScore', Expr::add([
+        'totalHomework',
+        'totalQuiz',
+        'extraCredit',
+    ]));
+dd($aggregate->pipe());
 
 $m = new \Chukdo\Db\Mongo\Aggregate\Expression('multiply', [
     'price',

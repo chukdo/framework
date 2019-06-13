@@ -2,6 +2,7 @@
 
 Namespace Chukdo\DB\Mongo;
 
+use Chukdo\Db\Mongo\Aggregate\Aggregate;
 use Closure;
 use Chukdo\Json\Json;
 use Chukdo\Helper\Is;
@@ -156,6 +157,14 @@ Class Collection
     public function write(): Write
     {
         return new Write($this);
+    }
+
+    /**
+     * @return Aggregate
+     */
+    public function aggregate(): Aggregate
+    {
+        return new Aggregate($this);
     }
 
     /**

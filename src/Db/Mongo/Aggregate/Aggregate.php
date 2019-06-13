@@ -4,6 +4,7 @@ namespace Chukdo\Db\Mongo\Aggregate;
 
 use Chukdo\DB\Mongo\Collection;
 use Chukdo\Db\Mongo\Where;
+use Chukdo\Json\Json;
 
 /**
  * Mongo Aggregate Group.
@@ -40,7 +41,10 @@ Class Aggregate
      */
     public function group( $expression ): Group
     {
-        return $this->pipe[] = new Group($expression);
+        $group        = new Group($expression);
+        $this->pipe[] = [ '$group' => $group ];
+
+        return $group;
     }
 
     /**
@@ -49,7 +53,10 @@ Class Aggregate
      */
     public function addField(): AddFields
     {
-        return $this->pipe[] = new AddFields();
+        $addFields    = new AddFields();
+        $this->pipe[] = [ '$addFields' => $addFields ];
+
+        return $addFields;
     }
 
     /**
@@ -58,7 +65,10 @@ Class Aggregate
      */
     public function match(): Where
     {
-        return $this->pipe[] = new Where($this->collection);
+        $where        = new Where($this->collection);
+        $this->pipe[] = [ '$match' => $where ];
+
+        return $where;
     }
 
     /**
@@ -167,7 +177,7 @@ Class Aggregate
      * https://docs.mongodb.com/manual/reference/operator/aggregation/geoNear/
      * @param float      $lon
      * @param float      $lat
-     * @param int        $distance
+     * @param int        $distance (in meter)
      * @param int        $limit
      * @param string     $as
      * @param Where|null $where
@@ -272,14 +282,24 @@ Class Aggregate
      */
     public function pipe(): array
     {
-        $pipes = $this->pipe;
+        $pipes = [];
 
-        foreach ( $pipes as $key => $pipe ) {
-            if ( $pipe instanceof Group || $pipe instanceof Where || $pipe instanceof AddFields ) {
-                $pipes[$key] = $pipe->projection();
+        foreach ( $this->pipe as $pipe ) {
+            $json         = new Json($pipe);
+            $accumulator = $json->getKeyFirst();
+            $expression  = $json->getFirst();
+
+            if ( $accumulator === '$group' || $accumulator === '$addFields' ) {
+                $pipes[] = [ $accumulator => $expression->projection() ];
+            }
+            elseif ( $accumulator === '$match' ) {
+                $pipes[] = [ $accumulator => $expression->filter() ];
+            }
+            else {
+                $pipes[] = $pipe;
             }
         }
 
-        return $this->pipe;
+        return $pipes;
     }
 }
