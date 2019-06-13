@@ -2,11 +2,11 @@
 
 namespace Chukdo\Validation;
 
+use Chukdo\Contracts\Http\Input as InputInterface;
 use Chukdo\Contracts\Validation\Filter as FilterInterface;
 use Chukdo\Contracts\Validation\Validate as ValidateInterface;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
-use Chukdo\Json\Input;
 
 /**
  * Validation de regle.
@@ -118,25 +118,26 @@ class Rule
     {
         list($rule, $attrs) = Str::explode(':', $rule, 2);
 
-        $attrs = new Json(Str::explode(',', $attrs));
+        $json = new Json(Str::explode(',', $attrs));
 
         /* Recherche d'attributs faisant référence à un chemin de configuration (commence par @) */
-        $attrs->filter(function( $k, $v )
-        {
-            $isConf = substr($v, 0, 1) == '@';
-            $conf   = substr($v, 1);
+        $filter = $json->collection()
+            ->filter(function( $k, $v )
+            {
+                $isConf = substr($v, 0, 1) == '@';
+                $conf   = substr($v, 1);
 
-            if ( $isConf ) {
-                return $this->validator->request()
-                    ->conf($conf);
-            }
+                if ( $isConf ) {
+                    return $this->validator->request()
+                        ->conf($conf);
+                }
 
-            return $v;
-        });
+                return $v;
+            });
 
         return [
             $rule,
-            $attrs,
+            $filter,
         ];
     }
 
@@ -172,67 +173,6 @@ class Rule
         }
 
         return true;
-    }
-
-    /**
-     * @return bool
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
-     */
-    protected function inputScalarOrArray(): bool
-    {
-        $input = $this->input();
-
-        if ( $this->type[ 'array' ] ) {
-            if ( $input instanceof Input ) {
-                $countInput = count($input->toSimpleArray());
-
-                if ( $countInput >= $this->type[ 'min' ] && $countInput <= $this->type[ 'max' ] ) {
-                    return true;
-                }
-            }
-
-            $this->error('array');
-            return false;
-        }
-        elseif ( $input instanceof Input ) {
-            $this->error('scalar');
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     *
-     */
-    protected function inputFilters(): void
-    {
-        foreach ( $this->rules as $name => $attrs ) {
-            if ( $filter = $this->validator->filter($name) ) {
-                $filter->attributes($attrs);
-                $this->inputFilter($filter);
-            }
-        }
-    }
-
-    /**
-     * @return bool
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
-     */
-    protected function validateRule(): bool
-    {
-        $validated = true;
-
-        foreach ( $this->rules as $name => $attrs ) {
-            if ( $validate = $this->validator->validator($name) ) {
-                $validate->attributes($attrs);
-                $validated .= $this->validateInput($validate, $name);
-            }
-        }
-
-        return $validated;
     }
 
     /**
@@ -280,25 +220,86 @@ class Rule
     }
 
     /**
+     * @return bool
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
+     */
+    protected function inputScalarOrArray(): bool
+    {
+        $input = $this->input();
+
+        if ( $this->type[ 'array' ] ) {
+            if ( $input instanceof InputInterface ) {
+                $countInput = count($input->toSimpleArray());
+
+                if ( $countInput >= $this->type[ 'min' ] && $countInput <= $this->type[ 'max' ] ) {
+                    return true;
+                }
+            }
+
+            $this->error('array');
+            return false;
+        }
+        elseif ( $input instanceof InputInterface ) {
+            $this->error('scalar');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     *
+     */
+    protected function inputFilters(): void
+    {
+        foreach ( $this->rules as $name => $attrs ) {
+            if ( $filter = $this->validator->filter($name) ) {
+                $filter->attributes($attrs);
+                $this->inputFilter($filter);
+            }
+        }
+    }
+
+    /**
      * @param FilterInterface $filter
      */
     protected function inputFilter( FilterInterface $filter ): void
     {
         $input = $this->input();
 
-        if ( $input instanceof Input ) {
-            $input->filterRecursive(function( $k, $v ) use ( $filter )
+        if ( $input instanceof InputInterface ) {
+            $inputs = $input->collection()->filterRecursive(function( $k, $v ) use ( $filter )
             {
                 return $filter->filter($v);
-            });
+            })->values();
 
             $this->validator->inputs()
-                ->mergeRecursive($input, true);
+                ->mergeRecursive($inputs, true);
         }
         else {
             $this->validator->inputs()
                 ->set($this->path, $filter->filter($input));
         }
+    }
+
+    /**
+     * @return bool
+     * @throws \Chukdo\Bootstrap\ServiceException
+     * @throws \ReflectionException
+     */
+    protected function validateRule(): bool
+    {
+        $validated = true;
+
+        foreach ( $this->rules as $name => $attrs ) {
+            if ( $validate = $this->validator->validator($name) ) {
+                $validate->attributes($attrs);
+                $validated .= $this->validateInput($validate, $name);
+            }
+        }
+
+        return $validated;
     }
 
     /**
@@ -312,7 +313,7 @@ class Rule
     {
         $input = $this->input();
 
-        if ( $input instanceof Input ) {
+        if ( $input instanceof InputInterface ) {
             return $this->validateArray($validate, $name);
         }
 

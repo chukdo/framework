@@ -57,6 +57,7 @@ Class Collection
         $stats = $this->mongo()
             ->command([ 'collStats' => $this->name() ], $this->databaseName())
             ->getIndex(0, new Json())
+            ->collection()
             ->filter(function( $k, $v )
             {
                 if ( is_scalar($v) ) {
@@ -65,7 +66,8 @@ Class Collection
 
                 return false;
             })
-            ->clean();
+            ->clean()
+            ->values();
 
         return $stats;
     }

@@ -154,7 +154,7 @@ class Request
      */
     public function only( ...$offsets ): Json
     {
-        return $this->inputs->only($offsets);
+        return $this->inputs->collection()->only($offsets)->values();
     }
 
     /**
@@ -163,7 +163,7 @@ class Request
      */
     public function except( ...$offsets ): Json
     {
-        return $this->inputs->except($offsets);
+        return $this->inputs->collection()->except($offsets)->values();
     }
 
     /**

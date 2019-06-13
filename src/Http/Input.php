@@ -2,6 +2,7 @@
 
 namespace Chukdo\Http;
 
+use Chukdo\Contracts\Http\Input as InputInterface;
 use Chukdo\Json\Json;
 use Chukdo\Helper\Cli;
 use Chukdo\Storage\FileUploaded;
@@ -13,7 +14,7 @@ use Chukdo\Storage\FileUploaded;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class Input extends Json
+class Input extends Json implements InputInterface
 {
     /**
      * Input constructor.

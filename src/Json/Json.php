@@ -2,6 +2,7 @@
 
 namespace Chukdo\Json;
 
+use Chukdo\Contracts\Json\Json as JsonInterface;
 use ArrayObject;
 use Chukdo\Helper\Cli;
 use Chukdo\Helper\Is;
@@ -19,7 +20,7 @@ use Throwable;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class Json extends ArrayObject
+class Json extends ArrayObject implements JsonInterface
 {
     /**
      * @var Closure|null
@@ -58,7 +59,7 @@ class Json extends ArrayObject
     public function offsetSet( $key, $value ): self
     {
         if ( Is::iterable($value) ) {
-            parent::offsetSet($key, $this->newParentClass($value));
+            parent::offsetSet($key, new Json($value));
         }
         else {
             parent::offsetSet($key, $this->preFilter instanceof Closure
@@ -70,40 +71,18 @@ class Json extends ArrayObject
     }
 
     /**
-     * @param $param
-     * @return mixed
+     * @return Collection
      */
-    protected function newParentClass( $param )
+    public function collection(): Collection
     {
-        $params = [
-            $param,
-            $this->preFilter,
-        ];
-
-        try {
-            $rc = new \ReflectionClass(get_called_class());
-            $rc->newInstanceArgs($params);
-
-            return call_user_func_array([
-                $rc,
-                'newInstance',
-            ],
-                $params);
-        } catch ( Throwable $e ) {
-        }
+        return new Collection($this);
     }
 
     /**
-     * @return Json
+     * @return $this
      */
-    public function clean(): self
+    public function all()
     {
-        foreach ( $this->getArrayCopy() as $k => $v ) {
-            if ( $v === false ) {
-                $this->offsetUnset($k);
-            }
-        }
-
         return $this;
     }
 
@@ -126,38 +105,6 @@ class Json extends ArrayObject
     }
 
     /**
-     * @param mixed $key
-     * @return mixed|null
-     */
-    public function offsetUnset( $key )
-    {
-        if ( $this->offsetExists($key) ) {
-            $offset = parent::offsetGet($key);
-            parent::offsetUnset($key);
-
-            return $offset;
-        }
-
-        return null;
-    }
-
-    /**
-     * @return $this
-     */
-    public function all()
-    {
-        return $this;
-    }
-
-    /**
-     * @return Json
-     */
-    public function clone(): Json
-    {
-        return $this->newParentClass($this->getArrayCopy());
-    }
-
-    /**
      * @return bool
      */
     public function isEmpty(): bool
@@ -165,31 +112,6 @@ class Json extends ArrayObject
         return $this->count() == 0
             ? true
             : false;
-    }
-
-    /**
-     * @return $this
-     */
-    public function resetKeys(): Json
-    {
-        $this->reset(array_values($this->getArrayCopy()));
-
-        return $this;
-    }
-
-    /**
-     * @param array $reset
-     * @return Json
-     */
-    public function reset( array $reset = [] ): self
-    {
-        parent::__construct([]);
-
-        foreach ( $reset as $key => $value ) {
-            $this->offsetSet($key, $value);
-        }
-
-        return $this;
     }
 
     /**
@@ -235,7 +157,7 @@ class Json extends ArrayObject
      */
     public function getKeyFirst()
     {
-        foreach($this as $key => $unused) {
+        foreach ( $this as $key => $unused ) {
             return $key;
         }
 
@@ -249,7 +171,7 @@ class Json extends ArrayObject
     {
         $last = null;
 
-        foreach($this as $key => $unused) {
+        foreach ( $this as $key => $unused ) {
             $last = $key;
         }
 
@@ -272,27 +194,6 @@ class Json extends ArrayObject
         }
 
         return $default;
-    }
-
-    /**
-     * @param string $key
-     * @param int    $order
-     * @return Json
-     */
-    public function sort( string $key, int $order = SORT_ASC ): self
-    {
-        $array  = $this->getArrayCopy();
-        $toSort = [];
-
-        foreach ( $array as $k => $v ) {
-            $toSort[ $k ] = $v[ $key ];
-        }
-
-        array_multisort($toSort, $order, $array);
-
-        $this->reset($array);
-
-        return $this;
     }
 
     /**
@@ -354,7 +255,7 @@ class Json extends ArrayObject
             foreach ( $merge as $k => $v ) {
                 /* Les deux sont iterables on boucle en recursif */
                 if ( is_iterable($v)
-                     && $this->instanceOfJson($this->offsetGet($k)) ) {
+                     && $this->offsetGet($k) instanceof JsonInterface ) {
                     $this->offsetGet($k)
                         ->mergeRecursive($v,
                             $overwrite);
@@ -368,15 +269,6 @@ class Json extends ArrayObject
         }
 
         return $this;
-    }
-
-    /**
-     * @param $object
-     * @return bool
-     */
-    protected function instanceOfJson( $object ): bool
-    {
-        return $object instanceof Json || is_subclass_of($object, 'Chukdo\Json\Json');
     }
 
     /**
@@ -416,88 +308,13 @@ class Json extends ArrayObject
     public function append( $value ): self
     {
         if ( Is::arr($value) ) {
-            parent::append($this->newParentClass($value));
+            parent::append(new Json($value));
         }
         else {
             parent::append($value);
         }
 
         return $this;
-    }
-
-    /**
-     * Applique une fonction aux resultats.
-     * @param Closure $closure
-     * @return Json
-     */
-    public function filter( Closure $closure ): self
-    {
-        foreach ( $this as $k => $v ) {
-            $this->offsetSet($k, $closure($k, $v));
-        }
-
-        return $this;
-    }
-
-    /**
-     * Applique une fonction aux resultats de maniere recursive.
-     * @param closure $closure
-     * @return Json
-     */
-    public function filterRecursive( Closure $closure ): self
-    {
-        foreach ( $this as $k => $v ) {
-            if ( $this->instanceOfJson($v) ) {
-                $v->filterRecursive($closure);
-            }
-            else {
-                $this->offsetSet($k, $closure($k, $v));
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * Appel d'une methode callback.
-     * @param $callback
-     * @return Json
-     */
-    public function callBack( $callback ): self
-    {
-        $toCall = [];
-
-        if ( is_callable($callback) ) {
-            foreach ( $this as $key => $value ) {
-                $toCall[ $key ] = $value;
-            }
-
-            foreach ( $toCall as $key => $value ) {
-                $callback($this,
-                    $key,
-                    $value);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param mixed ...$offsets
-     * @return Json
-     */
-    public function only( ...$offsets ): self
-    {
-        $only = $this->newParentClass([]);
-
-        foreach ( $offsets as $offsetList ) {
-            foreach ( (array) $offsetList as $offset ) {
-                $only->set($offset,
-                    $this->get($offset));
-            }
-        }
-
-        return $only;
     }
 
     /**
@@ -516,7 +333,7 @@ class Json extends ArrayObject
         $endPath   = $arr->join('.');
         $get       = $this->offsetGet($firstPath);
 
-        if ( $this->instanceOfJson($get) ) {
+        if ( $get instanceof JsonInterface ) {
             return $get->get($endPath);
         }
 
@@ -562,23 +379,6 @@ class Json extends ArrayObject
     }
 
     /**
-     * @param mixed ...$offsets
-     * @return Json
-     */
-    public function except( ...$offsets ): self
-    {
-        $except = $this->newParentClass($this->getArrayCopy());
-
-        foreach ( $offsets as $offsetList ) {
-            foreach ( (array) $offsetList as $offset ) {
-                $except->unset($offset);
-            }
-        }
-
-        return $except;
-    }
-
-    /**
      * @param string $path
      * @return mixed|null
      */
@@ -593,8 +393,24 @@ class Json extends ArrayObject
         $endPath   = $arr->join('.');
         $get       = $this->offsetGet($firstPath);
 
-        if ( $this->instanceOfJson($get) ) {
+        if ( $get instanceof JsonInterface ) {
             return $get->unset($endPath);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param mixed $key
+     * @return mixed|null
+     */
+    public function offsetUnset( $key )
+    {
+        if ( $this->offsetExists($key) ) {
+            $offset = parent::offsetGet($key);
+            parent::offsetUnset($key);
+
+            return $offset;
         }
 
         return null;
@@ -642,12 +458,12 @@ class Json extends ArrayObject
         $firstPath = $arr->getFirstAndRemove();
         $emptyPath = $arr->empty();
         $endPath   = $arr->join('.');
-        $json      = $this->newParentClass([]);
+        $json      = new Json([]);
         $get       = $this->offsetGet($firstPath);
 
         if ( $firstPath == '*' ) {
             foreach ( $this as $key => $value ) {
-                if ( $this->instanceOfJson($value) ) {
+                if ( $value instanceof JsonInterface ) {
                     if ( ( $get = $value->wildcard($endPath,
                         $scalarResultOnly) )->count() ) {
                         $json->offsetSet($key,
@@ -656,7 +472,7 @@ class Json extends ArrayObject
                 }
             }
         }
-        elseif ( $this->instanceOfJson($get) && !$emptyPath ) {
+        elseif ( $get instanceof JsonInterface && !$emptyPath ) {
             $json->offsetSet($firstPath,
                 $get->wildcard($endPath,
                     $scalarResultOnly));
@@ -681,7 +497,7 @@ class Json extends ArrayObject
             $k = trim($prefix . '.' . $k,
                 '.');
 
-            if ( $this->instanceOfJson($v) ) {
+            if ( $v instanceof JsonInterface ) {
                 $mixed = array_merge($mixed,
                     $v->toSimpleArray($k));
             }
@@ -691,27 +507,6 @@ class Json extends ArrayObject
         }
 
         return $mixed;
-    }
-
-    /**
-     * @return Xml
-     * @throws \Chukdo\Xml\NodeException
-     * @throws \Chukdo\Xml\XmlException
-     */
-    public function toXml()
-    {
-        $xml = new Xml();
-        $xml->import($this->toArray());
-
-        return $xml;
-    }
-
-    /**
-     * @return array
-     */
-    public function toArray(): array
-    {
-        return $this->getArrayCopy();
     }
 
     /**
@@ -751,6 +546,15 @@ class Json extends ArrayObject
 
         return $climate->output->get('buffer')
             ->get();
+    }    /**
+     * @return Xml
+     */
+    public function toXml(): Xml
+    {
+        $xml = new Xml();
+        $xml->import($this->toArray());
+
+        return $xml;
     }
 
     /**
@@ -783,6 +587,12 @@ class Json extends ArrayObject
             $function,
         ],
             $param);
+    }    /**
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return $this->getArrayCopy();
     }
 
     /**
@@ -842,4 +652,10 @@ class Json extends ArrayObject
     {
         return (bool) $this->offsetUnset($key);
     }
+
+
+
+
+
+
 }

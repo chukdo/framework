@@ -111,6 +111,7 @@ Class Mongo
     {
         $status = $this->command([ 'replSetGetStatus' => 1 ])
             ->getIndex('0', new Json())
+            ->collection()
             ->filter(function( $k, $v )
             {
                 if ( is_scalar($v) ) {
@@ -119,7 +120,8 @@ Class Mongo
 
                 return false;
             })
-            ->clean();
+            ->clean()
+            ->values();
 
         return $status;
     }
@@ -131,6 +133,7 @@ Class Mongo
     {
         $status = $this->command([ 'serverStatus' => 1 ])
             ->getIndex('0', new Json())
+            ->collection()
             ->filter(function( $k, $v )
             {
                 if ( is_scalar($v) ) {
@@ -139,7 +142,8 @@ Class Mongo
 
                 return false;
             })
-            ->clean();
+            ->clean()
+            ->values();
 
         return $status;
     }
