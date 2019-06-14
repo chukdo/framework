@@ -13,7 +13,7 @@ use MongoDB\BSON\UTCDateTime;
 use MongoDB\BSON\Timestamp;
 
 /**
- * Mongo Mongo Collection.
+ * Mongo Mongo Collect.
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -37,7 +37,7 @@ Class Collection
     protected $collection;
 
     /**
-     * Collection constructor.
+     * Collect constructor.
      * @param Mongo  $mongo
      * @param string $database
      * @param string $collection

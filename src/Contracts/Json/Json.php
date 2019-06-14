@@ -2,7 +2,7 @@
 
 namespace Chukdo\Contracts\Json;
 
-use Chukdo\Json\Collection;
+use Chukdo\Json\Collect;
 use Chukdo\Xml\Xml;
 
 /**
@@ -25,7 +25,7 @@ interface Json
     public function toXml(): Xml;
 
     /**
-     * @return Collection
+     * @return Collect
      */
-    public function collection(): Collection;
+    public function collect(): Collect;
 }

@@ -152,18 +152,18 @@ class Request
      * @param mixed ...$offsets
      * @return Json
      */
-    public function only( ...$offsets ): Json
+    public function with( ...$offsets ): Json
     {
-        return $this->inputs->collection()->only($offsets)->values();
+        return $this->inputs->with($offsets);
     }
 
     /**
      * @param mixed ...$offsets
      * @return Json
      */
-    public function except( ...$offsets ): Json
+    public function without( ...$offsets ): Json
     {
-        return $this->inputs->collection()->except($offsets)->values();
+        return $this->inputs->without($offsets);
     }
 
     /**

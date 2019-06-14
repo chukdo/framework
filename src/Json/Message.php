@@ -43,16 +43,14 @@ class Message extends Json
     /**
      * @param string|null $title
      * @param string|null $color
-     * @param string|null $widthFirstCol
      * @return string
      */
-    public function toHtml( string $title = null, string $color = null, string $widthFirstCol = null ): string
+    public function toHtml( string $title = null, string $color = null ): string
     {
         return To::html($this,
             $title
                 ?: $this->name,
-            $color,
-            $widthFirstCol);
+            $color);
     }
 
     /**

@@ -71,11 +71,11 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
-     * @return Collection
+     * @return Collect
      */
-    public function collection(): Collection
+    public function collect(): Collect
     {
-        return new Collection($this);
+        return new Collect($this);
     }
 
     /**
@@ -300,7 +300,7 @@ class Json extends ArrayObject implements JsonInterface
      * @param mixed ...$offsets
      * @return Json
      */
-    public function only( ...$offsets ): self
+    public function with( ...$offsets ): self
     {
         $only = new Json();
 
@@ -317,7 +317,7 @@ class Json extends ArrayObject implements JsonInterface
      * @param mixed ...$offsets
      * @return Json
      */
-    public function except( ...$offsets ): self
+    public function without( ...$offsets ): self
     {
         $except = new Json($this->toArray());
 
@@ -355,6 +355,22 @@ class Json extends ArrayObject implements JsonInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @return Json
+     */
+    public function clean(): self
+    {
+        $json = new Json();
+
+        foreach ( $this as $k => $v ) {
+            if ( $v !== null && $v !== '') {
+                $json->offsetSet($k, $v);
+            }
+        }
+
+        return $json;
     }
 
     /**

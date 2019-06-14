@@ -147,9 +147,19 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
     }
 }
 
+$json = new \Chukdo\Json\Json([
+   ['prix' => 10, 'produit' => 'maison', 'cp' => 16200],
+   ['prix' => 100, 'produit' => 'avion', 'cp' => 33000],
+   ['prix' => 1000, 'produit' => 'voiture', 'cp' => 64000],
+   ['prix' => 200, 'produit' => 'moto', 'cp' => 75000],
+   ['prix' => 300, 'produit' => 'telephone', 'cp' => 67000]
+]);
+
+dd($json->collect()->where('prix', 'in', [200, 300])->values()->toHtml());
+
 //dd(Conf::offsetGet('db.mongo.dsn'));
 //dd(Db::collection('contrat'));
-
+/**
 use Chukdo\Db\Mongo\Aggregate\Expr;
 
 $aggregate = Db::collection('contrat')
@@ -205,7 +215,7 @@ dd($find
 
 //$contrat->write()->insert();
 //$contrat->write()->set()->set()->where()->updateOne();
-
+*/
 Request::Inputs()
     ->set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, Conf::get('salt')));
 Request::Inputs()
