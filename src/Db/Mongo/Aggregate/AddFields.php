@@ -21,7 +21,7 @@ Class AddFields
      * @param        $expression
      * @return AddFields
      */
-    public function add(string $field, $expression): self
+    public function addField(string $field, $expression): self
     {
         $this->addFields[$field] = Expression::parseExpression($expression);
 

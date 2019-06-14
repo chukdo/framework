@@ -49,11 +49,13 @@ Class Aggregate
 
     /**
      * https://docs.mongodb.com/manual/reference/operator/aggregation/addFields/
+     * @param string $field
+     * @param        $expression
      * @return AddFields
      */
-    public function addField(): AddFields
+    public function addField( string $field, $expression ): AddFields
     {
-        $addFields    = new AddFields();
+        $addFields    = ( new AddFields() )->addField($field, $expression);
         $this->pipe[] = [ '$addFields' => $addFields ];
 
         return $addFields;
@@ -61,11 +63,15 @@ Class Aggregate
 
     /**
      * https://docs.mongodb.com/manual/reference/operator/aggregation/match/
+     * @param string $field
+     * @param string $operator
+     * @param        $value
+     * @param null   $value2
      * @return Where
      */
-    public function match(): Where
+    public function where( string $field, string $operator, $value, $value2 = null ): Where
     {
-        $where        = new Where($this->collection);
+        $where        = ( new Where($this->collection) )->where($field, $operator, $value, $value2);
         $this->pipe[] = [ '$match' => $where ];
 
         return $where;
@@ -285,7 +291,7 @@ Class Aggregate
         $pipes = [];
 
         foreach ( $this->pipe as $pipe ) {
-            $json         = new Json($pipe);
+            $json        = new Json($pipe);
             $accumulator = $json->getKeyFirst();
             $expression  = $json->getFirst();
 

@@ -155,11 +155,11 @@ $json = new \Chukdo\Json\Json([
    ['prix' => 300, 'produit' => 'telephone', 'cp' => 67000]
 ]);
 
-dd($json->collect()->where('prix', 'in', [200, 300])->values()->toHtml());
+//dd($json->collect()->where('prix', 'in', [200, 300])->values()->toHtml());
 
 //dd(Conf::offsetGet('db.mongo.dsn'));
 //dd(Db::collection('contrat'));
-/**
+
 use Chukdo\Db\Mongo\Aggregate\Expr;
 
 $aggregate = Db::collection('contrat')
@@ -177,10 +177,9 @@ $aggregate->group([
     ])))
     ->calculate('averageQuantity', Expr::avg('quantity'))
     ->calculate('count', Expr::sum(1));
-$aggregate->match()
-    ->where('title', '=', 'bonjour');
-$aggregate->addField()->add('totalHomework', Expr::sum('homework'))
-    ->add('totalScore', Expr::add([
+$aggregate->where('title', '=', 'bonjour')->where('price', '>', 100);
+$aggregate->addField('totalHomework', Expr::sum('homework'))
+    ->addField('totalScore', Expr::add([
         'totalHomework',
         'totalQuiz',
         'extraCredit',
@@ -215,7 +214,7 @@ dd($find
 
 //$contrat->write()->insert();
 //$contrat->write()->set()->set()->where()->updateOne();
-*/
+
 Request::Inputs()
     ->set('csrf', \Chukdo\Helper\Crypto::encodeCsrf(60, Conf::get('salt')));
 Request::Inputs()
