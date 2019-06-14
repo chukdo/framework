@@ -167,6 +167,12 @@ Class Find extends Where
     {
         foreach ( $this->limit(1)
             ->cursor() as $key => $value ) {
+
+            /** Suppression des ID defini par without */
+            if ( $this->hiddenId ) {
+                $value->offsetUnset('_id');
+            }
+
             return $value;
         }
 

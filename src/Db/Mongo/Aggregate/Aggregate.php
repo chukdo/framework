@@ -308,4 +308,6 @@ Class Aggregate
 
         return $pipes;
     }
+
+    // all
 }
