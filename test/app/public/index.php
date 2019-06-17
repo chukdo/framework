@@ -248,14 +248,17 @@ use Chukdo\Db\Mongo\Aggregate\Expr;
 $write = db::collection('test', 'test')
     ->write();
 
-    $write->startTransaction();
-    $write->insert([ 'cust_id'  => 'domingo',
-               'ord_date' => new DateTime(),
-               'status'   => 'A',
-               'amount'   => 400,
-    ]);
-    $write->set('amount', 600)->where('cust_id', '=', 'domingo')->update();
-    $write->commitTransaction();
+$write->startTransaction();
+$write->insert([
+    'cust_id'  => 'domingo',
+    'ord_date' => new DateTime(),
+    'status'   => 'A',
+    'amount'   => 400,
+]);
+$write->set('amount', 600)
+    ->where('cust_id', '=', 'domingo')
+    ->update();
+$write->commitTransaction();
 
 $aggregate = Db::collection('test', 'test')
     ->aggregate()

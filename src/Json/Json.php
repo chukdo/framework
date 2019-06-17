@@ -422,10 +422,12 @@ class Json extends ArrayObject implements JsonInterface
     public function append( $value ): self
     {
         if ( Is::arr($value) ) {
-            parent::append(new Json($value));
+            parent::append(new Json($value, $this->preFilter));
         }
         else {
-            parent::append($value);
+            parent::append($this->preFilter instanceof Closure
+                ? ( $this->preFilter )(null, $value)
+                : $value);
         }
 
         return $this;
