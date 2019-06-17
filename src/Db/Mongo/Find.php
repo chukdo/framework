@@ -3,7 +3,6 @@
 namespace Chukdo\Db\Mongo;
 
 use Chukdo\Json\Json;
-use MongoDB\Collection as MongoDbCollection;
 
 /**
  * Mongo Find.
@@ -175,14 +174,6 @@ Class Find extends Where
     {
         return new Cursor($this->collection()
             ->find($this->filter(), $this->projection()));
-    }
-
-    /**
-     * @return MongoDbCollection
-     */
-    public function collection(): MongoDbCollection
-    {
-        return $this->collection->collection();
     }
 
     /**

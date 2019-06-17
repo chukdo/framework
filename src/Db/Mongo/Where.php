@@ -3,6 +3,7 @@
 namespace Chukdo\Db\Mongo;
 
 use MongoDB\BSON\Regex;
+use MongoDB\Collection as MongoDbCollection;
 
 /**
  * Mongo Where Trait.
@@ -35,6 +36,14 @@ Class Where
     public function __construct( Collection $collection )
     {
         $this->collection = $collection;
+    }
+
+    /**
+     * @return MongoDbCollection
+     */
+    public function collection(): MongoDbCollection
+    {
+        return $this->collection->collection();
     }
 
     /**

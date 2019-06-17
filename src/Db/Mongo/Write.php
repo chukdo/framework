@@ -3,7 +3,6 @@
 namespace Chukdo\Db\Mongo;
 
 use Chukdo\Json\Json;
-use MongoDB\Collection as MongoDbCollection;
 use MongoDB\Operation\FindOneAndUpdate;
 
 /**
@@ -19,6 +18,11 @@ Class Write extends Where
      * @var array
      */
     protected $fields = [];
+
+    /**
+     * @var array
+     */
+    protected $options = [];
 
     /**
      * @param array $values
@@ -132,11 +136,24 @@ Class Write extends Where
     }
 
     /**
-     * @return MongoDbCollection
+     * @param array $values
+     * @return string|null
      */
-    public function collection(): MongoDbCollection
+    public function insert( array $values ): ?string
     {
-        return $this->collection->collection();
+        return (string) $this->collection()
+            ->insertOne((new Json($values, Collection::filterIn()))->toArray(), $this->options)
+            ->getInsertedId();
+    }
+
+    /**
+     * @return int
+     */
+    public function update(): int
+    {
+        return (int) $this->collection()
+            ->updateMany($this->filter(), $this->fields(), $this->options)
+            ->getModifiedCount();
     }
 
     /**
@@ -148,43 +165,26 @@ Class Write extends Where
     }
 
     /**
-     * @param array $values
-     * @return string|null
-     */
-    public function insert( array $values ): ?string
-    {
-        return (string) $this->collection()
-            ->insertOne($values)
-            ->getInsertedId();
-    }
-
-    /**
-     * @return int
-     */
-    public function update(): int
-    {
-        return (int) $this->collection()
-            ->updateMany($this->filter(), $this->fields())
-            ->getModifiedCount();
-    }
-
-    /**
      * @return string|null
      */
     public function updateOrInsert(): ?string
     {
+        $options = array_merge([
+            'upsert' => true,
+        ], $this->options);
+
         return (string) $this->collection()
-            ->updateOne($this->filter(), $this->fields(), [ 'upsert' => true ])
+            ->updateOne($this->filter(), $this->fields(), $options)
             ->getUpsertedId();
     }
 
     /**
-     * @return int
+     * @return bool
      */
-    public function updateOne(): int
+    public function updateOne(): bool
     {
-        return (int) $this->collection()
-            ->updateOne($this->filter(), $this->fields())
+        return (bool) $this->collection()
+            ->updateOne($this->filter(), $this->fields(), $this->options)
             ->getModifiedCount();
     }
 
@@ -194,15 +194,15 @@ Class Write extends Where
      */
     public function updateOneAndGet( bool $before = false ): Json
     {
-        $projection = [
+        $options = array_merge([
             'projection'     => [],
             'returnDocument' => $before
                 ? FindOneAndUpdate::RETURN_DOCUMENT_BEFORE
                 : FindOneAndUpdate::RETURN_DOCUMENT_AFTER,
-        ];
+        ], $this->options);
 
         return new Json($this->collection()
-            ->findOneAndUpdate($this->filter(), $this->fields(), $projection), Collection::filterOut());
+            ->findOneAndUpdate($this->filter(), $this->fields(), $options), Collection::filterOut());
     }
 
     /**
@@ -211,17 +211,17 @@ Class Write extends Where
     public function delete(): int
     {
         return (int) $this->collection()
-            ->deleteMany($this->filter())
+            ->deleteMany($this->filter(), $this->options)
             ->getDeletedCount();
     }
 
     /**
-     * @return int
+     * @return bool
      */
-    public function deleteOne(): int
+    public function deleteOne(): bool
     {
-        return (int) $this->collection()
-            ->deleteOne($this->filter())
+        return (bool) $this->collection()
+            ->deleteOne($this->filter(), $this->options)
             ->getDeletedCount();
     }
 
@@ -231,6 +231,53 @@ Class Write extends Where
     public function deleteOneAndGet(): Json
     {
         return new Json($this->collection()
-            ->findOneAndDelete($this->filter()), Collection::filterOut());
+            ->findOneAndDelete($this->filter(), $this->options), Collection::filterOut());
+    }
+
+    /**
+     * @return Write
+     */
+    public function startTransaction(): self
+    {
+        if (isset($this->options['session'])) {
+            throw new MongoException('Session or Transaction already exists.');
+        }
+
+        $session = $this->collection->mongo()->mongo()->startSession();
+        $session->startTransaction([]);
+
+        $this->options['session'] = $session;
+
+        return $this;
+    }
+
+    /**
+     * @return Write
+     */
+    public function abortTransaction(): self
+    {
+        if (!isset($this->options['session'])) {
+            throw new MongoException('Session or Transaction no exists.');
+        }
+
+        $this->options['session']->abortTransaction();
+        unset($this->options['session']);
+
+        return $this;
+    }
+
+    /**
+     * @return Write
+     */
+    public function commitTransaction(): self
+    {
+        if (!isset($this->options['session'])) {
+            throw new MongoException('Session or Transaction no exists.');
+        }
+
+        $this->options['session']->commitTransaction();
+        unset($this->options['session']);
+
+        return $this;
     }
 }

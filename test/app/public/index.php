@@ -219,31 +219,43 @@ $json = new \Chukdo\Json\Json([
 ]);
 
 // addToSet > tva, ref.prix tcc closure
-
-dd($json->collect()
-    ->where('ref.public', '=', 'ORPI')
-    ->without('prix', 'ref.client')
-    ->addToSet([
-        'tva',
-        'ref.prix',
-    ], 'prix.ttc', function( $p )
-    {
-        return ( 1 + ( $p[ 'tva' ] / 100 ) ) * $p[ 'ref.prix' ];
-    })
-    ->without('tva', 'ref.prix')
-    ->filterKey('ref.public', function( $r )
-    {
-        return strtolower($r);
-    })
-    ->group('cp')
-    //->match('cp', '=', 'ref.cp')
-    ->values()
-    ->toHtml());
-
+/**
+ * dd($json->collect()
+ * ->where('ref.public', '=', 'ORPI')
+ * ->without('prix', 'ref.client')
+ * ->addToSet([
+ * 'tva',
+ * 'ref.prix',
+ * ], 'prix.ttc', function( $p )
+ * {
+ * return ( 1 + ( $p[ 'tva' ] / 100 ) ) * $p[ 'ref.prix' ];
+ * })
+ * ->without('tva', 'ref.prix')
+ * ->filterKey('ref.public', function( $r )
+ * {
+ * return strtolower($r);
+ * })
+ * ->group('cp')
+ * //->match('cp', '=', 'ref.cp')
+ * ->values()
+ * ->toHtml());
+ */
 //dd(Conf::offsetGet('db.mongo.dsn'));
 //dd(Db::collection('contrat'));
 
 use Chukdo\Db\Mongo\Aggregate\Expr;
+
+$write = db::collection('test', 'test')
+    ->write();
+
+    $write->startTransaction();
+    $write->insert([ 'cust_id'  => 'domingo',
+               'ord_date' => new DateTime(),
+               'status'   => 'A',
+               'amount'   => 400,
+    ]);
+    $write->set('amount', 600)->where('cust_id', '=', 'domingo')->update();
+    $write->commitTransaction();
 
 $aggregate = Db::collection('test', 'test')
     ->aggregate()
@@ -253,7 +265,7 @@ $aggregate = Db::collection('test', 'test')
     ->calculate('total', Expr::sum('amount'))
     ->pipe()
     ->sort('total', 'desc');
-dd(( new \Chukdo\Json\Json($aggregate->projection()) )->toArray());
+dd(( new \Chukdo\Json\Json($aggregate->all()) )->toHtml());
 
 $m = new \Chukdo\Db\Mongo\Aggregate\Expression('multiply', [
     'price',
