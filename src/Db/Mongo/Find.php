@@ -67,21 +67,12 @@ Class Find extends Where
      * @param array $without
      * @return Find
      */
-    public function project(array $with = [], array $without = []): self
+    public function project( array $with = [], array $without = [] ): self
     {
         $this->withFields($with);
         $this->withFields($without);
 
         return $this;
-    }
-
-    /**
-     * @param string ...$fields
-     * @return Find
-     */
-    public function with( string ...$fields ): self
-    {
-        return $this->withFields($fields);
     }
 
     /**
@@ -95,6 +86,15 @@ Class Find extends Where
         }
 
         return $this;
+    }
+
+    /**
+     * @param string ...$fields
+     * @return Find
+     */
+    public function with( string ...$fields ): self
+    {
+        return $this->withFields($fields);
     }
 
     /**
@@ -150,17 +150,6 @@ Class Find extends Where
     }
 
     /**
-     * @param int $limit
-     * @return Find
-     */
-    public function limit( int $limit ): self
-    {
-        $this->limit = $limit;
-
-        return $this;
-    }
-
-    /**
      * @return Json
      */
     public function one(): Json
@@ -184,7 +173,64 @@ Class Find extends Where
      */
     public function cursor(): Cursor
     {
-        return new Cursor($this);
+        return new Cursor($this->collection()
+            ->find($this->filter(), $this->projection()));
+    }
+
+    /**
+     * @return MongoDbCollection
+     */
+    public function collection(): MongoDbCollection
+    {
+        return $this->collection->collection();
+    }
+
+    /**
+     * @return array
+     */
+    public function projection(): array
+    {
+        $projection = [
+            'projection'      => $this->projection,
+            'noCursorTimeout' => false,
+        ];
+
+        if ( !empty($this->sort) ) {
+            $projection[ 'sort' ] = $this->sort;
+        }
+
+        if ( $this->skip > 0 ) {
+            $projection[ 'skip' ] = $this->skip;
+        }
+
+        if ( $this->limit > 0 ) {
+            $projection[ 'limit' ] = $this->limit;
+        }
+
+        return $projection;
+    }
+
+    /**
+     * @param int $limit
+     * @return Find
+     */
+    public function limit( int $limit ): self
+    {
+        $this->limit = $limit;
+
+        return $this;
+    }
+
+    /**
+     * @return Json
+     */
+    public function explain(): Json
+    {
+        return new Cursor($this->collection()
+            ->find($this->filter(), $this->projection()), [
+            'explain'   => true,
+            'useCursor' => true,
+        ]);
     }
 
     /**
@@ -228,14 +274,6 @@ Class Find extends Where
     }
 
     /**
-     * @return MongoDbCollection
-     */
-    public function collection(): MongoDbCollection
-    {
-        return $this->collection->collection();
-    }
-
-    /**
      * @param string $field
      * @return Json
      */
@@ -243,30 +281,5 @@ Class Find extends Where
     {
         return new Json($this->collection()
             ->distinct($field, $this->filter()));
-    }
-
-    /**
-     * @return array
-     */
-    public function projection(): array
-    {
-        $projection = [
-            'projection'      => $this->projection,
-            'noCursorTimeout' => false,
-        ];
-
-        if ( !empty($this->sort) ) {
-            $projection[ 'sort' ] = $this->sort;
-        }
-
-        if ( $this->skip > 0 ) {
-            $projection[ 'skip' ] = $this->skip;
-        }
-
-        if ( $this->limit > 0 ) {
-            $projection[ 'limit' ] = $this->limit;
-        }
-
-        return $projection;
     }
 }

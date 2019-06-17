@@ -3,6 +3,8 @@
 namespace Chukdo\Db\Mongo\Aggregate;
 
 use Chukdo\DB\Mongo\Collection;
+use Chukdo\Db\Mongo\Cursor;
+use Chukdo\Db\Mongo\Match;
 use Chukdo\Db\Mongo\Where;
 use Chukdo\Json\Json;
 
@@ -41,7 +43,7 @@ Class Aggregate
      */
     public function group( $expression ): Group
     {
-        $group        = new Group($expression);
+        $group        = new Group($this, $expression);
         $this->pipe[] = [ '$group' => $group ];
 
         return $group;
@@ -55,7 +57,8 @@ Class Aggregate
      */
     public function addField( string $field, $expression ): AddFields
     {
-        $addFields    = ( new AddFields() )->addField($field, $expression);
+        $addFields = new AddFields($this);
+        $addFields->addField($field, $expression);
         $this->pipe[] = [ '$addFields' => $addFields ];
 
         return $addFields;
@@ -67,14 +70,15 @@ Class Aggregate
      * @param string $operator
      * @param        $value
      * @param null   $value2
-     * @return Where
+     * @return Match
      */
-    public function where( string $field, string $operator, $value, $value2 = null ): Where
+    public function where( string $field, string $operator, $value, $value2 = null ): Match
     {
-        $where        = ( new Where($this->collection) )->where($field, $operator, $value, $value2);
-        $this->pipe[] = [ '$match' => $where ];
+        $match = new Match($this, $this->collection);
+        $match->where($field, $operator, $value, $value2);
+        $this->pipe[] = [ '$match' => $match ];
 
-        return $where;
+        return $match;
     }
 
     /**
@@ -284,9 +288,33 @@ Class Aggregate
     }
 
     /**
+     * @param bool $allowDiskUse
+     * @param bool $bypassDocumentValidation
+     * @return Json
+     */
+    public function all( bool $allowDiskUse = false, bool $bypassDocumentValidation = false ): Json
+    {
+        return new Json($this->cursor([
+            'allowDiskUse'             => $allowDiskUse,
+            'bypassDocumentValidation' => $bypassDocumentValidation,
+            'useCursor'                => true,
+        ]));
+    }
+
+    /**
+     * @param array $options
+     * @return Cursor
+     */
+    public function cursor( array $options = [] ): Cursor
+    {
+        return new Cursor($this->collection->collection()
+            ->aggregate($this->projection(), $options));
+    }
+
+    /**
      * @return array
      */
-    public function pipe(): array
+    public function projection(): array
     {
         $pipes = [];
 
@@ -309,5 +337,15 @@ Class Aggregate
         return $pipes;
     }
 
-    // all
+    /**
+     * @return Json
+     */
+    public function explain(): Json
+    {
+        return new Json(new Cursor($this->collection->collection()
+            ->aggregate($this->projection(), [
+                'explain'   => true,
+                'useCursor' => true,
+            ])));
+    }
 }

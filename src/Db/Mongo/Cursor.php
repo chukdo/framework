@@ -7,6 +7,7 @@ use Chukdo\Json\Json;
 use MongoDB\Driver\Cursor as MongoDbCursor;
 use Iterator;
 use IteratorIterator;
+use Traversable;
 
 /**
  * Mongodb cursor.
@@ -34,13 +35,11 @@ class Cursor implements Iterator
 
     /**
      * Cursor constructor.
-     * @param Find $find
+     * @param Traversable $cursor
      */
-    public function __construct( Find $find )
+    public function __construct( Traversable $cursor )
     {
-        $this->find   = $find;
-        $this->cursor = $find->collection()
-            ->find($find->filter(), $find->projection());
+        $this->cursor = $cursor;
 
         $this->cursor->setTypeMap([
             'root'     => 'array',

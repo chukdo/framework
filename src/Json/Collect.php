@@ -18,9 +18,9 @@ use Closure;
 class Collect
 {
     /**
-     * @var array
+     * @var Json
      */
-    protected $collection = [];
+    protected $collection;
 
     /**
      * Collect constructor.
@@ -29,189 +29,175 @@ class Collect
     public function __construct( $json )
     {
         if ( $json instanceof JsonInterface ) {
-            $this->collection = $json->toArray();
+            $this->collection = $json;
         }
         elseif ( Is::arr($json) ) {
-            $this->collection = $json;
+            $this->collection = new Json($json);
         }
     }
 
     /**
      * @param string $field
      * @param string $operator
-     * @param        $value
-     * @param null   $value2
+     * @param        $fieldValue
+     * @param null   $fieldValue2
      * @return Collect
      */
-    public function where( string $field, string $operator, $value, $value2 = null ): Collect
+    public function match( string $field, string $operator, $fieldValue, $fieldValue2 = null ): Collect
+    {
+        $json    = new json();
+        $closure = $this->whereClosure($operator);
+
+        foreach ( $this->collection as $k => $v ) {
+            if ( $g = $v->get($field) ) {
+                if ( $c = $closure($g, $v->get($fieldValue), $v->get($fieldValue2)) ) {
+                    $json->offsetSet($k, $v);
+                }
+            }
+        }
+
+        return new Collect($json);
+    }
+
+    /**
+     * @param string|Closure $operator
+     * @return Closure
+     */
+    protected function whereClosure( $operator ): Closure
     {
         $closure = null;
 
         switch ( $operator ) {
             case '=' :
-                $closure = function( $k, $v ) use ( $field, $value, $value2 )
+                $closure = function( $v, $value )
                 {
-                    if ( $k == $field && $v == $value ) {
-                        return $v;
-                    }
-
-                    return null;
+                    return $v == $value
+                        ? $v
+                        : null;
                 };
                 break;
             case '!=' :
-                $closure = function( $k, $v ) use ( $field, $value, $value2 )
+                $closure = function( $v, $value )
                 {
-                    if ( $k == $field && $v != $value ) {
-                        return $v;
-                    }
-
-                    return null;
+                    return $v !== $value
+                        ? $v
+                        : null;
                 };
                 break;
             case '>' :
-                $closure = function( $k, $v ) use ( $field, $value, $value2 )
+                $closure = function( $v, $value )
                 {
-                    if ( $k == $field && $v > $value ) {
-                        return $v;
-                    }
-
-                    return null;
+                    return $v > $value
+                        ? $v
+                        : null;
                 };
                 break;
             case '>=':
-                $closure = function( $k, $v ) use ( $field, $value, $value2 )
+                $closure = function( $v, $value )
                 {
-                    if ( $k == $field && $v >= $value ) {
-                        return $v;
-                    }
-
-                    return null;
+                    return $v >= $value
+                        ? $v
+                        : null;
                 };
                 break;
             case '<':
-                $closure = function( $k, $v ) use ( $field, $value, $value2 )
+                $closure = function( $v, $value )
                 {
-                    if ( $k == $field && $v < $value ) {
-                        return $v;
-                    }
-
-                    return null;
+                    return $v < $value
+                        ? $v
+                        : null;
                 };
                 break;
             case '<=':
-                $closure = function( $k, $v ) use ( $field, $value, $value2 )
+                $closure = function( $v, $value )
                 {
-                    if ( $k == $field && $v <= $value ) {
-                        return $v;
-                    }
-
-                    return null;
+                    return $v <= $value
+                        ? $v
+                        : null;
                 };
                 break;
             case '<>' :
-                $closure = function( $k, $v ) use ( $field, $value, $value2 )
+                $closure = function( $v, $value, $value2 )
                 {
-                    if ( $k == $field && $v < $value && $v > $value2 ) {
-                        return $v;
-                    }
-
-                    return null;
+                    return $v < $value && $v > $value2
+                        ? $v
+                        : null;
                 };
                 break;
             case '<=>' :
-                $closure = function( $k, $v ) use ( $field, $value, $value2 )
+                $closure = function( $v, $value, $value2 )
                 {
-                    if ( $k == $field && $v <= $value && $v >= $value2 ) {
-                        return $v;
-                    }
-
-                    return null;
+                    return $v <= $value && $v >= $value2
+                        ? $v
+                        : null;
                 };
                 break;
             case 'in':
-                $closure = function( $k, $v ) use ( $field, $value, $value2 )
+                $closure = function( $v, $value )
                 {
-                    if ( $k == $field && in_array($v, (array) $value) ) {
-                        return $v;
-                    }
-
-                    return null;
+                    return in_array($v, (array) $value)
+                        ? $v
+                        : null;
                 };
                 break;
             case '!in':
-                $closure = function( $k, $v ) use ( $field, $value, $value2 )
+                $closure = function( $v, $value )
                 {
-                    if ( $k == $field && !in_array($v, (array) $value) ) {
-                        return $v;
-                    }
-
-                    return null;
+                    return !in_array($v, (array) $value)
+                        ? $v
+                        : null;
                 };
                 break;
             case 'type':
-                $closure = function( $k, $v ) use ( $field, $value, $value2 )
+                $closure = function( $v, $value )
                 {
-                    if ( $k == $field && Str::type($v) == $value ) {
-                        return $v;
-                    }
-
-                    return null;
+                    return Str::type($v) == $value
+                        ? $v
+                        : null;
                 };
                 break;
             case '%':
-                $closure = function( $k, $v ) use ( $field, $value, $value2 )
+                $closure = function( $v, $value, $value2 )
                 {
-                    if ( $k == $field && $v % $value == $value2
-                        ?: 0 ) {
-                        return $v;
-                    }
-
-                    return null;
+                    return $v % $value == $value2
+                        ? $v
+                        : null;
                 };
                 break;
             case 'size':
-                $closure = function( $k, $v ) use ( $field, $value, $value2 )
+                $closure = function( $v, $value )
                 {
-                    if ( $k == $field && count((array) $v) == $value ) {
-                        return $v;
-                    }
-
-                    return null;
+                    return count((array) $v) == $value
+                        ? $v
+                        : null;
                 };
                 break;
             case 'exist':
-                $closure = function( $k, $v ) use ( $field, $value, $value2 )
+                $closure = function( $v )
                 {
-                    if ( $k == $field ) {
-                        return $v;
-                    }
-
-                    return null;
+                    return $v
+                        ? $v
+                        : null;
                 };
                 break;
             case 'regex':
-                $closure = function( $k, $v ) use ( $field, $value, $value2 )
+                $closure = function( $v, $value, $value2 )
                 {
-                    if ( $k == $field
-                         && Str::match('/' . $value . '/' . ( $value2
-                                ?: 'i' ), $v) ) {
-                        return $v;
-                    }
-
-                    return null;
+                    return Str::match('/' . $value . '/' . ( $value2
+                            ?: 'i' ), $v)
+                        ? $v
+                        : null;
                 };
                 break;
             case 'match':
-                $closure = function( $k, $v ) use ( $field, $value, $value2 )
+                $closure = function( $v, $value )
                 {
                     $valid = false;
 
-                    if ( $k == $field ) {
-                        foreach ( (array) $value as $valueItem ) {
-                            if ( in_array($valueItem, (array) $v) ) {
-                                $valid = true;
-                                break;
-                            }
+                    foreach ( (array) $value as $valueItem ) {
+                        if ( in_array($valueItem, (array) $v) ) {
+                            $valid = true;
+                            break;
                         }
                     }
 
@@ -221,13 +207,11 @@ class Collect
                 };
                 break;
             case 'all':
-                $closure = function( $k, $v ) use ( $field, $value, $value2 )
+                $closure = function( $v, $value )
                 {
-                    if ( $k == $field ) {
-                        foreach ( (array) $value as $valueItem ) {
-                            if ( !in_array($valueItem, (array) $v) ) {
-                                return null;
-                            }
+                    foreach ( (array) $value as $valueItem ) {
+                        if ( !in_array($valueItem, (array) $v) ) {
+                            return null;
                         }
                     }
 
@@ -235,43 +219,54 @@ class Collect
                 };
                 break;
             default :
-                throw new JsonException(sprintf("Unknown operator [%s]", $operator));
-
+                if ( $operator instanceof Closure ) {
+                    $closure = $operator;
+                }
+                else {
+                    throw new JsonException(sprintf("Unknown operator [%s]", $operator));
+                }
         }
 
-        $arr = [];
-
-        foreach ( $this->collection as $k => $row ) {
-            if ( $filter = $this->closure($row, $closure) ) {
-                $arr[ $k ] = $row;
-            }
-        }
-
-        return new Collect($arr);
+        return $closure;
     }
 
     /**
-     * @param array   $row
-     * @param Closure $closure
-     * @return array|null
+     * @param string $field
+     * @return Collect
      */
-    protected function closure( $row, Closure $closure ): ?array
+    public function group( string $field ): Collect
     {
-        if ( !Is::arr($row) ) {
-            return null;
+        $json = new json();
+
+        foreach ( $this->collection as $k => $v ) {
+            $json->offsetGetOrSet($v->get($field))
+                ->append($v);
         }
 
-        $arr = [];
+        return new Collect($json);
+    }
 
-        foreach ( $row as $key => $value ) {
-            if ( $r = $closure($key, $value) ) {
-                $arr[ $key ] = $r;
+    /**
+     * @param string         $field
+     * @param string|Closure $operator
+     * @param                $value
+     * @param null           $value2
+     * @return Collect
+     */
+    public function where( string $field, $operator, $value, $value2 = null ): Collect
+    {
+        $json    = new json();
+        $closure = $this->whereClosure($operator);
+
+        foreach ( $this->collection as $k => $v ) {
+            if ( $g = $v->get($field) ) {
+                if ( $c = $closure($g, $value, $value2) ) {
+                    $json->offsetSet($k, $v);
+                }
             }
         }
 
-        return !empty($arr)
-            ? $arr
-            : null;
+        return new Collect($json);
     }
 
     /**
@@ -280,19 +275,67 @@ class Collect
      */
     public function keyAsId( string $id ): self
     {
-        $arr = [];
+        $json = new Json();
 
         foreach ( $this->collection as $k => $row ) {
-            if ( Is::arr($row) ) {
-                if ( isset($row[ $id ]) ) {
-                    $key = $row[ $id ];
-                    unset($row[ $id ]);
-                    $arr[ $key ] = $row;
+            if ( $row instanceof JsonInterface ) {
+                if ( $key = $row->unset($id) ) {
+                    $json->set($key, $row);
                 }
             }
         }
 
-        return new Collect($arr);
+        return new Collect($json);
+    }
+
+    /**
+     * @param array   $paths
+     * @param string  $field
+     * @param Closure $closure
+     * @return Collect
+     */
+    public function addToSet( array $paths, string $field, Closure $closure ): self
+    {
+        $json = new Json($this->collection);
+
+        foreach ( $json as $k => $row ) {
+            if ( $row instanceof JsonInterface ) {
+                $arr = [];
+
+                foreach ( $paths as $path ) {
+                    $arr[ $path ] = $row->get($path);
+                }
+
+                $row->set($field, $closure($arr));
+            }
+        }
+
+        return new Collect($json);
+    }
+
+    /**
+     * @param string  $field
+     * @param Closure $closure
+     * @return Collect
+     */
+    public function filterKey( string $field, Closure $closure ): self
+    {
+        $json = new Json($this->collection);
+
+        foreach ( $json as $k => $row ) {
+            if ( $row instanceof JsonInterface ) {
+                $r = $closure($row->get($field));
+
+                if ( $r ) {
+                    $row->set($field, $r);
+                }
+                else {
+                    $row->unset($field);
+                }
+            }
+        }
+
+        return new Collect($json);
     }
 
     /**
@@ -302,15 +345,19 @@ class Collect
      */
     public function filter( Closure $closure ): self
     {
-        $arr = [];
+        $json = new Json();
 
         foreach ( $this->collection as $k => $row ) {
-            if ( $filter = $this->closure($row, $closure) ) {
-                $arr[ $k ] = $filter;
+            if ( $row instanceof JsonInterface ) {
+                $r = $row->filter($closure);
+
+                if ( $r->count() > 0 ) {
+                    $json->set($k, $r);
+                }
             }
         }
 
-        return new Collect($arr);
+        return new Collect($json);
     }
 
     /**
@@ -320,19 +367,19 @@ class Collect
      */
     public function filterRecursive( Closure $closure ): self
     {
-        $arr = [];
+        $json = new Json();
 
-        foreach ( $this->collection as $k => $v ) {
-            if ( Is::arr($v) ) {
-                $arr[ $k ] = ( new Collect($v) )->filterRecursive($closure)
-                    ->values();
-            }
-            else {
-                $arr[ $k ] = $closure($k, $v);
+        foreach ( $this->collection as $k => $row ) {
+            if ( $row instanceof JsonInterface ) {
+                $r = $row->filterRecursive($closure);
+
+                if ( $r->count() > 0 ) {
+                    $json->set($k, $r);
+                }
             }
         }
 
-        return new Collect($arr);
+        return new Collect($json);
     }
 
     /**
@@ -340,7 +387,7 @@ class Collect
      */
     public function values(): Json
     {
-        return new Json($this->collection);
+        return $this->collection;
     }
 
     /**
@@ -351,7 +398,7 @@ class Collect
     public function sort( string $key, int $order = SORT_ASC ): self
     {
         $toSort = [];
-        $arr    = $this->collection;
+        $arr    = $this->collection->toArray();
 
         foreach ( $arr as $k => $v ) {
             $toSort[ $k ] = $v[ $key ];
@@ -368,16 +415,14 @@ class Collect
      */
     public function with( ...$names ): self
     {
-        $arr = [];
+        $json = new Json($this->collection);
+        $arr  = [];
 
-        foreach ( $this->collection as $k => $row ) {
-            if ( $filter = $this->closure($row, function( $key, $value ) use ( $names )
-            {
-                return in_array($key, $names)
-                    ? $value
-                    : null;
-            }) ) {
-                $arr[ $k ] = $filter;
+        foreach ( $json as $k => $v ) {
+            $r = $v->with($names);
+
+            if ( $r->count() > 0 ) {
+                $arr[ $k ] = $r->toArray();
             }
         }
 
@@ -390,16 +435,14 @@ class Collect
      */
     public function without( ...$names ): self
     {
-        $arr = [];
+        $json = new Json($this->collection);
+        $arr  = [];
 
-        foreach ( $this->collection as $k => $row ) {
-            if ( $filter = $this->closure($row, function( $key, $value ) use ( $names )
-            {
-                return !in_array($key, $names)
-                    ? $value
-                    : null;
-            }) ) {
-                $arr[ $k ] = $filter;
+        foreach ( $json as $k => $v ) {
+            $r = $v->without($names);
+
+            if ( $r->count() > 0 ) {
+                $arr[ $k ] = $r->toArray();
             }
         }
 

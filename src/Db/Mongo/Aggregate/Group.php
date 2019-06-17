@@ -17,12 +17,19 @@ Class Group
     protected $group = [];
 
     /**
-     * Group constructor.
-     * @param $expression
+     * @var Aggregate
      */
-    public function __construct( $expression )
+    protected $aggregate;
+
+    /**
+     * Group constructor.
+     * @param Aggregate $aggregate
+     * @param           $expression
+     */
+    public function __construct( Aggregate $aggregate, $expression )
     {
-        $this->group['_id'] = Expression::parseExpression($expression);
+        $this->aggregate      = $aggregate;
+        $this->group[ '_id' ] = Expression::parseExpression($expression);
     }
 
     /**
@@ -30,9 +37,9 @@ Class Group
      * @param        $expression
      * @return Group
      */
-    public function calculate(string $field, $expression): self
+    public function calculate( string $field, $expression ): self
     {
-        $this->group[$field] = Expression::parseExpression($expression);
+        $this->group[ $field ] = Expression::parseExpression($expression);
 
         return $this;
     }
@@ -43,5 +50,10 @@ Class Group
     public function projection(): array
     {
         return $this->group;
+    }
+
+    public function pipe(): Aggregate
+    {
+        return $this->aggregate;
     }
 }

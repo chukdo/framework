@@ -148,43 +148,112 @@ class TraitMiddleWare implements \Chukdo\Contracts\Middleware\Middleware
 }
 
 $json = new \Chukdo\Json\Json([
-   ['prix' => 10, 'produit' => 'maison', 'cp' => 16200],
-   ['prix' => 100, 'produit' => 'avion', 'cp' => 33000],
-   ['prix' => 1000, 'produit' => 'voiture', 'cp' => 64000],
-   ['prix' => 200, 'produit' => 'moto', 'cp' => 75000],
-   ['prix' => 300, 'produit' => 'telephone', 'cp' => 67000]
+    [
+        'prix'    => 10,
+        'produit' => 'maison',
+        'cp'      => 16200,
+        'tva'     => 10,
+        'ref'     => [
+            'client' => 'orpi',
+            'public' => 'ORPI',
+            'prix'   => 12,
+            'cp'     => 16200,
+        ],
+    ],
+    [
+        'prix'    => 10,
+        'produit' => 'maison',
+        'cp'      => 16200,
+        'tva'     => 7,
+        'ref'     => [
+            'client' => 'orpi',
+            'public' => 'ORPI',
+            'prix'   => 100,
+            'cp'     => 16200,
+        ],
+    ],
+    [
+        'prix'    => 100,
+        'produit' => 'avion',
+        'cp'      => 33000,
+        'tva'     => 10,
+        'ref'     => [
+            'client' => 'doc',
+            'public' => 'ORPI',
+            'prix'   => 13,
+        ],
+    ],
+    [
+        'prix'    => 1000,
+        'produit' => 'voiture',
+        'cp'      => 64000,
+        'tva'     => 20,
+        'ref'     => [
+            'client' => 'laforet',
+            'public' => 'AC3',
+            'prix'   => 14,
+        ],
+    ],
+    [
+        'prix'    => 200,
+        'produit' => 'moto',
+        'cp'      => 75000,
+        'tva'     => 20,
+        'ref'     => [
+            'client' => 'cph',
+            'public' => 'AC3',
+            'prix'   => 15,
+        ],
+    ],
+    [
+        'prix'    => 300,
+        'produit' => 'telephone',
+        'cp'      => 67000,
+        'tva'     => 20,
+        'ref'     => [
+            'client' => 'guy hoquet',
+            'public' => 'IMMO-FACILE',
+            'prix'   => 16,
+        ],
+    ],
 ]);
 
-//dd($json->collect()->where('prix', 'in', [200, 300])->values()->toHtml());
+// addToSet > tva, ref.prix tcc closure
+
+dd($json->collect()
+    ->where('ref.public', '=', 'ORPI')
+    ->without('prix', 'ref.client')
+    ->addToSet([
+        'tva',
+        'ref.prix',
+    ], 'prix.ttc', function( $p )
+    {
+        return ( 1 + ( $p[ 'tva' ] / 100 ) ) * $p[ 'ref.prix' ];
+    })
+    ->without('tva', 'ref.prix')
+    ->filterKey('ref.public', function( $r )
+    {
+        return strtolower($r);
+    })
+    ->group('cp')
+    //->match('cp', '=', 'ref.cp')
+    ->values()
+    ->toHtml());
 
 //dd(Conf::offsetGet('db.mongo.dsn'));
 //dd(Db::collection('contrat'));
 
 use Chukdo\Db\Mongo\Aggregate\Expr;
 
-$aggregate = Db::collection('contrat')
-    ->aggregate();
-
-
-$aggregate->group([
-    'month' => Expr::month('date'),
-    'day'   => Expr::day('date'),
-    'year'  => Expr::year('date'),
-])
-    ->calculate('totalprice', Expr::sum(Expr::multiply([
-        'price',
-        'quantity',
-    ])))
-    ->calculate('averageQuantity', Expr::avg('quantity'))
-    ->calculate('count', Expr::sum(1));
-$aggregate->where('title', '=', 'bonjour')->where('price', '>', 100);
-$aggregate->addField('totalHomework', Expr::sum('homework'))
-    ->addField('totalScore', Expr::add([
-        'totalHomework',
-        'totalQuiz',
-        'extraCredit',
-    ]));
-dd($aggregate->pipe());
+$aggregate = Db::collection('test', 'test')
+    ->aggregate()
+    ->where('status', '=', 'A')
+    ->pipe()
+    ->group('cust_id')
+    ->calculate('total', Expr::sum('amount'))
+    ->pipe()
+    ->sort('total', 'desc');
+dd(( new \Chukdo\Json\Json($aggregate->projection()) )->toArray());
 
 $m = new \Chukdo\Db\Mongo\Aggregate\Expression('multiply', [
     'price',
@@ -195,8 +264,8 @@ $s = new \Chukdo\Db\Mongo\Aggregate\Expression('sum', $m);
 dd($s->projection());
 
 $contrat = Db::collection('contrat');
-$find    = $contrat->find();
-dd($find
+
+dd($contrat->find()
     ->without('_id')
     ->with('_agence', '_modele', 'history.id', 'history._version')
     ->limit(4)

@@ -42,7 +42,7 @@ Class Where
      * @param string $operator
      * @param        $value
      * @param null   $value2
-     * @return Where
+     * @return $this
      */
     public function where( string $field, string $operator, $value, $value2 = null ): self
     {

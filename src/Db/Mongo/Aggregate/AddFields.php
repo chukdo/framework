@@ -17,13 +17,27 @@ Class AddFields
     protected $addFields = [];
 
     /**
+     * @var Aggregate
+     */
+    protected $aggregate;
+
+    /**
+     * Group constructor.
+     * @param Aggregate $aggregate
+     */
+    public function __construct( Aggregate $aggregate )
+    {
+        $this->aggregate = $aggregate;
+    }
+
+    /**
      * @param string $field
      * @param        $expression
      * @return AddFields
      */
-    public function addField(string $field, $expression): self
+    public function addField( string $field, $expression ): self
     {
-        $this->addFields[$field] = Expression::parseExpression($expression);
+        $this->addFields[ $field ] = Expression::parseExpression($expression);
 
         return $this;
     }
@@ -34,5 +48,10 @@ Class AddFields
     public function projection(): array
     {
         return $this->addFields;
+    }
+
+    public function pipe(): Aggregate
+    {
+        return $this->aggregate;
     }
 }

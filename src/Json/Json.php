@@ -248,7 +248,7 @@ class Json extends ArrayObject implements JsonInterface
      * @param string ...$names
      * @return Json
      */
-    public function map( string ... $names ): self
+    public function map( string ... $names ): Json
     {
         $json = new Json();
 
@@ -265,12 +265,16 @@ class Json extends ArrayObject implements JsonInterface
      * @param Closure $closure
      * @return Json
      */
-    public function filter( Closure $closure ): self
+    public function filter( Closure $closure ): Json
     {
         $json = new Json();
 
         foreach ( $this as $k => $v ) {
-            $json->offsetSet($k, $closure($k, $v));
+            $r = $closure($k, $v);
+
+            if ($r !== null) {
+                $json->offsetSet($k, $r);
+            }
         }
 
         return $json;
@@ -280,16 +284,24 @@ class Json extends ArrayObject implements JsonInterface
      * @param Closure $closure
      * @return Json
      */
-    public function filterRecursive( Closure $closure ): self
+    public function filterRecursive( Closure $closure ): Json
     {
         $json = new Json();
 
         foreach ( $this as $k => $v ) {
             if ( $v instanceof Json) {
-                $json->offsetSet($k, $v->filterRecursive($closure));
+                $r = $v->filterRecursive($closure);
+
+                if ($r->count() > 0) {
+                    $json->offsetSet($k, $r);
+                }
             }
             else {
-                $json->offsetSet($k, $closure($k, $v));
+                $r = $closure($k, $v);
+
+                if ($r !== null) {
+                    $json->offsetSet($k, $r);
+                }
             }
         }
 
@@ -300,13 +312,13 @@ class Json extends ArrayObject implements JsonInterface
      * @param mixed ...$offsets
      * @return Json
      */
-    public function with( ...$offsets ): self
+    public function with( ...$offsets ): Json
     {
         $only = new Json();
 
         foreach ( $offsets as $offsetList ) {
             foreach ( (array) $offsetList as $offset ) {
-                $only->offsetSet($offset, $this->offsetGet( $offset ));
+                $only->set($offset, $this->get( $offset ));
             }
         }
 
@@ -317,13 +329,13 @@ class Json extends ArrayObject implements JsonInterface
      * @param mixed ...$offsets
      * @return Json
      */
-    public function without( ...$offsets ): self
+    public function without( ...$offsets ): Json
     {
         $except = new Json($this->toArray());
 
         foreach ( $offsets as $offsetList ) {
             foreach ( (array) $offsetList as $offset ) {
-                $except->offsetUnset($offset);
+                $except->unset($offset);
             }
         }
 
@@ -360,7 +372,7 @@ class Json extends ArrayObject implements JsonInterface
     /**
      * @return Json
      */
-    public function clean(): self
+    public function clean(): Json
     {
         $json = new Json();
 
@@ -420,12 +432,16 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
-     * @param string $path
-     * @param null   $default
-     * @return Json|mixed|null
+     * @param string|null $path
+     * @param null        $default
+     * @return mixed|null
      */
-    public function get( string $path, $default = null )
+    public function get( ?string $path, $default = null )
     {
+        if ($path == null) {
+            return $default;
+        }
+
         if ( Str::notContain($path, '.') ) {
             return $this->offsetGet($path, $default);
         }
