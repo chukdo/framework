@@ -36,7 +36,9 @@ class Json extends ArrayObject implements JsonInterface
     {
         parent::__construct([]);
 
-        $this->preFilter = $preFilter;
+        if ($preFilter instanceof Closure) {
+            $this->preFilter = $preFilter;
+        }
 
         if ( Is::iterable($data) ) {
             foreach ( $data as $k => $v ) {
@@ -59,7 +61,7 @@ class Json extends ArrayObject implements JsonInterface
     public function offsetSet( $key, $value ): self
     {
         if ( Is::iterable($value) ) {
-            parent::offsetSet($key, new Json($value));
+            parent::offsetSet($key, new Json($value, $this->preFilter));
         }
         else {
             parent::offsetSet($key, $this->preFilter instanceof Closure

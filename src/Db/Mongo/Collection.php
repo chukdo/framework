@@ -176,44 +176,42 @@ Class Collection
     }
 
     /**
-     * @return Closure
+     * @param string|null $field
+     * @param             $value
+     * @return mixed
      */
-    public static function filterOut()
+    public static function filterOut(?string $field, $value)
     {
-        return function( $field, $value )
-        {
-            if ( $value instanceof ObjectId ) {
-                return $value->__toString();
-            }
-            elseif ( $value instanceof Timestamp ) {
-                return $value->getTimestamp();
-            }
-            elseif ( $value instanceof UTCDateTime ) {
-                return $value->toDateTime();
-            }
+        if ( $value instanceof ObjectId ) {
+            return $value->__toString();
+        }
+        elseif ( $value instanceof Timestamp ) {
+            return $value->getTimestamp();
+        }
+        elseif ( $value instanceof UTCDateTime ) {
+            return $value->toDateTime();
+        }
 
-            return $value;
-        };
+        return $value;
     }
 
     /**
-     * @return Closure
+     * @param string|null $field
+     * @param             $value
+     * @return ObjectId|UTCDateTime
      */
-    public static function filterIn()
+    public static function filterIn(?string $field, $value)
     {
-        return function( $field, $value )
-        {
-            if ( $field === '_id' && Is::string($value) ) {
-                $value = new ObjectId($value);
-            }
-            elseif ( $value instanceof DateTime ) {
-                $value = new UTCDateTime($value->getTimestamp());
-            }
-            elseif ( substr($field, 0, 5) === '_date' ) {
-                $value = new UTCDateTime((int) $value);
-            }
+        if ( $field === '_id' && Is::string($value) ) {
+            $value = new ObjectId($value);
+        }
+        elseif ( $value instanceof DateTime ) {
+            $value = new UTCDateTime($value->getTimestamp());
+        }
+        elseif ( substr($field, 0, 5) === '_date' ) {
+            $value = new UTCDateTime((int) $value);
+        }
 
-            return $value;
-        };
+        return $value;
     }
 }

@@ -27,6 +27,38 @@ Class Write extends Where
     protected $options = [];
 
     /**
+     * @return int
+     */
+    public function delete(): int
+    {
+        return (int) $this->collection()
+            ->deleteMany($this->filter(), $this->options)
+            ->getDeletedCount();
+    }
+
+    /**
+     * @return bool
+     */
+    public function deleteOne(): bool
+    {
+        return (bool) $this->collection()
+            ->deleteOne($this->filter(), $this->options)
+            ->getDeletedCount();
+    }
+
+    /**
+     * @return Json
+     */
+    public function deleteOneAndGet(): Json
+    {
+        return new Json($this->collection()
+            ->findOneAndDelete($this->filter(), $this->options), function( $k, $v )
+        {
+            return Collection::filterOut($k, $v);
+        });
+    }
+
+    /**
      * @param array $values
      * @return Write
      */
@@ -39,6 +71,7 @@ Class Write extends Where
         return $this;
     }
 
+
     /**
      * @param string $field
      * @param        $value
@@ -48,6 +81,7 @@ Class Write extends Where
     {
         return $this->field('set', $field, $value);
     }
+
 
     /**
      * @param string $keyword
@@ -84,7 +118,7 @@ Class Write extends Where
      */
     public function setOnInsert( string $field, $value ): self
     {
-        return $this->field('setOnInsert', $field, Collection::filterIn()($field, $value));
+        return $this->field('setOnInsert', $field, Collection::filterIn($field, $value));
     }
 
     /**
@@ -104,7 +138,7 @@ Class Write extends Where
      */
     public function min( string $field, $value ): self
     {
-        return $this->field('min', $field, Collection::filterIn()($field, $value));
+        return $this->field('min', $field, Collection::filterIn($field, $value));
     }
 
     /**
@@ -114,7 +148,7 @@ Class Write extends Where
      */
     public function max( string $field, $value ): self
     {
-        return $this->field('max', $field, Collection::filterIn()($field, $value));
+        return $this->field('max', $field, Collection::filterIn($field, $value));
     }
 
     /**
@@ -144,7 +178,10 @@ Class Write extends Where
     public function insert( array $values ): ?string
     {
         return (string) $this->collection()
-            ->insertOne(( new Json($values, Collection::filterIn()) )->toArray(), $this->options)
+            ->insertOne(( new Json($values, function( $k, $v )
+            {
+                return Collection::filterIn($k, $v);
+            }) )->toArray(), $this->options)
             ->getInsertedId();
     }
 
@@ -204,35 +241,9 @@ Class Write extends Where
         ], $this->options);
 
         return new Json($this->collection()
-            ->findOneAndUpdate($this->filter(), $this->fields(), $options), Collection::filterOut());
-    }
-
-    /**
-     * @return int
-     */
-    public function delete(): int
-    {
-        return (int) $this->collection()
-            ->deleteMany($this->filter(), $this->options)
-            ->getDeletedCount();
-    }
-
-    /**
-     * @return bool
-     */
-    public function deleteOne(): bool
-    {
-        return (bool) $this->collection()
-            ->deleteOne($this->filter(), $this->options)
-            ->getDeletedCount();
-    }
-
-    /**
-     * @return Json
-     */
-    public function deleteOneAndGet(): Json
-    {
-        return new Json($this->collection()
-            ->findOneAndDelete($this->filter(), $this->options), Collection::filterOut());
+            ->findOneAndUpdate($this->filter(), $this->fields(), $options), function( $k, $v )
+        {
+            return Collection::filterOut($k, $v);
+        });
     }
 }

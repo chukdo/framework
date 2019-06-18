@@ -255,12 +255,14 @@ $write->insert([
     'ord_date' => new DateTime(),
     'status'   => 'A',
     'amount'   => 400,
+    'a'        => [ 'b' => [ 'toto' => 'titi' ] ],
 ]);
 
 $write2 = db::collection('test', 'test')
     ->write();
 $write2->setSession($write->session());
 $write2->set('amount', 600)
+    ->set('a', [ 'b' => [ 'toto2' => 'titi2' ] ])
     ->where('cust_id', '=', 'domingo')
     ->update();
 
@@ -271,12 +273,13 @@ $aggregate = Db::collection('test', 'test')
     ->where('status', '=', 'A')
     ->pipe()
     ->group('cust_id')
+    ->calculate('dates', Expr::push('ord_date'))
     ->calculate('total', Expr::sum('amount'))
     ->pipe()
     ->sort('total', 'desc');
 $write2->session()
-    ->abortTransaction();
-dd(( new \Chukdo\Json\Json($aggregate->all()) )->toHtml());
+    ->commitTransaction();
+dd($aggregate->all()->toHtml());
 
 $m = new \Chukdo\Db\Mongo\Aggregate\Expression('multiply', [
     'price',

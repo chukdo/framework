@@ -71,38 +71,38 @@ Class Where
     {
         switch ( $operator ) {
             case '=' :
-                return [ '$eq' => Collection::filterIn()($field, $value) ];
+                return [ '$eq' => Collection::filterIn($field, $value) ];
                 break;
             case '!=' :
-                return [ '$ne' => Collection::filterIn()($field, $value) ];
+                return [ '$ne' => Collection::filterIn($field, $value) ];
                 break;
             case '>' :
-                return [ '$gt' => Collection::filterIn()($field, $value) ];
+                return [ '$gt' => Collection::filterIn($field, $value) ];
                 break;
             case '>=':
-                return [ '$gte' => Collection::filterIn()($field, $value) ];
+                return [ '$gte' => Collection::filterIn($field, $value) ];
                 break;
             case '<':
-                return [ '$lt' => Collection::filterIn()($field, $value) ];
+                return [ '$lt' => Collection::filterIn($field, $value) ];
                 break;
             case '<=':
-                return [ '$lte' => Collection::filterIn()($field, $value) ];
+                return [ '$lte' => Collection::filterIn($field, $value) ];
                 break;
             case '<>' :
                 return [
-                    '$gt' => Collection::filterIn()($field, $value),
-                    '$lt' => Collection::filterIn()($field, $value2),
+                    '$gt' => Collection::filterIn($field, $value),
+                    '$lt' => Collection::filterIn($field, $value2),
                 ];
             case '<=>' :
                 return [
-                    '$gte' => Collection::filterIn()($field, $value),
-                    '$lte' => Collection::filterIn()($field, $value2),
+                    '$gte' => Collection::filterIn($field, $value),
+                    '$lte' => Collection::filterIn($field, $value2),
                 ];
             case 'in':
                 $in = [];
 
                 foreach ( $value as $k => $v ) {
-                    $in[ $k ] = Collection::filterIn()($field, $v);
+                    $in[ $k ] = Collection::filterIn($field, $v);
                 }
 
                 return [ '$in' => $in ];
@@ -111,13 +111,13 @@ Class Where
                 $nin = [];
 
                 foreach ( $value as $k => $v ) {
-                    $nin[ $k ] = Collection::filterIn()($field, $v);
+                    $nin[ $k ] = Collection::filterIn($field, $v);
                 }
 
                 return [ '$nin' => $nin ];
                 break;
             case 'type':
-                return [ '$type' => Collection::filterIn()($field, $value) ];
+                return [ '$type' => Collection::filterIn($field, $value) ];
                 break;
             case '%':
                 return [
