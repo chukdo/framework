@@ -14,6 +14,8 @@ use MongoDB\Operation\FindOneAndUpdate;
  */
 Class Write extends Where
 {
+    use Session;
+
     /**
      * @var array
      */
@@ -142,7 +144,7 @@ Class Write extends Where
     public function insert( array $values ): ?string
     {
         return (string) $this->collection()
-            ->insertOne((new Json($values, Collection::filterIn()))->toArray(), $this->options)
+            ->insertOne(( new Json($values, Collection::filterIn()) )->toArray(), $this->options)
             ->getInsertedId();
     }
 
@@ -232,52 +234,5 @@ Class Write extends Where
     {
         return new Json($this->collection()
             ->findOneAndDelete($this->filter(), $this->options), Collection::filterOut());
-    }
-
-    /**
-     * @return Write
-     */
-    public function startTransaction(): self
-    {
-        if (isset($this->options['session'])) {
-            throw new MongoException('Session or Transaction already exists.');
-        }
-
-        $session = $this->collection->mongo()->mongo()->startSession();
-        $session->startTransaction([]);
-
-        $this->options['session'] = $session;
-
-        return $this;
-    }
-
-    /**
-     * @return Write
-     */
-    public function abortTransaction(): self
-    {
-        if (!isset($this->options['session'])) {
-            throw new MongoException('Session or Transaction no exists.');
-        }
-
-        $this->options['session']->abortTransaction();
-        unset($this->options['session']);
-
-        return $this;
-    }
-
-    /**
-     * @return Write
-     */
-    public function commitTransaction(): self
-    {
-        if (!isset($this->options['session'])) {
-            throw new MongoException('Session or Transaction no exists.');
-        }
-
-        $this->options['session']->commitTransaction();
-        unset($this->options['session']);
-
-        return $this;
     }
 }

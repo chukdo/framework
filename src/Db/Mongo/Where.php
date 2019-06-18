@@ -6,7 +6,7 @@ use MongoDB\BSON\Regex;
 use MongoDB\Collection as MongoDbCollection;
 
 /**
- * Mongo Where Trait.
+ * Mongo Where.
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019

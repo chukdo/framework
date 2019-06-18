@@ -248,26 +248,34 @@ use Chukdo\Db\Mongo\Aggregate\Expr;
 $write = db::collection('test', 'test')
     ->write();
 
-$write->startTransaction();
+$write->session()
+    ->startTransaction([]);
 $write->insert([
     'cust_id'  => 'domingo',
     'ord_date' => new DateTime(),
     'status'   => 'A',
     'amount'   => 400,
 ]);
-$write->set('amount', 600)
+
+$write2 = db::collection('test', 'test')
+    ->write();
+$write2->setSession($write->session());
+$write2->set('amount', 600)
     ->where('cust_id', '=', 'domingo')
     ->update();
-$write->commitTransaction();
+
 
 $aggregate = Db::collection('test', 'test')
     ->aggregate()
+    ->setSession($write->session())
     ->where('status', '=', 'A')
     ->pipe()
     ->group('cust_id')
     ->calculate('total', Expr::sum('amount'))
     ->pipe()
     ->sort('total', 'desc');
+$write2->session()
+    ->abortTransaction();
 dd(( new \Chukdo\Json\Json($aggregate->all()) )->toHtml());
 
 $m = new \Chukdo\Db\Mongo\Aggregate\Expression('multiply', [

@@ -5,6 +5,7 @@ namespace Chukdo\Db\Mongo\Aggregate;
 use Chukdo\DB\Mongo\Collection;
 use Chukdo\Db\Mongo\Cursor;
 use Chukdo\Db\Mongo\Match;
+use Chukdo\Db\Mongo\Session;
 use Chukdo\Db\Mongo\Where;
 use Chukdo\Json\Json;
 
@@ -17,10 +18,17 @@ use Chukdo\Json\Json;
  */
 Class Aggregate
 {
+    use Session;
+
     /**
      * @var Collection
      */
     protected $collection;
+
+    /**
+     * @var array
+     */
+    protected $options = [];
 
     /**
      * @var array
@@ -307,6 +315,8 @@ Class Aggregate
      */
     public function cursor( array $options = [] ): Cursor
     {
+        $options = array_merge($this->options, $options);
+
         return new Cursor($this->collection->collection()
             ->aggregate($this->projection(), $options));
     }

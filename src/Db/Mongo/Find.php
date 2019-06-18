@@ -13,10 +13,17 @@ use Chukdo\Json\Json;
  */
 Class Find extends Where
 {
+    use Session;
+
     /**
      * @var array
      */
     protected $projection = [];
+
+    /**
+     * @var array
+     */
+    protected $options = [];
 
     /**
      * @var array
@@ -172,8 +179,10 @@ Class Find extends Where
      */
     public function cursor(): Cursor
     {
+        $options = array_merge($this->projection(), $this->options);
+
         return new Cursor($this->collection()
-            ->find($this->filter(), $this->projection()));
+            ->find($this->filter(), $options));
     }
 
     /**

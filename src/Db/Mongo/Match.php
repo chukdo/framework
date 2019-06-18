@@ -5,7 +5,7 @@ namespace Chukdo\Db\Mongo;
 use Chukdo\Db\Mongo\Aggregate\Aggregate;
 
 /**
- * Mongo Where Trait.
+ * Mongo Match.
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
