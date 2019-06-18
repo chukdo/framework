@@ -500,6 +500,21 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
+     * @param $value
+     * @return mixed
+     */
+    public function indexOf($value)
+    {
+        foreach ($this as $k => $v) {
+            if ($v === $value) {
+                return $k;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @param string $path
      * @return mixed|null
      */
