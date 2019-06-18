@@ -11,7 +11,6 @@ use Chukdo\Helper\To;
 use Chukdo\Xml\Xml;
 use Closure;
 use League\CLImate\CLImate;
-use Throwable;
 
 /**
  * Manipulation des données.

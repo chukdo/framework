@@ -3,7 +3,7 @@
 Namespace Chukdo\DB\Mongo;
 
 use Chukdo\Db\Mongo\Aggregate\Aggregate;
-use Closure;
+use Chukdo\Db\Mongo\Schema\Schema;
 use Chukdo\Json\Json;
 use Chukdo\Helper\Is;
 use MongoDB\Collection as MongoDbCollection;
@@ -47,6 +47,46 @@ Class Collection
         $this->mongo      = $mongo;
         $this->database   = $database;
         $this->collection = new MongoDbCollection($mongo->mongo(), $database, $collection);
+    }
+
+    /**
+     * @param string|null $field
+     * @param             $value
+     * @return mixed
+     */
+    public static function filterOut( ?string $field, $value )
+    {
+        if ( $value instanceof ObjectId ) {
+            return $value->__toString();
+        }
+        elseif ( $value instanceof Timestamp ) {
+            return $value->getTimestamp();
+        }
+        elseif ( $value instanceof UTCDateTime ) {
+            return $value->toDateTime();
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param string|null $field
+     * @param             $value
+     * @return ObjectId|UTCDateTime
+     */
+    public static function filterIn( ?string $field, $value )
+    {
+        if ( $field === '_id' && Is::string($value) ) {
+            $value = new ObjectId($value);
+        }
+        elseif ( $value instanceof DateTime ) {
+            $value = new UTCDateTime($value->getTimestamp());
+        }
+        elseif ( substr($field, 0, 5) === '_date' ) {
+            $value = new UTCDateTime((int) $value);
+        }
+
+        return $value;
     }
 
     /**
@@ -102,6 +142,14 @@ Class Collection
     {
         return $this->collection()
             ->getDatabaseName();
+    }
+
+    /**
+     * @return Schema
+     */
+    public function schema(): Schema
+    {
+        return new Schema($this);
     }
 
     /**
@@ -173,45 +221,5 @@ Class Collection
     public function find(): Find
     {
         return new Find($this);
-    }
-
-    /**
-     * @param string|null $field
-     * @param             $value
-     * @return mixed
-     */
-    public static function filterOut(?string $field, $value)
-    {
-        if ( $value instanceof ObjectId ) {
-            return $value->__toString();
-        }
-        elseif ( $value instanceof Timestamp ) {
-            return $value->getTimestamp();
-        }
-        elseif ( $value instanceof UTCDateTime ) {
-            return $value->toDateTime();
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param string|null $field
-     * @param             $value
-     * @return ObjectId|UTCDateTime
-     */
-    public static function filterIn(?string $field, $value)
-    {
-        if ( $field === '_id' && Is::string($value) ) {
-            $value = new ObjectId($value);
-        }
-        elseif ( $value instanceof DateTime ) {
-            $value = new UTCDateTime($value->getTimestamp());
-        }
-        elseif ( substr($field, 0, 5) === '_date' ) {
-            $value = new UTCDateTime((int) $value);
-        }
-
-        return $value;
     }
 }
