@@ -51,15 +51,28 @@ class Schema
     }
 
     /**
+     * @return bool
+     */
+    public function save(): bool
+    {
+        $s = new Json($this->collection->database()
+            ->database()
+            ->modifyCollection($this->collection->name(), $this->validator()));
+
+        return $s->offsetGet('ok') == 1;
+    }
+
+    /**
      * @return array
      */
-    public function schema(): array
+    public function validator(): array
     {
         return [
-            'collMod' => $this->collection->name(),
-            'validator' => [
-                '$jsonSchema' => $this->property->schema()
-            ]
+            'validator'        => [
+                '$jsonSchema' => $this->property->schema(),
+            ],
+            'validationLevel'  => 'strict',
+            'validationAction' => 'error',
         ];
     }
 
@@ -67,20 +80,10 @@ class Schema
      * @param string $name
      * @return Property
      */
-    public function setProperty(string $name): Property
+    public function setProperty( string $name ): Property
     {
-        return $this->properties()->offsetGetOrSet($name, new Property());
-    }
-
-    /**
-     * @param string $name
-     * @return Schema
-     */
-    public function unsetProperty(string $name): self
-    {
-        $this->properties()->offsetUnset($name);
-
-        return $this;
+        return $this->properties()
+            ->offsetGetOrSet($name, new Property());
     }
 
     /**
@@ -89,6 +92,18 @@ class Schema
     public function properties(): Json
     {
         return $this->property->properties();
+    }
+
+    /**
+     * @param string $name
+     * @return Schema
+     */
+    public function unsetProperty( string $name ): self
+    {
+        $this->properties()
+            ->offsetUnset($name);
+
+        return $this;
     }
 
     /**

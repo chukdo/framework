@@ -553,6 +553,27 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
+     * @param array $arr
+     * @return Json
+     */
+    public function reset(array $arr = []): self
+    {
+        parent::__construct($arr);
+
+        return $this;
+    }
+
+    /**
+     * @return Json
+     */
+    public function resetKeys(): self
+    {
+        $arr = array_values($this->toArray());
+
+        return $this->reset($arr);
+    }
+
+    /**
      * @param string $path
      * @return bool
      */

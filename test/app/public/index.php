@@ -245,7 +245,7 @@ $json = new \Chukdo\Json\Json([
 
 use Chukdo\Db\Mongo\Aggregate\Expr;
 
-dd(db::collection('students', 'test')->schema()->unsetRequired('name')->schema());
+dd(db::collection('students', 'test')->schema()->unsetRequired('name')->unsetProperty('name')->save());
 
 $write = db::collection('test', 'test')
     ->write();

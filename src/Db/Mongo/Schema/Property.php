@@ -136,16 +136,6 @@ class Property
      */
     public function setList( ...$values ): self
     {
-        return $this->resetList()
-            ->addList($values);
-    }
-
-    /**
-     * @param mixed ...$values
-     * @return Property
-     */
-    public function addList( ...$values ): self
-    {
         $list = $this->list();
 
         foreach ( $values as $value ) {
@@ -163,16 +153,6 @@ class Property
     public function List(): Json
     {
         return $this->property->offsetGetOrSet('enum');
-    }
-
-    /**
-     * @return Property
-     */
-    public function resetList(): self
-    {
-        $this->property->offsetSet('enum', []);
-
-        return $this;
     }
 
     /**
@@ -245,6 +225,33 @@ class Property
     }
 
     /**
+     * @param mixed ...$values
+     * @return Property
+     */
+    public function unsetList( ...$values ): self
+    {
+        $list = $this->list();
+
+        foreach ( $values as $value ) {
+            foreach ( (array) $value as $v ) {
+                if ( ( $indexOf = $list->indexOf($v) ) !== null ) {
+                    $list->offsetUnset($indexOf);
+                }
+            }
+        }
+    }
+
+    /**
+     * @return Property
+     */
+    public function resetList(): self
+    {
+        $this->property->offsetSet('enum', []);
+
+        return $this;
+    }
+
+    /**
      * @param mixed ...$fields
      * @return Property
      */
@@ -254,11 +261,13 @@ class Property
 
         foreach ( $fields as $field ) {
             foreach ( (array) $field as $f ) {
-                if (($indexOf = $required->indexOf($f)) !== null) {
+                if ( ( $indexOf = $required->indexOf($f) ) !== null ) {
                     $required->offsetUnset($indexOf);
                 }
             }
         }
+
+        $required->resetKeys();
 
         return $this;
     }
