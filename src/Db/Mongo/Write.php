@@ -200,6 +200,7 @@ Class Write extends Where
      */
     public function fields(): array
     {
+        // Schema -> convertData -> validateData
         return $this->fields;
     }
 

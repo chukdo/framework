@@ -35,7 +35,7 @@ class Json extends ArrayObject implements JsonInterface
     {
         parent::__construct([]);
 
-        if ($preFilter instanceof Closure) {
+        if ( $preFilter instanceof Closure ) {
             $this->preFilter = $preFilter;
         }
 
@@ -55,9 +55,9 @@ class Json extends ArrayObject implements JsonInterface
     /**
      * @param mixed $key
      * @param mixed $value
-     * @return self
+     * @return JsonInterface
      */
-    public function offsetSet( $key, $value ): self
+    public function offsetSet( $key, $value ): JsonInterface
     {
         if ( Is::iterable($value) ) {
             parent::offsetSet($key, new Json($value, $this->preFilter));
@@ -72,19 +72,74 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
-     * @return Collect
+     * @param string $key
+     * @return mixed|null
      */
-    public function collect(): Collect
+    public function __get( string $key )
     {
-        return new Collect($this);
+        return $this->offsetExists($key)
+            ? $this->offsetGet($key)
+            : null;
     }
 
     /**
-     * @return $this
+     * @param string $key
+     * @param        $value
      */
-    public function all()
+    public function __set( string $key, $value ): void
     {
-        return $this;
+        $this->offsetSet($key, $value);
+    }
+
+    /**
+     * @param mixed $key
+     * @param null  $default
+     * @return mixed|null
+     */
+    public function offsetGet( $key, $default = null )
+    {
+        if ( $this->offsetExists($key) ) {
+            return parent::offsetGet($key);
+        }
+
+        return $default;
+    }
+
+    /**
+     * @param string $key
+     * @return bool
+     */
+    public function __isset( string $key ): bool
+    {
+        return $this->offsetExists($key);
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->toJson(true);
+    }
+
+    /**
+     * @param bool $prettyfy
+     * @return string
+     */
+    public function toJson( bool $prettyfy = false ): string
+    {
+        return json_encode($this->toArray(),
+            $prettyfy
+                ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+                : JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return $this->getArrayCopy();
     }
 
     /**
@@ -106,13 +161,212 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
+     * @param string $key
      * @return bool
      */
-    public function isEmpty(): bool
+    public function __unset( string $key ): bool
     {
-        return $this->count() == 0
-            ? true
-            : false;
+        return (bool) $this->offsetUnset($key);
+    }
+
+    /**
+     * @param mixed $key
+     * @return mixed|null
+     */
+    public function offsetUnset( $key )
+    {
+        if ( $this->offsetExists($key) ) {
+            $offset = parent::offsetGet($key);
+            parent::offsetUnset($key);
+
+            return $offset;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param iterable $data
+     * @return JsonInterface
+     */
+    public function addToSet( iterable $data ): JsonInterface
+    {
+        foreach ( $data as $k => $v ) {
+            if ( !$this->in($v) ) {
+                $this->append($v);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param $value
+     * @return bool
+     */
+    public function in( $value ): bool
+    {
+        foreach ( $this as $v ) {
+            if ( $v === $value ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param mixed $value
+     * @return JsonInterface
+     */
+    public function append( $value ): JsonInterface
+    {
+        if ( Is::arr($value) ) {
+            parent::append(new Json($value, $this->preFilter));
+        }
+        else {
+            parent::append($this->preFilter instanceof Closure
+                ? ( $this->preFilter )(null, $value)
+                : $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function all()
+    {
+        return $this;
+    }
+
+    /**
+     * @return JsonInterface
+     */
+    public function clean(): JsonInterface
+    {
+        $json = new Json();
+
+        foreach ( $this as $k => $v ) {
+            if ( $v !== null && $v !== '' ) {
+                $json->offsetSet($k, $v);
+            }
+        }
+
+        return $json;
+    }
+
+    /**
+     * @return Collect
+     */
+    public function collect(): Collect
+    {
+        return new Collect($this);
+    }
+
+    /**
+     * @param string $path
+     * @return bool
+     */
+    public function exists( string $path ): bool
+    {
+        $value = $this->get($path);
+
+        if ( $value !== null ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $path
+     * @param null        $default
+     * @return mixed|null
+     */
+    public function get( ?string $path, $default = null )
+    {
+        if ( $path == null ) {
+            return $default;
+        }
+
+        if ( Str::notContain($path, '.') ) {
+            return $this->offsetGet($path, $default);
+        }
+
+        $arr       = new Arr(Str::split($path, '.'));
+        $firstPath = $arr->getFirstAndRemove();
+        $endPath   = $arr->join('.');
+        $get       = $this->offsetGet($firstPath);
+
+        if ( $get instanceof JsonInterface ) {
+            return $get->get($endPath);
+        }
+
+        return $default;
+    }
+
+    /**
+     * @param string $path
+     * @return bool
+     */
+    public function filled( string $path ): bool
+    {
+        $value = $this->get($path);
+
+        if ( $value != null && $value != '' ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param Closure $closure
+     * @return JsonInterface
+     */
+    public function filter( Closure $closure ): JsonInterface
+    {
+        $json = new Json();
+
+        foreach ( $this as $k => $v ) {
+            $r = $closure($k, $v);
+
+            if ( $r !== null ) {
+                $json->offsetSet($k, $r);
+            }
+        }
+
+        return $json;
+    }
+
+    /**
+     * @param Closure $closure
+     * @return JsonInterface
+     */
+    public function filterRecursive( Closure $closure ): JsonInterface
+    {
+        $json = new Json();
+
+        foreach ( $this as $k => $v ) {
+            if ( $v instanceof Json ) {
+                $r = $v->filterRecursive($closure);
+
+                if ( $r->count() > 0 ) {
+                    $json->offsetSet($k, $r);
+                }
+            }
+            else {
+                $r = $closure($k, $v);
+
+                if ( $r !== null ) {
+                    $json->offsetSet($k, $r);
+                }
+            }
+        }
+
+        return $json;
     }
 
     /**
@@ -146,14 +400,6 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
-     * @return mixed
-     */
-    public function getLast()
-    {
-        return $this->getIndex($this->count() - 1);
-    }
-
-    /**
      * @return mixed|null
      */
     public function getKeyFirst()
@@ -163,20 +409,6 @@ class Json extends ArrayObject implements JsonInterface
         }
 
         return null;
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function getKeyLast()
-    {
-        $last = null;
-
-        foreach ( $this as $key => $unused ) {
-            $last = $key;
-        }
-
-        return $last;
     }
 
     /**
@@ -198,41 +430,108 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
-     * @param array $keys
-     * @param null  $default
      * @return mixed|null
      */
-    public function offsetGetFirstInList( array $keys, $default = null )
+    public function getKeyLast()
     {
-        foreach ( $keys as $key ) {
-            if ( $get = $this->offsetGet($key) ) {
-                return $get;
-            }
+        $last = null;
+
+        foreach ( $this as $key => $unused ) {
+            $last = $key;
         }
 
-        return $default;
+        return $last;
     }
 
     /**
-     * @param mixed $key
-     * @param null  $default
-     * @return mixed|null
+     * @return mixed
      */
-    public function offsetGet( $key, $default = null )
+    public function getLast()
     {
-        if ( $this->offsetExists($key) ) {
-            return parent::offsetGet($key);
+        return $this->getIndex($this->count() - 1);
+    }
+
+    /**
+     * @param $value
+     * @return mixed
+     */
+    public function indexOf( $value )
+    {
+        foreach ( $this as $k => $v ) {
+            if ( $v === $value ) {
+                return $k;
+            }
         }
 
-        return $default;
+        return null;
+    }
+
+    /**
+     * @param mixed ...$offsets
+     * @return JsonInterface
+     */
+    public function with( ...$offsets ): JsonInterface
+    {
+        $only = new Json();
+
+        foreach ( $offsets as $offsetList ) {
+            foreach ( (array) $offsetList as $offset ) {
+                $only->set($offset, $this->get($offset));
+            }
+        }
+
+        return $only;
+    }
+
+    /**
+     * @param mixed ...$param
+     * @return mixed
+     */
+    public function is( ...$param )
+    {
+        $function   = array_shift($param);
+        $param[ 0 ] = $this->get($param[ 0 ]);
+
+        return call_user_func_array([
+            '\Chukdo\Helper\Is',
+            $function,
+        ],
+            $param);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmpty(): bool
+    {
+        return $this->count() == 0
+            ? true
+            : false;
+    }
+
+    /**
+     * @param string ...$names
+     * @return JsonInterface
+     */
+    public function map( string ... $names ): JsonInterface
+    {
+        $json = new Json();
+
+        foreach ( $this as $k => $v ) {
+            if ( in_array($k, $names) ) {
+                $json->offsetSet($k, $v);
+            }
+        }
+
+        return $json;
     }
 
     /**
      * @param iterable|null $merge
      * @param bool|null     $overwrite
-     * @return Json
+     * @return JsonInterface
      */
-    public function merge( iterable $merge = null, bool $overwrite = null ): self
+    public function merge( iterable $merge = null, bool $overwrite = null ): JsonInterface
     {
         if ( $merge ) {
             foreach ( $merge as $k => $v ) {
@@ -246,109 +545,11 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
-     * @param string ...$names
-     * @return Json
-     */
-    public function map( string ... $names ): Json
-    {
-        $json = new Json();
-
-        foreach ( $this as $k => $v ) {
-            if (in_array($k, $names)) {
-                $json->offsetSet($k, $v);
-            }
-        }
-
-        return $json;
-    }
-
-    /**
-     * @param Closure $closure
-     * @return Json
-     */
-    public function filter( Closure $closure ): Json
-    {
-        $json = new Json();
-
-        foreach ( $this as $k => $v ) {
-            $r = $closure($k, $v);
-
-            if ($r !== null) {
-                $json->offsetSet($k, $r);
-            }
-        }
-
-        return $json;
-    }
-
-    /**
-     * @param Closure $closure
-     * @return Json
-     */
-    public function filterRecursive( Closure $closure ): Json
-    {
-        $json = new Json();
-
-        foreach ( $this as $k => $v ) {
-            if ( $v instanceof Json) {
-                $r = $v->filterRecursive($closure);
-
-                if ($r->count() > 0) {
-                    $json->offsetSet($k, $r);
-                }
-            }
-            else {
-                $r = $closure($k, $v);
-
-                if ($r !== null) {
-                    $json->offsetSet($k, $r);
-                }
-            }
-        }
-
-        return $json;
-    }
-
-    /**
-     * @param mixed ...$offsets
-     * @return Json
-     */
-    public function with( ...$offsets ): Json
-    {
-        $only = new Json();
-
-        foreach ( $offsets as $offsetList ) {
-            foreach ( (array) $offsetList as $offset ) {
-                $only->set($offset, $this->get( $offset ));
-            }
-        }
-
-        return $only;
-    }
-
-    /**
-     * @param mixed ...$offsets
-     * @return Json
-     */
-    public function without( ...$offsets ): Json
-    {
-        $except = new Json($this->toArray());
-
-        foreach ( $offsets as $offsetList ) {
-            foreach ( (array) $offsetList as $offset ) {
-                $except->unset($offset);
-            }
-        }
-
-        return $except;
-    }
-
-    /**
      * @param iterable|null $merge
      * @param bool|null     $overwrite
-     * @return Json
+     * @return JsonInterface
      */
-    public function mergeRecursive( iterable $merge = null, bool $overwrite = null ): self
+    public function mergeRecursive( iterable $merge = null, bool $overwrite = null ): JsonInterface
     {
         if ( $merge ) {
             foreach ( $merge as $k => $v ) {
@@ -371,102 +572,118 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
-     * @return Json
+     * @param mixed ...$offsets
+     * @return JsonInterface
      */
-    public function clean(): Json
+    public function without( ...$offsets ): JsonInterface
     {
-        $json = new Json();
+        $except = new Json($this->toArray());
 
-        foreach ( $this as $k => $v ) {
-            if ( $v !== null && $v !== '') {
-                $json->offsetSet($k, $v);
+        foreach ( $offsets as $offsetList ) {
+            foreach ( (array) $offsetList as $offset ) {
+                $except->unset($offset);
             }
         }
 
-        return $json;
+        return $except;
     }
 
     /**
-     * @param iterable $data
-     * @return Json
-     */
-    public function addToSet( iterable $data ): self
-    {
-        foreach ( $data as $k => $v ) {
-            if ( !$this->in($v) ) {
-                $this->append($v);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param $value
-     * @return bool
-     */
-    public function in( $value ): bool
-    {
-        foreach ( $this as $v ) {
-            if ( $v === $value ) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param mixed $value
-     * @return Json
-     */
-    public function append( $value ): self
-    {
-        if ( Is::arr($value) ) {
-            parent::append(new Json($value, $this->preFilter));
-        }
-        else {
-            parent::append($this->preFilter instanceof Closure
-                ? ( $this->preFilter )(null, $value)
-                : $value);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param string|null $path
-     * @param null        $default
+     * @param array $keys
+     * @param null  $default
      * @return mixed|null
      */
-    public function get( ?string $path, $default = null )
+    public function offsetGetFirstInList( array $keys, $default = null )
     {
-        if ($path == null) {
-            return $default;
-        }
-
-        if ( Str::notContain($path, '.') ) {
-            return $this->offsetGet($path, $default);
-        }
-
-        $arr       = new Arr(Str::split($path, '.'));
-        $firstPath = $arr->getFirstAndRemove();
-        $endPath   = $arr->join('.');
-        $get       = $this->offsetGet($firstPath);
-
-        if ( $get instanceof JsonInterface ) {
-            return $get->get($endPath);
+        foreach ( $keys as $key ) {
+            if ( $get = $this->offsetGet($key) ) {
+                return $get;
+            }
         }
 
         return $default;
     }
 
     /**
+     * @param string|null $title
+     * @param string|null $color
+     * @return string
+     */
+    public function toConsole( string $title = null, string $color = null ): string
+    {
+        if ( !Cli::runningInConsole() ) {
+            throw new JsonException('You can call json::toConsole only in CLI mode.');
+        }
+
+        $climate = new CLImate();
+        $climate->output->defaultTo('buffer');
+
+        if ( $title ) {
+            $climate->border();
+            $climate->style->addCommand('colored', $color
+                ?: 'green');
+            $climate->colored(ucfirst($title
+                ?: $this->name));
+            $climate->border();
+        }
+
+        $climate->json($this->toArray());
+
+        return $climate->output->get('buffer')
+            ->get();
+    }
+
+    /**
+     * @param string|null $title
+     * @param string|null $color
+     * @return string
+     */
+    public function toHtml( string $title = null, string $color = null ): string
+    {
+        return To::html($this, $title, $color, true);
+    }
+
+    /**
+     * @param string|null $prefix
+     * @return array
+     */
+    public function toSimpleArray( string $prefix = null ): array
+    {
+        $mixed = [];
+
+        foreach ( $this as $k => $v ) {
+            $k = trim($prefix . '.' . $k,
+                '.');
+
+            if ( $v instanceof JsonInterface ) {
+                $mixed = array_merge($mixed,
+                    $v->toSimpleArray($k));
+            }
+            else {
+                $mixed[ $k ] = $v;
+            }
+        }
+
+        return $mixed;
+    }
+
+    /**
+     * @return Xml
+     */
+    public function toXml(): Xml
+    {
+        $xml = new Xml();
+        $xml->import($this->toArray());
+
+        return $xml;
+    }
+
+    /**
      * @param string $path
      * @param        $value
-     * @return Json
+     * @return JsonInterface
      */
-    public function set( string $path, $value ): self
+    public function set( string $path, $value ): JsonInterface
     {
         if ( Str::notContain($path, '.') ) {
             return $this->offsetSet($path, $value);
@@ -500,21 +717,6 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
-     * @param $value
-     * @return mixed
-     */
-    public function indexOf($value)
-    {
-        foreach ($this as $k => $v) {
-            if ($v === $value) {
-                return $k;
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * @param string $path
      * @return mixed|null
      */
@@ -537,26 +739,10 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
-     * @param mixed $key
-     * @return mixed|null
-     */
-    public function offsetUnset( $key )
-    {
-        if ( $this->offsetExists($key) ) {
-            $offset = parent::offsetGet($key);
-            parent::offsetUnset($key);
-
-            return $offset;
-        }
-
-        return null;
-    }
-
-    /**
      * @param array $arr
-     * @return Json
+     * @return JsonInterface
      */
-    public function reset(array $arr = []): self
+    public function reset( array $arr = [] ): JsonInterface
     {
         parent::__construct($arr);
 
@@ -564,9 +750,9 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
-     * @return Json
+     * @return JsonInterface
      */
-    public function resetKeys(): self
+    public function resetKeys(): JsonInterface
     {
         $arr = array_values($this->toArray());
 
@@ -575,40 +761,10 @@ class Json extends ArrayObject implements JsonInterface
 
     /**
      * @param string $path
-     * @return bool
-     */
-    public function filled( string $path ): bool
-    {
-        $value = $this->get($path);
-
-        if ( $value != null && $value != '' ) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param string $path
-     * @return bool
-     */
-    public function exists( string $path ): bool
-    {
-        $value = $this->get($path);
-
-        if ( $value !== null ) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param string $path
      * @param bool   $scalarResultOnly
-     * @return Json
+     * @return JsonInterface
      */
-    public function wildcard( string $path, $scalarResultOnly = false ): self
+    public function wildcard( string $path, $scalarResultOnly = false ): JsonInterface
     {
         $path      = rtrim($path, '.*');
         $arr       = new Arr(Str::split($path, '.'));
@@ -643,78 +799,6 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
-     * @param string|null $prefix
-     * @return array
-     */
-    public function toSimpleArray( string $prefix = null ): array
-    {
-        $mixed = [];
-
-        foreach ( $this as $k => $v ) {
-            $k = trim($prefix . '.' . $k,
-                '.');
-
-            if ( $v instanceof JsonInterface ) {
-                $mixed = array_merge($mixed,
-                    $v->toSimpleArray($k));
-            }
-            else {
-                $mixed[ $k ] = $v;
-            }
-        }
-
-        return $mixed;
-    }
-
-    /**
-     * @param string|null $title
-     * @param string|null $color
-     * @return string
-     */
-    public function toHtml( string $title = null, string $color = null ): string
-    {
-        return To::html($this, $title, $color, true);
-    }
-
-    /**
-     * @param string|null $title
-     * @param string|null $color
-     * @return string
-     */
-    public function toConsole( string $title = null, string $color = null ): string
-    {
-        if ( !Cli::runningInConsole() ) {
-            throw new JsonException('You can call json::toConsole only in CLI mode.');
-        }
-
-        $climate = new CLImate();
-        $climate->output->defaultTo('buffer');
-
-        if ( $title ) {
-            $climate->border();
-            $climate->style->addCommand('colored', $color
-                ?: 'green');
-            $climate->colored(ucfirst($title
-                ?: $this->name));
-            $climate->border();
-        }
-
-        $climate->json($this->toArray());
-
-        return $climate->output->get('buffer')
-            ->get();
-    }    /**
-     * @return Xml
-     */
-    public function toXml(): Xml
-    {
-        $xml = new Xml();
-        $xml->import($this->toArray());
-
-        return $xml;
-    }
-
-    /**
      * @param mixed ...$param
      * @return mixed
      */
@@ -729,90 +813,6 @@ class Json extends ArrayObject implements JsonInterface
         ],
             $param);
     }
-
-    /**
-     * @param mixed ...$param
-     * @return mixed
-     */
-    public function is( ...$param )
-    {
-        $function   = array_shift($param);
-        $param[ 0 ] = $this->get($param[ 0 ]);
-
-        return call_user_func_array([
-            '\Chukdo\Helper\Is',
-            $function,
-        ],
-            $param);
-    }    /**
-     * @return array
-     */
-    public function toArray(): array
-    {
-        return $this->getArrayCopy();
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString(): string
-    {
-        return $this->toJson(true);
-    }
-
-    /**
-     * @param bool $prettyfy
-     * @return string
-     */
-    public function toJson( bool $prettyfy = false ): string
-    {
-        return json_encode($this->toArray(),
-            $prettyfy
-                ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-                : JSON_UNESCAPED_SLASHES);
-    }
-
-    /**
-     * @param string $key
-     * @return bool
-     */
-    public function __isset( string $key ): bool
-    {
-        return $this->offsetExists($key);
-    }
-
-    /**
-     * @param string $key
-     * @return mixed|null
-     */
-    public function __get( string $key )
-    {
-        return $this->offsetExists($key)
-            ? $this->offsetGet($key)
-            : null;
-    }
-
-    /**
-     * @param string $key
-     * @param        $value
-     */
-    public function __set( string $key, $value ): void
-    {
-        $this->offsetSet($key, $value);
-    }
-
-    /**
-     * @param string $key
-     * @return bool
-     */
-    public function __unset( string $key ): bool
-    {
-        return (bool) $this->offsetUnset($key);
-    }
-
-
-
-
 
 
 }

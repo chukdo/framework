@@ -219,27 +219,27 @@ $json = new \Chukdo\Json\Json([
 ]);
 
 // addToSet > tva, ref.prix tcc closure
-/**
- * dd($json->collect()
- * ->where('ref.public', '=', 'ORPI')
- * ->without('prix', 'ref.client')
- * ->addToSet([
- * 'tva',
- * 'ref.prix',
- * ], 'prix.ttc', function( $p )
- * {
- * return ( 1 + ( $p[ 'tva' ] / 100 ) ) * $p[ 'ref.prix' ];
- * })
- * ->without('tva', 'ref.prix')
- * ->filterKey('ref.public', function( $r )
- * {
- * return strtolower($r);
- * })
- * ->group('cp')
- * //->match('cp', '=', 'ref.cp')
- * ->values()
- * ->toHtml());
- */
+
+  dd($json->collect()
+  ->where('ref.public', '=', 'ORPI')
+  ->without('prix', 'ref.client')
+  ->addToSet([
+  'tva',
+  'ref.prix',
+  ], 'prix.ttc', function( $p )
+  {
+  return ( 1 + ( $p[ 'tva' ] / 100 ) ) * $p[ 'ref.prix' ];
+  })
+  ->without('tva', 'ref.prix')
+  ->filterKey('ref.public', function( $r )
+  {
+  return strtolower($r);
+ })
+ ->group('cp')
+ //->match('cp', '=', 'ref.cp')
+ ->values()
+ ->toHtml());
+
 //dd(Conf::offsetGet('db.mongo.dsn'));
 //dd(Db::collection('contrat'));
 

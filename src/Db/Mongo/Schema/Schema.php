@@ -2,7 +2,9 @@
 
 namespace Chukdo\Db\Mongo\Schema;
 
+use Chukdo\Contracts\Json as JsonInterface;
 use Chukdo\DB\Mongo\Collection;
+use Chukdo\Db\Mongo\MongoException;
 use Chukdo\Json\Json;
 use MongoDB\Collection as MongoDbCollection;
 
@@ -48,6 +50,51 @@ class Schema
             ], $this->collection->databaseName());
 
         return $json->get('0.options.validator.$jsonSchema');
+    }
+
+    /**
+     * @param JsonInterface $data
+     * @return bool
+     */
+    public function validateData( JsonInterface $data ): bool
+    {
+        // parse
+        // check
+        // lock ?!
+    }
+
+    /**
+     * @param JsonInterface $data
+     * @return array
+     */
+    public function convertData( JsonInterface $data ): array
+    {
+        foreach ( $this->required() as $required ) {
+            if ( $data->get($required) === null ) {
+                throw new MongoException(sprintf("The field %s is required", $required));
+            }
+        }
+
+        // check required
+        // loop properties
+        // bsonType
+        // scalar
+        // champ exist
+        // converti
+
+        // change scalar to good type
+        // key => valeur
+        // valeur => non scalaire
+        // loop
+        // hic objet en racine se base a.b.c
+    }
+
+    /**
+     * @return Json
+     */
+    public function required(): Json
+    {
+        return $this->property->required();
     }
 
     /**
@@ -104,14 +151,6 @@ class Schema
             ->offsetUnset($name);
 
         return $this;
-    }
-
-    /**
-     * @return Json
-     */
-    public function required(): Json
-    {
-        return $this->property->required();
     }
 
     /**

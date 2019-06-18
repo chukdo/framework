@@ -23,13 +23,13 @@ class Message extends Json
     /**
      * Message constructor.
      * @param string $name
-     * @param string $render
+     * @param null   $preFilter
      */
-    public function __construct( string $name )
+    public function __construct( string $name, $preFilter = null )
     {
         $this->name = $name;
 
-        parent::__construct([]);
+        parent::__construct([], $preFilter);
     }
 
     /**
