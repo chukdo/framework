@@ -37,6 +37,9 @@ class Property
                 case 'description':
                     $this->setDescription((string) $value);
                     break;
+                case 'pattern':
+                    $this->setPattern((string) $value);
+                    break;
                 case 'minimum' :
                     $this->setMin((int) $value);
                     break;
@@ -93,6 +96,17 @@ class Property
         }
 
         $this->property->offsetSet('bsonType', $value);
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     * @return Property
+     */
+    public function setPattern( string $value ): self
+    {
+        $this->property->offsetSet('pattern', $value);
 
         return $this;
     }
@@ -344,6 +358,14 @@ class Property
     public function description(): ?string
     {
         return $this->property->offsetGet('description');
+    }
+
+    /**
+     * @return string|null
+     */
+    public function pattern(): ?string
+    {
+        return $this->property->offsetGet('pattern');
     }
 
     /**

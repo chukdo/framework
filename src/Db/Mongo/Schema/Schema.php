@@ -2,10 +2,12 @@
 
 namespace Chukdo\Db\Mongo\Schema;
 
-use Chukdo\Contracts\Json as JsonInterface;
 use Chukdo\DB\Mongo\Collection;
 use Chukdo\Db\Mongo\MongoException;
+use Chukdo\Helper\Is;
+use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
+use Chukdo\Contracts\Json\Json as JsonInterface;
 use MongoDB\Collection as MongoDbCollection;
 
 /**
@@ -53,48 +55,19 @@ class Schema
     }
 
     /**
-     * @param JsonInterface $data
-     * @return bool
-     */
-    public function validateData( JsonInterface $data ): bool
-    {
-        // parse
-        // check
-        // lock ?!
-    }
-
-    /**
-     * @param JsonInterface $data
-     * @return array
-     */
-    public function convertData( JsonInterface $data ): array
-    {
-        foreach ( $this->required() as $required ) {
-            if ( $data->get($required) === null ) {
-                throw new MongoException(sprintf("The field %s is required", $required));
-            }
-        }
-
-        // check required
-        // loop properties
-        // bsonType
-        // scalar
-        // champ exist
-        // converti
-
-        // change scalar to good type
-        // key => valeur
-        // valeur => non scalaire
-        // loop
-        // hic objet en racine se base a.b.c
-    }
-
-    /**
      * @return Json
      */
     public function required(): Json
     {
         return $this->property->required();
+    }
+
+    /**
+     * @return Json
+     */
+    public function properties(): Json
+    {
+        return $this->property->properties();
     }
 
     /**
@@ -104,7 +77,7 @@ class Schema
     {
         $s = new Json($this->collection->database()
             ->database()
-            ->modifyCollection($this->collection->name(), $this->validator()));
+            ->modifyCollection($this->collection->name(), $this->schema()));
 
         return $s->offsetGet('ok') == 1;
     }
@@ -112,7 +85,7 @@ class Schema
     /**
      * @return array
      */
-    public function validator(): array
+    public function schema(): array
     {
         return [
             'validator'        => [
@@ -124,6 +97,17 @@ class Schema
     }
 
     /**
+     * @param JsonInterface $json
+     * @return JsonInterface
+     */
+    public function validator(JsonInterface $json): JsonInterface
+    {
+        $rules = new Validator($this);
+
+        return $rules->validate($json);
+    }
+
+    /**
      * @param string $name
      * @return Property
      */
@@ -131,14 +115,6 @@ class Schema
     {
         return $this->properties()
             ->offsetGetOrSet($name, new Property());
-    }
-
-    /**
-     * @return Json
-     */
-    public function properties(): Json
-    {
-        return $this->property->properties();
     }
 
     /**

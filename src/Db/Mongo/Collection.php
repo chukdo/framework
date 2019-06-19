@@ -4,6 +4,7 @@ Namespace Chukdo\DB\Mongo;
 
 use Chukdo\Db\Mongo\Aggregate\Aggregate;
 use Chukdo\Db\Mongo\Schema\Schema;
+use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
 use Chukdo\Helper\Is;
 use MongoDB\Collection as MongoDbCollection;
@@ -82,7 +83,7 @@ Class Collection
         elseif ( $value instanceof DateTime ) {
             $value = new UTCDateTime($value->getTimestamp());
         }
-        elseif ( substr($field, 0, 5) === '_date' ) {
+        elseif ( Str::contain($field, 'date') && Is::scalar($value) ) {
             $value = new UTCDateTime((int) $value);
         }
 

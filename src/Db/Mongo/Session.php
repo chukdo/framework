@@ -10,9 +10,6 @@ use MongoDB\Driver\Session as MongoSession;
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
- * @mixin Find
- * @mixin Write
- * @mixin Aggregate\Aggregate
  */
 Trait Session
 {
