@@ -2,13 +2,11 @@
 
 namespace Chukdo\Db\Mongo\Schema;
 
-use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Db\Mongo\MongoException;
 use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
 use DateTime;
-use MongoDB\BSON\Decimal128;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\Timestamp;
 use MongoDB\BSON\UTCDateTime;
@@ -382,17 +380,17 @@ class Property
 
     /**
      * @param array|Json s$data
-     * @return Json
+     * @return array
      */
-    public function validate( $data ): Json
+    public function validate( $data ): array
     {
         $json = new Json($data);
 
         if ( $this->property->count() == 0 ) {
-            return $json;
+            return $json->toArray();
         }
 
-        return $this->validateObject($json);
+        return $this->validateObject($json)->toArray();
     }
 
     /**

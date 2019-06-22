@@ -198,12 +198,8 @@ Class Write extends Where
      */
     public function insert(): ?string
     {
-        $data = $this->collection->schema()
-            ->validate($this->fields('set'))
-            ->toArray();
-
         return (string) $this->collection()
-            ->insertOne($data, $this->options)
+            ->insertOne($this->fields('set'), $this->options)
             ->getInsertedId();
     }
 
@@ -213,13 +209,20 @@ Class Write extends Where
      */
     public function fields( string $type = null ): array
     {
+        $fields = $this->fields;
+
+        if ( isset($fields[ '$set' ]) ) {
+            $fields[ '$set' ] = $this->collection->schema()
+                ->validate($fields[ '$set' ]);
+        }
+
         if ( $type ) {
-            return isset($this->fields[ '$' . $type ])
-                ? $this->fields[ '$' . $type ]
+            return isset($fields[ '$' . $type ])
+                ? $fields[ '$' . $type ]
                 : [];
         }
 
-        return $this->fields;
+        return $fields;
     }
 
     /**
