@@ -150,7 +150,21 @@ Class Collection
      */
     public function schema(): Schema
     {
-        return new Schema($this);
+        return new Schema($this, $this->info()->toArray());
+    }
+
+    /**
+     * @return Json
+     */
+    public function info(): Json
+    {
+        $json = $this->mongo()
+            ->command([
+                'listCollections' => 1,
+                'filter'          => [ 'name' => $this->name() ],
+            ], $this->databaseName());
+
+        return $json->get('0.options.validator.$jsonSchema');
     }
 
     /**

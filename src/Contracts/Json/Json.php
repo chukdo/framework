@@ -16,6 +16,11 @@ use Closure;
 interface Json
 {
     /**
+     * @return int
+     */
+    public function count(): int;
+
+    /**
      * @param $key
      * @param $value
      * @return Json
@@ -156,6 +161,12 @@ interface Json
      * @return Json
      */
     public function append( $value ): Json;
+
+    /**
+     * @param mixed $value
+     * @return Json
+     */
+    public function appendIfNoExist( $value ): Json;
 
     /**
      * @param string|null $path

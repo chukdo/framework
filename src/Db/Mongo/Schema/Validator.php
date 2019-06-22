@@ -36,81 +36,68 @@ class Validator
     }
 
     /**
+     * @param Property      $property
      * @param JsonInterface $json
      * @return JsonInterface
      */
-    public function validate( JsonInterface $json ): JsonInterface
+    protected function validateProperty( Property $property, JsonInterface $json ): JsonInterface
     {
-        foreach ( $this->schema()
-            ->required() as $required ) {
-            if ( $json->get($required) === null ) {
-                throw new MongoException(sprintf("The field [%s] is required", $required));
-            }
+        $name = $property->name();
+        $get  = $json->get($name);
+        $type = $property->type();
+
+        switch ( $type ) {
+            case 'objectId' :
+                $get = $this->validateObjectId($property, $get);
+                break;
+            case 'string' :
+                $get = $this->validateString($property, $get);
+                break;
+            case 'int':
+            case 'long':
+                $get = $this->validateInt($property, $get);
+                break;
+            case 'decimal':
+            case 'double' :
+            case 'float':
+                $get = $this->validatefloat($property, $get);
+                break;
+            case 'boolean' :
+                $get = $this->validateBool($property, $get);
+                break;
+            case 'date' :
+                $get = $this->validateDate($property, $get);
+                break;
+            case 'timestamp' :
+                $get = $this->validateTimestamp($property, $get);
+                break;
+            case 'enum' :
+                $get = $this->validateList($property, $get);
+                break;
+            case 'array':
+                $get = $this->validateArray($property, $get);
+                break;
+            case 'object':
+                $get = $this->validateObject($property, $get);
+                break;
+            default :
+                throw new MongoException(sprintf("The field [%s] must be a valid type not [%s]", $name, $type));
         }
 
-        foreach ( $this->schema()
-            ->properties() as $key => $value ) {
-            $get  = $json->get($key);
-            $type = $value->bsonType();
-
-            switch ( $type ) {
-                case 'objectId' :
-                    $get = $this->validateObjectId($key, $value, $get);
-                    break;
-                case 'string' :
-                    $get = $this->validateString($key, $value, $get);
-                    break;
-                case 'int':
-                case 'long':
-                    $get = $this->validateInt($key, $value, $get);
-                    break;
-                case 'decimal':
-                case 'double' :
-                case 'float':
-                    $get = $this->validatefloat($key, $value, $get);
-                    break;
-                case 'boolean' :
-                    $get = $this->validateBool($key, $value, $get);
-                    break;
-                case 'date' :
-                    $get = $this->validateDate($key, $value, $get);
-                    break;
-                case 'timestamp' :
-                    $get = $this->validateTimestamp($key, $value, $get);
-                    break;
-                case 'enum' :
-                    $get = $this->validateList($key, $value, $get);
-                    break;
-                case 'array':
-                    // loop
-                    break;
-                case 'object':
-                    // ?!
-                    break;
-            }
-
-            $json->set($key, $get);
-        }
+        $json->set($name, $get);
 
         return $json;
     }
 
     /**
-     * @return Schema
-     */
-    public function schema(): Schema
-    {
-        return $this->schema;
-    }
-
-    /**
-     * @param string   $key
      * @param Property $property
      * @param          $data
-     * @return string
+     * @return ObjectId
      */
-    protected function validateObjectId( string $key, Property $property, $data )
+    protected function validateObjectId( Property $property, $data )
     {
+        $name = $property->name();
+
         if ( $data instanceof ObjectId ) {
             return $data;
         }
@@ -118,19 +105,20 @@ class Validator
             return new ObjectId($data);
         }
 
-        throw new MongoException(sprintf("The field [%s] must be a objectId", $key));
+        throw new MongoException(sprintf("The field [%s] must be a objectId", $name));
     }
 
     /**
-     * @param string   $key
      * @param Property $property
      * @param          $data
      * @return string
      */
-    protected function validateString( string $key, Property $property, $data )
+    protected function validateString( Property $property, $data )
     {
+        $name = $property->name();
+
         if ( !Is::scalar($data) ) {
-            throw new MongoException(sprintf("The field [%s] must be a string", $key));
+            throw new MongoException(sprintf("The field [%s] must be a string", $name));
         }
 
         $data    = (string) $data;
@@ -138,7 +126,7 @@ class Validator
 
         if ( $pattern ) {
             if ( !Str::match('/' . $pattern . '/i', $data) ) {
-                throw new MongoException(sprintf("The field [%s] must be a string", $key));
+                throw new MongoException(sprintf("The field [%s] must be a string with pattern [%s]", $name, $pattern));
             }
         }
 
@@ -146,15 +134,16 @@ class Validator
     }
 
     /**
-     * @param string   $key
      * @param Property $property
      * @param          $data
-     * @return string
+     * @return int
      */
-    public function validateInt( string $key, Property $property, $data )
+    protected function validateInt( Property $property, $data )
     {
+        $name = $property->name();
+
         if ( !Is::scalar($data) ) {
-            throw new MongoException(sprintf("The field [%s] must be a int", $key));
+            throw new MongoException(sprintf("The field [%s] must be a int", $name));
         }
 
         $data = (int) $data;
@@ -163,13 +152,13 @@ class Validator
 
         if ( $min ) {
             if ( $data < $min ) {
-                throw new MongoException(sprintf("The field [%s] must be lower than [%s]", $key, $min));
+                throw new MongoException(sprintf("The field [%s] must be lower than [%s]", $name, $min));
             }
         }
 
         if ( $max ) {
             if ( $data < $max ) {
-                throw new MongoException(sprintf("The field [%s] must be greater than [%s]", $key, $max));
+                throw new MongoException(sprintf("The field [%s] must be greater than [%s]", $name, $max));
             }
         }
 
@@ -177,15 +166,16 @@ class Validator
     }
 
     /**
-     * @param string   $key
      * @param Property $property
      * @param          $data
-     * @return string
+     * @return float
      */
-    public function validateFloat( string $key, Property $property, $data )
+    protected function validateFloat( Property $property, $data )
     {
+        $name = $property->name();
+
         if ( !Is::scalar($data) ) {
-            throw new MongoException(sprintf("The field [%s] must be a float", $key));
+            throw new MongoException(sprintf("The field [%s] must be a float", $name));
         }
 
         $data = (float) $data;
@@ -194,13 +184,13 @@ class Validator
 
         if ( $min ) {
             if ( $data < $min ) {
-                throw new MongoException(sprintf("The field [%s] must be lower than [%s]", $key, $min));
+                throw new MongoException(sprintf("The field [%s] must be lower than [%s]", $name, $min));
             }
         }
 
         if ( $max ) {
             if ( $data < $max ) {
-                throw new MongoException(sprintf("The field [%s] must be greater than [%s]", $key, $max));
+                throw new MongoException(sprintf("The field [%s] must be greater than [%s]", $name, $max));
             }
         }
 
@@ -208,15 +198,16 @@ class Validator
     }
 
     /**
-     * @param string   $key
      * @param Property $property
      * @param          $data
-     * @return string
+     * @return bool
      */
-    public function validateBool( string $key, Property $property, $data )
+    protected function validateBool( Property $property, $data )
     {
+        $name = $property->name();
+
         if ( !Is::scalar($data) ) {
-            throw new MongoException(sprintf("The field [%s] must be a bool", $key));
+            throw new MongoException(sprintf("The field [%s] must be a bool", $name));
         }
 
         $data = (bool) $data;
@@ -225,30 +216,14 @@ class Validator
     }
 
     /**
-     * @param string   $key
      * @param Property $property
      * @param          $data
-     * @return string
+     * @return UTCDateTime
      */
-    protected function validateList( string $key, Property $property, $data )
+    protected function validateDate( Property $property, $data )
     {
-        $list = $property->list();
+        $name = $property->name();
 
-        if ( !Is::scalar($data) || !$list->in($data) ) {
-            throw new MongoException(sprintf("The field [%s] must be a element of list [%s]", $key, implode(',', $list->toArray())));
-        }
-
-        return $data;
-    }
-
-    /**
-     * @param string   $key
-     * @param Property $property
-     * @param          $data
-     * @return string
-     */
-    protected function validateDate( string $key, Property $property, $data )
-    {
         if ( $data instanceof UTCDateTime ) {
             return $data;
         }
@@ -259,17 +234,18 @@ class Validator
             return new UTCDateTime((int) $data);
         }
 
-        throw new MongoException(sprintf("The field [%s] must be a date", $key));
+        throw new MongoException(sprintf("The field [%s] must be a date", $name));
     }
 
     /**
-     * @param string   $key
      * @param Property $property
      * @param          $data
-     * @return string
+     * @return Timestamp
      */
-    protected function validateTimestamp( string $key, Property $property, $data )
+    protected function validateTimestamp( Property $property, $data )
     {
+        $name = $property->name();
+
         if ( $data instanceof Timestamp ) {
             return $data;
         }
@@ -280,7 +256,95 @@ class Validator
             return new Timestamp((int) $data, 1);
         }
 
-        throw new MongoException(sprintf("The field [%s] must be a timestamp", $key));
+        throw new MongoException(sprintf("The field [%s] must be a timestamp", $name));
+    }
+
+    /**
+     * @param Property $property
+     * @param          $data
+     * @return mixed
+     */
+    protected function validateList( Property $property, $data )
+    {
+        $name = $property->name();
+        $list = $property->list();
+
+        if ( !Is::scalar($data) || !$list->in($data) ) {
+            throw new MongoException(sprintf("The field [%s] must be a element of list [%s]", $name, implode(',', $list->toArray())));
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param Property $property
+     * @param          $data
+     * @return mixed
+     */
+    protected function validateArray( Property $property, $data )
+    {
+        $name = $property->name();
+
+        if ( !( $data instanceof JsonInterface ) ) {
+            throw new MongoException(sprintf("The field [%s] must be a object", $name));
+        }
+
+        $count = $data->count();
+        $min   = $property->minItems();
+        $max   = $property->maxItems();
+
+        if ( $min ) {
+            if ( $count < $min ) {
+                throw new MongoException(sprintf("The field [%s] must have more than [%s] items", $name, $min));
+            }
+        }
+
+        if ( $max ) {
+            if ( $count < $max ) {
+                throw new MongoException(sprintf("The field [%s] must have less than [%s] items", $name, $max));
+            }
+        }
+
+        foreach ( $property->properties() as $key => $property ) {
+            $this->validateProperty($property, $data);
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param Property $property
+     * @param          $data
+     * @return mixed
+     */
+    protected function validateObject( Property $property, $data )
+    {
+        $name = $property->name();
+
+        if ( !( $data instanceof JsonInterface ) ) {
+            throw new MongoException(sprintf("The field [%s] must be a object", $name));
+        }
+
+        foreach ( $property->required() as $required ) {
+            if ( $data->get($required) === null ) {
+                throw new MongoException(sprintf("The field [%s] is required", $required));
+            }
+        }
+
+        foreach ( $property->properties() as $key => $property ) {
+            $this->validateProperty($property, $data);
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param JsonInterface $json
+     * @return JsonInterface
+     */
+    public function validate( JsonInterface $json ): JsonInterface
+    {
+        return $this->validateProperty($this->schema, $json);
     }
 
 

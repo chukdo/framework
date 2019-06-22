@@ -2,13 +2,9 @@
 
 namespace Chukdo\Db\Mongo\Schema;
 
-use Chukdo\DB\Mongo\Collection;
-use Chukdo\Db\Mongo\MongoException;
-use Chukdo\Helper\Is;
-use Chukdo\Helper\Str;
-use Chukdo\Json\Json;
 use Chukdo\Contracts\Json\Json as JsonInterface;
-use MongoDB\Collection as MongoDbCollection;
+use Chukdo\DB\Mongo\Collection;
+use Chukdo\Json\Json;
 
 /**
  * Mongo Schema validation.
@@ -17,7 +13,7 @@ use MongoDB\Collection as MongoDbCollection;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class Schema
+class Schema extends Property
 {
     /**
      * @var Collection
@@ -25,49 +21,16 @@ class Schema
     protected $collection;
 
     /**
-     * @var Property
+     * Schema constructor.
+     * @param Collection  $collection
+     * @param array       $property
+     * @param string|null $name
      */
-    protected $property;
-
-    /**
-     * Index constructor.
-     * @param Collection $collection
-     */
-    public function __construct( Collection $collection )
+    public function __construct( Collection $collection, Array $property = [], string $name = null )
     {
         $this->collection = $collection;
-        $this->property   = new Property($this->info()
-            ->toArray());
-    }
 
-    /**
-     * @return Json
-     */
-    public function info(): Json
-    {
-        $json = $this->collection->mongo()
-            ->command([
-                'listCollections' => 1,
-                'filter'          => [ 'name' => $this->collection->name() ],
-            ], $this->collection->databaseName());
-
-        return $json->get('0.options.validator.$jsonSchema');
-    }
-
-    /**
-     * @return Json
-     */
-    public function required(): Json
-    {
-        return $this->property->required();
-    }
-
-    /**
-     * @return Json
-     */
-    public function properties(): Json
-    {
-        return $this->property->properties();
+        parent::__construct($property, $name);
     }
 
     /**
@@ -77,7 +40,7 @@ class Schema
     {
         $s = new Json($this->collection->database()
             ->database()
-            ->modifyCollection($this->collection->name(), $this->schema()));
+            ->modifyCollection($this->collection->name(), $this->get()));
 
         return $s->offsetGet('ok') == 1;
     }
@@ -85,106 +48,14 @@ class Schema
     /**
      * @return array
      */
-    public function schema(): array
+    public function get(): array
     {
         return [
             'validator'        => [
-                '$jsonSchema' => $this->property->schema(),
+                '$jsonSchema' => parent::get(),
             ],
             'validationLevel'  => 'strict',
             'validationAction' => 'error',
         ];
-    }
-
-    /**
-     * @param JsonInterface $json
-     * @return JsonInterface
-     */
-    public function validator(JsonInterface $json): JsonInterface
-    {
-        $rules = new Validator($this);
-
-        return $rules->validate($json);
-    }
-
-    /**
-     * @param string $name
-     * @return Property
-     */
-    public function setProperty( string $name ): Property
-    {
-        return $this->properties()
-            ->offsetGetOrSet($name, new Property());
-    }
-
-    /**
-     * @param string $name
-     * @return Schema
-     */
-    public function unsetProperty( string $name ): self
-    {
-        $this->properties()
-            ->offsetUnset($name);
-
-        return $this;
-    }
-
-    /**
-     * @return bool|null
-     */
-    public function locked(): ?bool
-    {
-        return $this->property->locked();
-    }
-
-    /**
-     * @param bool $value
-     * @return Schema
-     */
-    public function setLocked( bool $value ): self
-    {
-        $this->property->setLocked($value);
-
-        return $this;
-    }
-
-    /**
-     * @param mixed ...$fields
-     * @return Schema
-     */
-    public function setRequired( ...$fields ): self
-    {
-        $this->property->setRequired($fields);
-
-        return $this;
-    }
-
-    /**
-     * @param mixed ...$fields
-     * @return Schema
-     */
-    public function unsetRequired( ...$fields ): self
-    {
-        $this->property->unsetRequired($fields);
-
-        return $this;
-    }
-
-    /**
-     * @return Schema
-     */
-    public function resetRequired(): self
-    {
-        $this->property->resetRequired();
-
-        return $this;
-    }
-
-    /**
-     * @return MongoDbCollection
-     */
-    public function collection(): MongoDbCollection
-    {
-        return $this->collection->collection();
     }
 }

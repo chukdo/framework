@@ -18,18 +18,30 @@ use Traversable;
 final class Is
 {
     /**
-     * @param string|null $value
+     * @param mixed $value
      * @return bool
      */
-    public static function json( string $value = null ): bool
+    public static function jsonString( $value = null ): bool
     {
-        if ( substr($value, 0, 1) !== '{' ) {
+        if ( !self::scalar($value) ) {
+            return false;
+        }
+        elseif ( substr($value, 0, 1) !== '{' ) {
             return false;
         }
 
         $json = json_decode($value);
 
         return $json && $value != $json;
+    }
+
+    /**
+     * @param $value
+     * @return bool
+     */
+    public static function scalar( $value ): bool
+    {
+        return is_scalar($value);
     }
 
     /**
@@ -316,15 +328,6 @@ final class Is
         }
 
         return false;
-    }
-
-    /**
-     * @param $value
-     * @return bool
-     */
-    public static function scalar( $value ): bool
-    {
-        return is_scalar($value);
     }
 
     /**

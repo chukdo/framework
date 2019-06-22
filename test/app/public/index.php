@@ -219,8 +219,8 @@ $json = new \Chukdo\Json\Json([
 ]);
 
 // addToSet > tva, ref.prix tcc closure
-
-  dd($json->collect()
+//dd(db::collection('students', 'test')->info());
+  /**dd($json->collect()
   ->where('ref.public', '=', 'ORPI')
   ->without('prix', 'ref.client')
   ->addToSet([
@@ -238,33 +238,53 @@ $json = new \Chukdo\Json\Json([
  ->group('cp')
  //->match('cp', '=', 'ref.cp')
  ->values()
- ->toHtml());
+ ->toHtml());*/
 
 //dd(Conf::offsetGet('db.mongo.dsn'));
 //dd(Db::collection('contrat'));
 
 use Chukdo\Db\Mongo\Aggregate\Expr;
 
-dd(db::collection('students', 'test')->schema()->unsetRequired('name')->unsetProperty('name')->save());
+$json = new \Chukdo\Json\Json([
+    'gender' => 'toto',
+    'year' => 4017,
+    'major' => 'English',
+    'gpa' => 234,
+    'address' => [
+        'city' => 'bordeaux',
+        'street' => '250 rue camille godard',
+    ],
+    'titi' => true,
+    'coucou' => 'tutu'
+]);
+echo '<pre>';
+$student = db::collection('students', 'test');
+$valid = $student->schema()->validate($json);
 
+//$student->write()->insert($valid->toArray());
+
+$json->set('address.city', 'luchac');
+$json->set('bof', 'ok');
+print_r($valid);
+//exit;
 $write = db::collection('test', 'test')
     ->write();
 
 $write->session()
     ->startTransaction([]);
-$write->insert([
+$write->setMultiple([
     'cust_id'  => 'domingo',
     'ord_date' => new DateTime(),
     'status'   => 'A',
     'amount'   => 400,
     'a'        => [ 'b' => [ 'toto' => 'titi' ] ],
-]);
+])->insert();
 
 $write2 = db::collection('test', 'test')
     ->write();
 $write2->setSession($write->session());
 $write2->set('amount', 600)
-    ->set('a', [ 'b' => [ 'toto2' => 'titi2' ] ])
+    ->set('a', [ 'b' => [ 'toto2' => 'titi2', 'date' => new DateTime()] ])
     ->where('cust_id', '=', 'domingo')
     ->update();
 

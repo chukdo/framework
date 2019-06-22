@@ -2,7 +2,15 @@
 
 namespace Chukdo\Db\Mongo\Schema;
 
+use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\Db\Mongo\MongoException;
+use Chukdo\Helper\Is;
+use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
+use DateTime;
+use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\Timestamp;
+use MongoDB\BSON\UTCDateTime;
 
 /**
  * Mongo Schema properties.
@@ -19,11 +27,18 @@ class Property
     protected $property;
 
     /**
-     * Property constructor.
-     * @param array $property
+     * @var string|null
      */
-    public function __construct( Array $property = [] )
+    protected $name = null;
+
+    /**
+     * Property constructor.
+     * @param array       $property
+     * @param string|null $name
+     */
+    public function __construct( Array $property = [], string $name = null )
     {
+        $this->name     = $name;
         $this->property = new Json();
 
         foreach ( $property as $key => $value ) {
@@ -70,14 +85,14 @@ class Property
 
     /**
      * @param array $value
-     * @return Property
+     * @return $this
      */
     public function setProperties( array $value ): self
     {
         $properties = $this->property->offsetGetOrSet('properties', []);
 
         foreach ( $value as $k => $v ) {
-            $properties->offsetSet($k, new Property((array) $v));
+            $properties->offsetSet($k, new Property((array) $v, $k));
         }
 
         return $this;
@@ -85,7 +100,7 @@ class Property
 
     /**
      * @param string|array $value
-     * @return Property
+     * @return $this
      */
     public function setType( $value ): self
     {
@@ -102,18 +117,7 @@ class Property
 
     /**
      * @param string $value
-     * @return Property
-     */
-    public function setPattern( string $value ): self
-    {
-        $this->property->offsetSet('pattern', $value);
-
-        return $this;
-    }
-
-    /**
-     * @param string $value
-     * @return Property
+     * @return $this
      */
     public function setDescription( string $value ): self
     {
@@ -123,8 +127,19 @@ class Property
     }
 
     /**
+     * @param string $value
+     * @return $this
+     */
+    public function setPattern( string $value ): self
+    {
+        $this->property->offsetSet('pattern', $value);
+
+        return $this;
+    }
+
+    /**
      * @param int $value
-     * @return Property
+     * @return $this
      */
     public function setMin( int $value ): self
     {
@@ -135,7 +150,7 @@ class Property
 
     /**
      * @param int $value
-     * @return Property
+     * @return $this
      */
     public function setMax( int $value ): self
     {
@@ -146,7 +161,7 @@ class Property
 
     /**
      * @param mixed ...$values
-     * @return Property
+     * @return $this
      */
     public function setList( ...$values ): self
     {
@@ -154,7 +169,68 @@ class Property
 
         foreach ( $values as $value ) {
             foreach ( (array) $value as $v ) {
-                $list->append($v);
+                $list->appendIfNoExist($v);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param int $value
+     * @return $this
+     */
+    public function setMinItems( int $value ): self
+    {
+        $this->property->offsetSet('minItems', $value);
+
+        return $this;
+    }
+
+    /**
+     * @param int $value
+     * @return $this
+     */
+    public function setMaxItems( int $value ): self
+    {
+        $this->property->offsetSet('maxItems', $value);
+
+        return $this;
+    }
+
+    /**
+     * @param array $value
+     * @return $this
+     */
+    public function setItems( array $value ): self
+    {
+        $this->property->offsetSet('items', new Property($value));
+
+        return $this;
+    }
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setLocked( bool $value ): self
+    {
+        $this->property->offsetSet('additionalProperties', $value);
+
+        return $this;
+    }
+
+    /**
+     * @param mixed ...$fields
+     * @return $this
+     */
+    public function setRequired( ...$fields ): self
+    {
+        $required = $this->required();
+
+        foreach ( $fields as $field ) {
+            foreach ( (array) $field as $f ) {
+                $required->appendIfNoExist($f);
             }
         }
 
@@ -170,67 +246,6 @@ class Property
     }
 
     /**
-     * @param int $value
-     * @return Property
-     */
-    public function setMinItems( int $value ): self
-    {
-        $this->property->offsetSet('minItems', $value);
-
-        return $this;
-    }
-
-    /**
-     * @param int $value
-     * @return Property
-     */
-    public function setMaxItems( int $value ): self
-    {
-        $this->property->offsetSet('maxItems', $value);
-
-        return $this;
-    }
-
-    /**
-     * @param array $value
-     * @return Property
-     */
-    public function setItems( array $value ): self
-    {
-        $this->property->offsetSet('items', new Property($value));
-
-        return $this;
-    }
-
-    /**
-     * @param bool $value
-     * @return Property
-     */
-    public function setLocked( bool $value ): self
-    {
-        $this->property->offsetSet('additionalProperties', $value);
-
-        return $this;
-    }
-
-    /**
-     * @param mixed ...$fields
-     * @return Property
-     */
-    public function setRequired( ...$fields ): self
-    {
-        $required = $this->required();
-
-        foreach ( $fields as $field ) {
-            foreach ( (array) $field as $f ) {
-                $required->append($f);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Json
      */
     public function required(): Json
@@ -240,7 +255,7 @@ class Property
 
     /**
      * @param mixed ...$values
-     * @return Property
+     * @return $this
      */
     public function unsetList( ...$values ): self
     {
@@ -256,7 +271,7 @@ class Property
     }
 
     /**
-     * @return Property
+     * @return $this
      */
     public function resetList(): self
     {
@@ -267,7 +282,7 @@ class Property
 
     /**
      * @param mixed ...$fields
-     * @return Property
+     * @return $this
      */
     public function unsetRequired( ...$fields ): self
     {
@@ -287,7 +302,7 @@ class Property
     }
 
     /**
-     * @return Property
+     * @return $this
      */
     public function resetRequired(): self
     {
@@ -297,11 +312,21 @@ class Property
     }
 
     /**
-     * @return Property|null
+     * @return $this|null
      */
     public function items(): ?Property
     {
         return $this->property->offsetGet('items');
+    }
+
+    /**
+     * @param string $name
+     * @return $this
+     */
+    public function setProperty( string $name ): Property
+    {
+        return $this->properties()
+            ->offsetGetOrSet($name, new Property());
     }
 
     /**
@@ -313,11 +338,379 @@ class Property
     }
 
     /**
+     * @param string $name
+     * @return $this
+     */
+    public function unsetProperty( string $name ): self
+    {
+        $this->properties()
+            ->offsetUnset($name);
+
+        return $this;
+    }
+
+    /**
      * @return bool|null
      */
     public function locked(): ?bool
     {
         return $this->property->offsetGet('additionalProperties');
+    }
+
+    /**
+     * @return string|null
+     */
+    public function description(): ?string
+    {
+        return $this->property->offsetGet('description');
+    }
+
+    /**
+     * @return array
+     */
+    public function get(): array
+    {
+        return $this->property->filterRecursive(function( $k, $v )
+        {
+            return $v instanceof Property
+                ? $v->get()
+                : $v;
+        })
+            ->toArray();
+    }
+
+    /**
+     * @param JsonInterface $json
+     * @return Json
+     */
+    public function validate( JsonInterface $json ): Json
+    {
+        $json = new Json($json->toArray());
+
+        return $this->validateProperty($json);
+    }
+
+    /**
+     * @param Json $json
+     * @return Json
+     */
+    protected function validateProperty( Json $json ): Json
+    {
+        $get = $this->name()
+            ? $json->get($this->name())
+            : $json;
+
+        switch ( $this->type() ) {
+            case 'objectId' :
+                $get = $this->validateObjectId($get);
+                break;
+            case 'string' :
+                $get = $this->validateString($get);
+                break;
+            case 'int':
+            case 'long':
+                $get = $this->validateInt($get);
+                break;
+            case 'decimal':
+            case 'double' :
+            case 'float':
+                $get = $this->validatefloat($get);
+                break;
+            case 'boolean' :
+                $get = $this->validateBool($get);
+                break;
+            case 'date' :
+                $get = $this->validateDate($get);
+                break;
+            case 'timestamp' :
+                $get = $this->validateTimestamp($get);
+                break;
+            case 'enum' :
+                $get = $this->validateList($get);
+                break;
+            case 'array':
+                $get = $this->validateArray($get);
+                break;
+            case 'object':
+                $get = $this->validateObject($get);
+                break;
+            default :
+                $enum = $this->property->offsetGet('enum');
+
+                if ($enum) {
+                    $get = $this->validateList($get);
+                } else {
+                    throw new MongoException(sprintf("The field [%s] must be a valid type not [%s]", $this->name(), $this->type()));
+                }
+        }
+
+        if ($this->name()) {
+            $json->set($this->name(), $get);
+        } else {
+            $json = $get;
+        }
+
+        return $json;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function name(): ?string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function type(): ?string
+    {
+        return $this->property->offsetGet('bsonType');
+    }
+
+    /**
+     * @param $data
+     * @return ObjectId
+     */
+    protected function validateObjectId( $data )
+    {
+        if ( $data instanceof ObjectId ) {
+            return $data;
+        }
+        elseif ( Is::string($data) ) {
+            return new ObjectId($data);
+        }
+
+        throw new MongoException(sprintf("The field [%s] must be a objectId", $this->name()));
+    }
+
+    /**
+     * @param $data
+     * @return string
+     */
+    protected function validateString( $data )
+    {
+        if ( !Is::scalar($data) ) {
+            throw new MongoException(sprintf("The field [%s] must be a string", $this->name()));
+        }
+
+        $data    = (string) $data;
+        $pattern = $this->pattern();
+
+        if ( $pattern ) {
+            if ( !Str::match('/' . $pattern . '/i', $data) ) {
+                throw new MongoException(sprintf("The field [%s] must be a string with pattern [%s]", $this->name(), $pattern));
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param $data
+     * @return int
+     */
+    protected function validateInt( $data )
+    {
+        if ( !Is::scalar($data) ) {
+            throw new MongoException(sprintf("The field [%s] must be a int", $this->name()));
+        }
+
+        $data = (int) $data;
+        $min  = $this->min();
+        $max  = $this->max();
+
+        if ( $min ) {
+            if ( $data < $min ) {
+                throw new MongoException(sprintf("The field [%s] must be lower than [%s]", $this->name(), $min));
+            }
+        }
+
+        if ( $max ) {
+            if ( $data < $max ) {
+                throw new MongoException(sprintf("The field [%s] must be greater than [%s]", $this->name(), $max));
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param $data
+     * @return float
+     */
+    protected function validateFloat( $data )
+    {
+        if ( !Is::scalar($data) ) {
+            throw new MongoException(sprintf("The field [%s] must be a float", $this->name()));
+        }
+
+        $data = (float) $data;
+        $min  = $this->min();
+        $max  = $this->max();
+
+        if ( $min ) {
+            if ( $data < $min ) {
+                throw new MongoException(sprintf("The field [%s] must be lower than [%s]", $this->name(), $min));
+            }
+        }
+
+        if ( $max ) {
+            if ( $data < $max ) {
+                throw new MongoException(sprintf("The field [%s] must be greater than [%s]", $this->name(), $max));
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param $data
+     * @return bool
+     */
+    protected function validateBool( $data )
+    {
+        if ( !Is::scalar($data) ) {
+            throw new MongoException(sprintf("The field [%s] must be a bool", $this->name()));
+        }
+
+        $data = (bool) $data;
+
+        return $data;
+    }
+
+    /**
+     * @param $data
+     * @return UTCDateTime
+     */
+    protected function validateDate( $data )
+    {
+        if ( $data instanceof UTCDateTime ) {
+            return $data;
+        }
+        elseif ( $data instanceof DateTime ) {
+            return new UTCDateTime($data->getTimestamp());
+        }
+        elseif ( Is::scalar($data) ) {
+            return new UTCDateTime((int) $data);
+        }
+
+        throw new MongoException(sprintf("The field [%s] must be a date", $this->name()));
+    }
+
+    /**
+     * @param $data
+     * @return Timestamp
+     */
+    protected function validateTimestamp( $data )
+    {
+        if ( $data instanceof Timestamp ) {
+            return $data;
+        }
+        elseif ( $data instanceof DateTime ) {
+            return new Timestamp($data->getTimestamp(), 1);
+        }
+        elseif ( Is::scalar($data) ) {
+            return new Timestamp((int) $data, 1);
+        }
+
+        throw new MongoException(sprintf("The field [%s] must be a timestamp", $this->name()));
+    }
+
+    /**
+     * @param $data
+     * @return mixed
+     */
+    protected function validateList( $data )
+    {
+        $list = $this->list();
+
+        if ( !Is::scalar($data) || !$list->in($data) ) {
+            throw new MongoException(sprintf("The field [%s] must be a element of list [%s]", $this->name(), implode(',', $list->toArray())));
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param $data
+     * @return mixed
+     */
+    protected function validateArray( $data )
+    {
+        if ( !( $data instanceof Json ) ) {
+            throw new MongoException(sprintf("The field [%s] must be a object", $this->name()));
+        }
+
+        $count = $data->count();
+        $min   = $this->minItems();
+        $max   = $this->maxItems();
+
+        if ( $min ) {
+            if ( $count < $min ) {
+                throw new MongoException(sprintf("The field [%s] must have more than [%s] items", $this->name(), $min));
+            }
+        }
+
+        if ( $max ) {
+            if ( $count < $max ) {
+                throw new MongoException(sprintf("The field [%s] must have less than [%s] items", $this->name(), $max));
+            }
+        }
+
+        foreach ( $this->properties() as $key => $property ) {
+            $property->validate($data);
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param $data
+     * @return mixed
+     */
+    protected function validateObject( $data )
+    {
+        if ( !( $data instanceof Json ) ) {
+            throw new MongoException(sprintf("The field [%s] must be a object", $this->name()));
+        }
+
+        foreach ( $this->required() as $required ) {
+            if ( $data->get($required) === null ) {
+                throw new MongoException(sprintf("The field [%s] is required", $required));
+            }
+        }
+
+        foreach ( $this->properties() as $key => $property ) {
+            $property->validate($data);
+        }
+
+        return $data;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function pattern(): ?string
+    {
+        return $this->property->offsetGet('pattern');
+    }
+
+    /**
+     * @return int|null
+     */
+    public function min(): ?int
+    {
+        return $this->property->offsetGet('minimum');
+    }
+
+    /**
+     * @return int|null
+     */
+    public function max(): ?int
+    {
+        return $this->property->offsetGet('maximum');
     }
 
     /**
@@ -334,59 +727,5 @@ class Property
     public function maxItems(): ?int
     {
         return $this->property->offsetGet('maxItems');
-    }
-
-    /**
-     * @return int|null
-     */
-    public function max(): ?int
-    {
-        return $this->property->offsetGet('maximum');
-    }
-
-    /**
-     * @return int|null
-     */
-    public function min(): ?int
-    {
-        return $this->property->offsetGet('minimum');
-    }
-
-    /**
-     * @return string|null
-     */
-    public function description(): ?string
-    {
-        return $this->property->offsetGet('description');
-    }
-
-    /**
-     * @return string|null
-     */
-    public function pattern(): ?string
-    {
-        return $this->property->offsetGet('pattern');
-    }
-
-    /**
-     * @return string|null
-     */
-    public function type(): ?string
-    {
-        return $this->property->offsetGet('bsonType');
-    }
-
-    /**
-     * @return array
-     */
-    public function schema(): array
-    {
-        return $this->property->filterRecursive(function( $k, $v )
-        {
-            return $v instanceof Property
-                ? $v->schema()
-                : $v;
-        })
-            ->toArray();
     }
 }

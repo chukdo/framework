@@ -2,6 +2,7 @@
 
 namespace Chukdo\Db\Mongo;
 
+use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
 use MongoDB\Operation\FindOneAndUpdate;
 
@@ -97,6 +98,16 @@ Class Write extends Where
             $this->fields[ $keyword ] = [];
         }
 
+        if ( Is::scalar($value) ) {
+            $value = Collection::filterIn($field, $value);
+        }
+        else {
+            $value = ( new Json($value, function( $k, $v )
+            {
+                return Collection::filterIn($k, $v);
+            }) )->toArray();
+        }
+
         $this->fields[ $keyword ][ $field ] = $value;
 
         return $this;
@@ -118,7 +129,7 @@ Class Write extends Where
      */
     public function setOnInsert( string $field, $value ): self
     {
-        return $this->field('setOnInsert', $field, Collection::filterIn($field, $value));
+        return $this->field('setOnInsert', $field, $value);
     }
 
     /**
@@ -138,7 +149,7 @@ Class Write extends Where
      */
     public function min( string $field, $value ): self
     {
-        return $this->field('min', $field, Collection::filterIn($field, $value));
+        return $this->field('min', $field, $value);
     }
 
     /**
@@ -148,7 +159,7 @@ Class Write extends Where
      */
     public function max( string $field, $value ): self
     {
-        return $this->field('max', $field, Collection::filterIn($field, $value));
+        return $this->field('max', $field, $value);
     }
 
     /**
@@ -172,17 +183,28 @@ Class Write extends Where
     }
 
     /**
-     * @param array $values
      * @return string|null
      */
-    public function insert( array $values ): ?string
+    public function insert(): ?string
     {
         return (string) $this->collection()
-            ->insertOne(( new Json($values, function( $k, $v )
-            {
-                return Collection::filterIn($k, $v);
-            }) )->toArray(), $this->options)
+            ->insertOne($this->fields('set'), $this->options)
             ->getInsertedId();
+    }
+
+    /**
+     * @param string|null $type
+     * @return array
+     */
+    public function fields( string $type = null ): array
+    {
+        if ( $type ) {
+            return isset($this->fields[ $type ])
+                ? $this->fields[ $type ]
+                : [];
+        }
+
+        return $this->fields;
     }
 
     /**
@@ -193,14 +215,6 @@ Class Write extends Where
         return (int) $this->collection()
             ->updateMany($this->filter(), $this->fields(), $this->options)
             ->getModifiedCount();
-    }
-
-    /**
-     * @return array
-     */
-    public function fields(): array
-    {
-        return $this->fields;
     }
 
     /**

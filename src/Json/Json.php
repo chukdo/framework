@@ -44,9 +44,8 @@ class Json extends ArrayObject implements JsonInterface
                 $this->offsetSet($k, $v);
             }
         }
-        elseif ( Is::json($data) ) {
-            foreach ( json_decode($data,
-                true) as $k => $v ) {
+        elseif ( Is::jsonString($data) ) {
+            foreach ( json_decode($data, true) as $k => $v ) {
                 $this->offsetSet($k, $v);
             }
         }
@@ -242,6 +241,21 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
+     * @param mixed $value
+     * @return JsonInterface
+     */
+    public function appendIfNoExist( $value ): JsonInterface
+    {
+        foreach ( $this as $k => $v ) {
+            if ( $v === $value ) {
+                return $this;
+            }
+        }
+
+        return $this->append($value);
+    }
+
+    /**
      * @return JsonInterface
      */
     public function clean(): JsonInterface
@@ -400,6 +414,14 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
+     * @return int
+     */
+    public function count(): int
+    {
+        return parent::count();
+    }
+
+    /**
      * @return mixed|null
      */
     public function getKeyFirst()
@@ -467,6 +489,20 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
+     * @param mixed ...$param
+     * @return mixed
+     */
+    public function is( ...$param )
+    {
+        $function   = array_shift($param);
+        $param[ 0 ] = $this->get($param[ 0 ]);
+
+        return call_user_func_array([
+            '\Chukdo\Helper\Is',
+            $function,
+        ],
+            $param);
+    }    /**
      * @param mixed ...$offsets
      * @return JsonInterface
      */
@@ -481,22 +517,6 @@ class Json extends ArrayObject implements JsonInterface
         }
 
         return $only;
-    }
-
-    /**
-     * @param mixed ...$param
-     * @return mixed
-     */
-    public function is( ...$param )
-    {
-        $function   = array_shift($param);
-        $param[ 0 ] = $this->get($param[ 0 ]);
-
-        return call_user_func_array([
-            '\Chukdo\Helper\Is',
-            $function,
-        ],
-            $param);
     }
 
     /**
@@ -572,23 +592,6 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
-     * @param mixed ...$offsets
-     * @return JsonInterface
-     */
-    public function without( ...$offsets ): JsonInterface
-    {
-        $except = new Json($this->toArray());
-
-        foreach ( $offsets as $offsetList ) {
-            foreach ( (array) $offsetList as $offset ) {
-                $except->unset($offset);
-            }
-        }
-
-        return $except;
-    }
-
-    /**
      * @param array $keys
      * @param null  $default
      * @return mixed|null
@@ -631,6 +634,21 @@ class Json extends ArrayObject implements JsonInterface
 
         return $climate->output->get('buffer')
             ->get();
+    }    /**
+     * @param mixed ...$offsets
+     * @return JsonInterface
+     */
+    public function without( ...$offsets ): JsonInterface
+    {
+        $except = new Json($this->toArray());
+
+        foreach ( $offsets as $offsetList ) {
+            foreach ( (array) $offsetList as $offset ) {
+                $except->unset($offset);
+            }
+        }
+
+        return $except;
     }
 
     /**
@@ -677,6 +695,10 @@ class Json extends ArrayObject implements JsonInterface
 
         return $xml;
     }
+
+
+
+
 
     /**
      * @param string $path
