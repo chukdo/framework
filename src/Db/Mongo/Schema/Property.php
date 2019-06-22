@@ -8,6 +8,7 @@ use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
 use DateTime;
+use MongoDB\BSON\Decimal128;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\Timestamp;
 use MongoDB\BSON\UTCDateTime;
@@ -380,18 +381,18 @@ class Property
     }
 
     /**
-     * @param $data
+     * @param array|Json s$data
      * @return Json
      */
     public function validate( $data ): Json
     {
         $json = new Json($data);
 
-        if ($this->property->count() == 0) {
+        if ( $this->property->count() == 0 ) {
             return $json;
         }
 
-        return $this->validateProperty($json);
+        return $this->validateObject($json);
     }
 
     /**
@@ -400,59 +401,53 @@ class Property
      */
     protected function validateProperty( Json $json ): Json
     {
-        $get = $this->name()
-            ? $json->get($this->name())
-            : $json;
+        $getData = $json->get($this->name());
 
         switch ( $this->type() ) {
             case 'objectId' :
-                $get = $this->validateObjectId($get);
+                $validatedData = $this->validateObjectId($getData);
                 break;
             case 'string' :
-                $get = $this->validateString($get);
+                $validatedData = $this->validateString($getData);
                 break;
             case 'int':
             case 'long':
-                $get = $this->validateInt($get);
+                $validatedData = $this->validateInt($getData);
                 break;
             case 'decimal':
             case 'double' :
-            case 'float':
-                $get = $this->validatefloat($get);
+                $validatedData = $this->validatefloat($getData);
                 break;
             case 'boolean' :
-                $get = $this->validateBool($get);
+                $validatedData = $this->validateBool($getData);
                 break;
             case 'date' :
-                $get = $this->validateDate($get);
+                $validatedData = $this->validateDate($getData);
                 break;
             case 'timestamp' :
-                $get = $this->validateTimestamp($get);
+                $validatedData = $this->validateTimestamp($getData);
                 break;
             case 'enum' :
-                $get = $this->validateList($get);
+                $validatedData = $this->validateList($getData);
                 break;
             case 'array':
-                $get = $this->validateArray($get);
+                $validatedData = $this->validateArray($getData);
                 break;
             case 'object':
-                $get = $this->validateObject($get);
+                $validatedData = $this->validateObject($getData);
                 break;
             default :
                 $enum = $this->property->offsetGet('enum');
 
-                if ($enum) {
-                    $get = $this->validateList($get);
-                } else {
+                if ( $enum ) {
+                    $validatedData = $this->validateList($getData);
+                }
+                else {
                     throw new MongoException(sprintf("The field [%s] must be a valid type not [%s]", $this->name(), $this->type()));
                 }
         }
 
-        if ($this->name()) {
-            $json->set($this->name(), $get);
-        } else {
-            $json = $get;
-        }
+        $json->set($this->name(), $validatedData);
 
         return $json;
     }
@@ -522,20 +517,9 @@ class Property
         }
 
         $data = (int) $data;
-        $min  = $this->min();
-        $max  = $this->max();
 
-        if ( $min ) {
-            if ( $data < $min ) {
-                throw new MongoException(sprintf("The field [%s] must be lower than [%s]", $this->name(), $min));
-            }
-        }
-
-        if ( $max ) {
-            if ( $data < $max ) {
-                throw new MongoException(sprintf("The field [%s] must be greater than [%s]", $this->name(), $max));
-            }
-        }
+        $this->checkMin($data);
+        $this->checkMax($data);
 
         return $data;
     }
@@ -551,20 +535,9 @@ class Property
         }
 
         $data = (float) $data;
-        $min  = $this->min();
-        $max  = $this->max();
 
-        if ( $min ) {
-            if ( $data < $min ) {
-                throw new MongoException(sprintf("The field [%s] must be lower than [%s]", $this->name(), $min));
-            }
-        }
-
-        if ( $max ) {
-            if ( $data < $max ) {
-                throw new MongoException(sprintf("The field [%s] must be greater than [%s]", $this->name(), $max));
-            }
-        }
+        $this->checkMin($data);
+        $this->checkMax($data);
 
         return $data;
     }
@@ -647,24 +620,11 @@ class Property
             throw new MongoException(sprintf("The field [%s] must be a object", $this->name()));
         }
 
-        $count = $data->count();
-        $min   = $this->minItems();
-        $max   = $this->maxItems();
-
-        if ( $min ) {
-            if ( $count < $min ) {
-                throw new MongoException(sprintf("The field [%s] must have more than [%s] items", $this->name(), $min));
-            }
-        }
-
-        if ( $max ) {
-            if ( $count < $max ) {
-                throw new MongoException(sprintf("The field [%s] must have less than [%s] items", $this->name(), $max));
-            }
-        }
+        $this->checkMinItems($data);
+        $this->checkMaxItems($data);
 
         foreach ( $this->properties() as $key => $property ) {
-            $property->validate($data);
+            $property->validateProperty($data);
         }
 
         return $data;
@@ -687,7 +647,7 @@ class Property
         }
 
         foreach ( $this->properties() as $key => $property ) {
-            $property->validate($data);
+            $property->validateProperty($data);
         }
 
         return $data;
@@ -699,6 +659,54 @@ class Property
     public function pattern(): ?string
     {
         return $this->property->offsetGet('pattern');
+    }
+
+    /**
+     * @param $data
+     */
+    protected function checkMin( $data )
+    {
+        if ( $min = $this->min() ) {
+            if ( $data < $min ) {
+                throw new MongoException(sprintf("The field [%s] must be greater than [%s]", $this->name(), $min));
+            }
+        }
+    }
+
+    /**
+     * @param $data
+     */
+    protected function checkMax( $data )
+    {
+        if ( $max = $this->max() ) {
+            if ( $data > $max ) {
+                throw new MongoException(sprintf("The field [%s] must be lower than [%s]", $this->name(), $max));
+            }
+        }
+    }
+
+    /**
+     * @param Json $data
+     */
+    protected function checkMinItems( Json $data )
+    {
+        if ( $min = $this->minItems() ) {
+            if ( $data->count() < $min ) {
+                throw new MongoException(sprintf("The field [%s] must have more than [%s] items", $this->name(), $min));
+            }
+        }
+    }
+
+    /**
+     * @param Json $data
+     */
+    protected function checkMaxItems( Json $data )
+    {
+        if ( $max = $this->maxItems() ) {
+            if ( $data->count() > $max ) {
+                throw new MongoException(sprintf("The field [%s] must have less than [%s] items", $this->name(), $max));
+            }
+        }
     }
 
     /**

@@ -28,6 +28,16 @@ Class Write extends Where
     protected $options = [];
 
     /**
+     * @return Write
+     */
+    public function bypassValidation(): self
+    {
+        $this->options[ 'bypassDocumentValidation' ] = true;
+
+        return $this;
+    }
+
+    /**
      * @return int
      */
     public function delete(): int
@@ -60,10 +70,10 @@ Class Write extends Where
     }
 
     /**
-     * @param array $values
+     * @param iterable $values
      * @return Write
      */
-    public function setMultiple( array $values ): self
+    public function setMultiple( iterable $values ): self
     {
         foreach ( $values as $field => $value ) {
             $this->set($field, $value);
@@ -105,7 +115,7 @@ Class Write extends Where
             }) )->toArray();
 
         }
-        else if (Is::scalar($value)){
+        elseif ( Is::scalar($value) ) {
             $value = Collection::filterIn($field, $value);
         }
 
@@ -188,7 +198,9 @@ Class Write extends Where
      */
     public function insert(): ?string
     {
-        $data = $this->collection->schema()->validate($this->fields('set'));
+        $data = $this->collection->schema()
+            ->validate($this->fields('set'))
+            ->toArray();
 
         return (string) $this->collection()
             ->insertOne($data, $this->options)

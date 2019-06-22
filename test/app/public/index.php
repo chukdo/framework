@@ -247,26 +247,21 @@ use Chukdo\Db\Mongo\Aggregate\Expr;
 
 $json = new \Chukdo\Json\Json([
     'gender' => 'toto',
-    'year' => 4017,
+    'year' => 2019,
     'major' => 'English',
-    'gpa' => 234,
+    'gpa' => '234',
     'address' => [
         'city' => 'bordeaux',
         'street' => '250 rue camille godard',
-    ],
-    'titi' => true,
-    'coucou' => 'tutu'
+    ]
 ]);
 //echo '<pre>';
-//$student = db::collection('students', 'test');
-//$valid = $student->schema()->validate($json);
-
-//$student->write()->insert($valid->toArray());
+$student = db::collection('students', 'test')->write()->setMultiple($json)->insert();
 
 $json->set('address.city', 'luchac');
 $json->set('bof', 'ok');
-//print_r($valid);
-//exit;
+print_r($student);
+exit;
 $write = db::collection('test', 'test')
     ->write();
 

@@ -502,7 +502,19 @@ class Json extends ArrayObject implements JsonInterface
             $function,
         ],
             $param);
-    }    /**
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmpty(): bool
+    {
+        return $this->count() == 0
+            ? true
+            : false;
+    }
+
+    /**
      * @param mixed ...$offsets
      * @return JsonInterface
      */
@@ -517,16 +529,6 @@ class Json extends ArrayObject implements JsonInterface
         }
 
         return $only;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isEmpty(): bool
-    {
-        return $this->count() == 0
-            ? true
-            : false;
     }
 
     /**
@@ -634,21 +636,6 @@ class Json extends ArrayObject implements JsonInterface
 
         return $climate->output->get('buffer')
             ->get();
-    }    /**
-     * @param mixed ...$offsets
-     * @return JsonInterface
-     */
-    public function without( ...$offsets ): JsonInterface
-    {
-        $except = new Json($this->toArray());
-
-        foreach ( $offsets as $offsetList ) {
-            foreach ( (array) $offsetList as $offset ) {
-                $except->unset($offset);
-            }
-        }
-
-        return $except;
     }
 
     /**
@@ -686,6 +673,23 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
+     * @param mixed ...$offsets
+     * @return JsonInterface
+     */
+    public function without( ...$offsets ): JsonInterface
+    {
+        $except = new Json($this->toArray());
+
+        foreach ( $offsets as $offsetList ) {
+            foreach ( (array) $offsetList as $offset ) {
+                $except->unset($offset);
+            }
+        }
+
+        return $except;
+    }
+
+    /**
      * @return Xml
      */
     public function toXml(): Xml
@@ -695,10 +699,6 @@ class Json extends ArrayObject implements JsonInterface
 
         return $xml;
     }
-
-
-
-
 
     /**
      * @param string $path
@@ -716,8 +716,7 @@ class Json extends ArrayObject implements JsonInterface
         $endPath   = $arr->join('.');
 
         return $this->offsetGetOrSet($firstPath)
-            ->set($endPath,
-                $value);
+            ->set($endPath, $value);
     }
 
     /**
