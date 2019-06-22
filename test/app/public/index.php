@@ -257,15 +257,15 @@ $json = new \Chukdo\Json\Json([
     'titi' => true,
     'coucou' => 'tutu'
 ]);
-echo '<pre>';
-$student = db::collection('students', 'test');
-$valid = $student->schema()->validate($json);
+//echo '<pre>';
+//$student = db::collection('students', 'test');
+//$valid = $student->schema()->validate($json);
 
 //$student->write()->insert($valid->toArray());
 
 $json->set('address.city', 'luchac');
 $json->set('bof', 'ok');
-print_r($valid);
+//print_r($valid);
 //exit;
 $write = db::collection('test', 'test')
     ->write();
@@ -277,7 +277,7 @@ $write->setMultiple([
     'ord_date' => new DateTime(),
     'status'   => 'A',
     'amount'   => 400,
-    'a'        => [ 'b' => [ 'toto' => 'titi' ] ],
+    'a'        => [ 'b' => [ 'toto' => 'titi', 'test' => new DateTime() ] ],
 ])->insert();
 
 $write2 = db::collection('test', 'test')

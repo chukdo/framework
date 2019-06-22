@@ -380,12 +380,16 @@ class Property
     }
 
     /**
-     * @param JsonInterface $json
+     * @param $data
      * @return Json
      */
-    public function validate( JsonInterface $json ): Json
+    public function validate( $data ): Json
     {
-        $json = new Json($json->toArray());
+        $json = new Json($data);
+
+        if ($this->property->count() == 0) {
+            return $json;
+        }
 
         return $this->validateProperty($json);
     }

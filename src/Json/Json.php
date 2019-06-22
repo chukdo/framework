@@ -315,7 +315,7 @@ class Json extends ArrayObject implements JsonInterface
         $get       = $this->offsetGet($firstPath);
 
         if ( $get instanceof JsonInterface ) {
-            return $get->get($endPath);
+            return $get->get($endPath, $default);
         }
 
         return $default;

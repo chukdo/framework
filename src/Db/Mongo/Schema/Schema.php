@@ -2,7 +2,6 @@
 
 namespace Chukdo\Db\Mongo\Schema;
 
-use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\DB\Mongo\Collection;
 use Chukdo\Json\Json;
 

@@ -164,7 +164,7 @@ Class Collection
                 'filter'          => [ 'name' => $this->name() ],
             ], $this->databaseName());
 
-        return $json->get('0.options.validator.$jsonSchema');
+        return $json->get('0.options.validator.$jsonSchema', new Json());
     }
 
     /**

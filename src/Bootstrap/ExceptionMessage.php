@@ -138,11 +138,16 @@ class ExceptionMessage
                 $content     = $this->renderHtml($this->message);;
         }
 
-        $response->status(500)
-            ->header('Content-Type', $contentType . '; charset=utf-8')
-            ->content($content)
-            ->send()
-            ->end();
+        try {
+            $response->status(500)
+                ->header('Content-Type', $contentType . '; charset=utf-8')
+                ->content($content)
+                ->send()
+                ->end();
+        } catch (Throwable $e) {
+            die($content);
+        }
+
     }
 
     /**

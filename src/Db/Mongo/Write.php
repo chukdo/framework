@@ -98,14 +98,15 @@ Class Write extends Where
             $this->fields[ $keyword ] = [];
         }
 
-        if ( Is::scalar($value) ) {
-            $value = Collection::filterIn($field, $value);
-        }
-        else {
+        if ( Is::iterable($value) ) {
             $value = ( new Json($value, function( $k, $v )
             {
                 return Collection::filterIn($k, $v);
             }) )->toArray();
+
+        }
+        else if (Is::scalar($value)){
+            $value = Collection::filterIn($field, $value);
         }
 
         $this->fields[ $keyword ][ $field ] = $value;
@@ -187,8 +188,10 @@ Class Write extends Where
      */
     public function insert(): ?string
     {
+        $data = $this->collection->schema()->validate($this->fields('set'));
+
         return (string) $this->collection()
-            ->insertOne($this->fields('set'), $this->options)
+            ->insertOne($data, $this->options)
             ->getInsertedId();
     }
 
@@ -199,8 +202,8 @@ Class Write extends Where
     public function fields( string $type = null ): array
     {
         if ( $type ) {
-            return isset($this->fields[ $type ])
-                ? $this->fields[ $type ]
+            return isset($this->fields[ '$' . $type ])
+                ? $this->fields[ '$' . $type ]
                 : [];
         }
 
