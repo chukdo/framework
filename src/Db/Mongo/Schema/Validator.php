@@ -22,15 +22,29 @@ class Validator extends Property
 {
     /**
      * @param array|Json $data
-     * @param bool       $insert
      * @return array
      */
-    public function validate( $data, bool $insert = true ): array
+    public function validateDataToInsert( $data ): array
     {
         $json = new Json($data);
 
         if ( $this->property->count() == 0 ) {
             return $json->toArray();
+        }
+
+        return $this->validateObject($json, true)
+            ->toArray();
+    }
+
+    /**
+     * @param      $json
+     * @param bool $insert
+     * @return mixed
+     */
+    protected function validateObject( $json, bool $insert = true )
+    {
+        if ( !( $json instanceof Json ) ) {
+            throw new MongoException(sprintf("The field [%s] must be a object", $this->name()));
         }
 
         if ( $insert ) {
@@ -39,71 +53,117 @@ class Validator extends Property
                     throw new MongoException(sprintf("The field [%s] is required", $required));
                 }
             }
+
+            foreach ( $this->properties() as $key => $property ) {
+                $json->set($key, $property->validateProperty($json->get($key), $insert));
+            }
+        }
+        else {
+            foreach ( $json as $key => $value ) {
+                if ( $property = $this->properties()
+                    ->offsetGet($key) ) {
+                    $json->offsetSet($key, $property->validateProperty($value, false));
+                }
+            }
         }
 
-        foreach ( $this->properties() as $key => $property ) {
-            $property->validateProperty($json, $insert);
-        }
-
-        return $json->toArray();
+        return $json;
     }
 
     /**
-     * @param Json $json
+     * @param      $json
      * @param bool $insert
-     * @return Json
+     * @return mixed
      */
-    public function validateProperty( Json $json, bool $insert = true ): Json
+    protected function validateArray( $json, bool $insert = true )
     {
-        $getData = $json->get($this->name());
+        if ( !( $json instanceof Json ) ) {
+            throw new MongoException(sprintf("The field [%s] must be a object", $this->name()));
+        }
 
+        if ( $insert ) {
+            $this->checkMinItems($json);
+            $this->checkMaxItems($json);
+
+            if ($items = $this->items()) {
+                $items->validateProperty($json, $insert);
+            }
+        }
+        else {
+//todo
+        }
+
+        return $json;
+    }
+
+    /**
+     * @param array|Json $data
+     * @return array
+     */
+    public function validateDataToUpdate( $data ): array
+    {
+        $json = new Json($data);
+
+        if ( $this->property->count() == 0 ) {
+            return $json->toArray();
+        }
+
+        return $this->validateObject($json, false)
+            ->toArray();
+    }
+
+    /**
+     * @param      $data
+     * @param bool $insert
+     * @return mixed
+     */
+    public function validateProperty( $data, bool $insert = true )
+    {
         switch ( $this->type() ) {
             case 'objectId' :
-                $validatedData = $this->validateObjectId($getData);
+                $validatedData = $this->validateObjectId($data);
                 break;
             case 'string' :
-                $validatedData = $this->validateString($getData);
+                $validatedData = $this->validateString($data);
                 break;
             case 'int':
             case 'long':
-                $validatedData = $this->validateInt($getData);
+                $validatedData = $this->validateInt($data);
                 break;
             case 'decimal':
             case 'double' :
-                $validatedData = $this->validatefloat($getData);
+                $validatedData = $this->validatefloat($data);
                 break;
             case 'boolean' :
-                $validatedData = $this->validateBool($getData);
+                $validatedData = $this->validateBool($data);
                 break;
             case 'date' :
-                $validatedData = $this->validateDate($getData);
+                $validatedData = $this->validateDate($data);
                 break;
             case 'timestamp' :
-                $validatedData = $this->validateTimestamp($getData);
+                $validatedData = $this->validateTimestamp($data);
                 break;
             case 'enum' :
-                $validatedData = $this->validateList($getData);
+                $validatedData = $this->validateList($data);
                 break;
             case 'array':
-                $validatedData = $this->validateArray($getData, $insert);
+                $validatedData = $this->validateArray($data, $insert);
                 break;
             case 'object':
-                $validatedData = $this->validateObject($getData, $insert);
+                $validatedData = $this->validateObject($data, $insert);
                 break;
             default :
                 $enum = $this->property->offsetGet('enum');
 
                 if ( $enum ) {
-                    $validatedData = $this->validateList($getData);
+                    $validatedData = $this->validateList($data);
                 }
                 else {
                     throw new MongoException(sprintf("The field [%s] must be a valid type not [%s]", $this->name(), $this->type()));
                 }
         }
 
-        $json->set($this->name(), $validatedData);
-
-        return $json;
+        return $validatedData;
     }
 
     /**
@@ -243,53 +303,6 @@ class Validator extends Property
 
         if ( !Is::scalar($data) || !$list->in($data) ) {
             throw new MongoException(sprintf("The field [%s] must be a element of list [%s]", $this->name(), implode(',', $list->toArray())));
-        }
-
-        return $data;
-    }
-
-    /**
-     * @param      $data
-     * @param bool $insert
-     * @return mixed
-     */
-    protected function validateArray( $data, bool $insert = true )
-    {
-        if ( !( $data instanceof Json ) ) {
-            throw new MongoException(sprintf("The field [%s] must be a object", $this->name()));
-        }
-
-        $this->checkMinItems($data);
-        $this->checkMaxItems($data);
-
-        foreach ( $this->properties() as $key => $property ) {
-            $property->validateProperty($data, $insert);
-        }
-
-        return $data;
-    }
-
-    /**
-     * @param      $data
-     * @param bool $insert
-     * @return mixed
-     */
-    protected function validateObject( $data, bool $insert = true )
-    {
-        if ( !( $data instanceof Json ) ) {
-            throw new MongoException(sprintf("The field [%s] must be a object", $this->name()));
-        }
-
-        if ( $insert ) {
-            foreach ( $this->required() as $required ) {
-                if ( $data->get($required) === null ) {
-                    throw new MongoException(sprintf("The field [%s] is required", $required));
-                }
-            }
-        }
-
-        foreach ( $this->properties() as $key => $property ) {
-            $property->validateProperty($data, $insert);
         }
 
         return $data;

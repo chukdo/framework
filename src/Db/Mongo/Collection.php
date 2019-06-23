@@ -129,14 +129,6 @@ Class Collection
     }
 
     /**
-     * @return MongoDbCollection
-     */
-    public function collection(): MongoDbCollection
-    {
-        return $this->collection;
-    }
-
-    /**
      * @return string
      */
     public function databaseName(): string
@@ -146,11 +138,33 @@ Class Collection
     }
 
     /**
+     * @return MongoDbCollection
+     */
+    public function collection(): MongoDbCollection
+    {
+        return $this->collection;
+    }
+
+    /**
      * @return Schema
      */
     public function schema(): Schema
     {
-        return new Schema($this, $this->info()->toArray());
+        return new Schema($this->info()
+            ->toArray());
+    }
+
+    /**
+     * @param Schema $schema
+     * @return bool
+     */
+    public function saveSchema(Schema $schema): bool
+    {
+        $save = new Json($this->database()
+            ->database()
+            ->modifyCollection($this->name(), $schema->get()));
+
+        return $save->offsetGet('ok') == 1;
     }
 
     /**

@@ -220,25 +220,25 @@ $json = new \Chukdo\Json\Json([
 
 // addToSet > tva, ref.prix tcc closure
 //dd(db::collection('students', 'test')->info());
-  /**dd($json->collect()
-  ->where('ref.public', '=', 'ORPI')
-  ->without('prix', 'ref.client')
-  ->addToSet([
-  'tva',
-  'ref.prix',
-  ], 'prix.ttc', function( $p )
-  {
-  return ( 1 + ( $p[ 'tva' ] / 100 ) ) * $p[ 'ref.prix' ];
-  })
-  ->without('tva', 'ref.prix')
-  ->filterKey('ref.public', function( $r )
-  {
-  return strtolower($r);
- })
- ->group('cp')
- //->match('cp', '=', 'ref.cp')
- ->values()
- ->toHtml());*/
+/**dd($json->collect()
+ * ->where('ref.public', '=', 'ORPI')
+ * ->without('prix', 'ref.client')
+ * ->addToSet([
+ * 'tva',
+ * 'ref.prix',
+ * ], 'prix.ttc', function( $p )
+ * {
+ * return ( 1 + ( $p[ 'tva' ] / 100 ) ) * $p[ 'ref.prix' ];
+ * })
+ * ->without('tva', 'ref.prix')
+ * ->filterKey('ref.public', function( $r )
+ * {
+ * return strtolower($r);
+ * })
+ * ->group('cp')
+ * //->match('cp', '=', 'ref.cp')
+ * ->values()
+ * ->toHtml());*/
 
 //dd(Conf::offsetGet('db.mongo.dsn'));
 //dd(Db::collection('contrat'));
@@ -246,21 +246,31 @@ $json = new \Chukdo\Json\Json([
 use Chukdo\Db\Mongo\Aggregate\Expr;
 
 $json = new \Chukdo\Json\Json([
-    'gender' => 'toto',
-    'year' => 2019,
-    'major' => 'English',
-    'gpa' => '234',
+    'gender'  => 'toto',
+    'year'    => 2019,
+    'major'   => 'English',
+    'gpa'     => '234',
     'address' => [
-        'city' => 'bordeaux',
+        'city'   => 'bordeaux',
         'street' => '250 rue camille godard',
-    ]
+    ],
 ]);
 //echo '<pre>';
-$student = db::collection('students', 'test')->write()->setMultiple($json)->insert();
+dd(db::collection('product', 'test')->schema()->get());
 
-$json->set('address.city', 'luchac');
-$json->set('bof', 'ok');
+$student = db::collection('students', 'test')
+    ->write()
+    ->setMultiple($json)
+    ->insert();
+
 print_r($student);
+
+$up = db::collection('students', 'test')
+    ->write()
+    ->set('address.city', 1234)
+    ->where('year', '=', 2019)
+    ->update();
+dd($up);
 exit;
 $write = db::collection('test', 'test')
     ->write();
@@ -272,14 +282,25 @@ $write->setMultiple([
     'ord_date' => new DateTime(),
     'status'   => 'A',
     'amount'   => 400,
-    'a'        => [ 'b' => [ 'toto' => 'titi', 'test' => new DateTime() ] ],
-])->insert();
+    'a'        => [
+        'b' => [
+            'toto' => 'titi',
+            'test' => new DateTime(),
+        ],
+    ],
+])
+    ->insert();
 
 $write2 = db::collection('test', 'test')
     ->write();
 $write2->setSession($write->session());
 $write2->set('amount', 600)
-    ->set('a', [ 'b' => [ 'toto2' => 'titi2', 'date' => new DateTime()] ])
+    ->set('a', [
+        'b' => [
+            'toto2' => 'titi2',
+            'date'  => new DateTime(),
+        ],
+    ])
     ->where('cust_id', '=', 'domingo')
     ->update();
 
@@ -296,7 +317,8 @@ $aggregate = Db::collection('test', 'test')
     ->sort('total', 'desc');
 $write2->session()
     ->commitTransaction();
-dd($aggregate->all()->toHtml());
+dd($aggregate->all()
+    ->toHtml());
 
 $m = new \Chukdo\Db\Mongo\Aggregate\Expression('multiply', [
     'price',

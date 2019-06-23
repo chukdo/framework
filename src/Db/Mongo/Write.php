@@ -19,14 +19,24 @@ Class Write extends Where
     use Session;
 
     /**
-     * @var array
+     * @var Json
      */
-    protected $fields = [];
+    protected $fields;
 
     /**
      * @var array
      */
     protected $options = [];
+
+    /**
+     * Index constructor.
+     * @param Collection $collection
+     */
+    public function __construct( Collection $collection )
+    {
+        $this->fields = new Json();
+        parent::__construct($collection);
+    }
 
     /**
      * @return Write
@@ -105,10 +115,6 @@ Class Write extends Where
     {
         $keyword = '$' . $keyword;
 
-        if ( !isset($this->fields[ $keyword ]) ) {
-            $this->fields[ $keyword ] = [];
-        }
-
         if ( Is::iterable($value) ) {
             $value = ( new Json($value, function( $k, $v )
             {
@@ -120,7 +126,8 @@ Class Write extends Where
             $value = Collection::filterIn($field, $value);
         }
 
-        $this->fields[ $keyword ][ $field ] = $value;
+        $this->fields->offsetGetOrSet($keyword)
+            ->offsetSet($field, $value);
 
         return $this;
     }
@@ -200,44 +207,20 @@ Class Write extends Where
     public function insert(): ?string
     {
         return (string) $this->collection()
-            ->insertOne($this->fields('set'), $this->options)
+            ->insertOne($this->validatedInsertFields(), $this->options)
             ->getInsertedId();
     }
 
     /**
-     * @param string|null $type
      * @return array
      */
-    public function fields( string $type = null ): array
+    public function validatedInsertFields(): array
     {
-        $fields = $this->fields;
+        $set       = $this->fields->offsetGet('$set');
+        $validator = new Validator($this->collection->info()
+            ->toArray());
 
-        if ( $type ) {
-            return isset($fields[ '$' . $type ])
-                ? $fields[ '$' . $type ]
-                : [];
-        }
-
-        return $fields;
-    }
-
-    /**
-     * @param array|Json $data
-     * @param bool $insert
-     * @return array
-     */
-    public function validate($data, bool $insert = true): array
-    {
-        $validator = new Validator($this->collection->info()->toArray());
-
-        return $validator->validate($data, $insert);
-
-        // validateUpdateFields()
-        // validateInsertFields()
-        // fields > json
-        // unset > check required
-        // set > validate + required if insert
-        // setOnInsert > validate
+        return $validator->validateDataToInsert($set);
     }
 
     /**
@@ -246,8 +229,38 @@ Class Write extends Where
     public function update(): int
     {
         return (int) $this->collection()
-            ->updateMany($this->filter(), $this->fields(), $this->options)
+            ->updateMany($this->filter(), $this->validatedUpdateFields(), $this->options)
             ->getModifiedCount();
+    }
+
+    /**
+     * @return array
+     */
+    public function validatedUpdateFields(): array
+    {
+        $fields      = new Json($this->fields());
+        $set         = $fields->offsetGet('$set');
+        $setOnInsert = $fields->offsetGet('$setOnInsert');
+        $validator   = new Validator($this->collection->info()
+            ->toArray());
+
+        if ($set) {
+            $fields->offsetSet('$set', $validator->validateDataToUpdate($set));
+        }
+
+        if ($setOnInsert) {
+            $fields->offsetSet('$setOnInsert', $validator->validateDataToUpdate($setOnInsert));
+        }
+
+        return $fields->toArray();
+    }
+
+    /**
+     * @return Json
+     */
+    public function fields(): Json
+    {
+        return $this->fields;
     }
 
     /**
@@ -260,7 +273,7 @@ Class Write extends Where
         ], $this->options);
 
         return (string) $this->collection()
-            ->updateOne($this->filter(), $this->fields(), $options)
+            ->updateOne($this->filter(), $this->validatedUpdateFields(), $options)
             ->getUpsertedId();
     }
 
@@ -270,7 +283,7 @@ Class Write extends Where
     public function updateOne(): bool
     {
         return (bool) $this->collection()
-            ->updateOne($this->filter(), $this->fields(), $this->options)
+            ->updateOne($this->filter(), $this->validatedUpdateFields(), $this->options)
             ->getModifiedCount();
     }
 
@@ -288,7 +301,7 @@ Class Write extends Where
         ], $this->options);
 
         return new Json($this->collection()
-            ->findOneAndUpdate($this->filter(), $this->fields(), $options), function( $k, $v )
+            ->findOneAndUpdate($this->filter(), $this->validatedUpdateFields(), $options), function( $k, $v )
         {
             return Collection::filterOut($k, $v);
         });
