@@ -2,6 +2,7 @@
 
 namespace Chukdo\Db\Mongo;
 
+use Chukdo\Db\Mongo\Schema\Validator;
 use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
 use MongoDB\Operation\FindOneAndUpdate;
@@ -211,11 +212,6 @@ Class Write extends Where
     {
         $fields = $this->fields;
 
-        if ( isset($fields[ '$set' ]) ) {
-            $fields[ '$set' ] = $this->collection->schema()
-                ->validate($fields[ '$set' ]);
-        }
-
         if ( $type ) {
             return isset($fields[ '$' . $type ])
                 ? $fields[ '$' . $type ]
@@ -223,6 +219,25 @@ Class Write extends Where
         }
 
         return $fields;
+    }
+
+    /**
+     * @param array|Json $data
+     * @param bool $insert
+     * @return array
+     */
+    public function validate($data, bool $insert = true): array
+    {
+        $validator = new Validator($this->collection->info()->toArray());
+
+        return $validator->validate($data, $insert);
+
+        // validateUpdateFields()
+        // validateInsertFields()
+        // fields > json
+        // unset > check required
+        // set > validate + required if insert
+        // setOnInsert > validate
     }
 
     /**
