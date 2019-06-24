@@ -84,13 +84,12 @@ class Validator extends Property
         if ( $insert ) {
             $this->checkMinItems($json);
             $this->checkMaxItems($json);
-
-            if ($items = $this->items()) {
-                $items->validateProperty($json, $insert);
-            }
         }
-        else {
-//todo
+
+        if ($items = $this->items()) {
+            foreach ($json as $key => $value) {
+                $json->offsetSet($key, $items->validateProperty($value, $insert));
+            }
         }
 
         return $json;
