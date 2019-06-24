@@ -3,8 +3,6 @@
 namespace Chukdo\Db\Mongo\Schema;
 
 use Chukdo\Json\Json;
-use ReflectionClass;
-use Exception;
 
 /**
  * Mongo Schema properties.
@@ -68,7 +66,14 @@ class Property
                     $this->setItems((array) $value);
                     break;
                 case 'additionalProperties' :
-                    $this->setLocked((bool) $value);
+                    $value = (bool) $value;
+
+                    if ( $value === true ) {
+                        $this->lock();
+                    }
+                    else {
+                        $this->unlock();
+                    }
                     break;
                 case 'required' :
                     $this->setRequired((array) $value);
@@ -201,20 +206,44 @@ class Property
      */
     public function setItems( array $value ): self
     {
-        $this->property->offsetSet('items', $this->newParentClass([ $value ]));
+        $this->property->offsetSet('items', $this->newParentClass([ $value , 'items']));
 
         return $this;
     }
 
     /**
-     * @param bool $value
-     * @return $this
+     * @return Property
      */
-    public function setLocked( bool $value ): self
+    public function lock(): self
     {
-        $this->property->offsetSet('additionalProperties', $value);
+        $this->property->offsetSet('additionalProperties', false);
 
         return $this;
+    }
+
+    /**
+     * @return Property
+     */
+    public function unlock(): self
+    {
+        $this->property->offsetSet('additionalProperties', true);
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $field
+     * @return bool
+     */
+    public function isRequired( string $field = null): bool
+    {
+        foreach ( $this->required() as $required ) {
+            if ($required == $field) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -342,7 +371,10 @@ class Property
     public function setProperty( string $name ): Property
     {
         return $this->properties()
-            ->offsetGetOrSet($name, $this->newParentClass());
+            ->offsetGetOrSet($name, $this->newParentClass([
+                [],
+                $name,
+            ]));
     }
 
     /**

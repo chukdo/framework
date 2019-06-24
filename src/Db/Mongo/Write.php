@@ -5,6 +5,7 @@ namespace Chukdo\Db\Mongo;
 use Chukdo\Db\Mongo\Schema\Validator;
 use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
+use MongoDB\BSON\ObjectId;
 use MongoDB\Operation\FindOneAndUpdate;
 
 /**

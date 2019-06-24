@@ -26,7 +26,7 @@ class Lang extends Conf
         if ( $storage->exists($file) ) {
             $load = new Conf($storage->get($file));
 
-            $this->merge($load->toSimpleArray($name),
+            $this->merge($load->to2d($name),
                 true);
 
             return true;

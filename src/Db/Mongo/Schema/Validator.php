@@ -47,48 +47,39 @@ class Validator extends Property
             throw new MongoException(sprintf("The field [%s] must be a object", $this->name()));
         }
 
+        $lockMessage = $this->name()
+            ? sprintf("The field [%s] not allow additional properties", $this->name())
+            : "No additional properties allowed for object";
+
+        /** Insert */
         if ( $insert ) {
-            foreach ( $this->required() as $required ) {
-                if ( $json->get($required) === null ) {
-                    throw new MongoException(sprintf("The field [%s] is required", $required));
+            if ( $this->locked() ) {
+                if ( $json->diff($this->properties())
+                         ->count() > 0 ) {
+                    throw new MongoException($lockMessage);
                 }
             }
 
             foreach ( $this->properties() as $key => $property ) {
-                $json->set($key, $property->validateProperty($json->get($key), $insert));
+                if ( $get = $json->offsetGet($key) ) {
+                    $json->offsetSet($key, $property->validateProperty($get, $insert));
+                }
+                elseif ( $this->isRequired($key) ) {
+                    throw new MongoException(sprintf("The field [%s] is required", $key));
+                }
             }
         }
+
+        /** Update */
         else {
             foreach ( $json as $key => $value ) {
                 if ( $property = $this->properties()
                     ->offsetGet($key) ) {
                     $json->offsetSet($key, $property->validateProperty($value, false));
                 }
-            }
-        }
-
-        return $json;
-    }
-
-    /**
-     * @param      $json
-     * @param bool $insert
-     * @return mixed
-     */
-    protected function validateArray( $json, bool $insert = true )
-    {
-        if ( !( $json instanceof Json ) ) {
-            throw new MongoException(sprintf("The field [%s] must be a object", $this->name()));
-        }
-
-        if ( $insert ) {
-            $this->checkMinItems($json);
-            $this->checkMaxItems($json);
-        }
-
-        if ($items = $this->items()) {
-            foreach ($json as $key => $value) {
-                $json->offsetSet($key, $items->validateProperty($value, $insert));
+                elseif ( $this->locked() ) {
+                    throw new MongoException($lockMessage);
+                }
             }
         }
 
@@ -109,6 +100,55 @@ class Validator extends Property
 
         return $this->validateObject($json, false)
             ->toArray();
+    }
+
+    /**
+     * @param      $json
+     * @param bool $insert
+     * @return mixed
+     */
+    protected function validateArray( $json, bool $insert = true )
+    {
+        if ( !( $json instanceof Json ) ) {
+            throw new MongoException(sprintf("The field [%s] must be a object", $this->name()));
+        }
+
+        if ( $insert ) {
+            $this->checkMinItems($json);
+            $this->checkMaxItems($json);
+        }
+
+        if ( $items = $this->items() ) {
+            foreach ( $json as $key => $value ) {
+                $json->offsetSet($key, $items->validateProperty($value, $insert));
+            }
+        }
+
+        return $json;
+    }
+
+    /**
+     * @param Json $data
+     */
+    protected function checkMinItems( Json $data )
+    {
+        if ( $min = $this->minItems() ) {
+            if ( $data->count() < $min ) {
+                throw new MongoException(sprintf("The field [%s] must have more than [%s] items", $this->name(), $min));
+            }
+        }
+    }
+
+    /**
+     * @param Json $data
+     */
+    protected function checkMaxItems( Json $data )
+    {
+        if ( $max = $this->maxItems() ) {
+            if ( $data->count() > $max ) {
+                throw new MongoException(sprintf("The field [%s] must have less than [%s] items", $this->name(), $max));
+            }
+        }
     }
 
     /**
@@ -327,30 +367,6 @@ class Validator extends Property
         if ( $max = $this->max() ) {
             if ( $data > $max ) {
                 throw new MongoException(sprintf("The field [%s] must be lower than [%s]", $this->name(), $max));
-            }
-        }
-    }
-
-    /**
-     * @param Json $data
-     */
-    protected function checkMinItems( Json $data )
-    {
-        if ( $min = $this->minItems() ) {
-            if ( $data->count() < $min ) {
-                throw new MongoException(sprintf("The field [%s] must have more than [%s] items", $this->name(), $min));
-            }
-        }
-    }
-
-    /**
-     * @param Json $data
-     */
-    protected function checkMaxItems( Json $data )
-    {
-        if ( $max = $this->maxItems() ) {
-            if ( $data->count() > $max ) {
-                throw new MongoException(sprintf("The field [%s] must have less than [%s] items", $this->name(), $max));
             }
         }
     }

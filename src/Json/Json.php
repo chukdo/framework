@@ -71,6 +71,58 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
+     * @param JsonInterface $json
+     * @return JsonInterface
+     */
+    public function intersect( JsonInterface $json ): JsonInterface
+    {
+        $intersect = new Json();
+
+        foreach ( $this as $key => $value ) {
+            if ( $json->offsetExists($key) ) {
+                $intersect->offsetSet($key, $value);
+            }
+        }
+
+        return $intersect;
+    }
+
+    /**
+     * @param JsonInterface $json
+     * @return JsonInterface
+     */
+    public function diff( JsonInterface $json ): JsonInterface
+    {
+        $diff = new Json();
+
+        foreach ( $this as $key => $value ) {
+            if ( !$json->offsetExists($key) ) {
+                $diff->offsetSet($key, $value);
+            }
+        }
+
+        return $diff;
+    }
+
+    /**
+     * @param mixed $value
+     * @return JsonInterface
+     */
+    public function append( $value ): JsonInterface
+    {
+        if ( Is::arr($value) ) {
+            parent::append(new Json($value, $this->preFilter));
+        }
+        else {
+            parent::append($this->preFilter instanceof Closure
+                ? ( $this->preFilter )(null, $value)
+                : $value);
+        }
+
+        return $this;
+    }
+
+    /**
      * @param string $key
      * @return mixed|null
      */
@@ -88,6 +140,15 @@ class Json extends ArrayObject implements JsonInterface
     public function __set( string $key, $value ): void
     {
         $this->offsetSet($key, $value);
+    }
+
+    /**
+     * @param mixed $key
+     * @return bool
+     */
+    public function offsetExists( $key ): bool
+    {
+        return parent::offsetExists($key);
     }
 
     /**
@@ -212,24 +273,6 @@ class Json extends ArrayObject implements JsonInterface
         }
 
         return false;
-    }
-
-    /**
-     * @param mixed $value
-     * @return JsonInterface
-     */
-    public function append( $value ): JsonInterface
-    {
-        if ( Is::arr($value) ) {
-            parent::append(new Json($value, $this->preFilter));
-        }
-        else {
-            parent::append($this->preFilter instanceof Closure
-                ? ( $this->preFilter )(null, $value)
-                : $value);
-        }
-
-        return $this;
     }
 
     /**
@@ -515,23 +558,6 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
-     * @param mixed ...$offsets
-     * @return JsonInterface
-     */
-    public function with( ...$offsets ): JsonInterface
-    {
-        $only = new Json();
-
-        foreach ( $offsets as $offsetList ) {
-            foreach ( (array) $offsetList as $offset ) {
-                $only->set($offset, $this->get($offset));
-            }
-        }
-
-        return $only;
-    }
-
-    /**
      * @param string ...$names
      * @return JsonInterface
      */
@@ -546,6 +572,21 @@ class Json extends ArrayObject implements JsonInterface
         }
 
         return $json;
+    }    /**
+     * @param mixed ...$offsets
+     * @return JsonInterface
+     */
+    public function with( ...$offsets ): JsonInterface
+    {
+        $only = new Json();
+
+        foreach ( $offsets as $offsetList ) {
+            foreach ( (array) $offsetList as $offset ) {
+                $only->set($offset, $this->get($offset));
+            }
+        }
+
+        return $only;
     }
 
     /**
@@ -650,26 +691,36 @@ class Json extends ArrayObject implements JsonInterface
 
     /**
      * @param string|null $prefix
-     * @return array
+     * @return JsonInterface
      */
-    public function toSimpleArray( string $prefix = null ): array
+    public function to2d( string $prefix = null ): JsonInterface
     {
-        $mixed = [];
+        $mixed = new Json();
 
         foreach ( $this as $k => $v ) {
             $k = trim($prefix . '.' . $k,
                 '.');
 
             if ( $v instanceof JsonInterface ) {
-                $mixed = array_merge($mixed,
-                    $v->toSimpleArray($k));
+                $mixed->merge($v->to2d($k));
             }
             else {
-                $mixed[ $k ] = $v;
+                $mixed->offsetSet($k, $v);
             }
         }
 
         return $mixed;
+    }
+
+    /**
+     * @return Xml
+     */
+    public function toXml(): Xml
+    {
+        $xml = new Xml();
+        $xml->import($this->toArray());
+
+        return $xml;
     }
 
     /**
@@ -689,16 +740,7 @@ class Json extends ArrayObject implements JsonInterface
         return $except;
     }
 
-    /**
-     * @return Xml
-     */
-    public function toXml(): Xml
-    {
-        $xml = new Xml();
-        $xml->import($this->toArray());
 
-        return $xml;
-    }
 
     /**
      * @param string $path

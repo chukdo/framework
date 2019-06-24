@@ -247,16 +247,20 @@ use Chukdo\Db\Mongo\Aggregate\Expr;
 
 $json = new \Chukdo\Json\Json([
     'gender'  => 'toto',
-    'year'    => 2019,
+    'year'    => '2019',
     'major'   => 'English',
     'gpa'     => '234',
     'address' => [
         'city'   => 'bordeaux',
-        'street' => '250 rue camille godard',
+        'street' => 'ici'
     ],
+    //'titi' => ['a', 'b', 'c']
 ]);
 //echo '<pre>';
 //dd(db::collection('product', 'test')->schema()->get());
+
+//$coll = db::collection('students', 'test');
+//$coll->modify($coll->schema()->lock());
 
 $student = db::collection('students', 'test')
     ->write()
@@ -267,7 +271,8 @@ print_r($student);
 
 $up = db::collection('students', 'test')
     ->write()
-    ->set('address.city', 1234)
+    ->set('address.city', 12345)
+    //->set('address.info', 'nouvelle info')
     ->where('year', '=', 2019)
     ->update();
 dd($up);

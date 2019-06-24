@@ -3,6 +3,7 @@
 Namespace Chukdo\DB\Mongo;
 
 use Chukdo\Db\Mongo\Aggregate\Aggregate;
+use Chukdo\Db\Mongo\Schema\Property;
 use Chukdo\Db\Mongo\Schema\Schema;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
@@ -146,25 +147,12 @@ Class Collection
     }
 
     /**
-     * @return Schema
+     * @return Property
      */
-    public function schema(): Schema
+    public function schema(): Property
     {
-        return new Schema($this->info()
+        return new Property($this->info()
             ->toArray());
-    }
-
-    /**
-     * @param Schema $schema
-     * @return bool
-     */
-    public function saveSchema(Schema $schema): bool
-    {
-        $save = new Json($this->database()
-            ->database()
-            ->modifyCollection($this->name(), $schema->get()));
-
-        return $save->offsetGet('ok') == 1;
     }
 
     /**
@@ -179,6 +167,35 @@ Class Collection
             ], $this->databaseName());
 
         return $json->get('0.options.validator.$jsonSchema', new Json());
+    }
+
+    /**
+     * @param Property $property
+     * @return bool
+     */
+    public function modify( Property $property ): bool
+    {
+        $schema = [
+            'validator'        => [
+                '$jsonSchema' => $property->get(),
+            ],
+            'validationLevel'  => 'strict',
+            'validationAction' => 'error',
+        ];
+
+        $save = new Json($this->database()
+            ->database()
+            ->modifyCollection($this->name(), $schema));
+
+        return $save->offsetGet('ok') == 1;
+    }
+
+    /**
+     * @return Database
+     */
+    public function database(): Database
+    {
+        return new Database($this->mongo(), $this->databaseName());
     }
 
     /**
@@ -198,14 +215,6 @@ Class Collection
     public function index(): Index
     {
         return new Index($this);
-    }
-
-    /**
-     * @return Database
-     */
-    public function database(): Database
-    {
-        return new Database($this->mongo(), $this->databaseName());
     }
 
     /**

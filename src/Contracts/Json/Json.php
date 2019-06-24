@@ -2,9 +2,14 @@
 
 namespace Chukdo\Contracts\Json;
 
+use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Json\Collect;
 use Chukdo\Xml\Xml;
 use Closure;
+use ArrayAccess;
+use Countable;
+use IteratorAggregate;
+use Serializable;
 
 /**
  * Interface de gestion des documents JSON.
@@ -13,12 +18,18 @@ use Closure;
  * @since         08/01/2019
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-interface Json
+interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
 {
     /**
      * @return int
      */
     public function count(): int;
+
+    /**
+     * @param $key
+     * @return bool
+     */
+    public function offsetExists( $key ): bool;
 
     /**
      * @param $key
@@ -157,6 +168,18 @@ interface Json
     public function in( $value ): bool;
 
     /**
+     * @param JsonInterface $json
+     * @return JsonInterface
+     */
+    public function intersect( Json $json ): Json;
+
+    /**
+     * @param JsonInterface $json
+     * @return JsonInterface
+     */
+    public function diff( Json $json ): Json;
+
+    /**
      * @param mixed $value
      * @return Json
      */
@@ -239,9 +262,9 @@ interface Json
 
     /**
      * @param string|null $prefix
-     * @return array
+     * @return Json
      */
-    public function toSimpleArray( string $prefix = null ): array;
+    public function to2d( string $prefix = null ): Json;
 
     /**
      * @param string|null $title
