@@ -256,7 +256,7 @@ $json = new \Chukdo\Json\Json([
     ],
 ]);
 //echo '<pre>';
-dd(db::collection('product', 'test')->schema()->get());
+//dd(db::collection('product', 'test')->schema()->get());
 
 $student = db::collection('students', 'test')
     ->write()

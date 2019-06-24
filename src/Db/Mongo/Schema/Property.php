@@ -86,7 +86,10 @@ class Property
         $properties = $this->property->offsetGetOrSet('properties', []);
 
         foreach ( $value as $k => $v ) {
-            $properties->offsetSet($k, new Property((array) $v, $k));
+            $properties->offsetSet($k, $this->newParentClass([
+                (array) $v,
+                $k,
+            ]));
         }
 
         return $this;
@@ -198,7 +201,7 @@ class Property
      */
     public function setItems( array $value ): self
     {
-        $this->property->offsetSet('items', new Property( $value ));
+        $this->property->offsetSet('items', $this->newParentClass([ $value ]));
 
         return $this;
     }
@@ -229,6 +232,25 @@ class Property
         }
 
         return $this;
+    }
+
+    /**
+     * @param array $params
+     * @return mixed
+     */
+    protected function newParentClass( array $params = [] )
+    {
+        try {
+            $rc = new \ReflectionClass(get_called_class());
+            $rc->newInstanceArgs($params);
+
+            return call_user_func_array([
+                $rc,
+                'newInstance',
+            ],
+                $params);
+        } catch ( \Throwable $e ) {
+        }
     }
 
     /**
@@ -320,7 +342,7 @@ class Property
     public function setProperty( string $name ): Property
     {
         return $this->properties()
-            ->offsetGetOrSet($name, new Property());
+            ->offsetGetOrSet($name, $this->newParentClass());
     }
 
     /**
