@@ -259,7 +259,7 @@ $json = new \Chukdo\Json\Json([
 //echo '<pre>';
 //dd(db::collection('product', 'test')->schema()->get());
 
-//$coll = db::collection('students', 'test');
+$coll = db::collection('students', 'test');
 //$coll->modify($coll->schema()->lock());
 
 $student = db::collection('students', 'test')
@@ -271,8 +271,8 @@ print_r($student);
 
 $up = db::collection('students', 'test')
     ->write()
-    ->set('address.city', 12345)
-    //->set('address.info', 'nouvelle info')
+    ->set('address.city', 2019)
+    ->set('address.info', 'nouvelle info')
     ->where('year', '=', 2019)
     ->update();
 dd($up);

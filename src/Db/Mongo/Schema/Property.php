@@ -2,6 +2,8 @@
 
 namespace Chukdo\Db\Mongo\Schema;
 
+use Chukdo\Helper\Str;
+use Chukdo\Json\Arr;
 use Chukdo\Json\Json;
 
 /**
@@ -206,44 +208,12 @@ class Property
      */
     public function setItems( array $value ): self
     {
-        $this->property->offsetSet('items', $this->newParentClass([ $value , 'items']));
+        $this->property->offsetSet('items', $this->newParentClass([
+            $value,
+            'items',
+        ]));
 
         return $this;
-    }
-
-    /**
-     * @return Property
-     */
-    public function lock(): self
-    {
-        $this->property->offsetSet('additionalProperties', false);
-
-        return $this;
-    }
-
-    /**
-     * @return Property
-     */
-    public function unlock(): self
-    {
-        $this->property->offsetSet('additionalProperties', true);
-
-        return $this;
-    }
-
-    /**
-     * @param string|null $field
-     * @return bool
-     */
-    public function isRequired( string $field = null): bool
-    {
-        foreach ( $this->required() as $required ) {
-            if ($required == $field) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -296,6 +266,21 @@ class Property
     public function required(): Json
     {
         return $this->property->offsetGetOrSet('required');
+    }
+
+    /**
+     * @param string|null $field
+     * @return bool
+     */
+    public function isRequired( string $field = null ): bool
+    {
+        foreach ( $this->required() as $required ) {
+            if ( $required == $field ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -366,6 +351,30 @@ class Property
 
     /**
      * @param string $name
+     * @return $this|null
+     */
+    public function getProperty( string $name ): ?Property
+    {
+        if ( Str::notContain($name, '.') ) {
+            return $this->properties()
+                ->offsetGet($name);
+        }
+
+        $arr       = new Arr(Str::split($name, '.'));
+        $firstPath = $arr->getFirstAndRemove();
+        $endPath   = $arr->join('.');
+        $get       = $this->properties()
+            ->offsetGet($firstPath);
+
+        if ( $get instanceof Property ) {
+            return $get->getProperty($endPath);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $name
      * @return $this
      */
     public function setProperty( string $name ): Property
@@ -395,14 +404,6 @@ class Property
             ->offsetUnset($name);
 
         return $this;
-    }
-
-    /**
-     * @return bool|null
-     */
-    public function locked(): ?bool
-    {
-        return $this->property->offsetGet('additionalProperties');
     }
 
     /**

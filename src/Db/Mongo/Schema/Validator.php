@@ -47,19 +47,8 @@ class Validator extends Property
             throw new MongoException(sprintf("The field [%s] must be a object", $this->name()));
         }
 
-        $lockMessage = $this->name()
-            ? sprintf("The field [%s] not allow additional properties", $this->name())
-            : "No additional properties allowed for object";
-
         /** Insert */
         if ( $insert ) {
-            if ( $this->locked() ) {
-                if ( $json->diff($this->properties())
-                         ->count() > 0 ) {
-                    throw new MongoException($lockMessage);
-                }
-            }
-
             foreach ( $this->properties() as $key => $property ) {
                 if ( $get = $json->offsetGet($key) ) {
                     $json->offsetSet($key, $property->validateProperty($get, $insert));
@@ -73,12 +62,8 @@ class Validator extends Property
         /** Update */
         else {
             foreach ( $json as $key => $value ) {
-                if ( $property = $this->properties()
-                    ->offsetGet($key) ) {
+                if ( $property = $this->getProperty($key)) {
                     $json->offsetSet($key, $property->validateProperty($value, false));
-                }
-                elseif ( $this->locked() ) {
-                    throw new MongoException($lockMessage);
                 }
             }
         }
