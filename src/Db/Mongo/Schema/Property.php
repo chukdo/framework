@@ -67,16 +67,6 @@ class Property
                 case 'items':
                     $this->setItems((array) $value);
                     break;
-                case 'additionalProperties' :
-                    $value = (bool) $value;
-
-                    if ( $value === true ) {
-                        $this->lock();
-                    }
-                    else {
-                        $this->unlock();
-                    }
-                    break;
                 case 'required' :
                     $this->setRequired((array) $value);
                     break;
