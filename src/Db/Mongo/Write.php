@@ -40,6 +40,14 @@ Class Write extends Where
     }
 
     /**
+     * @return array
+     */
+    public function options(): array
+    {
+        return $this->options;
+    }
+
+    /**
      * @return Write
      */
     public function bypassValidation(): self
@@ -55,7 +63,7 @@ Class Write extends Where
     public function delete(): int
     {
         return (int) $this->collection()
-            ->deleteMany($this->filter(), $this->options)
+            ->deleteMany($this->filter(), $this->options())
             ->getDeletedCount();
     }
 
@@ -65,7 +73,7 @@ Class Write extends Where
     public function deleteOne(): bool
     {
         return (bool) $this->collection()
-            ->deleteOne($this->filter(), $this->options)
+            ->deleteOne($this->filter(), $this->options())
             ->getDeletedCount();
     }
 
@@ -75,7 +83,7 @@ Class Write extends Where
     public function deleteOneAndGet(): Json
     {
         return new Json($this->collection()
-            ->findOneAndDelete($this->filter(), $this->options), function( $k, $v )
+            ->findOneAndDelete($this->filter(), $this->options()), function( $k, $v )
         {
             return Collection::filterOut($k, $v);
         });
@@ -208,7 +216,7 @@ Class Write extends Where
     public function insert(): ?string
     {
         return (string) $this->collection()
-            ->insertOne($this->validatedInsertFields(), $this->options)
+            ->insertOne($this->validatedInsertFields(), $this->options())
             ->getInsertedId();
     }
 
@@ -230,7 +238,7 @@ Class Write extends Where
     public function update(): int
     {
         return (int) $this->collection()
-            ->updateMany($this->filter(), $this->validatedUpdateFields(), $this->options)
+            ->updateMany($this->filter(), $this->validatedUpdateFields(), $this->options())
             ->getModifiedCount();
     }
 
@@ -253,6 +261,9 @@ Class Write extends Where
             $fields->offsetSet('$setOnInsert', $validator->validateDataToUpdate($setOnInsert));
         }
 
+        // cas de push et de addfield to set
+            // Expr
+
         return $fields->toArray();
     }
 
@@ -271,7 +282,7 @@ Class Write extends Where
     {
         $options = array_merge([
             'upsert' => true,
-        ], $this->options);
+        ], $this->options());
 
         return (string) $this->collection()
             ->updateOne($this->filter(), $this->validatedUpdateFields(), $options)
@@ -284,7 +295,7 @@ Class Write extends Where
     public function updateOne(): bool
     {
         return (bool) $this->collection()
-            ->updateOne($this->filter(), $this->validatedUpdateFields(), $this->options)
+            ->updateOne($this->filter(), $this->validatedUpdateFields(), $this->options())
             ->getModifiedCount();
     }
 
@@ -299,7 +310,7 @@ Class Write extends Where
             'returnDocument' => $before
                 ? FindOneAndUpdate::RETURN_DOCUMENT_BEFORE
                 : FindOneAndUpdate::RETURN_DOCUMENT_AFTER,
-        ], $this->options);
+        ], $this->options());
 
         return new Json($this->collection()
             ->findOneAndUpdate($this->filter(), $this->validatedUpdateFields(), $options), function( $k, $v )

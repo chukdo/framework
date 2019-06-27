@@ -51,7 +51,7 @@ class Validator extends Property
         if ( $insert ) {
             foreach ( $this->properties() as $key => $property ) {
                 if ( $get = $json->offsetGet($key) ) {
-                    $json->offsetSet($key, $property->validateProperty($get, $insert));
+                    $json->offsetSet($key, $property->validateType($get, $insert));
                 }
                 elseif ( $this->isRequired($key) ) {
                     throw new MongoException(sprintf("The field [%s] is required", $key));
@@ -63,7 +63,7 @@ class Validator extends Property
         else {
             foreach ( $json as $key => $value ) {
                 if ( $property = $this->getProperty($key)) {
-                    $json->offsetSet($key, $property->validateProperty($value, false));
+                    $json->offsetSet($key, $property->validateType($value, false));
                 }
             }
         }
@@ -105,7 +105,7 @@ class Validator extends Property
 
         if ( $items = $this->items() ) {
             foreach ( $json as $key => $value ) {
-                $json->offsetSet($key, $items->validateProperty($value, $insert));
+                $json->offsetSet($key, $items->validateType($value, $insert));
             }
         }
 
@@ -141,9 +141,36 @@ class Validator extends Property
      * @param bool $insert
      * @return mixed
      */
-    public function validateProperty( $data, bool $insert = true )
+    public function validateType($data, bool $insert = true)
     {
-        switch ( $this->type() ) {
+        $type = $this->type();
+
+        if (Is::arr($type)) {
+            $count = count($type);
+
+            foreach ($type as $i => $t) {
+                try {
+                    return $this->validateProperty($t, $data, $insert);
+                } catch (MongoException $e) {
+                    if ($i == $count) {
+                        throw $e;
+                    }
+                }
+            }
+        }
+
+        return $this->validateProperty($type, $data, $insert);
+    }
+
+    /**
+     * @param string|null $type
+     * @param             $data
+     * @param bool        $insert
+     * @return bool|float|int|ObjectId|Timestamp|UTCDateTime|string
+     */
+    protected function validateProperty(?string $type, $data, bool $insert = true )
+    {
+        switch ( $type ) {
             case 'objectId' :
                 $validatedData = $this->validateObjectId($data);
                 break;

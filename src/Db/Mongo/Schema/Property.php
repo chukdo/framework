@@ -437,9 +437,9 @@ class Property
     }
 
     /**
-     * @return string|null
+     * @return string|array|null
      */
-    public function type(): ?string
+    public function type()
     {
         return $this->property->offsetGet('bsonType');
     }
