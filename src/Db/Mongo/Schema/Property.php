@@ -171,6 +171,17 @@ class Property
     }
 
     /**
+     * @param bool $value
+     * @return Property
+     */
+    public function setUniqueItems( bool $value ): self
+    {
+        $this->property->offsetSet('uniqueItems', $value);
+
+        return $this;
+    }
+
+    /**
      * @param int $value
      * @return $this
      */
@@ -472,5 +483,13 @@ class Property
     public function maxItems(): ?int
     {
         return $this->property->offsetGet('maxItems');
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function uniqueItems(): ?bool
+    {
+        return $this->property->offsetGet('uniqueItems');
     }
 }

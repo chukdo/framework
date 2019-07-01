@@ -135,7 +135,7 @@ Class Find extends Where
      * @param string $sort
      * @return Find
      */
-    public function sort( string $field, string $sort ): self
+    public function sort( string $field, string $sort = 'ASC' ): self
     {
         $this->sort[ $field ] = $sort === 'asc' || $sort === 'ASC'
             ? 1

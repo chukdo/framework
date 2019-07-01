@@ -51,7 +51,7 @@ class Validator extends Property
         if ( $insert ) {
             foreach ( $this->properties() as $key => $property ) {
                 if ( $get = $json->offsetGet($key) ) {
-                    $json->offsetSet($key, $property->validateType($get, $insert));
+                    $json->offsetSet($key, $property->validateType($get, true));
                 }
                 elseif ( $this->isRequired($key) ) {
                     throw new MongoException(sprintf("The field [%s] is required", $key));
@@ -62,7 +62,7 @@ class Validator extends Property
         /** Update */
         else {
             foreach ( $json as $key => $value ) {
-                if ( $property = $this->getProperty($key)) {
+                if ( $property = $this->getProperty($key) ) {
                     $json->offsetSet($key, $property->validateType($value, false));
                 }
             }
@@ -88,28 +88,33 @@ class Validator extends Property
     }
 
     /**
-     * @param      $json
+     * @param      $data
      * @param bool $insert
      * @return mixed
      */
-    protected function validateArray( $json, bool $insert = true )
+    protected function validateArray( $data, bool $insert = true )
     {
-        if ( !( $json instanceof Json ) ) {
-            throw new MongoException(sprintf("The field [%s] must be a object", $this->name()));
-        }
-
         if ( $insert ) {
-            $this->checkMinItems($json);
-            $this->checkMaxItems($json);
-        }
+            if ( !( $data instanceof Json ) ) {
+                throw new MongoException(sprintf("The field [%s] must be a array", $this->name()));
+            }
 
-        if ( $items = $this->items() ) {
-            foreach ( $json as $key => $value ) {
-                $json->offsetSet($key, $items->validateType($value, $insert));
+            $this->checkMinItems($data);
+            $this->checkMaxItems($data);
+
+            if ( $items = $this->items() ) {
+                foreach ( $data as $key => $value ) {
+                    $data->offsetSet($key, $items->validateType($value, true));
+                }
+            }
+        }
+        else {
+            if ( $items = $this->items() ) {
+                $data = $items->validateType($data, false);
             }
         }
 
-        return $json;
+        return $data;
     }
 
     /**
@@ -141,18 +146,18 @@ class Validator extends Property
      * @param bool $insert
      * @return mixed
      */
-    public function validateType($data, bool $insert = true)
+    public function validateType( $data, bool $insert = true )
     {
         $type = $this->type();
 
-        if (Is::arr($type)) {
+        if ( Is::arr($type) ) {
             $count = count($type);
 
-            foreach ($type as $i => $t) {
+            foreach ( $type as $i => $t ) {
                 try {
                     return $this->validateProperty($t, $data, $insert);
-                } catch (MongoException $e) {
-                    if ($i == $count) {
+                } catch ( MongoException $e ) {
+                    if ( $i == $count ) {
                         throw $e;
                     }
                 }
@@ -168,7 +173,7 @@ class Validator extends Property
      * @param bool        $insert
      * @return bool|float|int|ObjectId|Timestamp|UTCDateTime|string
      */
-    protected function validateProperty(?string $type, $data, bool $insert = true )
+    protected function validateProperty( ?string $type, $data, bool $insert = true )
     {
         switch ( $type ) {
             case 'objectId' :

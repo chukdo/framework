@@ -6,6 +6,7 @@ use Chukdo\Db\Mongo\Schema\Validator;
 use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
 use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\Regex;
 use MongoDB\Operation\FindOneAndUpdate;
 
 /**
@@ -40,14 +41,6 @@ Class Write extends Where
     }
 
     /**
-     * @return array
-     */
-    public function options(): array
-    {
-        return $this->options;
-    }
-
-    /**
      * @return Write
      */
     public function bypassValidation(): self
@@ -65,6 +58,14 @@ Class Write extends Where
         return (int) $this->collection()
             ->deleteMany($this->filter(), $this->options())
             ->getDeletedCount();
+    }
+
+    /**
+     * @return array
+     */
+    public function options(): array
+    {
+        return $this->options;
     }
 
     /**
@@ -93,7 +94,7 @@ Class Write extends Where
      * @param iterable $values
      * @return Write
      */
-    public function setMultiple( iterable $values ): self
+    public function setAll( iterable $values ): self
     {
         foreach ( $values as $field => $value ) {
             $this->set($field, $value);
@@ -101,7 +102,6 @@ Class Write extends Where
 
         return $this;
     }
-
 
     /**
      * @param string $field
@@ -112,7 +112,6 @@ Class Write extends Where
     {
         return $this->field('set', $field, $value);
     }
-
 
     /**
      * @param string $keyword
@@ -139,6 +138,172 @@ Class Write extends Where
             ->offsetSet($field, $value);
 
         return $this;
+    }
+
+    /**
+     * @param string $field
+     * @return Write
+     */
+    public function pop( string $field ): self
+    {
+        return $this->field('pop', $field, 1);
+    }
+
+    /**
+     * @param string $field
+     * @return Write
+     */
+    public function shift( string $field ): self
+    {
+        return $this->field('pop', $field, -1);
+    }
+
+    /**
+     * @param string $field
+     * @param        $value
+     * @return Write
+     */
+    public function addToSet( string $field, $value ): self
+    {
+        return $this->field('addToSet', $field, $value);
+    }
+
+    /**
+     * @param string $field
+     * @param array  $values
+     * @return Write
+     */
+    public function addToSetAll( string $field, array $values ): self
+    {
+        return $this->field('addToSet', $field, [
+            '$each' => $values,
+        ]);
+    }
+
+    /**
+     * @param string $field
+     * @param string $operator
+     * @param        $value
+     * @param null   $value2
+     * @return Write
+     */
+    public function pull( string $field, string $operator, $value, $value2 = null ): self
+    {
+        switch ( $operator ) {
+            case '=' :
+                return $this->field('pull', $field, $value);
+                break;
+            case '!=' :
+                return $this->field('pull', $field, [
+                    '$ne' => $value,
+                ]);
+                break;
+            case '>' :
+                return $this->field('pull', $field, [
+                    '$gt' => $value,
+                ]);
+                break;
+            case '>=':
+                return $this->field('pull', $field, [
+                    '$gte' => $value,
+                ]);
+                break;
+            case '<':
+                return $this->field('pull', $field, [
+                    '$lt' => $value,
+                ]);
+                break;
+            case '<=':
+                return $this->field('pull', $field, [
+                    '$lte' => $value,
+                ]);
+                break;
+            case '<>' :
+                return $this->field('pull', $field, [
+                    '$gt' => $value,
+                    '$lt' => $value2,
+                ]);
+            case '<=>' :
+                return $this->field('pull', $field, [
+                    '$gte' => $value,
+                    '$lte' => $value2,
+                ]);
+            case 'in':
+                return $this->field('pull', $field, [
+                    '$in' => $value,
+                ]);
+                break;
+            case '!in':
+                return $this->field('pull', $field, [
+                    '$nin' => $value,
+                ]);
+                break;
+            case 'type':
+                return $this->field('pull', $field, [
+                    '$type' => $value,
+                ]);
+                break;
+            case 'regex':
+                return $this->field('pull', $field, [
+                    '$regex' => new Regex($value, $value2
+                        ?: 'i'),
+                ]);
+                break;
+            case 'match':
+                return $this->field('pull', $field, [
+                ]);
+                break;
+            case 'all':
+                return $this->field('pullAll', $field, $value);
+                break;
+            default :
+                throw new MongoException(sprintf("Unknown operator [%s]", $operator));
+
+        }
+    }
+
+    /**
+     * @param string $field
+     * @param        $value
+     * @return Write
+     */
+    public function push( string $field, $value ): self
+    {
+        return $this->field('push', $field, $value);
+    }
+
+    /**
+     * @param string      $field
+     * @param array       $values
+     * @param int|null    $position
+     * @param int|null    $slice
+     * @param string|null $orderby
+     * @param string      $sort
+     * @return Write
+     */
+    public function pushAll( string $field, array $values, int $position = null, int $slice = null, string $orderby = null, string $sort = 'ASC' ): self
+    {
+        $value = [
+            '$each' => $values,
+        ];
+
+        if ( $position !== null ) {
+            $value[ '$position' ] = $position;
+        }
+
+        if ( $slice !== null ) {
+            $value[ '$slice' ] = $slice;
+        }
+
+        if ( $orderby !== null ) {
+            $value[ '$sort' ] = [
+                $orderby => $sort === 'asc' || $sort === 'ASC'
+                    ? 1
+                    : -1,
+            ];
+        }
+
+        return $this->field('push', $field, $value);
     }
 
     /**
@@ -250,20 +415,36 @@ Class Write extends Where
         $fields      = new Json($this->fields());
         $set         = $fields->offsetGet('$set');
         $setOnInsert = $fields->offsetGet('$setOnInsert');
+        $push        = $fields->offsetGet('$push');
+        $addToSet    = $fields->offsetGet('$addToSet');
         $validator   = new Validator($this->collection->info()
             ->toArray());
 
-        if ($set) {
+        if ( $set ) {
             $fields->offsetSet('$set', $validator->validateDataToUpdate($set));
         }
 
-        if ($setOnInsert) {
+        if ( $setOnInsert ) {
             $fields->offsetSet('$setOnInsert', $validator->validateDataToUpdate($setOnInsert));
         }
 
-        //@todo
-        // cas de push et de addfield to set
-            // Expr
+        if ( $push ) {
+            if ( $each = $push->offsetGet('$each') ) {
+                $push->offsetSet('$each', $validator->validateDataToUpdate($each));
+            }
+            else {
+                $fields->offsetSet('$push', $validator->validateDataToUpdate($push));
+            }
+        }
+
+        if ( $addToSet ) {
+            if ( $each = $addToSet->offsetGet('$each') ) {
+                $addToSet->offsetSet('$each', $validator->validateDataToUpdate($each));
+            }
+            else {
+                $fields->offsetSet('$addToSet', $validator->validateDataToUpdate($addToSet));
+            }
+        }
 
         return $fields->toArray();
     }

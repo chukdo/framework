@@ -264,7 +264,7 @@ $coll = db::collection('students', 'test');
 
 $student = db::collection('students', 'test')
     ->write()
-    ->setMultiple($json)
+    ->setAll($json)
     ->insert();
 
 print_r($student);
@@ -273,6 +273,7 @@ $up = db::collection('students', 'test')
     ->write()
     ->set('address.city', 2019)
     ->set('address.info', 'nouvelle info')
+    ->pull('address.cp', '<=', 13)
     ->where('year', '=', 2019)
     ->update();
 dd($up);
@@ -282,7 +283,7 @@ $write = db::collection('test', 'test')
 
 $write->session()
     ->startTransaction([]);
-$write->setMultiple([
+$write->setAll([
     'cust_id'  => 'domingo',
     'ord_date' => new DateTime(),
     'status'   => 'A',
