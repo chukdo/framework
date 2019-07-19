@@ -132,16 +132,16 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
     public function filterRecursive( Closure $closure ): Json;
 
     /**
-     * @param mixed ...$offsets
+     * @param string ...$offsets
      * @return Json
      */
-    public function with( ...$offsets ): Json;
+    public function with( string ...$offsets ): Json;
 
     /**
-     * @param mixed ...$offsets
+     * @param string ...$offsets
      * @return Json
      */
-    public function without( ...$offsets ): Json;
+    public function without( string ...$offsets ): Json;
 
     /**
      * @param iterable|null $merge

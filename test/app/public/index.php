@@ -218,6 +218,8 @@ $json = new \Chukdo\Json\Json([
     ],
 ]);
 
+dd($json->sort('ref.prix', true)->toHtml());
+
 // addToSet > tva, ref.prix tcc closure
 //dd(db::collection('students', 'test')->info());
 /**dd($json->collect()
@@ -258,9 +260,6 @@ $json = new \Chukdo\Json\Json([
 ]);
 //echo '<pre>';
 //dd(db::collection('product', 'test')->schema()->get());
-
-$coll = db::collection('students', 'test');
-//$coll->modify($coll->schema()->lock());
 
 $student = db::collection('students', 'test')
     ->write()

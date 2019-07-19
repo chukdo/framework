@@ -572,11 +572,13 @@ class Json extends ArrayObject implements JsonInterface
         }
 
         return $json;
-    }    /**
-     * @param mixed ...$offsets
+    }
+
+    /**
+     * @param string ...$offsets
      * @return JsonInterface
      */
-    public function with( ...$offsets ): JsonInterface
+    public function with( string ...$offsets ): JsonInterface
     {
         $only = new Json();
 
@@ -724,10 +726,10 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
-     * @param mixed ...$offsets
+     * @param string ...$offsets
      * @return JsonInterface
      */
-    public function without( ...$offsets ): JsonInterface
+    public function without( string ... $offsets ): JsonInterface
     {
         $except = new Json($this->toArray());
 
