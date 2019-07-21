@@ -313,7 +313,7 @@ Class Aggregate
      * @param string $sort
      * @return Aggregate
      */
-    public function sort( string $field, string $sort ): self
+    public function sort( string $field, string $sort = 'ASC' ): self
     {
         $this->pipe[] = [
             '$sort' => [

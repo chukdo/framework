@@ -255,6 +255,13 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
 
     /**
      * @param string $path
+     * @param string $sort
+     * @return Json
+     */
+    public function sort(string $path, string $sort = 'ASC'): Json;
+
+    /**
+     * @param string $path
      * @param bool   $scalarResultOnly
      * @return Json
      */

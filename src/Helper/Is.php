@@ -48,6 +48,15 @@ final class Is
      * @param $value
      * @return bool
      */
+    public static function null( $value ): bool
+    {
+        return is_null($value);
+    }
+
+    /**
+     * @param $value
+     * @return bool
+     */
     public static function iterable( $value ): bool
     {
         return is_iterable($value) || $value instanceof stdClass || self::arr($value);

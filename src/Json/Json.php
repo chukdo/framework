@@ -71,58 +71,6 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
-     * @param JsonInterface $json
-     * @return JsonInterface
-     */
-    public function intersect( JsonInterface $json ): JsonInterface
-    {
-        $intersect = new Json();
-
-        foreach ( $this as $key => $value ) {
-            if ( $json->offsetExists($key) ) {
-                $intersect->offsetSet($key, $value);
-            }
-        }
-
-        return $intersect;
-    }
-
-    /**
-     * @param JsonInterface $json
-     * @return JsonInterface
-     */
-    public function diff( JsonInterface $json ): JsonInterface
-    {
-        $diff = new Json();
-
-        foreach ( $this as $key => $value ) {
-            if ( !$json->offsetExists($key) ) {
-                $diff->offsetSet($key, $value);
-            }
-        }
-
-        return $diff;
-    }
-
-    /**
-     * @param mixed $value
-     * @return JsonInterface
-     */
-    public function append( $value ): JsonInterface
-    {
-        if ( Is::arr($value) ) {
-            parent::append(new Json($value, $this->preFilter));
-        }
-        else {
-            parent::append($this->preFilter instanceof Closure
-                ? ( $this->preFilter )(null, $value)
-                : $value);
-        }
-
-        return $this;
-    }
-
-    /**
      * @param string $key
      * @return mixed|null
      */
@@ -276,6 +224,24 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
+     * @param mixed $value
+     * @return JsonInterface
+     */
+    public function append( $value ): JsonInterface
+    {
+        if ( Is::arr($value) ) {
+            parent::append(new Json($value, $this->preFilter));
+        }
+        else {
+            parent::append($this->preFilter instanceof Closure
+                ? ( $this->preFilter )(null, $value)
+                : $value);
+        }
+
+        return $this;
+    }
+
+    /**
      * @return $this
      */
     public function all()
@@ -320,6 +286,23 @@ class Json extends ArrayObject implements JsonInterface
     public function collect(): Collect
     {
         return new Collect($this);
+    }
+
+    /**
+     * @param JsonInterface $json
+     * @return JsonInterface
+     */
+    public function diff( JsonInterface $json ): JsonInterface
+    {
+        $diff = new Json();
+
+        foreach ( $this as $key => $value ) {
+            if ( !$json->offsetExists($key) ) {
+                $diff->offsetSet($key, $value);
+            }
+        }
+
+        return $diff;
     }
 
     /**
@@ -421,6 +404,42 @@ class Json extends ArrayObject implements JsonInterface
                     $json->offsetSet($k, $r);
                 }
             }
+        }
+
+        return $json;
+    }    /**
+     * @param string $path
+     * @param string $sort
+     * @return JsonInterface
+     */
+    public function sort( string $path, string $sort = 'ASC' ): JsonInterface
+    {
+        $toSort = [];
+
+        foreach ( $this as $k => $v ) {
+            $get = $v->get($path);
+
+            if ( !Is::scalar($get) || Is::null($get) ) {
+                $get = uniqid('');
+            };
+
+            $toSort[ $get ] = [
+                'k' => $k,
+                'v' => $v,
+            ];
+        }
+
+        if ( $sort == 'ASC' || $sort == 'asc' ) {
+            ksort($toSort);
+        }
+        else {
+            krsort($toSort);
+        }
+
+        $json = new Json();
+
+        foreach ( $toSort as $sorted ) {
+            $json->offsetSet($sorted[ 'k' ], $sorted[ 'v' ]);
         }
 
         return $json;
@@ -532,6 +551,23 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
+     * @param JsonInterface $json
+     * @return JsonInterface
+     */
+    public function intersect( JsonInterface $json ): JsonInterface
+    {
+        $intersect = new Json();
+
+        foreach ( $this as $key => $value ) {
+            if ( $json->offsetExists($key) ) {
+                $intersect->offsetSet($key, $value);
+            }
+        }
+
+        return $intersect;
+    }
+
+    /**
      * @param mixed ...$param
      * @return mixed
      */
@@ -575,6 +611,58 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
+     * @param string|null $title
+     * @param string|null $color
+     * @return string
+     */
+    public function toConsole( string $title = null, string $color = null ): string
+    {
+        if ( !Cli::runningInConsole() ) {
+            throw new JsonException('You can call json::toConsole only in CLI mode.');
+        }
+
+        $climate = new CLImate();
+        $climate->output->defaultTo('buffer');
+
+        if ( $title ) {
+            $climate->border();
+            $climate->style->addCommand('colored', $color
+                ?: 'green');
+            $climate->colored(ucfirst($title
+                ?: $this->name));
+            $climate->border();
+        }
+
+        $climate->json($this->toArray());
+
+        return $climate->output->get('buffer')
+            ->get();
+    }
+
+    /**
+     * @param string|null $title
+     * @param string|null $color
+     * @return string
+     */
+    public function toHtml( string $title = null, string $color = null ): string
+    {
+        return To::html($this, $title, $color, true);
+    }
+
+    /**
+     * @return Xml
+     */
+    public function toXml(): Xml
+    {
+        $xml = new Xml();
+        $xml->import($this->toArray());
+
+        return $xml;
+    }
+
+
+
+    /**
      * @param string ...$offsets
      * @return JsonInterface
      */
@@ -590,6 +678,7 @@ class Json extends ArrayObject implements JsonInterface
 
         return $only;
     }
+
 
     /**
      * @param iterable|null $merge
@@ -652,44 +741,6 @@ class Json extends ArrayObject implements JsonInterface
         return $default;
     }
 
-    /**
-     * @param string|null $title
-     * @param string|null $color
-     * @return string
-     */
-    public function toConsole( string $title = null, string $color = null ): string
-    {
-        if ( !Cli::runningInConsole() ) {
-            throw new JsonException('You can call json::toConsole only in CLI mode.');
-        }
-
-        $climate = new CLImate();
-        $climate->output->defaultTo('buffer');
-
-        if ( $title ) {
-            $climate->border();
-            $climate->style->addCommand('colored', $color
-                ?: 'green');
-            $climate->colored(ucfirst($title
-                ?: $this->name));
-            $climate->border();
-        }
-
-        $climate->json($this->toArray());
-
-        return $climate->output->get('buffer')
-            ->get();
-    }
-
-    /**
-     * @param string|null $title
-     * @param string|null $color
-     * @return string
-     */
-    public function toHtml( string $title = null, string $color = null ): string
-    {
-        return To::html($this, $title, $color, true);
-    }
 
     /**
      * @param string|null $prefix
@@ -714,16 +765,6 @@ class Json extends ArrayObject implements JsonInterface
         return $mixed;
     }
 
-    /**
-     * @return Xml
-     */
-    public function toXml(): Xml
-    {
-        $xml = new Xml();
-        $xml->import($this->toArray());
-
-        return $xml;
-    }
 
     /**
      * @param string ...$offsets
@@ -741,7 +782,6 @@ class Json extends ArrayObject implements JsonInterface
 
         return $except;
     }
-
 
 
     /**

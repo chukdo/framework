@@ -391,22 +391,41 @@ class Collect
     }
 
     /**
-     * @param string $key
-     * @param int    $order
+     * @param string $path
+     * @param string $sort
      * @return Collect
      */
-    public function sort( string $key, int $order = SORT_ASC ): self
+    public function sort( string $path, string $sort = 'ASC' ): self
     {
         $toSort = [];
-        $arr    = $this->collection->toArray();
 
-        foreach ( $arr as $k => $v ) {
-            $toSort[ $k ] = $v[ $key ];
+        foreach ( $this->collection as $k => $v ) {
+            $get = $v->get($path);
+
+            if ( !Is::scalar($get) || Is::null($get) ) {
+                $get = uniqid('');
+            };
+
+            $toSort[ $get ] = [
+                'k' => $k,
+                'v' => $v,
+            ];
         }
 
-        array_multisort($toSort, $order, $arr);
+        if ( $sort == 'ASC' || $sort == 'asc' ) {
+            ksort($toSort);
+        }
+        else {
+            krsort($toSort);
+        }
 
-        return new Collect($arr);
+        $json = new Json();
+
+        foreach ( $toSort as $sorted ) {
+            $json->offsetSet($sorted[ 'k' ], $sorted[ 'v' ]);
+        }
+
+        return new Collect($json);
     }
 
     /**

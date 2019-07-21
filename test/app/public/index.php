@@ -218,7 +218,46 @@ $json = new \Chukdo\Json\Json([
     ],
 ]);
 
-dd($json->sort('ref.prix', true)->toHtml());
+$json = new \Chukdo\Json\Json([
+    'produit1' => [
+        [
+            'prix'    => 199,
+            'product' => 'tel',
+        ],
+        [
+            'prix'    => 340,
+            'product' => 'tablette',
+        ],
+        [
+            'prix'    => 500,
+            'product' => 'ordinateur',
+        ],
+    ],
+    'produit2' => [
+        [
+            'prix'    => 400,
+            'product' => 'console',
+        ],
+        [
+            'prix'    => 50,
+            'product' => 'hub',
+        ],
+        [
+            'prix'    => 2000,
+            'product' => 'mac',
+        ],
+    ],
+]);
+
+$json->set('produit2', $json->get('produit2')
+    ->collect()
+    ->sort('prix', 'desc')
+    ->values());
+
+//$json->sortSubSet('produit2.prix', 'desc');
+
+dd(
+    $json->toHtml());
 
 // addToSet > tva, ref.prix tcc closure
 //dd(db::collection('students', 'test')->info());
@@ -254,7 +293,7 @@ $json = new \Chukdo\Json\Json([
     'gpa'     => '234',
     'address' => [
         'city'   => 'bordeaux',
-        'street' => 'ici'
+        'street' => 'ici',
     ],
     //'titi' => ['a', 'b', 'c']
 ]);
