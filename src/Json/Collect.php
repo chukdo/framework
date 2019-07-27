@@ -5,6 +5,7 @@ namespace Chukdo\Json;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
+use Chukdo\Helper\Arr;
 use Closure;
 
 /**
@@ -443,12 +444,13 @@ class Collect
     }
 
     /**
-     * @param string ...$names
+     * @param mixed ...$names
      * @return Collect
      */
-    public function with( string ...$names ): self
+    public function with( ...$names ): self
     {
-        $json = new Json();
+        $names = Arr::spreadArgs($names);
+        $json  = new Json();
 
         foreach ( $this->collection as $k => $row ) {
             if ( $row instanceof JsonInterface ) {
@@ -466,12 +468,13 @@ class Collect
     }
 
     /**
-     * @param string ...$names
+     * @param mixed ...$names
      * @return Collect
      */
-    public function without( string ...$names ): self
+    public function without( ...$names ): self
     {
-        $json = new Json();
+        $names = Arr::spreadArgs($names);
+        $json  = new Json();
 
         foreach ( $this->collection as $k => $row ) {
             if ( $row instanceof JsonInterface ) {

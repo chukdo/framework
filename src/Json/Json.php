@@ -8,6 +8,7 @@ use Chukdo\Helper\Cli;
 use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
 use Chukdo\Helper\To;
+use Chukdo\Helper\Arr;
 use Chukdo\Xml\Xml;
 use Closure;
 use League\CLImate\CLImate;
@@ -281,11 +282,14 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
+     * @param bool $clone
      * @return Collect
      */
-    public function collect(): Collect
+    public function collect( bool $clone = false ): Collect
     {
-        return new Collect($this);
+        return new Collect($clone
+            ? $this->getArrayCopy()
+            : $this);
     }
 
     /**
@@ -407,42 +411,6 @@ class Json extends ArrayObject implements JsonInterface
         }
 
         return $json;
-    }    /**
-     * @param string $path
-     * @param string $sort
-     * @return JsonInterface
-     */
-    public function sort( string $path, string $sort = 'ASC' ): JsonInterface
-    {
-        $toSort = [];
-
-        foreach ( $this as $k => $v ) {
-            $get = $v->get($path);
-
-            if ( !Is::scalar($get) || Is::null($get) ) {
-                $get = uniqid('');
-            };
-
-            $toSort[ $get ] = [
-                'k' => $k,
-                'v' => $v,
-            ];
-        }
-
-        if ( $sort == 'ASC' || $sort == 'asc' ) {
-            ksort($toSort);
-        }
-        else {
-            krsort($toSort);
-        }
-
-        $json = new Json();
-
-        foreach ( $toSort as $sorted ) {
-            $json->offsetSet($sorted[ 'k' ], $sorted[ 'v' ]);
-        }
-
-        return $json;
     }
 
     /**
@@ -525,6 +493,42 @@ class Json extends ArrayObject implements JsonInterface
         }
 
         return $last;
+    }    /**
+     * @param string $path
+     * @param string $sort
+     * @return JsonInterface
+     */
+    public function sort( string $path, string $sort = 'ASC' ): JsonInterface
+    {
+        $toSort = [];
+
+        foreach ( $this as $k => $v ) {
+            $get = $v->get($path);
+
+            if ( !Is::scalar($get) || Is::null($get) ) {
+                $get = uniqid('');
+            };
+
+            $toSort[ $get ] = [
+                'k' => $k,
+                'v' => $v,
+            ];
+        }
+
+        if ( $sort == 'ASC' || $sort == 'asc' ) {
+            ksort($toSort);
+        }
+        else {
+            krsort($toSort);
+        }
+
+        $json = new Json();
+
+        foreach ( $toSort as $sorted ) {
+            $json->offsetSet($sorted[ 'k' ], $sorted[ 'v' ]);
+        }
+
+        return $json;
     }
 
     /**
@@ -573,6 +577,7 @@ class Json extends ArrayObject implements JsonInterface
      */
     public function is( ...$param )
     {
+        $param      = Arr::spreadArgs($param);
         $function   = array_shift($param);
         $param[ 0 ] = $this->get($param[ 0 ]);
 
@@ -594,12 +599,13 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
-     * @param string ...$names
+     * @param mixed ...$names
      * @return JsonInterface
      */
-    public function map( string ... $names ): JsonInterface
+    public function map( ... $names ): JsonInterface
     {
-        $json = new Json();
+        $json  = new Json();
+        $names = Arr::spreadArgs($names);
 
         foreach ( $this as $k => $v ) {
             if ( in_array($k, $names) ) {
@@ -661,26 +667,20 @@ class Json extends ArrayObject implements JsonInterface
     }
 
 
+
+
     /**
      * @param mixed ...$offsets
      * @return JsonInterface
      */
     public function with( ...$offsets ): JsonInterface
     {
-        $only = new Json();
+        $offsets = Arr::spreadArgs($offsets);
+        $only    = new Json();
 
-        if (isset($offsets[0])) {
-            if (is_array($offsets[0])) {
-
-            }
+        foreach ( $offsets as $offset ) {
+            $only->set($offset, $this->get($offset));
         }
-
-        foreach ( $offsets as $offsetList ) {
-            foreach ( (array) $offsetList as $offset ) {
-                $only->set($offset, $this->get($offset));
-            }
-        }
-
         return $only;
     }
 
@@ -777,7 +777,8 @@ class Json extends ArrayObject implements JsonInterface
      */
     public function without( ... $offsets ): JsonInterface
     {
-        $except = new Json($this->toArray());
+        $offsets = Arr::spreadArgs($offsets);
+        $except  = new Json($this->toArray());
 
         foreach ( $offsets as $offsetList ) {
             foreach ( (array) $offsetList as $offset ) {
@@ -914,6 +915,7 @@ class Json extends ArrayObject implements JsonInterface
      */
     public function to( ...$param )
     {
+        $param      = Arr::spreadArgs($param);
         $function   = array_shift($param);
         $param[ 0 ] = $this->get($param[ 0 ]);
 

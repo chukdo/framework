@@ -253,23 +253,11 @@ $json = new \Chukdo\Json\Json([
 
 $json->get('produit2')
     ->collect()
-    ->with('prix')
+    ->with(['prix'])
     ->sort('prix', 'asc');
 $json->get('produit1')
     ->collect()
     ->sort('prix', 'asc');
-dd(
-    $json->toHtml());
-
-$json->set('produit2', $json->get('produit2')
-    ->collect()
-    ->sort('prix', 'asc')
-    ->values());
-$json->set('produit1', $json->get('produit1')
-    ->collect()
-    ->sort('prix', 'asc')
-    ->values());
-//$json->sortSubSet('produit2.prix', 'desc');
 
 dd(
     $json->toHtml());
