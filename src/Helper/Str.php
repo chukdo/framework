@@ -6,7 +6,7 @@ use Chukdo\Json\Json;
 
 /**
  * Classe Str
- * Fonctionnalités de filtre sur les données.
+ * Fonctionnalités des chaines de caracteres.
  * @version       1.0.0
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
  * @since         08/01/2019

@@ -48,15 +48,19 @@ class Collect
         $json    = new json();
         $closure = $this->whereClosure($operator);
 
-        foreach ( $this->collection as $k => $v ) {
-            if ( $g = $v->get($field) ) {
-                if ( $c = $closure($g, $v->get($fieldValue), $v->get($fieldValue2)) ) {
-                    $json->offsetSet($k, $v);
+        foreach ( $this->collection as $k => $row ) {
+            if ( $row instanceof JsonInterface ) {
+                if ( $get = $row->get($field) ) {
+                    if ( $closure($get, $row->get($fieldValue), $row->get($fieldValue2)) ) {
+                        $json->offsetSet($k, $row);
+                    }
                 }
             }
         }
 
-        return new Collect($json);
+        $this->collection->reset($json);
+
+        return $this;
     }
 
     /**
@@ -238,12 +242,16 @@ class Collect
     {
         $json = new json();
 
-        foreach ( $this->collection as $k => $v ) {
-            $json->offsetGetOrSet($v->get($field))
-                ->append($v);
+        foreach ( $this->collection as $k => $row ) {
+            if ( $row instanceof JsonInterface ) {
+                $json->offsetGetOrSet($row->get($field))
+                    ->append($row);
+            }
         }
 
-        return new Collect($json);
+        $this->collection->reset($json);
+
+        return $this;
     }
 
     /**
@@ -258,15 +266,19 @@ class Collect
         $json    = new json();
         $closure = $this->whereClosure($operator);
 
-        foreach ( $this->collection as $k => $v ) {
-            if ( $g = $v->get($field) ) {
-                if ( $c = $closure($g, $value, $value2) ) {
-                    $json->offsetSet($k, $v);
+        foreach ( $this->collection as $k => $row ) {
+            if ( $row instanceof JsonInterface ) {
+                if ( $get = $row->get($field) ) {
+                    if ( $closure($get, $value, $value2) ) {
+                        $json->offsetSet($k, $row);
+                    }
                 }
             }
         }
 
-        return new Collect($json);
+        $this->collection->reset($json);
+
+        return $this;
     }
 
     /**
@@ -279,13 +291,15 @@ class Collect
 
         foreach ( $this->collection as $k => $row ) {
             if ( $row instanceof JsonInterface ) {
-                if ( $key = $row->unset($id) ) {
-                    $json->set($key, $row);
+                if ( $unsetId = $row->unset($id) ) {
+                    $json->set($unsetId, $row);
                 }
             }
         }
 
-        return new Collect($json);
+        $this->collection->reset($json);
+
+        return $this;
     }
 
     /**
@@ -296,9 +310,7 @@ class Collect
      */
     public function addToSet( array $paths, string $field, Closure $closure ): self
     {
-        $json = new Json($this->collection);
-
-        foreach ( $json as $k => $row ) {
+        foreach ( $this->collection as $k => $row ) {
             if ( $row instanceof JsonInterface ) {
                 $arr = [];
 
@@ -310,7 +322,7 @@ class Collect
             }
         }
 
-        return new Collect($json);
+        return $this;
     }
 
     /**
@@ -320,14 +332,12 @@ class Collect
      */
     public function filterKey( string $field, Closure $closure ): self
     {
-        $json = new Json($this->collection);
-
-        foreach ( $json as $k => $row ) {
+        foreach ( $this->collection as $k => $row ) {
             if ( $row instanceof JsonInterface ) {
-                $r = $closure($row->get($field));
+                $filter = $closure($row->get($field));
 
-                if ( $r ) {
-                    $row->set($field, $r);
+                if ( $filter ) {
+                    $row->set($field, $filter);
                 }
                 else {
                     $row->unset($field);
@@ -335,7 +345,7 @@ class Collect
             }
         }
 
-        return new Collect($json);
+        return $this;
     }
 
     /**
@@ -349,15 +359,17 @@ class Collect
 
         foreach ( $this->collection as $k => $row ) {
             if ( $row instanceof JsonInterface ) {
-                $r = $row->filter($closure);
+                $filter = $row->filter($closure);
 
-                if ( $r->count() > 0 ) {
-                    $json->set($k, $r);
+                if ( $filter->count() > 0 ) {
+                    $json->set($k, $filter);
                 }
             }
         }
 
-        return new Collect($json);
+        $this->collection->reset($json);
+
+        return $this;
     }
 
     /**
@@ -371,15 +383,17 @@ class Collect
 
         foreach ( $this->collection as $k => $row ) {
             if ( $row instanceof JsonInterface ) {
-                $r = $row->filterRecursive($closure);
+                $filter = $row->filterRecursive($closure);
 
-                if ( $r->count() > 0 ) {
-                    $json->set($k, $r);
+                if ( $filter->count() > 0 ) {
+                    $json->set($k, $filter);
                 }
             }
         }
 
-        return new Collect($json);
+        $this->collection->reset($json);
+
+        return $this;
     }
 
     /**
@@ -419,52 +433,58 @@ class Collect
             krsort($toSort);
         }
 
-        $json = new Json();
+        $json = $this->collection->reset();
 
         foreach ( $toSort as $sorted ) {
             $json->offsetSet($sorted[ 'k' ], $sorted[ 'v' ]);
         }
 
-        return new Collect($json);
+        return $this;
     }
 
     /**
-     * @param mixed ...$names
+     * @param string ...$names
      * @return Collect
      */
-    public function with( ...$names ): self
+    public function with( string ...$names ): self
     {
-        $json = new Json($this->collection);
-        $arr  = [];
+        $json = new Json();
 
-        foreach ( $json as $k => $v ) {
-            $r = $v->with($names);
+        foreach ( $this->collection as $k => $row ) {
+            if ( $row instanceof JsonInterface ) {
+                $with = $row->with($names);
 
-            if ( $r->count() > 0 ) {
-                $arr[ $k ] = $r->toArray();
+                if ( $with->count() > 0 ) {
+                    $json->offsetSet($k, $with);
+                }
             }
         }
 
-        return new Collect($arr);
+        $this->collection->reset($json);
+
+        return $this;
     }
 
     /**
-     * @param mixed ...$names
+     * @param string ...$names
      * @return Collect
      */
-    public function without( ...$names ): self
+    public function without( string ...$names ): self
     {
-        $json = new Json($this->collection);
-        $arr  = [];
+        $json = new Json();
 
-        foreach ( $json as $k => $v ) {
-            $r = $v->without($names);
+        foreach ( $this->collection as $k => $row ) {
+            if ( $row instanceof JsonInterface ) {
+                $without = $row->without($names);
 
-            if ( $r->count() > 0 ) {
-                $arr[ $k ] = $r->toArray();
+                if ( $without->count() > 0 ) {
+                    $json->offsetSet($k, $without);
+                }
             }
         }
 
-        return new Collect($arr);
+        $this->collection->reset($json);
+
+        return $this;
     }
 }

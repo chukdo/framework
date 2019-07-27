@@ -114,10 +114,10 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
     public function merge( iterable $merge = null, bool $overwrite = null ): Json;
 
     /**
-     * @param string ...$names
+     * @param mixed ...$names
      * @return Json
      */
-    public function map( string ... $names ): Json;
+    public function map( ... $names ): Json;
 
     /**
      * @param Closure $closure
@@ -132,16 +132,16 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
     public function filterRecursive( Closure $closure ): Json;
 
     /**
-     * @param string ...$offsets
+     * @param mixed ...$offsets
      * @return Json
      */
-    public function with( string ...$offsets ): Json;
+    public function with( ...$offsets ): Json;
 
     /**
-     * @param string ...$offsets
+     * @param mixed ...$offsets
      * @return Json
      */
-    public function without( string ...$offsets ): Json;
+    public function without( ...$offsets ): Json;
 
     /**
      * @param iterable|null $merge
@@ -231,10 +231,10 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
     public function offsetUnset( $key );
 
     /**
-     * @param array $arr
+     * @param $data
      * @return Json
      */
-    public function reset(array $arr = []): Json;
+    public function reset( $data = []): Json;
 
     /**
      * @return Json

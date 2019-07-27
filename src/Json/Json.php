@@ -661,14 +661,19 @@ class Json extends ArrayObject implements JsonInterface
     }
 
 
-
     /**
-     * @param string ...$offsets
+     * @param mixed ...$offsets
      * @return JsonInterface
      */
-    public function with( string ...$offsets ): JsonInterface
+    public function with( ...$offsets ): JsonInterface
     {
         $only = new Json();
+
+        if (isset($offsets[0])) {
+            if (is_array($offsets[0])) {
+
+            }
+        }
 
         foreach ( $offsets as $offsetList ) {
             foreach ( (array) $offsetList as $offset ) {
@@ -767,10 +772,10 @@ class Json extends ArrayObject implements JsonInterface
 
 
     /**
-     * @param string ...$offsets
+     * @param mixed ...$offsets
      * @return JsonInterface
      */
-    public function without( string ... $offsets ): JsonInterface
+    public function without( ... $offsets ): JsonInterface
     {
         $except = new Json($this->toArray());
 
@@ -844,12 +849,12 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
-     * @param array $arr
+     * @param array $data
      * @return JsonInterface
      */
-    public function reset( array $arr = [] ): JsonInterface
+    public function reset( $data = [] ): JsonInterface
     {
-        parent::__construct($arr);
+        parent::__construct($data);
 
         return $this;
     }
