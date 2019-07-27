@@ -209,15 +209,15 @@ Class Find extends Where
     }
 
     /**
-     * @return Json
+     * @return Cursor
      */
-    public function explain(): Json
+    public function explain(): Cursor
     {
         return new Cursor($this->collection()
-            ->find($this->filter(), $this->projection()), [
-            'explain'   => true,
-            'useCursor' => true,
-        ]);
+            ->find($this->filter(), array_merge($this->projection(), [
+                'explain'   => true,
+                'useCursor' => true,
+            ])));
     }
 
     /**
