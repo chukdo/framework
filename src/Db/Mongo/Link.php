@@ -2,6 +2,7 @@
 
 namespace Chukdo\Db\Mongo;
 
+use Chukdo\Helper\Arr;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
 
@@ -90,23 +91,23 @@ Class Link
     }
 
     /**
-     * @param array $fields
+     * @param mixed ...$fields
      * @return Link
      */
-    public function withFields( array $fields = [] ): self
+    public function with( ... $fields ): self
     {
-        $this->with = $fields;
+        $this->with = Arr::spreadArgs($fields);
 
         return $this;
     }
 
     /**
-     * @param array $fields
+     * @param mixed ...$fields
      * @return Link
      */
-    public function withoutFields( array $fields = [] ): self
+    public function without( ... $fields ): self
     {
-        $this->without = $fields;
+        $this->without = Arr::spreadArgs($fields);
 
         return $this;
     }
@@ -168,8 +169,8 @@ Class Link
     {
         $find = new Find($this->collection);
 
-        return $find->withFields($this->with)
-            ->withoutFields($this->without)
+        return $find->with($this->with)
+            ->without($this->without)
             ->where('_id', 'in', $ids)
             ->all(true);
     }

@@ -2,6 +2,7 @@
 
 namespace Chukdo\Db\Mongo;
 
+use Chukdo\Helper\Arr;
 use Chukdo\Json\Json;
 
 /**
@@ -61,8 +62,8 @@ Class Find extends Where
     {
         $link = new Link($this->collection->database(), $field);
 
-        $this->link[] = $link->withFields($with)
-            ->withoutFields($without)
+        $this->link[] = $link->with($with)
+            ->without($without)
             ->setLinkedName($linked);
 
         return $this;
@@ -75,18 +76,20 @@ Class Find extends Where
      */
     public function project( array $with = [], array $without = [] ): self
     {
-        $this->withFields($with);
-        $this->withFields($without);
+        $this->with($with);
+        $this->with($without);
 
         return $this;
     }
 
     /**
-     * @param array $fields
+     * @param mixed ...$fields
      * @return Find
      */
-    public function withFields( array $fields ): self
+    public function with( ...$fields ): self
     {
+        $fields = Arr::spreadArgs($fields);
+
         foreach ( $fields as $field ) {
             $this->projection[ $field ] = 1;
         }
@@ -95,29 +98,13 @@ Class Find extends Where
     }
 
     /**
-     * @param string ...$fields
+     * @param mixed ...$fields
      * @return Find
      */
-    public function with( string ...$fields ): self
+    public function without( ...$fields ): self
     {
-        return $this->withFields($fields);
-    }
+        $fields = Arr::spreadArgs($fields);
 
-    /**
-     * @param string ...$fields
-     * @return Find
-     */
-    public function without( string ...$fields ): self
-    {
-        return $this->withoutFields($fields);
-    }
-
-    /**
-     * @param array $fields
-     * @return Find
-     */
-    public function withoutFields( array $fields ): self
-    {
         foreach ( $fields as $field ) {
             if ( $field == '_id' ) {
                 $this->hiddenId = true;
@@ -186,6 +173,17 @@ Class Find extends Where
     }
 
     /**
+     * @param int $limit
+     * @return Find
+     */
+    public function limit( int $limit ): self
+    {
+        $this->limit = $limit;
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function projection(): array
@@ -208,17 +206,6 @@ Class Find extends Where
         }
 
         return $projection;
-    }
-
-    /**
-     * @param int $limit
-     * @return Find
-     */
-    public function limit( int $limit ): self
-    {
-        $this->limit = $limit;
-
-        return $this;
     }
 
     /**
