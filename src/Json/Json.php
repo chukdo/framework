@@ -8,7 +8,7 @@ use Chukdo\Helper\Cli;
 use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
 use Chukdo\Helper\To;
-use Chukdo\Helper\Arr;
+use Chukdo\Helper\Arr as ArrHelper;
 use Chukdo\Xml\Xml;
 use Closure;
 use League\CLImate\CLImate;
@@ -577,7 +577,7 @@ class Json extends ArrayObject implements JsonInterface
      */
     public function is( ...$param )
     {
-        $param      = Arr::spreadArgs($param);
+        $param      = ArrHelper::spreadArgs($param);
         $function   = array_shift($param);
         $param[ 0 ] = $this->get($param[ 0 ]);
 
@@ -605,7 +605,7 @@ class Json extends ArrayObject implements JsonInterface
     public function map( ... $names ): JsonInterface
     {
         $json  = new Json();
-        $names = Arr::spreadArgs($names);
+        $names = ArrHelper::spreadArgs($names);
 
         foreach ( $this as $k => $v ) {
             if ( in_array($k, $names) ) {
@@ -675,7 +675,7 @@ class Json extends ArrayObject implements JsonInterface
      */
     public function with( ...$offsets ): JsonInterface
     {
-        $offsets = Arr::spreadArgs($offsets);
+        $offsets = ArrHelper::spreadArgs($offsets);
         $only    = new Json();
 
         foreach ( $offsets as $offset ) {
@@ -777,7 +777,7 @@ class Json extends ArrayObject implements JsonInterface
      */
     public function without( ... $offsets ): JsonInterface
     {
-        $offsets = Arr::spreadArgs($offsets);
+        $offsets = ArrHelper::spreadArgs($offsets);
         $except  = new Json($this->toArray());
 
         foreach ( $offsets as $offsetList ) {
@@ -915,7 +915,7 @@ class Json extends ArrayObject implements JsonInterface
      */
     public function to( ...$param )
     {
-        $param      = Arr::spreadArgs($param);
+        $param      = ArrHelper::spreadArgs($param);
         $function   = array_shift($param);
         $param[ 0 ] = $this->get($param[ 0 ]);
 

@@ -209,15 +209,24 @@ Class Find extends Where
     }
 
     /**
-     * @return Cursor
+     * @return Json
      */
-    public function explain(): Cursor
+    public function explain(): Json
     {
-        return new Cursor($this->collection()
-            ->find($this->filter(), array_merge($this->projection(), [
-                'explain'   => true,
-                'useCursor' => true,
-            ])));
+        $explain = $this->collection->mongo()
+            ->command([
+                'explain' => [
+                    'find'   => $this->collection->name(),
+                    'filter' => $this->filter(),
+                ],
+            ]);
+
+        $json = new Json();
+
+        $json->offsetSet('queryPlanner', $explain->get('0.queryPlanner'));
+        $json->offsetSet('executionStats', $explain->get('0.executionStats'));
+
+        return $json;
     }
 
     /**

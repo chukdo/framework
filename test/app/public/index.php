@@ -259,8 +259,8 @@ $json->get('produit1')
     ->collect()
     ->sort('prix', 'asc');
 
-dd(
-    $json->toHtml());
+/**dd(
+    $json->toHtml());*/
 
 // addToSet > tva, ref.prix tcc closure
 //dd(db::collection('students', 'test')->info());
@@ -317,8 +317,8 @@ $up = db::collection('students', 'test')
     ->pull('address.cp', '<=', 13)
     ->where('year', '=', 2019)
     ->update();
-dd($up);
-exit;
+//dd($up);
+//exit;
 $write = db::collection('test', 'test')
     ->write();
 
@@ -364,8 +364,8 @@ $aggregate = Db::collection('test', 'test')
     ->sort('total', 'desc');
 $write2->session()
     ->commitTransaction();
-dd($aggregate->all()
-    ->toHtml());
+/**dd($aggregate->all()
+    ->toHtml());*/
 
 $m = new \Chukdo\Db\Mongo\Aggregate\Expression('multiply', [
     'price',
@@ -373,7 +373,7 @@ $m = new \Chukdo\Db\Mongo\Aggregate\Expression('multiply', [
 ]);
 $s = new \Chukdo\Db\Mongo\Aggregate\Expression('sum', $m);
 
-dd($s->projection());
+//dd($s->projection());
 
 $contrat = Db::collection('contrat');
 
@@ -385,9 +385,7 @@ dd($contrat->find()
     ->where('state', '=', '1')
     ->where('history', 'size', 4)
     ->where('history._version', '=', '5a3c37db3fcd9e16e21fe0b5')
-    ->link('_version', [], [ 'template' ], 'new_v')
-    ->all()
-    ->toHtml());
+    ->explain()->toHtml());
 // join
 // group or aggregate
 //
