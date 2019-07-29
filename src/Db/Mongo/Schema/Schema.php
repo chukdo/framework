@@ -3,9 +3,7 @@
 namespace Chukdo\Db\Mongo\Schema;
 
 use Chukdo\DB\Mongo\Collection;
-use Chukdo\Db\Mongo\Write;
 use Chukdo\Json\Json;
-use React\Promise\PromiseTest\PromisePendingTestTrait;
 
 /**
  * Mongo Schema.
@@ -70,13 +68,24 @@ class Schema
 
     /**
      * @param string $name
-     * @param string $type
-     * @param bool   $required
+     * @param array  $options
      * @return Property
      */
-    public function set( string $name, string $type = null, bool $required = null): Property
+    public function setProperty( string $name, array $options = []): Property
     {
-        $property = $this->property()->setProperty($name);
+        return $this->property()->setProperty($name, $options);
+    }
+
+    /**
+     * @param string      $name
+     * @param string|null $type
+     * @param bool|null   $required
+     * @param array       $options
+     * @return Schema
+     */
+    public function set( string $name, string $type = null, bool $required = null, array $options = []): self
+    {
+        $property = $this->property()->setProperty($name, $options);
 
         if ($type) {
             $property->setType($type);
@@ -86,7 +95,7 @@ class Schema
             $this->property()->setRequired($name);
         }
 
-        return $property;
+        return $this;
     }
 
     /**

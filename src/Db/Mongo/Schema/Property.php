@@ -360,12 +360,13 @@ class Property
 
     /**
      * @param string $name
-     * @return $this
+     * @param array  $options
+     * @return Property
      */
-    public function setProperty( string $name ): Property
+    public function setProperty( string $name, array $options = [] ): Property
     {
         return $this->properties()
-            ->offsetGetOrSet($name, new Property([], $name));
+            ->offsetGetOrSet($name, new Property($options, $name));
     }
 
     /**

@@ -13,6 +13,11 @@ Class Index
     protected $collection;
 
     /**
+     * @var array
+     */
+    protected $index;
+
+    /**
      * Index constructor.
      * @param Collection $collection
      */
@@ -24,7 +29,7 @@ Class Index
     /**
      * @return Json
      */
-    public function indexes(): Json
+    public function get(): Json
     {
         $indexes = new Json();
 
@@ -51,50 +56,84 @@ Class Index
      * @param bool   $unique
      * @return Index
      */
-    public function create( string $field, string $order = 'desc', bool $unique = false ): self
+    public function set( string $field, string $order = 'desc', bool $unique = false ): self
     {
-        $name = $unique
+        $name  = $unique
             ? $field . '_unique'
             : $field;
         $order = $order == 'asc' || $order == 'ASC'
             ? 1
             : -1;
 
+        $this->index[ $field ] = [
+            'name'   => $name,
+            'order'  => $order,
+            'field'  => $field,
+            'unique' => $unique,
+        ];
+
         $this->collection()
             ->collection()
-            ->createIndex([ $field => $order ], [ 'unique' => $unique, 'name' => $name ]);
+            ->createIndex([ $field => $order ], [
+                'unique' => $unique,
+                'name'   => $name,
+            ]);
 
         return $this;
     }
 
     /**
-     * @return Index
+     * @return bool
      */
-    public function drop(): self
+    public function save(): bool
+    {
+        try {
+            foreach ( $this->index as $index ) {
+                $this->collection()
+                    ->collection()
+                    ->createIndex([ $index[ 'field' ] => $index[ 'order' ] ], [
+                        'unique' => $index[ 'unique' ],
+                        'name'   => $index[ 'name' ],
+                    ]);
+            }
+
+            return true;
+        } catch ( Exception $e ) {
+            return false;
+        }
+
+    }
+
+    /**
+     * @return bool
+     */
+    public function drop(): bool
     {
         try {
             $this->collection()
                 ->collection()
                 ->dropIndexes();
-        } catch ( Exception $e ) {
-        }
 
-        return $this;
+            return true;
+        } catch ( Exception $e ) {
+            return false;
+        }
     }
 
     /**
      * @param string $name
-     * @return Index
+     * @return bool
      */
-    public function delete( string $name ): self
+    public function delete( string $name ): bool
     {
         try {
             $this->collection()
                 ->collection()
                 ->dropIndex($name);
-        } catch ( Exception $e ) {
-        }
 
-        return $this;
+            return true;
+        } catch ( Exception $e ) {
+            return false;
+        }
     }
 }

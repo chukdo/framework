@@ -10,16 +10,21 @@ class Agence extends Model
     {
         $this->collection()
             ->index()
-            ->create('nom')
-            ->create('date_created', 'desc')
-            ->create('codeage', 'asc', true);
+            ->set('nom')
+            ->set('date_created', 'desc')
+            ->set('codeage', 'asc', true)
+            ->save();
     }
 
     public function schema()
     {
-        $schema = $this->collection()->schema();
-        $schema->set('nom', 'string', true);
-        $schema->set('codeage', 'int', true)->setMin(300)->setMax(600);
-        $schema->save();
+        $this->collection()
+            ->schema()
+            ->set('nom', 'string', true)
+            ->set('codeage', 'int', true, [
+                'min' => 300,
+                'max' => 600,
+            ])
+            ->save();
     }
 }
