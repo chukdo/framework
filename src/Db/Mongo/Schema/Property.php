@@ -4,6 +4,7 @@ namespace Chukdo\Db\Mongo\Schema;
 
 use Chukdo\Helper\Str;
 use Chukdo\Json\Arr;
+use Chukdo\Helper\Arr as ArrHelper;
 use Chukdo\Json\Json;
 
 /**
@@ -83,10 +84,7 @@ class Property
         $properties = $this->property->offsetGetOrSet('properties', []);
 
         foreach ( $value as $k => $v ) {
-            $properties->offsetSet($k, $this->newParentClass([
-                (array) $v,
-                $k,
-            ]));
+            $properties->offsetSet($k, new Property((array) $v, $k));
         }
 
         return $this;
@@ -171,17 +169,6 @@ class Property
     }
 
     /**
-     * @param bool $value
-     * @return Property
-     */
-    public function setUniqueItems( bool $value ): self
-    {
-        $this->property->offsetSet('uniqueItems', $value);
-
-        return $this;
-    }
-
-    /**
      * @param int $value
      * @return $this
      */
@@ -209,10 +196,7 @@ class Property
      */
     public function setItems( array $value ): self
     {
-        $this->property->offsetSet('items', $this->newParentClass([
-            $value,
-            'items',
-        ]));
+        $this->property->offsetSet('items', new Property($value, 'items'));
 
         return $this;
     }
@@ -225,32 +209,13 @@ class Property
     {
         $required = $this->required();
 
-        foreach ( $fields as $field ) {
+        foreach ( ArrHelper::spreadArgs($fields) as $field ) {
             foreach ( (array) $field as $f ) {
                 $required->appendIfNoExist($f);
             }
         }
 
         return $this;
-    }
-
-    /**
-     * @param array $params
-     * @return mixed
-     */
-    protected function newParentClass( array $params = [] )
-    {
-        try {
-            $rc = new \ReflectionClass(get_called_class());
-            $rc->newInstanceArgs($params);
-
-            return call_user_func_array([
-                $rc,
-                'newInstance',
-            ],
-                $params);
-        } catch ( \Throwable $e ) {
-        }
     }
 
     /**
@@ -267,6 +232,25 @@ class Property
     public function required(): Json
     {
         return $this->property->offsetGetOrSet('required');
+    }
+
+    /**
+     * @return int
+     */
+    public function count(): int
+    {
+        return $this->property->count();
+    }
+
+    /**
+     * @param bool $value
+     * @return Property
+     */
+    public function setUniqueItems( bool $value ): self
+    {
+        $this->property->offsetSet('uniqueItems', $value);
+
+        return $this;
     }
 
     /**
@@ -381,10 +365,7 @@ class Property
     public function setProperty( string $name ): Property
     {
         return $this->properties()
-            ->offsetGetOrSet($name, $this->newParentClass([
-                [],
-                $name,
-            ]));
+            ->offsetGetOrSet($name, new Property([], $name));
     }
 
     /**

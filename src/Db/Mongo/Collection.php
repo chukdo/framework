@@ -3,7 +3,6 @@
 Namespace Chukdo\DB\Mongo;
 
 use Chukdo\Db\Mongo\Aggregate\Aggregate;
-use Chukdo\Db\Mongo\Schema\Property;
 use Chukdo\Db\Mongo\Schema\Schema;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
@@ -147,12 +146,11 @@ Class Collection
     }
 
     /**
-     * @return Property
+     * @return Schema
      */
-    public function schema(): Property
+    public function schema(): Schema
     {
-        return new Property($this->info()
-            ->toArray());
+        return new Schema($this);
     }
 
     /**
@@ -167,27 +165,6 @@ Class Collection
             ], $this->databaseName());
 
         return $json->get('0.options.validator.$jsonSchema', new Json());
-    }
-
-    /**
-     * @param Property $property
-     * @return bool
-     */
-    public function modify( Property $property ): bool
-    {
-        $schema = [
-            'validator'        => [
-                '$jsonSchema' => $property->get(),
-            ],
-            'validationLevel'  => 'strict',
-            'validationAction' => 'error',
-        ];
-
-        $save = new Json($this->database()
-            ->database()
-            ->modifyCollection($this->name(), $schema));
-
-        return $save->offsetGet('ok') == 1;
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Chukdo\Db\Mongo;
 
 use Chukdo\Json\Json;
+use Exception;
 
 Class Index
 {
@@ -45,43 +46,55 @@ Class Index
     }
 
     /**
-     * @param array       $fields
-     * @param bool        $unique
-     * @param string|null $name
-     * @return string
+     * @param string $field
+     * @param string $order
+     * @param bool   $unique
+     * @return Index
      */
-    public function create( array $fields, bool $unique = false, string $name = null ): string
+    public function create( string $field, string $order = 'desc', bool $unique = false ): self
     {
-        return $this->collection()
+        $name = $unique
+            ? $field . '_unique'
+            : $field;
+        $order = $order == 'asc' || $order == 'ASC'
+            ? 1
+            : -1;
+
+        $this->collection()
             ->collection()
-            ->createIndex($fields, [
-                'name'   => $name,
-                'unique' => $unique,
-            ]);
+            ->createIndex([ $field => $order ], [ 'unique' => $unique, 'name' => $name ]);
+
+        return $this;
     }
 
     /**
-     * @return bool
+     * @return Index
      */
-    public function drop(): bool
+    public function drop(): self
     {
-        $drop = $this->collection()
-            ->collection()
-            ->dropIndexes();
+        try {
+            $this->collection()
+                ->collection()
+                ->dropIndexes();
+        } catch ( Exception $e ) {
+        }
 
-        return $drop[ 'ok' ] == 1;
+        return $this;
     }
 
     /**
      * @param string $name
-     * @return bool
+     * @return Index
      */
-    public function delete( string $name ): bool
+    public function delete( string $name ): self
     {
-        $drop = $this->collection()
-            ->collection()
-            ->dropIndex($name);
+        try {
+            $this->collection()
+                ->collection()
+                ->dropIndex($name);
+        } catch ( Exception $e ) {
+        }
 
-        return $drop[ 'ok' ] == 1;
+        return $this;
     }
 }

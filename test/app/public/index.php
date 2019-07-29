@@ -284,6 +284,10 @@ $json->get('produit1')
  * ->values()
  * ->toHtml());*/
 
+
+$agence= new \App\Model\Agence(db::collection('agence', 'test'));
+$agence->init();
+
 //dd(Conf::offsetGet('db.mongo.dsn'));
 //dd(Db::collection('contrat'));
 
@@ -301,7 +305,8 @@ $json = new \Chukdo\Json\Json([
     //'titi' => ['a', 'b', 'c']
 ]);
 //echo '<pre>';
-//dd(db::collection('product', 'test')->schema()->get());
+
+dd(db::collection('students', 'test')->schema()->get());
 
 $student = db::collection('students', 'test')
     ->write()
