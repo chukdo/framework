@@ -2,6 +2,8 @@
 
 namespace Chukdo\Db\Mongo;
 
+use Chukdo\Db\Mongo\Schema\Schema;
+
 /**
  * Mongo Model .
  * @version      1.0.0
@@ -9,7 +11,7 @@ namespace Chukdo\Db\Mongo;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Model
+abstract Class Model
 {
     /**
      * @var Write
@@ -44,25 +46,35 @@ Class Model
      */
     public function init()
     {
-        $this->collection()->index()->drop();
-        $this->index();
-        $this->collection()->schema()->drop();
-        $this->schema();
+        $this->index()->drop();
+        $this->createIndex();
+        $this->schema()->drop();
+        $this->createSchema();
+    }
+
+    /**
+     * @return Index
+     */
+    public function index(): Index
+    {
+        return $this->collection()->index();
     }
 
     /**
      * Création des index
      */
-    public function index()
-    {
+    public abstract function createIndex();
 
+    /**
+     * @return Schema
+     */
+    public function schema(): Schema
+    {
+        return $this->collection()->schema();
     }
 
     /**
      * Création des schema de validation des données
      */
-    public function schema()
-    {
-
-    }
+    public abstract function createSchema();
 }

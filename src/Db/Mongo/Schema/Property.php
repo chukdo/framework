@@ -221,7 +221,7 @@ class Property
     /**
      * @return Json
      */
-    public function List(): Json
+    public function list(): Json
     {
         return $this->property->offsetGetOrSet('enum');
     }

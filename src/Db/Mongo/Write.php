@@ -390,7 +390,7 @@ Class Write extends Where
     public function validatedInsertFields(): array
     {
         $set       = $this->fields->offsetGet('$set');
-        $validator = new Validator($this->collection->schema());
+        $validator = new Validator($this->collection->schema()->property());
 
         return $validator->validateDataToInsert($set);
     }
@@ -415,7 +415,7 @@ Class Write extends Where
         $setOnInsert = $fields->offsetGet('$setOnInsert');
         $push        = $fields->offsetGet('$push');
         $addToSet    = $fields->offsetGet('$addToSet');
-        $validator   = new Validator($this->collection->schema());
+        $validator   = new Validator($this->collection->schema()->property());
 
         if ( $set ) {
             $fields->offsetSet('$set', $validator->validateDataToUpdate($set));

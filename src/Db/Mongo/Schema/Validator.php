@@ -155,7 +155,7 @@ class Validator
                 $validatedData = $this->validateObject($data, $insert);
                 break;
             default :
-                $enum = $this->property->offsetGet('enum');
+                $enum = $this->property->list();
 
                 if ( $enum ) {
                     $validatedData = $this->validateList($data);

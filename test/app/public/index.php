@@ -306,14 +306,14 @@ $json = new \Chukdo\Json\Json([
 ]);
 //echo '<pre>';
 
-dd(db::collection('students', 'test')->schema()->get());
+//dd(db::collection('students', 'test')->schema()->get());
 
 $student = db::collection('students', 'test')
     ->write()
     ->setAll($json)
     ->insert();
 
-print_r($student);
+//print_r($student);
 
 $up = db::collection('students', 'test')
     ->write()
@@ -390,7 +390,7 @@ dd($contrat->find()
     ->where('state', '=', '1')
     ->where('history', 'size', 4)
     ->where('history._version', '=', '5a3c37db3fcd9e16e21fe0b5')
-    ->explain()->toHtml());
+    ->all()->toHtml());
 // join
 // group or aggregate
 //

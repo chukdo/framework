@@ -3,7 +3,6 @@
 
 namespace Chukdo\Db\Mongo;
 
-use Chukdo\Json\Json;
 use MongoDB\Driver\Cursor as MongoDbCursor;
 use Iterator;
 use IteratorIterator;
@@ -68,10 +67,7 @@ class Cursor implements Iterator
      */
     public function current()
     {
-        return new Json($this->iterator->current(), function( $k, $v )
-        {
-            return Collection::filterOut($k, $v);
-        });
+        return new Record($this->iterator->current());
     }
 
     /**

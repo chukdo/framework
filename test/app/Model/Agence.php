@@ -6,7 +6,7 @@ use Chukdo\Db\Mongo\Model;
 
 class Agence extends Model
 {
-    public function index()
+    public function createIndex()
     {
         $this->collection()
             ->index()
@@ -16,7 +16,7 @@ class Agence extends Model
             ->save();
     }
 
-    public function schema()
+    public function createSchema()
     {
         $this->collection()
             ->schema()
@@ -27,4 +27,12 @@ class Agence extends Model
             ])
             ->save();
     }
+
+
+    //save
+    //delete
+    //softDelete
+    // conf > collection / date / history
+    // extend find ()
+    //  -> find() renvoyer liste de modeles et non json ?!
 }
