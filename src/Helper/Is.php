@@ -2,6 +2,7 @@
 
 namespace Chukdo\Helper;
 
+use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Json\Arr;
 use stdClass;
 use ArrayObject;
@@ -313,6 +314,15 @@ final class Is
                         'regexp' => '/^[0-9abcdef]{22,26}$/iu',
                     ],
                 ]) !== false;
+    }
+
+    /**
+     * @param $value
+     * @return bool
+     */
+    public static function json( $value ): bool
+    {
+        return $value instanceof JsonInterface;
     }
 
     /**

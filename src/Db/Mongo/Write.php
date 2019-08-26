@@ -123,11 +123,13 @@ Class Write extends Where
         $keyword = '$' . $keyword;
 
         if ( Is::iterable($value) ) {
-            $value = ( new Json($value, function( $k, $v )
-            {
-                return Collection::filterIn($k, $v);
-            }) )->toArray();
+            $values = [];
 
+            foreach ($value as $k => $v) {
+                $values[$k] = Collection::filterIn($k, $v);
+            }
+
+            $value = $values;
         }
         elseif ( Is::scalar($value) ) {
             $value = Collection::filterIn($field, $value);

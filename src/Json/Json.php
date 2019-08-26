@@ -23,22 +23,20 @@ use League\CLImate\CLImate;
 class Json extends ArrayObject implements JsonInterface
 {
     /**
-     * @var Closure|null
+     * @var bool
      */
-    protected $preFilter = null;
+    protected $strict = false;
 
     /**
      * Json constructor.
      * @param null $data
-     * @param null $preFilter
+     * @param bool $strict
      */
-    public function __construct( $data = null, $preFilter = null )
+    public function __construct( $data = null, $strict = false )
     {
         parent::__construct([]);
 
-        if ( $preFilter instanceof Closure ) {
-            $this->preFilter = $preFilter;
-        }
+        $this->strict = $strict;
 
         if ( Is::iterable($data) ) {
             foreach ( $data as $k => $v ) {
@@ -59,7 +57,8 @@ class Json extends ArrayObject implements JsonInterface
      */
     public function offsetSet( $key, $value ): JsonInterface
     {
-        if ( Is::iterable($value) ) {
+        //todo strict implementation
+        if ( Is::iterable($value) && !Is::Json($value) ) {
             parent::offsetSet($key, new Json($value, $this->preFilter));
         }
         else {
@@ -230,7 +229,7 @@ class Json extends ArrayObject implements JsonInterface
      */
     public function append( $value ): JsonInterface
     {
-        if ( Is::arr($value) ) {
+        if ( Is::iterable($value) && !Is::Json($value) ) {
             parent::append(new Json($value, $this->preFilter));
         }
         else {
