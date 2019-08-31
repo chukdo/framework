@@ -320,7 +320,7 @@ final class Is
      * @param $value
      * @return bool
      */
-    public static function json( $value ): bool
+    public static function jsonInterface( $value ): bool
     {
         return $value instanceof JsonInterface;
     }

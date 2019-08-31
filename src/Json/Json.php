@@ -58,7 +58,7 @@ class Json extends ArrayObject implements JsonInterface
     public function offsetSet( $key, $value ): JsonInterface
     {
         //todo strict implementation
-        if ( Is::iterable($value) && !Is::Json($value) ) {
+        if ( Is::iterable($value) && !Is::jsonInterface($value) ) {
             parent::offsetSet($key, new Json($value, $this->preFilter));
         }
         else {
@@ -229,7 +229,7 @@ class Json extends ArrayObject implements JsonInterface
      */
     public function append( $value ): JsonInterface
     {
-        if ( Is::iterable($value) && !Is::Json($value) ) {
+        if ( Is::iterable($value) && !Is::jsonInterface($value) ) {
             parent::append(new Json($value, $this->preFilter));
         }
         else {
