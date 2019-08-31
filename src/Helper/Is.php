@@ -60,7 +60,7 @@ final class Is
      */
     public static function iterable( $value ): bool
     {
-        return is_iterable($value) || $value instanceof stdClass || self::arr($value);
+        return is_iterable($value) || self::arr($value);
     }
 
     /**
@@ -69,7 +69,7 @@ final class Is
      */
     public static function arr( $value ): bool
     {
-        return is_array($value) || $value instanceof ArrayObject || $value instanceof Arr;
+        return is_array($value) || $value instanceof ArrayObject || $value instanceof stdClass || $value instanceof Arr;
     }
 
     /**
@@ -329,7 +329,7 @@ final class Is
      * @param $value
      * @return bool
      */
-    public function empty( $value ): bool
+    public static function empty( $value ): bool
     {
         if ( self::scalar($value) ) {
             $value = trim($value);

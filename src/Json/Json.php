@@ -23,20 +23,12 @@ use League\CLImate\CLImate;
 class Json extends ArrayObject implements JsonInterface
 {
     /**
-     * @var bool
-     */
-    protected $strict = false;
-
-    /**
      * Json constructor.
      * @param null $data
-     * @param bool $strict
      */
-    public function __construct( $data = null, $strict = false )
+    public function __construct( $data = null )
     {
         parent::__construct([]);
-
-        $this->strict = $strict;
 
         if ( Is::iterable($data) ) {
             foreach ( $data as $k => $v ) {
@@ -48,6 +40,9 @@ class Json extends ArrayObject implements JsonInterface
                 $this->offsetSet($k, $v);
             }
         }
+        elseif ( !Is::null($data) ) {
+            throw new JsonException('Data must be null or Iterable or JsonString');
+        }
     }
 
     /**
@@ -57,14 +52,11 @@ class Json extends ArrayObject implements JsonInterface
      */
     public function offsetSet( $key, $value ): JsonInterface
     {
-        //todo strict implementation
-        if ( Is::iterable($value) && !Is::jsonInterface($value) ) {
-            parent::offsetSet($key, new Json($value, $this->preFilter));
+        if ( Is::arr($value) ) {
+            parent::offsetSet($key, new Json($value));
         }
         else {
-            parent::offsetSet($key, $this->preFilter instanceof Closure
-                ? ( $this->preFilter )($key, $value)
-                : $value);
+            parent::offsetSet($key, $value);
         }
 
         return $this;
@@ -229,13 +221,11 @@ class Json extends ArrayObject implements JsonInterface
      */
     public function append( $value ): JsonInterface
     {
-        if ( Is::iterable($value) && !Is::jsonInterface($value) ) {
-            parent::append(new Json($value, $this->preFilter));
+        if ( Is::arr($value) ) {
+            parent::append(new Json($value));
         }
         else {
-            parent::append($this->preFilter instanceof Closure
-                ? ( $this->preFilter )(null, $value)
-                : $value);
+            parent::append($value);
         }
 
         return $this;
@@ -492,42 +482,6 @@ class Json extends ArrayObject implements JsonInterface
         }
 
         return $last;
-    }    /**
-     * @param string $path
-     * @param string $sort
-     * @return JsonInterface
-     */
-    public function sort( string $path, string $sort = 'ASC' ): JsonInterface
-    {
-        $toSort = [];
-
-        foreach ( $this as $k => $v ) {
-            $get = $v->get($path);
-
-            if ( !Is::scalar($get) || Is::null($get) ) {
-                $get = uniqid('');
-            };
-
-            $toSort[ $get ] = [
-                'k' => $k,
-                'v' => $v,
-            ];
-        }
-
-        if ( $sort == 'ASC' || $sort == 'asc' ) {
-            ksort($toSort);
-        }
-        else {
-            krsort($toSort);
-        }
-
-        $json = new Json();
-
-        foreach ( $toSort as $sorted ) {
-            $json->offsetSet($sorted[ 'k' ], $sorted[ 'v' ]);
-        }
-
-        return $json;
     }
 
     /**
@@ -568,6 +522,42 @@ class Json extends ArrayObject implements JsonInterface
         }
 
         return $intersect;
+    }    /**
+     * @param string $path
+     * @param string $sort
+     * @return JsonInterface
+     */
+    public function sort( string $path, string $sort = 'ASC' ): JsonInterface
+    {
+        $toSort = [];
+
+        foreach ( $this as $k => $v ) {
+            $get = $v->get($path);
+
+            if ( !Is::scalar($get) || Is::null($get) ) {
+                $get = uniqid('');
+            };
+
+            $toSort[ $get ] = [
+                'k' => $k,
+                'v' => $v,
+            ];
+        }
+
+        if ( $sort == 'ASC' || $sort == 'asc' ) {
+            ksort($toSort);
+        }
+        else {
+            krsort($toSort);
+        }
+
+        $json = new Json();
+
+        foreach ( $toSort as $sorted ) {
+            $json->offsetSet($sorted[ 'k' ], $sorted[ 'v' ]);
+        }
+
+        return $json;
     }
 
     /**

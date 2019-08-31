@@ -3,6 +3,7 @@
 namespace Chukdo\Xml;
 
 use Chukdo\Helper\Is;
+use Chukdo\Json\Json;
 use DOMCDATASection;
 use DOMComment;
 use DOMDocument;
@@ -524,21 +525,6 @@ class Node implements IteratorAggregate
     }
 
     /**
-     * @param string $name
-     * @param string $value
-     * @return Node
-     * @throws NodeException
-     */
-    public function setAttr( string $name, string $value ): self
-    {
-        $this->element()
-            ->setAttribute($name,
-                $value);
-
-        return $this;
-    }
-
-    /**
      * @param Node $node
      * @return Node
      * @throws NodeException
@@ -550,6 +536,21 @@ class Node implements IteratorAggregate
             ->replaceChild($node->element(),
                 $this->element());
         $this->setElement($node->element());
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @param string $value
+     * @return Node
+     * @throws NodeException
+     */
+    public function setAttr( string $name, string $value ): self
+    {
+        $this->element()
+            ->setAttribute($name,
+                $value);
 
         return $this;
     }
@@ -1185,7 +1186,7 @@ class Node implements IteratorAggregate
      * @return string
      * @throws Exception
      */
-    public function toJson(): string
+    public function toJsonString(): string
     {
         return json_encode($this->toArray(),
             JSON_PRETTY_PRINT);
@@ -1211,8 +1212,7 @@ class Node implements IteratorAggregate
             $value = $child->childs()
                          ->count() == 0
                 ? $child->value()
-                : $this->toArray($default,
-                    $child);
+                : $this->toArray($default, $child);
 
             if ( !Is::empty($value) ) {
                 if ( isset($array[ $name ]) ) {
@@ -1241,6 +1241,15 @@ class Node implements IteratorAggregate
         }
 
         return $array;
+    }
+
+    /**
+     * @param string $default
+     * @return Json
+     */
+    public function toJson( string $default = 'item' ): Json
+    {
+        return new Json($this->toArray($default));
     }
 
     /**

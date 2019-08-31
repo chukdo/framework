@@ -14,15 +14,14 @@ use Chukdo\Json\Json;
 Class Record extends Json
 {
     /**
-     * Json constructor.
+     * Record constructor.
      * @param null $data
-     * @param null $preFilter
      */
     public function __construct( $data = null)
     {
-        parent::__construct($data, function( $k, $v )
+        /**parent::__construct($data, function( $k, $v )
         {
             return Collection::filterOut($k, $v);
-        });
+        });*/
     }
 }
