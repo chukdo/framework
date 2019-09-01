@@ -183,7 +183,7 @@ Class Find extends Where
             return $record;
         }
 
-        return new Record();
+        return new Record($this->collection);
     }
 
     /**
