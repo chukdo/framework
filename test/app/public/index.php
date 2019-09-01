@@ -253,14 +253,14 @@ $json = new \Chukdo\Json\Json([
 
 $json->get('produit2')
     ->collect()
-    ->with(['prix'])
+    ->with([ 'prix' ])
     ->sort('prix', 'asc');
 $json->get('produit1')
     ->collect()
     ->sort('prix', 'asc');
 
 /**dd(
-    $json->toHtml());*/
+ * $json->toHtml());*/
 
 // addToSet > tva, ref.prix tcc closure
 //dd(db::collection('students', 'test')->info());
@@ -285,7 +285,7 @@ $json->get('produit1')
  * ->toHtml());*/
 
 
-$agence= new \App\Model\Agence(db::collection('agence', 'test'));
+$agence = new \App\Model\Agence(Db::collection('agence', 'test'));
 $agence->init();
 
 //dd(Conf::offsetGet('db.mongo.dsn'));
@@ -308,14 +308,14 @@ $json = new \Chukdo\Json\Json([
 
 //dd(db::collection('students', 'test')->schema()->get());
 
-$student = db::collection('students', 'test')
+$student = Db::collection('students', 'test')
     ->write()
     ->setAll($json)
     ->insert();
 
 //print_r($student);
 
-$up = db::collection('students', 'test')
+$up = Db::collection('students', 'test')
     ->write()
     ->set('address.city', 2019)
     ->set('address.info', 'nouvelle info')
@@ -324,7 +324,7 @@ $up = db::collection('students', 'test')
     ->update();
 //dd($up);
 //exit;
-$write = db::collection('test', 'test')
+$write = Db::collection('test', 'test')
     ->write();
 
 $write->session()
@@ -343,7 +343,7 @@ $write->setAll([
 ])
     ->insert();
 
-$write2 = db::collection('test', 'test')
+$write2 = Db::collection('test', 'test')
     ->write();
 $write2->setSession($write->session());
 $write2->set('amount', 600)
@@ -370,7 +370,7 @@ $aggregate = Db::collection('test', 'test')
 $write2->session()
     ->commitTransaction();
 /**dd($aggregate->all()
-    ->toHtml());*/
+ * ->toHtml());*/
 
 $m = new \Chukdo\Db\Mongo\Aggregate\Expression('multiply', [
     'price',
@@ -385,16 +385,18 @@ $contrat = Db::collection('contrat');
 dd($contrat->find()
     ->without('_id')
     ->with('_agence', '_modele', 'history.id', 'history._version')
-    ->link('_agence', ['agence', 'cp', 'ville'])
+    ->link('_agence', [
+        'agence',
+        'cp',
+        'ville',
+    ])
     ->limit(4)
     ->where('version', '=', '2')
     ->where('state', '=', '1')
     ->where('history', 'size', 4)
     ->where('history._version', '=', '5a3c37db3fcd9e16e21fe0b5')
-    ->all()->toHtml());
-// join
-// group or aggregate
-//
+    ->all()
+    ->toHtml());
 
 
 //$contrat->write()->insert();
