@@ -1,9 +1,9 @@
 <?php
 
-namespace Chukdo\Db\Mongo;
+namespace Chukdo\Db\Mongo\Record;
 
 use Chukdo\Json\Json;
-use MongoDB\Collection as MongoDbCollection;
+use Chukdo\Db\Mongo\Collection;
 
 /**
  * Mongo RecordList.
@@ -31,10 +31,10 @@ Class RecordList extends Json
     }
 
     /**
-     * @return MongoDbCollection
+     * @return Collection
      */
-    public function collection(): MongoDbCollection
+    public function collection(): Collection
     {
-        return $this->collection->collection();
+        return $this->collection;
     }
 }

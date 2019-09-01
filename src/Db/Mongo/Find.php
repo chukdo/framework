@@ -4,6 +4,8 @@ namespace Chukdo\Db\Mongo;
 
 use Chukdo\Helper\Arr;
 use Chukdo\Json\Json;
+use Chukdo\Db\Mongo\Record\Record;
+use Chukdo\Db\Mongo\Record\RecordList;
 
 /**
  * Mongo Find.

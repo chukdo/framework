@@ -288,6 +288,9 @@ $json->get('produit1')
 $agence = new \App\Model\Agence(Db::collection('agence', 'test'));
 $agence->init();
 
+// agence->find()->update()
+// agence->new() = new record !!! ->save() or softDelete() or delete()
+
 //dd(Conf::offsetGet('db.mongo.dsn'));
 //dd(Db::collection('contrat'));
 
@@ -395,7 +398,7 @@ dd($contrat->find()
     ->where('state', '=', '1')
     ->where('history', 'size', 4)
     ->where('history._version', '=', '5a3c37db3fcd9e16e21fe0b5')
-    ->all()
+    ->one()
     ->toHtml());
 
 

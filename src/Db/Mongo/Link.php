@@ -3,6 +3,7 @@
 namespace Chukdo\Db\Mongo;
 
 use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\Db\Mongo\Record\RecordLink;
 use Chukdo\Helper\Is;
 use Chukdo\Helper\Arr;
 use Chukdo\Helper\Str;

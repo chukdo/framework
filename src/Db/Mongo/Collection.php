@@ -2,6 +2,8 @@
 
 Namespace Chukdo\DB\Mongo;
 
+use Chukdo\Contracts\Db\Record as RecordInterface;
+use Chukdo\Db\Mongo\Record\Record;
 use Chukdo\Db\Mongo\Aggregate\Aggregate;
 use Chukdo\Db\Mongo\Schema\Schema;
 use Chukdo\Helper\Str;
@@ -151,6 +153,15 @@ Class Collection
     public function schema(): Schema
     {
         return new Schema($this);
+    }
+
+    /**
+     * @param $data
+     * @return RecordInterface
+     */
+    public function record($data): RecordInterface
+    {
+        return new Record($this, $data);
     }
 
     /**

@@ -4,6 +4,7 @@
 namespace Chukdo\Db\Mongo;
 
 use MongoDB\Driver\Cursor as MongoDbCursor;
+use Chukdo\Db\Mongo\Record\Record;
 use Iterator;
 use IteratorIterator;
 use Traversable;
@@ -74,6 +75,9 @@ class Cursor implements Iterator
      */
     public function current()
     {
+        // @todo
+        // loadRecordClass > check si App/Model/Collection (class model) exist si oui instancie si non juste Record()
+        // collection > function loadClassRecord !!!!
         return new Record($this->collection, $this->iterator->current());
     }
 

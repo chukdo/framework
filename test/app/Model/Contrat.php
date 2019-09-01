@@ -4,15 +4,14 @@ namespace App\Model;
 
 use Chukdo\Db\Mongo\Record\Record;
 
-class Agence extends Record
+class Contrat extends Record
 {
     public function createIndex()
     {
         $this->collection()
             ->index()
-            ->set('nom')
-            ->set('date_created', 'desc')
-            ->set('codeage', 'asc', true)
+            ->set('_agence')
+            ->set('_modele')
             ->save();
     }
 
@@ -20,11 +19,8 @@ class Agence extends Record
     {
         $this->collection()
             ->schema()
-            ->set('nom', 'string', true)
-            ->set('codeage', 'int', true, [
-                'min' => 300,
-                'max' => 600,
-            ])
+            ->set('_agence', 'string', true)
+            ->set('_modele', 'string', true)
             ->save();
     }
 
