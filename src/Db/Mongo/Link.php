@@ -2,9 +2,10 @@
 
 namespace Chukdo\Db\Mongo;
 
+use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\Helper\Is;
 use Chukdo\Helper\Arr;
 use Chukdo\Helper\Str;
-use Chukdo\Json\Json;
 
 /**
  * Mongo Link .
@@ -82,15 +83,6 @@ Class Link
     }
 
     /**
-     * @return string
-     */
-    public function getLinkedName(): string
-    {
-        return $this->linked
-            ?: 'linked' . $this->field;
-    }
-
-    /**
      * @param mixed ...$fields
      * @return Link
      */
@@ -113,35 +105,35 @@ Class Link
     }
 
     /**
-     * @param Json $json
-     * @return Json
+     * @param JsonInterface $json
+     * @return JsonInterface
      */
-    public function hydrate( Json $json ): Json
+    public function hydrate( JsonInterface $json ): JsonInterface
     {
         return $this->hydrateIds($json, $this->findIds($this->extractIds($json)));
     }
 
     /**
-     * @param Json $json
-     * @param Json $find
-     * @return Json
+     * @param JsonInterface $json
+     * @param JsonInterface $find
+     * @return JsonInterface
      */
-    protected function hydrateIds( Json $json, Json $find ): Json
+    protected function hydrateIds( JsonInterface $json, JsonInterface $find ): JsonInterface
     {
         foreach ( $json as $key => $value ) {
             if ( $key === $this->field ) {
 
                 /** Multiple ids */
-                if ( $value instanceof Json ) {
+                if ( Is::JsonInterface($value) ) {
                     $list = [];
 
                     foreach ( (array) $value as $id ) {
                         if ( $get = $find->offsetGet($id) ) {
-                            $list[] = $get;
+                            $list[] = new RecordLink($this->collection, $get);
                         }
                     }
 
-                    if (!empty($list)) {
+                    if ( !empty($list) ) {
                         $json->offsetSet($this->getLinkedName(), $list);
                     }
                 }
@@ -149,11 +141,11 @@ Class Link
                 /** Single id */
                 else {
                     if ( $get = $find->offsetGet($value) ) {
-                        $json->offsetSet($this->getLinkedName(), $get);
+                        $json->offsetSet($this->getLinkedName(), new RecordLink($this->collection, $get));
                     }
                 }
             }
-            elseif ( $value instanceof Json ) {
+            elseif ( Is::JsonInterface($value) ) {
                 $this->hydrateIds($value, $find);
             }
         }
@@ -163,9 +155,9 @@ Class Link
 
     /**
      * @param array $ids
-     * @return Json
+     * @return JsonInterface
      */
-    protected function findIds( array $ids ): Json
+    protected function findIds( array $ids ): JsonInterface
     {
         $find = new Find($this->collection);
 
@@ -176,10 +168,10 @@ Class Link
     }
 
     /**
-     * @param Json $json
+     * @param JsonInterface $json
      * @return array
      */
-    protected function extractIds( Json $json ): array
+    protected function extractIds( JsonInterface $json ): array
     {
         $extractIds = [];
 
@@ -187,11 +179,20 @@ Class Link
             if ( $key === $this->field ) {
                 $extractIds = array_merge($extractIds, (array) $value);
             }
-            elseif ( $value instanceof Json ) {
+            elseif ( Is::JsonInterface($value) ) {
                 $extractIds = array_merge($extractIds, $this->extractIds($value));
             }
         }
 
         return $extractIds;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLinkedName(): string
+    {
+        return $this->linked
+            ?: 'linked' . $this->field;
     }
 }

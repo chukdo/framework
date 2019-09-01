@@ -18,6 +18,11 @@ use Traversable;
 class Cursor implements Iterator
 {
     /**
+     * @var Collection
+     */
+    protected $collection;
+
+    /**
      * @var Find
      */
     protected $find;
@@ -34,11 +39,13 @@ class Cursor implements Iterator
 
     /**
      * Cursor constructor.
+     * @param Collection  $collection
      * @param Traversable $cursor
      */
-    public function __construct( Traversable $cursor )
+    public function __construct( Collection $collection, Traversable $cursor )
     {
-        $this->cursor = $cursor;
+        $this->collection = $collection;
+        $this->cursor     = $cursor;
 
         $this->cursor->setTypeMap([
             'root'     => 'array',
@@ -67,7 +74,7 @@ class Cursor implements Iterator
      */
     public function current()
     {
-        return new Record($this->iterator->current());
+        return new Record($this->collection, $this->iterator->current());
     }
 
     /**

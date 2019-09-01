@@ -23,11 +23,19 @@ use League\CLImate\CLImate;
 class Json extends ArrayObject implements JsonInterface
 {
     /**
+     * @var bool $strict
+     */
+    protected $strict = true;
+
+    /**
      * Json constructor.
      * @param null $data
+     * @param bool $strict
      */
-    public function __construct( $data = null )
+    public function __construct( $data = null, bool $strict = true )
     {
+        $this->strict = $strict;
+
         parent::__construct([]);
 
         if ( Is::iterable($data) ) {
@@ -52,8 +60,8 @@ class Json extends ArrayObject implements JsonInterface
      */
     public function offsetSet( $key, $value ): JsonInterface
     {
-        if ( Is::arr($value) ) {
-            parent::offsetSet($key, new Json($value));
+        if ( ( $this->strict === true && Is::iterable($value) ) || ( Is::arr($value) && !Is::jsonInterface($value) ) ) {
+            parent::offsetSet($key, new Json($value, $this->strict));
         }
         else {
             parent::offsetSet($key, $value);
@@ -221,8 +229,8 @@ class Json extends ArrayObject implements JsonInterface
      */
     public function append( $value ): JsonInterface
     {
-        if ( Is::arr($value) ) {
-            parent::append(new Json($value));
+        if ( ( $this->strict === true && Is::iterable($value) ) || ( Is::arr($value) && !Is::jsonInterface($value) ) ) {
+            parent::append(new Json($value, $this->strict));
         }
         else {
             parent::append($value);
@@ -383,7 +391,7 @@ class Json extends ArrayObject implements JsonInterface
         $json = new Json();
 
         foreach ( $this as $k => $v ) {
-            if ( $v instanceof Json ) {
+            if ( $v instanceof JsonInterface ) {
                 $r = $v->filterRecursive($closure);
 
                 if ( $r->count() > 0 ) {
@@ -522,6 +530,23 @@ class Json extends ArrayObject implements JsonInterface
         }
 
         return $intersect;
+    }
+
+    /**
+     * @param mixed ...$param
+     * @return mixed
+     */
+    public function is( ...$param )
+    {
+        $param      = ArrHelper::spreadArgs($param);
+        $function   = array_shift($param);
+        $param[ 0 ] = $this->get($param[ 0 ]);
+
+        return call_user_func_array([
+            '\Chukdo\Helper\Is',
+            $function,
+        ],
+            $param);
     }    /**
      * @param string $path
      * @param string $sort
@@ -558,23 +583,6 @@ class Json extends ArrayObject implements JsonInterface
         }
 
         return $json;
-    }
-
-    /**
-     * @param mixed ...$param
-     * @return mixed
-     */
-    public function is( ...$param )
-    {
-        $param      = ArrHelper::spreadArgs($param);
-        $function   = array_shift($param);
-        $param[ 0 ] = $this->get($param[ 0 ]);
-
-        return call_user_func_array([
-            '\Chukdo\Helper\Is',
-            $function,
-        ],
-            $param);
     }
 
     /**

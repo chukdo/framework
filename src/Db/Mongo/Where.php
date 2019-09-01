@@ -15,8 +15,8 @@ use MongoDB\Collection as MongoDbCollection;
 Class Where
 {
     /**
-     * @var Collection
-     */
+ * @var Collection
+ */
     protected $collection;
 
     /**

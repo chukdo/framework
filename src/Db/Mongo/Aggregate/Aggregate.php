@@ -81,7 +81,7 @@ Class Aggregate
     {
         $options = array_merge($this->options, $options);
 
-        return new Cursor($this->collection->collection()
+        return new Cursor($this->collection, $this->collection->collection()
             ->aggregate($this->projection(), $options));
     }
 
@@ -127,7 +127,7 @@ Class Aggregate
      */
     public function explain(): Json
     {
-        return new Json(new Cursor($this->collection->collection()
+        return new Json(new Cursor($this->collection, $this->collection->collection()
             ->aggregate($this->projection(), [
                 'explain'   => true,
                 'useCursor' => true,

@@ -6,7 +6,6 @@ use Chukdo\Contracts\Http\Input as InputInterface;
 use Chukdo\Json\Json;
 use Chukdo\Helper\Cli;
 use Chukdo\Storage\FileUploaded;
-use Closure;
 
 /**
  * Gestion des inputs.
@@ -20,9 +19,8 @@ class Input extends Json implements InputInterface
     /**
      * Input constructor.
      * @param null $data
-     * @param null $preFilter
      */
-    public function __construct( $data = null, $preFilter = null )
+    public function __construct( $data = null )
     {
         $data = $data
             ?: ( Cli::runningInConsole()
@@ -38,7 +36,7 @@ class Input extends Json implements InputInterface
                 }
             });
 
-        parent::__construct($data, $preFilter);
+        parent::__construct($data);
     }
 
     /**

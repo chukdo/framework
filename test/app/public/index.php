@@ -385,6 +385,7 @@ $contrat = Db::collection('contrat');
 dd($contrat->find()
     ->without('_id')
     ->with('_agence', '_modele', 'history.id', 'history._version')
+    ->link('_agence', ['agence', 'cp', 'ville'])
     ->limit(4)
     ->where('version', '=', '2')
     ->where('state', '=', '1')

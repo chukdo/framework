@@ -145,20 +145,45 @@ Class Find extends Where
     /**
      * @return Json
      */
-    public function one(): Json
+    public function explain(): Json
+    {
+        $explain = $this->collection->mongo()
+            ->command([
+                'explain' => [
+                    'find'   => $this->collection->name(),
+                    'filter' => $this->filter(),
+                ],
+            ]);
+
+        $json = new Json();
+
+        $json->offsetSet('queryPlanner', $explain->get('0.queryPlanner'));
+        $json->offsetSet('executionStats', $explain->get('0.executionStats'));
+
+        return $json;
+    }
+
+    /**
+     * @return Record
+     */
+    public function one(): Record
     {
         foreach ( $this->limit(1)
-            ->cursor() as $key => $value ) {
+            ->cursor() as $key => $record ) {
 
             /** Suppression des ID defini par without */
             if ( $this->hiddenId ) {
-                $value->offsetUnset('_id');
+                $record->offsetUnset('_id');
             }
 
-            return $value;
+            foreach ( $this->link as $link ) {
+                $record = $link->hydrate($record);
+            }
+
+            return $record;
         }
 
-        return new Json();
+        return new Record();
     }
 
     /**
@@ -168,7 +193,7 @@ Class Find extends Where
     {
         $options = array_merge($this->projection(), $this->options);
 
-        return new Cursor($this->collection()
+        return new Cursor($this->collection, $this->collection()
             ->find($this->filter(), $options));
     }
 
@@ -209,55 +234,34 @@ Class Find extends Where
     }
 
     /**
-     * @return Json
-     */
-    public function explain(): Json
-    {
-        $explain = $this->collection->mongo()
-            ->command([
-                'explain' => [
-                    'find'   => $this->collection->name(),
-                    'filter' => $this->filter(),
-                ],
-            ]);
-
-        $json = new Json();
-
-        $json->offsetSet('queryPlanner', $explain->get('0.queryPlanner'));
-        $json->offsetSet('executionStats', $explain->get('0.executionStats'));
-
-        return $json;
-    }
-
-    /**
      * @param bool $idAsKey
-     * @return Json
+     * @return RecordList
      */
-    public function all( bool $idAsKey = false ): Json
+    public function all( bool $idAsKey = false ): RecordList
     {
-        $json = new Json();
+        $recordList = new RecordList($this->collection);
 
         foreach ( $this->cursor() as $key => $value ) {
             if ( $idAsKey ) {
-                $json->offsetSet($value->offsetGet('_id'), $value);
+                $recordList->offsetSet($value->offsetGet('_id'), $value);
             }
             else {
-                $json->offsetSet($key, $value);
+                $recordList->offsetSet($key, $value);
             }
         }
 
         foreach ( $this->link as $link ) {
-            $json = $link->hydrate($json);
+            $recordList = $link->hydrate($recordList);
         }
 
         /** Suppression des ID defini par without */
         if ( $this->hiddenId ) {
-            foreach ( $json as $key => $value ) {
+            foreach ( $recordList as $key => $value ) {
                 $value->offsetUnset('_id');
             }
         }
 
-        return $json;
+        return $recordList;
     }
 
     /**
