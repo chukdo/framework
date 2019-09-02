@@ -3,6 +3,7 @@
 namespace Chukdo\Db\Mongo;
 
 use Chukdo\Json\Json;
+use Chukdo\Contracts\Json\Json as JsonInterface;
 use Exception;
 
 Class Index
@@ -27,9 +28,9 @@ Class Index
     }
 
     /**
-     * @return Json
+     * @return JsonInterface
      */
-    public function get(): Json
+    public function get(): JsonInterface
     {
         $indexes = new Json();
 

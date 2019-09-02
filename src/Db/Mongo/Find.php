@@ -6,6 +6,8 @@ use Chukdo\Helper\Arr;
 use Chukdo\Json\Json;
 use Chukdo\Db\Mongo\Record\Record;
 use Chukdo\Db\Mongo\Record\RecordList;
+use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\Contracts\Db\Record as RecordInterface;
 
 /**
  * Mongo Find.
@@ -145,9 +147,9 @@ Class Find extends Where
     }
 
     /**
-     * @return Json
+     * @return JsonInterface
      */
-    public function explain(): Json
+    public function explain(): JsonInterface
     {
         $explain = $this->collection->mongo()
             ->command([
@@ -168,7 +170,7 @@ Class Find extends Where
     /**
      * @return Record
      */
-    public function one(): Record
+    public function one(): RecordInterface
     {
         foreach ( $this->limit(1)
             ->cursor() as $key => $record ) {
@@ -277,9 +279,9 @@ Class Find extends Where
 
     /**
      * @param string $field
-     * @return Json
+     * @return JsonInterface
      */
-    public function distinct( string $field ): json
+    public function distinct( string $field ): JsonInterface
     {
         return new Json($this->collection()
             ->distinct($field, $this->filter()));

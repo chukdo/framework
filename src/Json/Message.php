@@ -23,13 +23,12 @@ class Message extends Json
     /**
      * Message constructor.
      * @param string $name
-     * @param null   $preFilter
      */
-    public function __construct( string $name, $preFilter = null )
+    public function __construct( string $name )
     {
         $this->name = $name;
 
-        parent::__construct([], $preFilter);
+        parent::__construct([]);
     }
 
     /**
@@ -41,16 +40,14 @@ class Message extends Json
     }
 
     /**
-     * @param string|null $title
-     * @param string|null $color
-     * @return string
+     * @return array
      */
-    public function toHtml( string $title = null, string $color = null ): string
+    public function toArray(): array
     {
-        return To::html($this,
-            $title
-                ?: $this->name,
-            $color);
+        return [
+            'result'   => $this->name,
+            'messages' => $this->getArrayCopy(),
+        ];
     }
 
     /**
@@ -87,13 +84,15 @@ class Message extends Json
     }
 
     /**
-     * @return array
+     * @param string|null $title
+     * @param string|null $color
+     * @return string
      */
-    public function toArray(): array
+    public function toHtml( string $title = null, string $color = null ): string
     {
-        return [
-            'result'   => $this->name,
-            'messages' => $this->getArrayCopy(),
-        ];
+        return To::html($this,
+            $title
+                ?: $this->name,
+            $color);
     }
 }

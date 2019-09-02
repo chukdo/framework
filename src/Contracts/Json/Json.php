@@ -32,11 +32,11 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
     public function offsetExists( $key ): bool;
 
     /**
-     * @param $key
-     * @param $value
+     * @param mixed $key
+     * @param mixed $value
      * @return Json
      */
-    public function offsetSet( $key, $value ): Json;
+    public function offsetSet( $key, $value ): JsonInterface;
 
     /**
      * @return Collect
@@ -111,55 +111,55 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
      * @param bool|null     $overwrite
      * @return Json
      */
-    public function merge( iterable $merge = null, bool $overwrite = null ): Json;
+    public function merge( iterable $merge = null, bool $overwrite = null ): JsonInterface;
 
     /**
      * @param mixed ...$names
      * @return Json
      */
-    public function map( ... $names ): Json;
+    public function map( ... $names ): JsonInterface;
 
     /**
      * @param Closure $closure
      * @return Json
      */
-    public function filter( Closure $closure ): Json;
+    public function filter( Closure $closure ): JsonInterface;
 
     /**
      * @param Closure $closure
      * @return Json
      */
-    public function filterRecursive( Closure $closure ): Json;
+    public function filterRecursive( Closure $closure ): JsonInterface;
 
     /**
      * @param mixed ...$offsets
      * @return Json
      */
-    public function with( ...$offsets ): Json;
+    public function with( ...$offsets ): JsonInterface;
 
     /**
      * @param mixed ...$offsets
      * @return Json
      */
-    public function without( ...$offsets ): Json;
+    public function without( ...$offsets ): JsonInterface;
 
     /**
      * @param iterable|null $merge
      * @param bool|null     $overwrite
      * @return Json
      */
-    public function mergeRecursive( iterable $merge = null, bool $overwrite = null ): Json;
+    public function mergeRecursive( iterable $merge = null, bool $overwrite = null ): JsonInterface;
 
     /**
      * @return Json
      */
-    public function clean(): Json;
+    public function clean(): JsonInterface;
 
     /**
      * @param iterable $data
      * @return Json
      */
-    public function addToSet( iterable $data ): Json;
+    public function addToSet( iterable $data ): JsonInterface;
 
     /**
      * @param $value
@@ -168,28 +168,28 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
     public function in( $value ): bool;
 
     /**
-     * @param JsonInterface $json
-     * @return JsonInterface
+     * @param Json $json
+     * @return Json
      */
-    public function intersect( Json $json ): Json;
+    public function intersect( JsonInterface $json ): JsonInterface;
 
     /**
-     * @param JsonInterface $json
-     * @return JsonInterface
+     * @param Json $json
+     * @return Json
      */
-    public function diff( Json $json ): Json;
+    public function diff( JsonInterface $json ): JsonInterface;
 
     /**
      * @param mixed $value
      * @return Json
      */
-    public function append( $value ): Json;
+    public function append( $value ): JsonInterface;
 
     /**
      * @param mixed $value
      * @return Json
      */
-    public function appendIfNoExist( $value ): Json;
+    public function appendIfNoExist( $value ): JsonInterface;
 
     /**
      * @param string|null $path
@@ -203,7 +203,7 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
      * @param        $value
      * @return Json
      */
-    public function set( string $path, $value ): Json;
+    public function set( string $path, $value ): JsonInterface;
 
     /**
      * @param       $key
@@ -234,12 +234,12 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
      * @param $data
      * @return Json
      */
-    public function reset( $data = []): Json;
+    public function reset( $data = []): JsonInterface;
 
     /**
      * @return Json
      */
-    public function resetKeys(): Json;
+    public function resetKeys(): JsonInterface;
 
     /**
      * @param string $path
@@ -258,20 +258,20 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
      * @param string $sort
      * @return Json
      */
-    public function sort(string $path, string $sort = 'ASC'): Json;
+    public function sort(string $path, string $sort = 'ASC'): JsonInterface;
 
     /**
      * @param string $path
      * @param bool   $scalarResultOnly
      * @return Json
      */
-    public function wildcard( string $path, $scalarResultOnly = false ): Json;
+    public function wildcard( string $path, $scalarResultOnly = false ): JsonInterface;
 
     /**
      * @param string|null $prefix
      * @return Json
      */
-    public function to2d( string $prefix = null ): Json;
+    public function to2d( string $prefix = null ): JsonInterface;
 
     /**
      * @param string|null $title

@@ -7,6 +7,7 @@ use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
 use MongoDB\BSON\Regex;
 use MongoDB\Operation\FindOneAndUpdate;
+use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
  * Mongo Write.
@@ -78,12 +79,14 @@ Class Write extends Where
     }
 
     /**
-     * @return Json
+     * @return JsonInterface
      */
-    public function deleteOneAndGet(): Json
+    public function deleteOneAndGet(): JsonInterface
     {
-        return new Json($this->collection()
-            ->findOneAndDelete($this->filter(), $this->options()), function( $k, $v )
+        $json = new Json($this->collection()
+            ->findOneAndDelete($this->filter(), $this->options()));
+
+        return $json->filterRecursive(function( $k, $v )
         {
             return Collection::filterOut($k, $v);
         });
@@ -125,8 +128,8 @@ Class Write extends Where
         if ( Is::iterable($value) ) {
             $values = [];
 
-            foreach ($value as $k => $v) {
-                $values[$k] = Collection::filterIn($k, $v);
+            foreach ( $value as $k => $v ) {
+                $values[ $k ] = Collection::filterIn($k, $v);
             }
 
             $value = $values;
@@ -392,7 +395,8 @@ Class Write extends Where
     public function validatedInsertFields(): array
     {
         $set       = $this->fields->offsetGet('$set');
-        $validator = new Validator($this->collection->schema()->property());
+        $validator = new Validator($this->collection->schema()
+            ->property());
 
         return $validator->validateDataToInsert($set);
     }
@@ -417,7 +421,8 @@ Class Write extends Where
         $setOnInsert = $fields->offsetGet('$setOnInsert');
         $push        = $fields->offsetGet('$push');
         $addToSet    = $fields->offsetGet('$addToSet');
-        $validator   = new Validator($this->collection->schema()->property());
+        $validator   = new Validator($this->collection->schema()
+            ->property());
 
         if ( $set ) {
             $fields->offsetSet('$set', $validator->validateDataToUpdate($set));
@@ -449,9 +454,9 @@ Class Write extends Where
     }
 
     /**
-     * @return Json
+     * @return JsonInterface
      */
-    public function fields(): Json
+    public function fields(): JsonInterface
     {
         return $this->fields;
     }
@@ -482,9 +487,9 @@ Class Write extends Where
 
     /**
      * @param bool $before
-     * @return Json
+     * @return JsonInterface
      */
-    public function updateOneAndGet( bool $before = false ): Json
+    public function updateOneAndGet( bool $before = false ): JsonInterface
     {
         $options = array_merge([
             'projection'     => [],
@@ -493,8 +498,10 @@ Class Write extends Where
                 : FindOneAndUpdate::RETURN_DOCUMENT_AFTER,
         ], $this->options());
 
-        return new Json($this->collection()
-            ->findOneAndUpdate($this->filter(), $this->validatedUpdateFields(), $options), function( $k, $v )
+        $json = new Json($this->collection()
+            ->findOneAndUpdate($this->filter(), $this->validatedUpdateFields(), $options));
+
+        return $json->filterRecursive(function( $k, $v )
         {
             return Collection::filterOut($k, $v);
         });

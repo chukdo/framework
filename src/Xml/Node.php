@@ -16,6 +16,7 @@ use IteratorAggregate;
 use SimpleXMLElement;
 use Throwable;
 use Traversable;
+use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
  * Classe XML NODE, etend les fonctionnalites XML de PHP7
@@ -1245,9 +1246,9 @@ class Node implements IteratorAggregate
 
     /**
      * @param string $default
-     * @return Json
+     * @return JsonInterface
      */
-    public function toJson( string $default = 'item' ): Json
+    public function toJson( string $default = 'item' ): JsonInterface
     {
         return new Json($this->toArray($default));
     }

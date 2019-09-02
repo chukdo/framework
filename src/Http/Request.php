@@ -6,9 +6,9 @@ use Chukdo\Bootstrap\App;
 use Chukdo\Helper\Cli;
 use Chukdo\Helper\Str;
 use Chukdo\Helper\HttpRequest;
-use Chukdo\Json\Json;
 use Chukdo\Validation\Validator;
 use Chukdo\Storage\FileUploaded;
+use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
  * Gestion de requete HTTP entrante.
@@ -150,18 +150,18 @@ class Request
 
     /**
      * @param mixed ...$offsets
-     * @return Json
+     * @return JsonInterface
      */
-    public function with( ...$offsets ): Json
+    public function with( ...$offsets ): JsonInterface
     {
         return $this->inputs->with($offsets);
     }
 
     /**
      * @param mixed ...$offsets
-     * @return Json
+     * @return JsonInterface
      */
-    public function without( ...$offsets ): Json
+    public function without( ...$offsets ): JsonInterface
     {
         return $this->inputs->without($offsets);
     }
@@ -186,9 +186,9 @@ class Request
 
     /**
      * @param string $path
-     * @return Json
+     * @return JsonInterface
      */
-    public function wildcard( string $path ): Json
+    public function wildcard( string $path ): JsonInterface
     {
         return $this->inputs->wildcard($path);
     }

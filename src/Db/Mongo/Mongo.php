@@ -6,6 +6,7 @@ use Chukdo\Json\Json;
 use MongoDB\Driver\Manager;
 use MongoDB\Driver\Command;
 use MongoDB\Driver\Exception\Exception;
+use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
  * Mongo Mongo.
@@ -55,9 +56,9 @@ Class Mongo
     /**
      * @param array  $command
      * @param string $db
-     * @return Json
+     * @return JsonInterface
      */
-    public function command( array $command, string $db = 'admin' ): Json
+    public function command( array $command, string $db = 'admin' ): JsonInterface
     {
         try {
             $command = new Command($command);
@@ -105,9 +106,9 @@ Class Mongo
     }
 
     /**
-     * @return Json
+     * @return JsonInterface
      */
-    public function ReplicatSetStatus(): Json
+    public function ReplicatSetStatus(): JsonInterface
     {
         $status = $this->command([ 'replSetGetStatus' => 1 ])
             ->getIndex('0', new Json())
@@ -125,9 +126,9 @@ Class Mongo
     }
 
     /**
-     * @return Json
+     * @return JsonInterface
      */
-    public function status(): Json
+    public function status(): JsonInterface
     {
         $status = $this->command([ 'serverStatus' => 1 ])
             ->getIndex('0', new Json())
@@ -167,9 +168,9 @@ Class Mongo
     }
 
     /**
-     * @return Json
+     * @return JsonInterface
      */
-    public function databases(): Json
+    public function databases(): JsonInterface
     {
         $list      = new Json();
         $databases = $this->command([ 'listDatabases' => 1 ])

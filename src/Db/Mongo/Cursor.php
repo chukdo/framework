@@ -75,10 +75,7 @@ class Cursor implements Iterator
      */
     public function current()
     {
-        // @todo
-        // loadRecordClass > check si App/Model/Collection (class model) exist si oui instancie si non juste Record()
-        // collection > function loadClassRecord !!!!
-        return new Record($this->collection, $this->iterator->current());
+        return $this->collection->record($this->iterator->current());
     }
 
     /**

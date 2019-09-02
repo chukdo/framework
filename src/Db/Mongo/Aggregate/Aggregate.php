@@ -8,6 +8,7 @@ use Chukdo\Db\Mongo\Match;
 use Chukdo\Db\Mongo\Session;
 use Chukdo\Db\Mongo\Where;
 use Chukdo\Json\Json;
+use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
  * Mongo Aggregate Group.
@@ -62,9 +63,9 @@ Class Aggregate
     /**
      * @param bool $allowDiskUse
      * @param bool $bypassDocumentValidation
-     * @return Json
+     * @return JsonInterface
      */
-    public function all( bool $allowDiskUse = false, bool $bypassDocumentValidation = false ): Json
+    public function all( bool $allowDiskUse = false, bool $bypassDocumentValidation = false ): JsonInterface
     {
         return new Json($this->cursor([
             'allowDiskUse'             => $allowDiskUse,
@@ -123,9 +124,9 @@ Class Aggregate
     }
 
     /**
-     * @return Json
+     * @return JsonInterface
      */
-    public function explain(): Json
+    public function explain(): JsonInterface
     {
         return new Json(new Cursor($this->collection, $this->collection->collection()
             ->aggregate($this->projection(), [

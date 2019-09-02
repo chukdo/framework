@@ -130,7 +130,7 @@ Class Link
 
                     foreach ( (array) $value as $id ) {
                         if ( $get = $find->offsetGet($id) ) {
-                            $list[] = new RecordLink($this->collection, $get);
+                            $list[] = $this->collection->record($get);
                         }
                     }
 
@@ -142,7 +142,7 @@ Class Link
                 /** Single id */
                 else {
                     if ( $get = $find->offsetGet($value) ) {
-                        $json->offsetSet($this->getLinkedName(), new RecordLink($this->collection, $get));
+                        $json->offsetSet($this->getLinkedName(), $this->collection->record($get));
                     }
                 }
             }

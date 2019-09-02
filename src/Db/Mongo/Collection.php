@@ -2,6 +2,7 @@
 
 Namespace Chukdo\DB\Mongo;
 
+use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Contracts\Db\Record as RecordInterface;
 use Chukdo\Db\Mongo\Record\Record;
 use Chukdo\Db\Mongo\Aggregate\Aggregate;
@@ -14,6 +15,8 @@ use DateTime;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\BSON\Timestamp;
+use ReflectionClass;
+use ReflectionException;
 
 /**
  * Mongo Mongo Collect.
@@ -93,9 +96,9 @@ Class Collection
     }
 
     /**
-     * @return Json
+     * @return JsonInterface
      */
-    public function stat(): Json
+    public function stat(): JsonInterface
     {
         $stats = $this->mongo()
             ->command([ 'collStats' => $this->name() ], $this->databaseName())
@@ -159,15 +162,25 @@ Class Collection
      * @param $data
      * @return RecordInterface
      */
-    public function record($data): RecordInterface
+    public function record( $data ): RecordInterface
     {
-        return new Record($this, $data);
+        try {
+            $reflector = new ReflectionClass('\App\Model\\' . $this->name());
+
+            return $reflector->newInstanceArgs([
+                $this,
+                $data,
+            ]);
+
+        } catch ( ReflectionException $e ) {
+            return new Record($this, $data);
+        }
     }
 
     /**
-     * @return Json
+     * @return JsonInterface
      */
-    public function info(): Json
+    public function info(): JsonInterface
     {
         $json = $this->mongo()
             ->command([

@@ -6,6 +6,7 @@ use Chukdo\Helper\Str;
 use Chukdo\Json\Arr;
 use Chukdo\Helper\Arr as ArrHelper;
 use Chukdo\Json\Json;
+use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
  * Mongo Schema properties.
@@ -219,17 +220,17 @@ class Property
     }
 
     /**
-     * @return Json
+     * @return JsonInterface
      */
-    public function list(): Json
+    public function list(): JsonInterface
     {
         return $this->property->offsetGetOrSet('enum');
     }
 
     /**
-     * @return Json
+     * @return JsonInterface
      */
-    public function required(): Json
+    public function required(): JsonInterface
     {
         return $this->property->offsetGetOrSet('required');
     }
@@ -370,9 +371,9 @@ class Property
     }
 
     /**
-     * @return Json
+     * @return JsonInterface
      */
-    public function properties(): Json
+    public function properties(): JsonInterface
     {
         return $this->property->offsetGetOrSet('properties', []);
     }

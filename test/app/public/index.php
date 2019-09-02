@@ -284,7 +284,6 @@ $json->get('produit1')
  * ->values()
  * ->toHtml());*/
 
-
 $agence = new \App\Model\Agence(Db::collection('agence', 'test'));
 $agence->init();
 
@@ -398,7 +397,7 @@ dd($contrat->find()
     ->where('state', '=', '1')
     ->where('history', 'size', 4)
     ->where('history._version', '=', '5a3c37db3fcd9e16e21fe0b5')
-    ->one()
+    ->all()
     ->toHtml());
 
 

@@ -4,6 +4,7 @@ Namespace Chukdo\DB\Mongo;
 
 use Chukdo\Json\Json;
 use MongoDB\Database as MongoDbDatabase;
+use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
  * Mongo Mongo Database.
@@ -73,9 +74,9 @@ Class Database
     }
 
     /**
-     * @return Json
+     * @return JsonInterface
      */
-    public function stat(): Json
+    public function stat(): JsonInterface
     {
         $stats = $this->mongo()
             ->command([ 'dbStats' => 1 ], $this->name())
@@ -105,9 +106,9 @@ Class Database
     }
 
     /**
-     * @return Json
+     * @return JsonInterface
      */
-    public function collections(): Json
+    public function collections(): JsonInterface
     {
         $list = new Json();
 

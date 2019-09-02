@@ -398,9 +398,9 @@ class Collect
     }
 
     /**
-     * @return Json
+     * @return JsonInterface
      */
-    public function values(): Json
+    public function values(): JsonInterface
     {
         return $this->collection;
     }
