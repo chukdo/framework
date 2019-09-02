@@ -38,6 +38,11 @@ Class Record extends Json implements RecordInterface
     protected $autoDateRecord = false;
 
     /**
+     * @var bool
+     */
+    protected $binTrashRecord = false;
+
+    /**
      * Record constructor.
      * @param Collection $collection
      * @param null       $data
@@ -56,6 +61,7 @@ Class Record extends Json implements RecordInterface
 
     /**
      * @return JsonInterface
+     * @throws Exception
      */
     public function delete(): JsonInterface
     {
@@ -64,7 +70,19 @@ Class Record extends Json implements RecordInterface
         if ( ( $id = $this->id() ) !== null ) {
             $write->where('_id', '=', $id);
 
-            return $write->deleteOneAndGet();
+            $get = $write->deleteOneAndGet();
+
+            /** Options delete to Bin */
+            if ( $this->binTrashRecord ) {
+                $this->collection()->mongo()
+                    ->collection($this->collection()->name() . '_bintrash')
+                    ->write()
+                    ->setAll($get)
+                    ->set('date_deleted', new DateTime())
+                    ->insert();
+            }
+
+            return $get;
         }
 
         throw new MongoException('No ID to delete Record');
@@ -145,6 +163,7 @@ Class Record extends Json implements RecordInterface
             }
         }));
 
+        /** Option Auto Date */
         if ( $this->autoDateRecord ) {
             $write->setOnInsert('date_created', new DateTime())
                 ->set('date_modified', new DateTime());
@@ -154,7 +173,7 @@ Class Record extends Json implements RecordInterface
         if ( ( $id = $this->id() ) !== null ) {
             $write->where('_id', '=', $id);
 
-            return $write->updateOne();
+            return $write->updateOrInsert();
 
             /** Save */
         }

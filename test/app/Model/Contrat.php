@@ -7,6 +7,11 @@ use Chukdo\Helper\Is;
 
 class Contrat extends Record
 {
+    /**
+     * @var bool
+     */
+    protected $binTrashRecord = true;
+
     public function createIndex()
     {
         $this->collection()

@@ -397,12 +397,13 @@ $listing = $contrat->find()
     ->limit(4)
     ->where('version', '=', '2')
     ->where('state', '=', '1')
-    ->where('history', 'size', 4)
+    //->where('history', 'size', 4)
     ->where('history._version', '=', '5a3c37db3fcd9e16e21fe0b5')
     ->one();
+dd($listing->toHtml());
+$listing->delete();
 
-$listing->setReference(["qsqs", 'sdsdsds']);
-$listing->save();
+// hox to restore ?!!
 
 dd($contrat->find()
     ->without('_id')
@@ -417,7 +418,7 @@ dd($contrat->find()
     ->limit(4)
     ->where('version', '=', '2')
     ->where('state', '=', '1')
-    ->where('history', 'size', 4)
+    //->where('history', 'size', 4)
     ->where('history._version', '=', '5a3c37db3fcd9e16e21fe0b5')
     ->one()->toHtml());
 
