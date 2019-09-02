@@ -62,7 +62,7 @@ Class Mongo
     {
         try {
             $command = new Command($command);
-            $json    = new Json($this->mongo()
+            $json    = new Json($this->mongoManager()
                 ->executeCommand($db, $command));
 
             return $json;
@@ -75,7 +75,7 @@ Class Mongo
     /**
      * @return Manager
      */
-    public function mongo(): Manager
+    public function mongoManager(): Manager
     {
         return $this->mongo;
     }

@@ -4,7 +4,7 @@
 namespace Chukdo\Db\Mongo;
 
 use MongoDB\Driver\Cursor as MongoDbCursor;
-use Chukdo\Db\Mongo\Record\Record;
+use MongoDB\Driver\Session as MongoSession;
 use Iterator;
 use IteratorIterator;
 use Traversable;
@@ -40,8 +40,8 @@ class Cursor implements Iterator
 
     /**
      * Cursor constructor.
-     * @param Collection  $collection
-     * @param Traversable $cursor
+     * @param Collection        $collection
+     * @param Traversable       $cursor
      */
     public function __construct( Collection $collection, Traversable $cursor )
     {

@@ -33,7 +33,7 @@ Class Database
     public function __construct( Mongo $mongo, string $database )
     {
         $this->mongo    = $mongo;
-        $this->database = new MongoDbDatabase($mongo->mongo(), $database);
+        $this->database = new MongoDbDatabase($mongo->mongoManager(), $database);
     }
 
     /**
@@ -61,14 +61,14 @@ Class Database
      */
     public function name(): string
     {
-        return $this->database()
+        return $this->mongoDatabase()
             ->getDatabaseName();
     }
 
     /**
      * @return MongoDbDatabase
      */
-    public function database(): MongoDbDatabase
+    public function mongoDatabase(): MongoDbDatabase
     {
         return $this->database;
     }
@@ -99,7 +99,7 @@ Class Database
      */
     public function drop(): bool
     {
-        $drop = $this->database()
+        $drop = $this->mongoDatabase()
             ->drop();
 
         return $drop[ 'ok' ] == 1;
@@ -112,7 +112,7 @@ Class Database
     {
         $list = new Json();
 
-        foreach ( $this->database()
+        foreach ( $this->mongoDatabase()
             ->listCollections() as $collection ) {
             $list->append($collection->getName());
         }

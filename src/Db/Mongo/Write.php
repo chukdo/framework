@@ -6,6 +6,7 @@ use Chukdo\Db\Mongo\Schema\Validator;
 use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
 use MongoDB\BSON\Regex;
+use MongoDB\Driver\Session as MongoSession;
 use MongoDB\Operation\FindOneAndUpdate;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 
@@ -18,8 +19,6 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
  */
 Class Write extends Where
 {
-    use Session;
-
     /**
      * @var Json
      */
@@ -42,6 +41,93 @@ Class Write extends Where
     }
 
     /**
+     * @return bool
+     */
+    public function hasSession(): bool
+    {
+        return isset($this->options[ 'session' ]);
+    }
+
+    /**
+     * @return MongoSession|null
+     */
+    public function getSession(): ?MongoSession
+    {
+        if ( isset($this->options[ 'session' ]) ) {
+            return $this->options[ 'session' ];
+        }
+
+        return null;
+    }
+
+    /**
+     * @param MongoSession|null $session
+     * @return Write
+     */
+    public function setSession( MongoSession $session = null ): self
+    {
+        if ( $session ) {
+            if ( isset($this->options[ 'session' ]) ) {
+                $this->options[ 'session' ]->endSession();
+            }
+
+            $this->options[ 'session' ] = $session;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Session
+     */
+    public function startTransaction(): self
+    {
+        $this->session()
+            ->startTransaction([]);
+
+        return $this;
+    }
+
+    /**
+     * @return MongoSession
+     */
+    public function session(): MongoSession
+    {
+        if ( isset($this->options[ 'session' ]) ) {
+            return $this->options[ 'session' ];
+        }
+        else {
+            $mongo = $this->collection()
+                ->mongo()
+                ->mongoManager();
+
+            return $this->options[ 'session' ] = $mongo->startSession();
+        }
+    }
+
+    /**
+     * @return Session
+     */
+    public function commitTransaction(): self
+    {
+        $this->session()
+            ->commitTransaction();
+
+        return $this;
+    }
+
+    /**
+     * @return Session
+     */
+    public function abortTransaction(): self
+    {
+        $this->session()
+            ->abortTransaction();
+
+        return $this;
+    }
+
+    /**
      * @return Write
      */
     public function bypassValidation(): self
@@ -56,7 +142,7 @@ Class Write extends Where
      */
     public function delete(): int
     {
-        return (int) $this->collection()
+        return (int) $this->mongoCollection()
             ->deleteMany($this->filter(), $this->options())
             ->getDeletedCount();
     }
@@ -74,7 +160,7 @@ Class Write extends Where
      */
     public function deleteOne(): bool
     {
-        return (bool) $this->collection()
+        return (bool) $this->mongoCollection()
             ->deleteOne($this->filter(), $this->options())
             ->getDeletedCount();
     }
@@ -84,7 +170,7 @@ Class Write extends Where
      */
     public function deleteOneAndGet(): JsonInterface
     {
-        $json = new Json($this->collection()
+        $json = new Json($this->mongoCollection()
             ->findOneAndDelete($this->filter(), $this->options()));
 
         return $json->filterRecursive(function( $k, $v )
@@ -385,7 +471,7 @@ Class Write extends Where
      */
     public function insert(): ?string
     {
-        return (string) $this->collection()
+        return (string) $this->mongoCollection()
             ->insertOne($this->validatedInsertFields(), $this->options())
             ->getInsertedId();
     }
@@ -407,7 +493,7 @@ Class Write extends Where
      */
     public function update(): int
     {
-        return (int) $this->collection()
+        return (int) $this->mongoCollection()
             ->updateMany($this->filter(), $this->validatedUpdateFields(), $this->options())
             ->getModifiedCount();
     }
@@ -471,7 +557,7 @@ Class Write extends Where
             'upsert' => true,
         ], $this->options());
 
-        return (string) $this->collection()
+        return (string) $this->mongoCollection()
             ->updateOne($this->filter(), $this->validatedUpdateFields(), $options)
             ->getUpsertedId();
     }
@@ -481,7 +567,7 @@ Class Write extends Where
      */
     public function updateOne(): bool
     {
-        return (bool) $this->collection()
+        return (bool) $this->mongoCollection()
             ->updateOne($this->filter(), $this->validatedUpdateFields(), $this->options())
             ->getModifiedCount();
     }
@@ -499,7 +585,7 @@ Class Write extends Where
                 : FindOneAndUpdate::RETURN_DOCUMENT_AFTER,
         ], $this->options());
 
-        $json = new Json($this->collection()
+        $json = new Json($this->mongoCollection()
             ->findOneAndUpdate($this->filter(), $this->validatedUpdateFields(), $options));
 
         return $json->filterRecursive(function( $k, $v )

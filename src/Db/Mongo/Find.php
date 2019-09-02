@@ -18,8 +18,6 @@ use Chukdo\Contracts\Db\Record as RecordInterface;
  */
 Class Find extends Where
 {
-    use Session;
-
     /**
      * @var array
      */
@@ -64,7 +62,7 @@ Class Find extends Where
      */
     public function link( string $field, array $with = [], array $without = [], string $linked = null ): self
     {
-        $link = new Link($this->collection->database(), $field);
+        $link = new Link($this->collection()->database(), $field);
 
         $this->link[] = $link->with($with)
             ->without($without)
@@ -151,10 +149,10 @@ Class Find extends Where
      */
     public function explain(): JsonInterface
     {
-        $explain = $this->collection->mongo()
+        $explain = $this->collection()->mongo()
             ->command([
                 'explain' => [
-                    'find'   => $this->collection->name(),
+                    'find'   => $this->collection()->name(),
                     'filter' => $this->filter(),
                 ],
             ]);
@@ -187,7 +185,7 @@ Class Find extends Where
             return $record;
         }
 
-        return new Record($this->collection);
+        return new Record($this->collection());
     }
 
     /**
@@ -197,7 +195,7 @@ Class Find extends Where
     {
         $options = array_merge($this->projection(), $this->options);
 
-        return new Cursor($this->collection, $this->collection()
+        return new Cursor($this->collection(), $this->mongoCollection()
             ->find($this->filter(), $options));
     }
 
@@ -243,7 +241,7 @@ Class Find extends Where
      */
     public function all( bool $idAsKey = false ): RecordList
     {
-        $recordList = new RecordList($this->collection);
+        $recordList = new RecordList($this->collection());
 
         foreach ( $this->cursor() as $key => $value ) {
             if ( $idAsKey ) {
@@ -273,7 +271,7 @@ Class Find extends Where
      */
     public function count(): int
     {
-        return (int) $this->collection()
+        return (int) $this->mongoCollection()
             ->countDocuments($this->filter());
     }
 
@@ -283,7 +281,7 @@ Class Find extends Where
      */
     public function distinct( string $field ): JsonInterface
     {
-        return new Json($this->collection()
+        return new Json($this->mongoCollection()
             ->distinct($field, $this->filter()));
     }
 }

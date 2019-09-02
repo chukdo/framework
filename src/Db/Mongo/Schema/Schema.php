@@ -59,7 +59,7 @@ class Schema
 
         $save = new Json($this->collection()
             ->database()
-            ->database()
+            ->mongoDatabase()
             ->modifyCollection($this->collection()
                 ->name(), $schema));
 
@@ -113,7 +113,7 @@ class Schema
 
         $save = new Json($this->collection()
             ->database()
-            ->database()
+            ->mongoDatabase()
             ->modifyCollection($this->collection()
                 ->name(), $schema));
 

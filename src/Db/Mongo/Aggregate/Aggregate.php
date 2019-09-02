@@ -5,7 +5,6 @@ namespace Chukdo\Db\Mongo\Aggregate;
 use Chukdo\DB\Mongo\Collection;
 use Chukdo\Db\Mongo\Cursor;
 use Chukdo\Db\Mongo\Match;
-use Chukdo\Db\Mongo\Session;
 use Chukdo\Db\Mongo\Where;
 use Chukdo\Json\Json;
 use Chukdo\Contracts\Json\Json as JsonInterface;
@@ -20,8 +19,6 @@ use MongoDB\Driver\ReadPreference;
  */
 Class Aggregate
 {
-    use Session;
-
     /**
      * @var Collection
      */
@@ -58,7 +55,7 @@ Class Aggregate
     public function setReadPreference( int $readPreference ): self
     {
         $this->collection->mongo()
-            ->mongo()
+            ->mongoManager()
             ->selectServer(new ReadPreference($readPreference));
 
         return $this;
@@ -101,7 +98,7 @@ Class Aggregate
     {
         $options = array_merge($this->options, $options);
 
-        return new Cursor($this->collection, $this->collection->collection()
+        return new Cursor($this->collection, $this->collection->mongoCollection()
             ->aggregate($this->projection(), $options));
     }
 
@@ -147,7 +144,7 @@ Class Aggregate
      */
     public function explain(): JsonInterface
     {
-        return new Json(new Cursor($this->collection, $this->collection->collection()
+        return new Json(new Cursor($this->collection, $this->collection->mongoCollection()
             ->aggregate($this->projection(), [
                 'explain'   => true,
                 'useCursor' => true,

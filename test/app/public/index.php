@@ -327,28 +327,26 @@ $up = Db::collection('students', 'test')
 //dd($up);
 //exit;
 $write = Db::collection('test', 'test')
-    ->write();
-
-$write->session()
-    ->startTransaction([]);
-$write->setAll([
-    'cust_id'  => 'domingo',
-    'ord_date' => new DateTime(),
-    'status'   => 'A',
-    'amount'   => 400,
-    'a'        => [
-        'b' => [
-            'toto' => 'titi',
-            'test' => new DateTime(),
+    ->write()
+    ->startTransaction()
+    ->setAll([
+        'cust_id'  => 'domingo',
+        'ord_date' => new DateTime(),
+        'status'   => 'A',
+        'amount'   => 400,
+        'a'        => [
+            'b' => [
+                'toto' => 'titi',
+                'test' => new DateTime(),
+            ],
         ],
-    ],
-])
-    ->insert();
+    ]);
+$write->insert();
 
 $write2 = Db::collection('test', 'test')
-    ->write();
-$write2->setSession($write->session());
-$write2->set('amount', 600)
+    ->write()
+    ->setSession($write->session())
+    ->set('amount', 600)
     ->set('a', [
         'b' => [
             'toto2' => 'titi2',
@@ -361,7 +359,6 @@ $write2->set('amount', 600)
 
 $aggregate = Db::collection('test', 'test')
     ->aggregate()
-    ->setSession($write->session())
     ->where('status', '=', 'A')
     ->pipe()
     ->group('cust_id')
@@ -369,10 +366,9 @@ $aggregate = Db::collection('test', 'test')
     ->calculate('total', Expr::sum('amount'))
     ->pipe()
     ->sort('total', 'desc');
-$aAll = $aggregate->all();
-$write2->session()
-    ->commitTransaction();
-dd($aAll->toHtml());
+$aAll      = $aggregate->all();
+
+//dd($aAll->toHtml());
 /**dd($aggregate->all()
  * ->toHtml());*/
 
@@ -386,31 +382,24 @@ $s = new \Chukdo\Db\Mongo\Aggregate\Expression('sum', $m);
 
 $contrat = Db::collection('contrat');
 
-$listing = $contrat->find();
-$session = $listing->session();
-$session->startTransaction([]);
-$listing->without('_id')
+$listing = $contrat->find()
+    ->without('_id')
     ->with('_agence', '_modele', 'reference', 'history.id', 'history._version')
     ->link('_agence', [
         'agence',
         'cp',
         'ville',
         'date_created',
-        'date_modified'
+        'date_modified',
     ])
     ->limit(4)
     ->where('version', '=', '2')
     ->where('state', '=', '1')
     //->where('history', 'size', 4)
     ->where('history._version', '=', '5a3c37db3fcd9e16e21fe0b5');
-
-$result = $listing->one();
-$listing->session()
-    ->commitTransaction();
-dd($result->toHtml());
-$listing->delete();
-
-// hox to restore ?!!
+$r = $listing->one();
+$r->delete($write->session());
+$write->abortTransaction();
 
 dd($contrat->find()
     ->without('_id')
@@ -420,14 +409,15 @@ dd($contrat->find()
         'cp',
         'ville',
         'date_created',
-        'date_modified'
+        'date_modified',
     ])
     ->limit(4)
     ->where('version', '=', '2')
     ->where('state', '=', '1')
     //->where('history', 'size', 4)
     ->where('history._version', '=', '5a3c37db3fcd9e16e21fe0b5')
-    ->one()->toHtml());
+    ->one()
+    ->toHtml());
 
 //$contrat->write()->insert();
 //$contrat->write()->set()->set()->where()->updateOne();

@@ -12,6 +12,7 @@ use Chukdo\Json\Json;
 use Chukdo\Db\Mongo\Collection;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Contracts\Db\Record as RecordInterface;
+use MongoDB\Driver\Session as MongoSession;
 
 /**
  * Mongo Record.
@@ -60,12 +61,14 @@ Class Record extends Json implements RecordInterface
     }
 
     /**
+     * @param MongoSession|null $session
      * @return JsonInterface
      * @throws Exception
      */
-    public function delete(): JsonInterface
+    public function delete( MongoSession $session = null ): JsonInterface
     {
-        $write = $this->collection->write();
+        $write = $this->collection->write()
+            ->setSession($session);
 
         if ( ( $id = $this->id() ) !== null ) {
             $write->where('_id', '=', $id);
@@ -74,9 +77,12 @@ Class Record extends Json implements RecordInterface
 
             /** Options delete to Bin */
             if ( $this->binTrashRecord ) {
-                $this->collection()->mongo()
-                    ->collection($this->collection()->name() . '_bintrash')
+                $this->collection()
+                    ->mongo()
+                    ->collection($this->collection()
+                                     ->name() . '_bintrash')
                     ->write()
+                    ->setSession($session)
                     ->setAll($get)
                     ->set('date_deleted', new DateTime())
                     ->insert();
@@ -150,12 +156,14 @@ Class Record extends Json implements RecordInterface
     }
 
     /**
-     * @return bool|mixed|string|null
+     * @param MongoSession|null $session
+     * @return mixed|string|null
      * @throws Exception
      */
-    public function save()
+    public function save( MongoSession $session = null )
     {
-        $write = $this->collection->write();
+        $write = $this->collection->write()
+            ->setSession($session);
         $write->setAll($this->filterRecursive(function( $k, $v )
         {
             if ( !Is::RecordInterface($v) ) {

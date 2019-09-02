@@ -51,18 +51,26 @@ Class Where
     public function setReadPreference( int $readPreference ): self
     {
         $this->collection->mongo()
-            ->mongo()
+            ->mongoManager()
             ->selectServer(new ReadPreference($readPreference));
 
         return $this;
     }
 
     /**
+     * @return Collection
+     */
+    public function collection(): Collection
+    {
+        return $this->collection;
+    }
+
+    /**
      * @return MongoDbCollection
      */
-    public function collection(): MongoDbCollection
+    public function mongoCollection(): MongoDbCollection
     {
-        return $this->collection->collection();
+        return $this->collection()->mongoCollection();
     }
 
     /**

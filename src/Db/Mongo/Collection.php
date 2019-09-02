@@ -52,7 +52,7 @@ Class Collection
     {
         $this->mongo      = $mongo;
         $this->database   = $database;
-        $this->collection = new MongoDbCollection($mongo->mongo(), $database, $collection);
+        $this->collection = new MongoDbCollection($mongo->mongoManager(), $database, $collection);
     }
 
     /**
@@ -129,7 +129,7 @@ Class Collection
      */
     public function name(): string
     {
-        return $this->collection()
+        return $this->mongoCollection()
             ->getCollectionName();
     }
 
@@ -138,14 +138,14 @@ Class Collection
      */
     public function databaseName(): string
     {
-        return $this->collection()
+        return $this->mongoCollection()
             ->getDatabaseName();
     }
 
     /**
      * @return MongoDbCollection
      */
-    public function collection(): MongoDbCollection
+    public function mongoCollection(): MongoDbCollection
     {
         return $this->collection;
     }
@@ -204,7 +204,7 @@ Class Collection
      */
     public function drop(): bool
     {
-        $drop = $this->collection()
+        $drop = $this->mongoCollection()
             ->drop();
 
         return $drop[ 'ok' ] == 1;
