@@ -3,6 +3,7 @@
 namespace Chukdo\Db\Mongo;
 
 use MongoDB\Driver\Session as MongoSession;
+use MongoDB\Driver\ReadPreference;
 
 /**
  * Mongo Session TRAIT.
@@ -22,9 +23,10 @@ Trait Session
             return $this->options[ 'session' ];
         }
         else {
-            return $this->options[ 'session' ] = $this->collection->mongo()
-                ->mongo()
-                ->startSession();
+            $mongo = $this->collection->mongo()
+                ->mongo();
+
+            return $this->options[ 'session' ] = $mongo->startSession();
         }
     }
 

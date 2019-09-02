@@ -369,8 +369,10 @@ $aggregate = Db::collection('test', 'test')
     ->calculate('total', Expr::sum('amount'))
     ->pipe()
     ->sort('total', 'desc');
+$aAll = $aggregate->all();
 $write2->session()
     ->commitTransaction();
+dd($aAll->toHtml());
 /**dd($aggregate->all()
  * ->toHtml());*/
 
@@ -384,8 +386,10 @@ $s = new \Chukdo\Db\Mongo\Aggregate\Expression('sum', $m);
 
 $contrat = Db::collection('contrat');
 
-$listing = $contrat->find()
-    ->without('_id')
+$listing = $contrat->find();
+$session = $listing->session();
+$session->startTransaction([]);
+$listing->without('_id')
     ->with('_agence', '_modele', 'reference', 'history.id', 'history._version')
     ->link('_agence', [
         'agence',
@@ -398,9 +402,12 @@ $listing = $contrat->find()
     ->where('version', '=', '2')
     ->where('state', '=', '1')
     //->where('history', 'size', 4)
-    ->where('history._version', '=', '5a3c37db3fcd9e16e21fe0b5')
-    ->one();
-dd($listing->toHtml());
+    ->where('history._version', '=', '5a3c37db3fcd9e16e21fe0b5');
+
+$result = $listing->one();
+$listing->session()
+    ->commitTransaction();
+dd($result->toHtml());
 $listing->delete();
 
 // hox to restore ?!!

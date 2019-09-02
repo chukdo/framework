@@ -37,6 +37,7 @@ Class Write extends Where
     public function __construct( Collection $collection )
     {
         $this->fields = new Json();
+
         parent::__construct($collection);
     }
 
