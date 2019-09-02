@@ -4,6 +4,7 @@ namespace Chukdo\Db\Mongo\Record;
 
 use Chukdo\Db\Mongo\Index;
 use Chukdo\Db\Mongo\Schema\Schema;
+use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
 use Chukdo\Db\Mongo\Collection;
 use Chukdo\Contracts\Db\Record as RecordInterface;
@@ -96,25 +97,30 @@ Class Record extends Json implements RecordInterface
     /**
      * @return string|null
      */
-    public function getId(): ?string
+    public function id(): ?string
     {
         return $this->id;
     }
 
     /**
-     * @param string $id
-     * @return RecordInterface
+     * @return int|mixed|string|null
      */
-    public function setId( string $id ): RecordInterface
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
     public function save()
     {
-        // basé sur les données en faisant un update or insert maybe ?
+        $write = $this->collection->write();
+        $write->setAll($this->filterRecursive(function($k, $v) {
+            if (!Is::RecordInterface($v)) {
+                return $v;
+            }
+        }));
 
+        /** Update */
+        if (($id = $this->id()) !== null) {
+            return $write->update();
+
+        /** Save */
+        } else {
+            return $write->insert();
+        }
     }
 }

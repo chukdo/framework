@@ -49,13 +49,7 @@ interface Record extends JsonInterface
     /**
      * @return string|null
      */
-    public function getId(): ?string;
-
-    /**
-     * @param string $id
-     * @return Record
-     */
-    public function setId( string $id ): self;
+    public function id(): ?string;
 
     /**
      * @return mixed

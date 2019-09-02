@@ -28,11 +28,17 @@ class Agence extends Record
             ->save();
     }
 
+    /**
+     * @param $adresse
+     * @return Agence
+     */
+    public function setAdresse($adresse): self
+    {
+        list($cp, $ville) = array_pad(explode(' ', $adresse), 2, '');
 
-    //save
-    //delete
-    //softDelete
-    // conf > collection / date / history
-    // extend find ()
-    //  -> find() renvoyer liste de modeles et non json ?!
+        $this->offsetSet('cp', $cp);
+        $this->offsetSet('ville', $ville);
+
+        return $this;
+    }
 }

@@ -3,6 +3,7 @@
 namespace Chukdo\Helper;
 
 use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\Contracts\Db\Record as RecordInterface;
 use Chukdo\Json\Arr;
 use stdClass;
 use ArrayObject;
@@ -323,6 +324,15 @@ final class Is
     public static function jsonInterface( $value ): bool
     {
         return $value instanceof JsonInterface;
+    }
+
+    /**
+     * @param $value
+     * @return bool
+     */
+    public static function RecordInterface( $value ): bool
+    {
+        return $value instanceof RecordInterface;
     }
 
     /**

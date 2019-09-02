@@ -398,6 +398,7 @@ class Validator
     public function validateDataToUpdate( $data ): array
     {
         $json = new Json($data);
+        $json->offsetUnset('_id');
 
         if ( $this->property->count() == 0 ) {
             return $json->toArray();
