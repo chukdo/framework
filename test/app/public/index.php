@@ -386,11 +386,13 @@ $contrat = Db::collection('contrat');
 
 $listing = $contrat->find()
     ->without('_id')
-    ->with('_agence', '_modele', 'history.id', 'history._version')
+    ->with('_agence', '_modele', 'reference', 'history.id', 'history._version')
     ->link('_agence', [
         'agence',
         'cp',
         'ville',
+        'date_created',
+        'date_modified'
     ])
     ->limit(4)
     ->where('version', '=', '2')
@@ -399,11 +401,25 @@ $listing = $contrat->find()
     ->where('history._version', '=', '5a3c37db3fcd9e16e21fe0b5')
     ->one();
 
-$agence = $listing->offsetGet('linked_agence');
-$agence->setAdresse('64450 navailles-angos');
-$agence->save();
+$listing->setReference(["qsqs", 'sdsdsds']);
+$listing->save();
 
-dd($listing->toHtml());
+dd($contrat->find()
+    ->without('_id')
+    ->with('_agence', '_modele', 'reference', 'history.id', 'history._version')
+    ->link('_agence', [
+        'agence',
+        'cp',
+        'ville',
+        'date_created',
+        'date_modified'
+    ])
+    ->limit(4)
+    ->where('version', '=', '2')
+    ->where('state', '=', '1')
+    ->where('history', 'size', 4)
+    ->where('history._version', '=', '5a3c37db3fcd9e16e21fe0b5')
+    ->one()->toHtml());
 
 //$contrat->write()->insert();
 //$contrat->write()->set()->set()->where()->updateOne();

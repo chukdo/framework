@@ -3,6 +3,7 @@
 namespace App\Model;
 
 use Chukdo\Db\Mongo\Record\Record;
+use Chukdo\Helper\Is;
 
 class Contrat extends Record
 {
@@ -24,6 +25,14 @@ class Contrat extends Record
             ->save();
     }
 
+    public function setReference($ref)
+    {
+        if (Is::arr($ref)) {
+            $this->offsetSet('reference', implode('|', $ref));
+        } else {
+            $this->offsetSet('reference', $ref);
+        }
+    }
 
     //save
     //delete

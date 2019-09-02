@@ -2,11 +2,15 @@
 
 namespace Chukdo\Db\Mongo\Record;
 
+use Exception;
+use DateTime;
 use Chukdo\Db\Mongo\Index;
+use Chukdo\Db\Mongo\MongoException;
 use Chukdo\Db\Mongo\Schema\Schema;
 use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
 use Chukdo\Db\Mongo\Collection;
+use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Contracts\Db\Record as RecordInterface;
 
 /**
@@ -29,6 +33,11 @@ Class Record extends Json implements RecordInterface
     protected $id = null;
 
     /**
+     * @var bool
+     */
+    protected $autoDateRecord = false;
+
+    /**
      * Record constructor.
      * @param Collection $collection
      * @param null       $data
@@ -46,6 +55,30 @@ Class Record extends Json implements RecordInterface
     }
 
     /**
+     * @return JsonInterface
+     */
+    public function delete(): JsonInterface
+    {
+        $write = $this->collection->write();
+
+        if ( ( $id = $this->id() ) !== null ) {
+            $write->where('_id', '=', $id);
+
+            return $write->deleteOneAndGet();
+        }
+
+        throw new MongoException('No ID to delete Record');
+    }
+
+    /**
+     * @return string|null
+     */
+    public function id(): ?string
+    {
+        return $this->id;
+    }
+
+    /**
      * @return Collection
      */
     public function collection(): Collection
@@ -58,10 +91,12 @@ Class Record extends Json implements RecordInterface
      */
     public function init()
     {
-        $this->index()->drop();
-        $this->createIndex();
-        $this->schema()->drop();
-        $this->createSchema();
+        $this->index()
+            ->drop();
+        $this->initIndex();
+        $this->schema()
+            ->drop();
+        $this->initSchema();
     }
 
     /**
@@ -69,13 +104,14 @@ Class Record extends Json implements RecordInterface
      */
     public function index(): Index
     {
-        return $this->collection()->index();
+        return $this->collection()
+            ->index();
     }
 
     /**
      * Création des index
      */
-    public function createIndex()
+    public function initIndex()
     {
     }
 
@@ -84,43 +120,48 @@ Class Record extends Json implements RecordInterface
      */
     public function schema(): Schema
     {
-        return $this->collection()->schema();
+        return $this->collection()
+            ->schema();
     }
 
     /**
      * Création des schema de validation des données
      */
-    public function createSchema()
+    public function initSchema()
     {
     }
 
     /**
-     * @return string|null
-     */
-    public function id(): ?string
-    {
-        return $this->id;
-    }
-
-    /**
-     * @return int|mixed|string|null
+     * @return bool|mixed|string|null
+     * @throws Exception
      */
     public function save()
     {
         $write = $this->collection->write();
-        $write->setAll($this->filterRecursive(function($k, $v) {
-            if (!Is::RecordInterface($v)) {
+        $write->setAll($this->filterRecursive(function( $k, $v )
+        {
+            if ( !Is::RecordInterface($v) ) {
                 return $v;
             }
         }));
 
-        /** Update */
-        if (($id = $this->id()) !== null) {
-            return $write->update();
+        if ( $this->autoDateRecord ) {
+            $write->setOnInsert('date_created', new DateTime())
+                ->set('date_modified', new DateTime());
+        }
 
-        /** Save */
-        } else {
+        /** Update */
+        if ( ( $id = $this->id() ) !== null ) {
+            $write->where('_id', '=', $id);
+
+            return $write->updateOne();
+
+            /** Save */
+        }
+        else {
             return $write->insert();
         }
     }
+
+
 }

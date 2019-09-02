@@ -6,6 +6,11 @@ use Chukdo\Db\Mongo\Record\Record;
 
 class Agence extends Record
 {
+    /**
+     * @var bool
+     */
+    protected $autoDateRecord = true;
+
     public function createIndex()
     {
         $this->collection()

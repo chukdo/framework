@@ -86,10 +86,10 @@ Class Collection
             $value = new ObjectId($value);
         }
         elseif ( $value instanceof DateTime ) {
-            $value = new UTCDateTime($value->getTimestamp());
+            $value = new UTCDateTime($value->getTimestamp() * 1000);
         }
         elseif ( Str::contain($field, 'date') && Is::scalar($value) ) {
-            $value = new UTCDateTime((int) $value);
+            $value = new UTCDateTime(1000 * (int) $value);
         }
 
         return $value;

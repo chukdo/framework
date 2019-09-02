@@ -27,24 +27,24 @@ interface Record extends JsonInterface
     public function init();
 
     /**
+     * Création des index
+     */
+    public function initIndex();
+
+    /**
+     * Création des schema de validation des données
+     */
+    public function initSchema();
+
+    /**
      * @return Index
      */
     public function index(): Index;
 
     /**
-     * Création des index
-     */
-    public function createIndex();
-
-    /**
      * @return Schema
      */
     public function schema(): Schema;
-
-    /**
-     * Création des schema de validation des données
-     */
-    public function createSchema();
 
     /**
      * @return string|null

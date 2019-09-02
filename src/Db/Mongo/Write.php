@@ -134,7 +134,7 @@ Class Write extends Where
 
             $value = $values;
         }
-        elseif ( Is::scalar($value) ) {
+        else {
             $value = Collection::filterIn($field, $value);
         }
 
