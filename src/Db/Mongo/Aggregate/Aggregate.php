@@ -8,7 +8,6 @@ use Chukdo\Db\Mongo\Match;
 use Chukdo\Db\Mongo\Where;
 use Chukdo\Json\Json;
 use Chukdo\Contracts\Json\Json as JsonInterface;
-use MongoDB\Driver\ReadPreference;
 
 /**
  * Mongo Aggregate Group.
@@ -41,24 +40,6 @@ Class Aggregate
     public function __construct( Collection $collection )
     {
         $this->collection = $collection;
-    }
-
-    /**
-     * @param int $readPreference
-     * ReadPreference::RP_PRIMARY = 1,
-     * RP_SECONDARY = 2,
-     * RP_PRIMARY_PREFERRED = 5,
-     * RP_SECONDARY_PREFERRED = 6,
-     * RP_NEAREST = 10
-     * @return Aggregate
-     */
-    public function setReadPreference( int $readPreference ): self
-    {
-        $this->collection->mongo()
-            ->mongoManager()
-            ->selectServer(new ReadPreference($readPreference));
-
-        return $this;
     }
 
     /**
