@@ -4,9 +4,8 @@ namespace App\Providers;
 
 use Chukdo\Bootstrap\ServiceProvider;
 use Chukdo\Db\Mongo\Mongo;
-use Chukdo\Facades\Db;
 
-class DbServiceProvider extends ServiceProvider
+class MongoServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
@@ -18,6 +17,6 @@ class DbServiceProvider extends ServiceProvider
             ],
         ]);
 
-        $this->setClassAlias(Db::class, 'Db');
+        $this->setClassAlias(Mongo::class, 'Mongo');
     }
 }

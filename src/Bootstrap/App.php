@@ -2,7 +2,7 @@
 
 namespace Chukdo\Bootstrap;
 
-use Chukdo\Facades\Facade;
+use Chukdo\Helper\To;
 use Closure;
 
 /**
@@ -41,6 +41,16 @@ class App extends Service
     public function __construct()
     {
         $this->instance('\Chukdo\Bootstrap\App', $this);
+    }
+
+    /**
+     * @param $data
+     */
+    public function dd( $data )
+    {
+        die(php_sapi_name() == 'cli'
+            ? To::text($data)
+            : To::html($data, null, null, true));
     }
 
     /**

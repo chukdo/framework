@@ -39,8 +39,7 @@ class Basic implements FunctionsInterface
      */
     public function contain( string $data, string $search ): bool
     {
-        return Str::contain($data,
-            $search);
+        return Str::contain($data, $search);
     }
 
     /**

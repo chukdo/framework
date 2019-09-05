@@ -251,6 +251,52 @@ final class To
     }
 
     /**
+     * @param     $value
+     * @param int $indent
+     * @return string
+     */
+    public static function text( $value, int $indent = 0 ): string
+    {
+        $text   = '';
+        $prefix = str_repeat(' |  ', $indent);
+        if ( is_numeric($value) ) {
+            $text .= "Number: $value";
+        }
+        elseif ( \is_string($value) ) {
+            $text .= "String: '$value'";
+        }
+        elseif ( \is_null($value) ) {
+            $text .= "Null";
+        }
+        elseif ( $value === true ) {
+            $text .= "True";
+        }
+        elseif ( $value === false ) {
+            $text .= "False";
+        }
+        elseif ( is_array($value) ) {
+            $text .= "Array (" . count($value) . ')';
+            $indent++;
+
+            foreach ( $value AS $k => $v ) {
+                $text .= "\n$prefix [$k] = ";
+                $text .= self::text($v, $indent);
+            }
+        }
+        elseif ( is_object($value) ) {
+            $text .= "Object (" . get_class($value) . ")";
+            $indent++;
+
+            foreach ( $value AS $k => $v ) {
+                $text .= "\n$prefix $k -> ";
+                $text .= self::text($v, $indent);
+            }
+        }
+
+        return $text;
+    }
+
+    /**
      * @param             $value
      * @param string|null $title
      * @param string|null $color
@@ -268,10 +314,14 @@ final class To
 
         if ( $title ) {
             $color = $color
-                ?: '#499cef';
+                ?: '#777';
             $html  .= '<thead style="color: #fff;background: ' . $color
-                      . ';"><tr><th colspan="2" style="padding:10px;font-size:20px;">' . ucfirst($title)
+                      . ';"><tr><th colspan="2" style="padding:5px;font-size:18px;font-weight: normal;">' . ucfirst($title)
                       . "</th></tr></thead>";
+        }
+
+        if ( is_scalar($value) ) {
+            return '<span style="' . $style . '"><b>(' . gettype($value) . ')</b>: ' . $value . '<span>';
         }
 
         foreach ( $value as $k => $v ) {
@@ -284,8 +334,8 @@ final class To
                 $v = $v->format('d-m-Y H:i:s');
             }
 
-            $html .= '<tr><td style="background:#eee;padding:6px;border:1px solid #eee;width:' . strlen($k) * 9 . 'px;">'
-                     . $k . '</td><td  style="padding:6px;border:1px solid #eee;">' . $v . '</td></tr>';
+            $html .= '<tr><td style="background:#eee;padding:5px;border:1px solid #eee;width:' . strlen($k) * 9 . 'px;">'
+                     . $k . '</td><td  style="padding:5px;border:1px solid #eee;">' . $v . '</td></tr>';
         }
 
         return '<table id="ToHtml" style="' . $style . '">' . $html . '</table>';

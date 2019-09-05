@@ -34,12 +34,12 @@ Class Mongo
 
     /**
      * Mongo constructor.
-     * @param string      $dsn
+     * @param string|null $dsn
      * @param string|null $database
      */
-    public function __construct( string $dsn, string $database = null )
+    public function __construct( string $dsn = null, string $database = null )
     {
-        $this->dsn          = $dsn;
+        $this->dsn          = $dsn ?: 'mongodb://127.0.0.1:27017';
         $this->mongo        = new Manager($dsn);
         $this->databaseName = $database;
     }

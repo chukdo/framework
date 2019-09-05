@@ -10,7 +10,7 @@ namespace Chukdo\Facades;
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  * @mixin \Chukdo\Db\Mongo\Mongo
  */
-class Db extends Facade
+class Mongo extends Facade
 {
     public static function name(): string
     {

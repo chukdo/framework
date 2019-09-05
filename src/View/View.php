@@ -59,18 +59,24 @@ class View
 
     /**
      * @param string|null $folder
+     * @return View
      */
-    public function setDefaultFolder( string $folder = null ): void
+    public function setDefaultFolder( string $folder = null ): self
     {
         $this->defaultFolder = rtrim($folder, '/');
+
+        return $this;
     }
 
     /**
      * @param Response|null $response
+     * @return View
      */
-    public function setResponseHandler( Response $response = null )
+    public function setResponseHandler( Response $response = null ): self
     {
         $this->response = $response ?: new Response();
+
+        return $this;
     }
 
     /**
@@ -186,10 +192,13 @@ class View
 
     /**
      * @param Functions $functions
+     * @return View
      */
-    public function loadFunction( Functions $functions ): void
+    public function loadFunction( Functions $functions ): self
     {
         $functions->register($this);
+
+        return $this;
     }
 
     /**
