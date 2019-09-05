@@ -124,6 +124,36 @@ Class Database
      * @param string $collection
      * @return Collection
      */
+    public function createCollection( string $collection ): Collection
+    {
+        if ( !$this->collectionExist($collection) ) {
+            $this->mongoDatabase()
+                ->createCollection($collection);
+        }
+
+        return $this->collection($collection);
+    }
+
+    /**
+     * @param string $collection
+     * @return bool
+     */
+    public function collectionExist( string $collection ): bool
+    {
+        foreach ( $this->mongoDatabase()
+            ->listCollections() as $coll ) {
+            if ( $coll->getName() == $collection ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $collection
+     * @return Collection
+     */
     public function collection( string $collection ): Collection
     {
         return new Collection($this->mongo(), $this->name(), $collection);

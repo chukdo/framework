@@ -6,6 +6,7 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\DB\Mongo\Collection;
 use Chukdo\Db\Mongo\Index;
 use Chukdo\Db\Mongo\Schema\Schema;
+use MongoDB\Driver\Session as MongoSession;
 
 /**
  * Interface de gestion des documents JSON.
@@ -52,7 +53,25 @@ interface Record extends JsonInterface
     public function id(): ?string;
 
     /**
+     * @param MongoSession|null $session
+     * @return Record
+     */
+    public function save( MongoSession $session = null ): self;
+
+    /**
+     * @return JsonInterface
+     */
+    public function record(): JsonInterface;
+
+    /**
+     * @param MongoSession|null $session
+     * @return Record
+     */
+    public function delete( MongoSession $session = null ): self;
+
+    /**
+     * @param string $collection
      * @return mixed
      */
-    public function save();
+    public function moveTo( string $collection ): self;
 }

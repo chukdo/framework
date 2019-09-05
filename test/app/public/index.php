@@ -220,7 +220,14 @@ $json = new \Chukdo\Json\Json([
 
 //dd($json->sort('ref.prix')->toHtml());
 
-$json = new \Chukdo\Json\Json([
+$json2 = new \Chukdo\Json\Json([
+    [
+        'tva'     => 10,
+        'ref'     => [
+            'client' => 'doc12',
+            'public' => 'ORPI',
+        ],
+    ],
     'produit1' => [
         [
             'prix'    => 340,
@@ -251,11 +258,13 @@ $json = new \Chukdo\Json\Json([
     ],
 ]);
 
-$json->get('produit2')
+dd($json->diff($json2)->toHtml());
+
+$json2->get('produit2')
     ->collect()
     ->with([ 'prix' ])
     ->sort('prix', 'asc');
-$json->get('produit1')
+$json2->get('produit1')
     ->collect()
     ->sort('prix', 'asc');
 

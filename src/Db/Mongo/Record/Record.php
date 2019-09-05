@@ -10,9 +10,9 @@ use Chukdo\Db\Mongo\Schema\Schema;
 use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
 use Chukdo\Db\Mongo\Collection;
-use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Contracts\Db\Record as RecordInterface;
 use MongoDB\Driver\Session as MongoSession;
+use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
  * Mongo Record.
@@ -39,9 +39,9 @@ Class Record extends Json implements RecordInterface
     protected $autoDateRecord = false;
 
     /**
-     * @var bool
+     * @var string|null
      */
-    protected $binTrashRecord = false;
+    protected $versioningCollection = null;
 
     /**
      * Record constructor.
@@ -62,10 +62,10 @@ Class Record extends Json implements RecordInterface
 
     /**
      * @param MongoSession|null $session
-     * @return JsonInterface
+     * @return Record
      * @throws Exception
      */
-    public function delete( MongoSession $session = null ): JsonInterface
+    public function delete( MongoSession $session = null ): RecordInterface
     {
         $write = $this->collection->write()
             ->setSession($session);
@@ -73,22 +73,9 @@ Class Record extends Json implements RecordInterface
         if ( ( $id = $this->id() ) !== null ) {
             $write->where('_id', '=', $id);
 
-            $get = $write->deleteOneAndGet();
+            $write->deleteOne();
 
-            /** Options delete to Bin */
-            if ( $this->binTrashRecord ) {
-                $this->collection()
-                    ->mongo()
-                    ->collection($this->collection()
-                                     ->name() . '_bintrash')
-                    ->write()
-                    ->setSession($session)
-                    ->setAll($get)
-                    ->set('date_deleted', new DateTime())
-                    ->insert();
-            }
-
-            return $get;
+            return $this;
         }
 
         throw new MongoException('No ID to delete Record');
@@ -108,6 +95,35 @@ Class Record extends Json implements RecordInterface
     public function collection(): Collection
     {
         return $this->collection;
+    }
+
+    /**
+     * @param string            $collection
+     * @param MongoSession|null $session
+     * @return Record
+     * @throws Exception
+     */
+    public function moveTo( string $collection, MongoSession $session = null ): RecordInterface
+    {
+        $write = $this->collection->write()
+            ->setSession($session);
+
+        if ( ( $id = $this->id() ) !== null ) {
+            $write->where('_id', '=', $id);
+
+            $this->collection()
+                ->database()
+                ->collection($collection)
+                ->write()
+                ->setSession($session)
+                ->setAll($write->deleteOneAndGet())
+                ->set('date_archived', new DateTime())
+                ->insert();
+
+            return $this;
+        }
+
+        throw new MongoException('No ID to delete Record');
     }
 
     /**
@@ -156,20 +172,30 @@ Class Record extends Json implements RecordInterface
     }
 
     /**
+     * @return JsonInterface
+     */
+    public function record(): JsonInterface
+    {
+        return $this->filterRecursive(function( $k, $v )
+        {
+            return !Is::RecordInterface($v)
+                ? $v
+                : null;
+        });
+    }
+
+
+    /**
      * @param MongoSession|null $session
-     * @return mixed|string|null
+     * @return Record
      * @throws Exception
      */
-    public function save( MongoSession $session = null )
+    public function save( MongoSession $session = null ): RecordInterface
     {
-        $write = $this->collection->write()
-            ->setSession($session);
-        $write->setAll($this->filterRecursive(function( $k, $v )
-        {
-            if ( !Is::RecordInterface($v) ) {
-                return $v;
-            }
-        }));
+        $insert = false;
+        $write  = $this->collection->write()
+            ->setSession($session)
+            ->setAll($this->record());
 
         /** Option Auto Date */
         if ( $this->autoDateRecord ) {
@@ -177,18 +203,55 @@ Class Record extends Json implements RecordInterface
                 ->set('date_modified', new DateTime());
         }
 
+        /** Insert */
+        if ( $this->id() === null ) {
+            $insert   = true;
+            $this->id = $write->insert();
+            $this->offsetSet('_id', $this->id());
+        }
+
         /** Update */
-        if ( ( $id = $this->id() ) !== null ) {
-            $write->where('_id', '=', $id);
-
-            return $write->updateOrInsert();
-
-            /** Save */
-        }
         else {
-            return $write->insert();
+            $write->where('_id', '=', $this->id())
+                ->updateOne();
         }
+
+        /** Option Versioning */
+        if ( $this->versioningCollection ) {
+            $this->versionning($session, $insert
+                ? $this->record()
+                : $this->collection()
+                    ->find()
+                    ->where('_id', '=', $this->id())
+                    ->one());
+        }
+
+        return $this;
     }
 
+    /**
+     * @param MongoSession|null $session
+     * @param JsonInterface     $record
+     * @return Record
+     * @throws Exception
+     */
+    protected function versionning( ?MongoSession $session, JsonInterface $record ): RecordInterface
+    {
+        $db = $this->collection()
+            ->database();
 
+        if ( $session && $this->versioningCollection && !$db->collectionExist($this->versioningCollection) ) {
+            $session->abortTransaction();
+            throw new MongoException(sprintf('Aborting transaction, Versioning collection [%s] no exist', $this->versioningCollection));
+        }
+
+        $db->collection($this->versioningCollection)
+            ->write()
+            ->setSession($session)
+            ->setAll($record)
+            ->set('date_versioning', new DateTime())
+            ->insert();
+
+        return $this;
+    }
 }

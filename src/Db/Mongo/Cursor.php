@@ -4,7 +4,6 @@
 namespace Chukdo\Db\Mongo;
 
 use MongoDB\Driver\Cursor as MongoDbCursor;
-use MongoDB\Driver\Session as MongoSession;
 use Iterator;
 use IteratorIterator;
 use Traversable;
