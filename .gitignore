@@ -4,9 +4,8 @@
 /.vagrant
 /vagrantfile
 /vendor
-/test/conf/
 /composer.lock
 /composer.phar
 *.sh
 *.log
-.DS_Store
+*.DS_Store
