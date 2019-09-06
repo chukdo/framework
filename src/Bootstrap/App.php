@@ -2,6 +2,8 @@
 
 namespace Chukdo\Bootstrap;
 
+use Chukdo\Conf\Conf;
+use Chukdo\Conf\Lang;
 use Chukdo\Helper\To;
 use Closure;
 
@@ -19,15 +21,12 @@ class App extends Service
      * @var array
      */
     protected static $aliases = [];
+
     /**
      * Tableau des ecouteurs de resolution.
      * @var array
      */
     protected $resolving = [];
-    /**
-     * @var string
-     */
-    protected $env = '';
 
     /**
      * @var string
@@ -64,16 +63,12 @@ class App extends Service
     }
 
     /**
-     * @param string|null $env
-     * @return string
+     * To store in /etc/apache2/envvars => export CHUKDO=dev
+     * @return string|null
      */
-    public function env( string $env = null ): string
+    public function env(): ?string
     {
-        if ( $env != null ) {
-            $this->env = $env;
-        }
-
-        return $this->env;
+        return getenv('CHUKDO');
     }
 
     /**
@@ -90,16 +85,13 @@ class App extends Service
     }
 
     /**
-     * @param string $key
-     * @param null   $default
-     * @return string|null
+     * @return Conf
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function conf( string $key, $default = null ): ?string
+    public function conf(): Conf
     {
-        return $this->make('Chukdo\Conf\Conf')
-            ->offsetGet($key, $default);
+        return $this->make('Chukdo\Conf\Conf');
     }
 
     /**
@@ -153,16 +145,13 @@ class App extends Service
     }
 
     /**
-     * @param string $key
-     * @param null   $default
-     * @return string|null
+     * @return Lang
      * @throws ServiceException
      * @throws \ReflectionException
      */
-    public function lang( string $key, $default = null ): ?string
+    public function lang(): Lang
     {
-        return $this->make('Chukdo\Conf\Lang')
-            ->offsetGet($key, $default);
+        return $this->make('Chukdo\Conf\Lang');
     }
 
     /**

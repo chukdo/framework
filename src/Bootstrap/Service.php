@@ -2,6 +2,7 @@
 
 namespace Chukdo\Bootstrap;
 
+use Chukdo\Conf\Conf;
 use Closure;
 use ArrayAccess;
 use ReflectionClass;
@@ -263,20 +264,18 @@ class Service implements ArrayAccess
             return $this->make($lastPart);
         }
         elseif ( $firstPart == '@' ) {
-            return $this->conf($lastPart);
+            return $this->conf()->offsetGet($lastPart);
         }
 
         return $arg;
     }
 
     /**
-     * @param string $key
-     * @param null   $default
-     * @return string|null
+     * @return Conf
      */
-    public function conf( string $key, $default = null ): ?string
+    public function conf(): Conf
     {
-        return null;
+        return new Conf();
     }
 
     /**

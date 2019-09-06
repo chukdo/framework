@@ -1,5 +1,4 @@
 {
-  "env": "dev",
   "log": {
     "file": "/storage/www/chukdo/test/app/log/exception.log",
     "driver": "log_file",
@@ -9,8 +8,5 @@
     "ws": "1",
     "api": "1",
     "webhook": "1"
-  },
-  "view": {
-    "cache": "0"
   }
 }

@@ -2,8 +2,9 @@
 
 namespace Chukdo\Conf;
 
+use Chukdo\Bootstrap\AppException;
+use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Storage\Storage;
-use Chukdo\Helper\Is;
 
 /**
  * Gestion des fichiers de langues.
@@ -16,9 +17,9 @@ class Lang extends Conf
 {
     /**
      * @param string $file
-     * @return bool
+     * @return JsonInterface
      */
-    public function loadFile( string $file ): bool
+    public function loadFile( string $file ): JsonInterface
     {
         $storage = new Storage();
         $name    = basename($file, '.json');
@@ -29,9 +30,9 @@ class Lang extends Conf
             $this->merge($load->to2d($name),
                 true);
 
-            return true;
+            return $this;
         }
 
-        return false;
+        throw new AppException(sprintf('Lang file [%s] no exist', $file));
     }
 }

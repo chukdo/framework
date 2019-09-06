@@ -31,22 +31,24 @@ class ExceptionHandler implements Handler
 
     /**
      * @param Throwable $e
-     * @throws ServiceException
-     * @throws \ReflectionException
-     */
-    public function report( Throwable $e ): void
-    {
-        $this->app->make('ExceptionLogger')
-            ->emergency('#' . $e->getCode() . ' ' . $e->getMessage() . ' ' . $e->getFile() . '(' . $e->getLine() . ')');
-    }
-
-    /**
-     * @param \Throwable $e
      */
     public function render( Throwable $e ): void
     {
         $message = new ExceptionMessage($e, $this->app->env());
 
         die($message->render());
+    }
+
+    /**
+     * @param Throwable $e
+     */
+    public function report( Throwable $e ): void
+    {
+        try {
+            $this->app->make('ExceptionLogger')
+                ->emergency('#' . $e->getCode() . ' ' . $e->getMessage() . ' ' . $e->getFile() . '(' . $e->getLine() . ')');
+        } catch ( Throwable $e ) {
+        }
+
     }
 }

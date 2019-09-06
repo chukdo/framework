@@ -2,7 +2,6 @@
 
 namespace Chukdo\Bootstrap;
 
-use Chukdo\Helper\Cli;
 use Throwable;
 use Exception;
 use ErrorException;

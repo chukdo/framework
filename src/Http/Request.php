@@ -88,7 +88,8 @@ class Request
      */
     public function conf( string $key, $default = null ): ?string
     {
-        return $this->app->conf($key, $default);
+        return $this->app->conf()
+            ->offsetGet($key, $default);
     }
 
     /**
@@ -100,7 +101,8 @@ class Request
      */
     public function lang( string $key, $default = null ): ?string
     {
-        return $this->app->lang('validation.' . $key, $default);
+        return $this->app->lang()
+            ->offsetGet('validation.' . $key, $default);
     }
 
     /**

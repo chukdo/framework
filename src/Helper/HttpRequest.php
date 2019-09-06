@@ -2,6 +2,8 @@
 
 namespace Chukdo\Helper;
 
+use Chukdo\Http\Url;
+
 /**
  * Gestion des messages HTTP.
  * @version      1.0.0
@@ -110,11 +112,35 @@ final class HttpRequest
     }
 
     /**
-     * @return array
+     * @return string
      */
-    public static function host(): array
+    public static function host(): string
     {
-        return (array) self::server('HTTP_HOST');
+        return self::server('HTTP_HOST');
+    }
+
+    /**
+     * @return string
+     */
+    public static function tld(): string
+    {
+        return (new Url(self::uri()))->getTld();
+    }
+
+    /**
+     * @return string
+     */
+    public static function domain(): string
+    {
+        return (new Url(self::uri()))->getDomain();
+    }
+
+    /**
+     * @return string
+     */
+    public static function subDomain(): string
+    {
+        return (new Url(self::uri()))->getSubDomain();
     }
 
     /**
