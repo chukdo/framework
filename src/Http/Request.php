@@ -9,6 +9,8 @@ use Chukdo\Helper\HttpRequest;
 use Chukdo\Validation\Validator;
 use Chukdo\Storage\FileUploaded;
 use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\Bootstrap\ServiceException;
+use ReflectionException;
 
 /**
  * Gestion de requete HTTP entrante.
@@ -42,8 +44,8 @@ class Request
     /**
      * Request constructor.
      * @param App $app
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
+     * @throws ReflectionException
+     * @throws ServiceException
      */
     public function __construct( App $app )
     {
@@ -83,8 +85,8 @@ class Request
      * @param string $key
      * @param null   $default
      * @return string|null
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
+     * @throws ReflectionException
+     * @throws ServiceException
      */
     public function conf( string $key, $default = null ): ?string
     {
@@ -96,8 +98,8 @@ class Request
      * @param string $key
      * @param null   $default
      * @return string|null
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
+     * @throws ReflectionException
+     * @throws ServiceException
      */
     public function lang( string $key, $default = null ): ?string
     {
@@ -108,8 +110,8 @@ class Request
     /**
      * @param array $rules
      * @return Validator
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
+     * @throws ReflectionException
+     * @throws ServiceException
      */
     public function validate( array $rules ): Validator
     {
