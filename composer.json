@@ -1,5 +1,7 @@
 {
   "name": "modelo/chukdo",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
   "type": "framework",
   "version": "1.0.0",
   "description": "Small Framework using AZURE Storage and MONGODB Database",
