@@ -2,7 +2,10 @@
 
 Namespace Chukdo\DB\Elastic;
 
+use Chukdo\Json\Json;
+use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
+use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
  * Mongo Mongo.
@@ -19,27 +22,108 @@ Class Elastic
     protected $dsn = null;
 
     /**
-     * @var Manager
+     * @var ClientBuilder
      */
-    protected $elastic;
+    protected $client;
 
     /**
      * Elastic constructor.
-     * @param string $dsn
-     * @param bool   $synchronous
+     * @param string|null $dsn
+     * @param bool        $synchronous
      */
-    public function __construct( string $dsn, bool $synchronous = true )
+    public function __construct( string $dsn = null, bool $synchronous = true )
     {
-        $this->dsn     = $dsn;
-        $this->elastic = ClientBuilder::create()
+        $this->dsn    = $dsn
+            ?: 'localhost:9200';
+        $this->client = ClientBuilder::create()
             ->setHosts(explode(',',
-                $dsn))
+                $this->dsn))
             ->setHandler($synchronous
                 ? ClientBuilder::singleHandler()
                 : ClientBuilder::multiHandler())
             ->build();
     }
 
-    // collection = indice
-        // schema = mapping
+    /**
+     * @return Client
+     */
+    public function client(): Client
+    {
+        return $this->client;
+    }
+
+    /**
+     * @return bool
+     */
+    public function ping(): bool
+    {
+        return $this->client()->ping();
+    }
+
+    /**
+     * @return JsonInterface
+     */
+    public function status(): JsonInterface
+    {
+        return new Json($this->client()->info());
+    }
+
+    /**
+     * @return string
+     */
+    public function version(): string
+    {
+        return (string) $this->status()->get('version.number');
+    }
+
+    /**
+     * @return JsonInterface
+     */
+    public function collections(): JsonInterface
+    {
+        $list = new Json();
+
+        foreach ( $this->client()->cat()->indices(['index' => '*']) as $indice ) {
+            $list->append($indice['index']);
+        }
+
+        return $list;
+    }
+
+    /**
+     * @param string $collection
+     * @return bool
+     */
+    public function collectionExist( string $collection ): bool
+    {
+        foreach ( $this->collections() as $coll ) {
+            if ( $coll == $collection ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $collection
+     * @return Collection
+     */
+    public function createCollection( string $collection ): Collection
+    {
+        if ( !$this->collectionExist($collection) ) {
+            $this->client()->indices()->create(['index' => $collection]);
+        }
+
+        return $this->collection($collection);
+    }
+
+    /**
+     * @param string $collection
+     * @return Collection
+     */
+    public function collection( string $collection ): Collection
+    {
+        return new Collection($this, $collection);
+    }
 }

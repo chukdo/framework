@@ -178,30 +178,6 @@ Class Collection
     }
 
     /**
-     * @return Collection
-     */
-    public function bintrash(): Collection
-    {
-        return new Collection($this->mongo(), $this->databaseName(), $this->name() . '_bintrash');
-    }
-
-    /**
-     * @return Collection
-     */
-    public function archive(): Collection
-    {
-        return new Collection($this->mongo(), $this->databaseName(), $this->name() . '_archive');
-    }
-
-    /**
-     * @return Collection
-     */
-    public function versioning(): Collection
-    {
-        return new Collection($this->mongo(), $this->databaseName(), $this->name() . '_versioning');
-    }
-
-    /**
      * @return JsonInterface
      */
     public function info(): JsonInterface
