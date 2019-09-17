@@ -12,7 +12,7 @@ use MongoDB\BSON\Timestamp;
 use MongoDB\BSON\UTCDateTime;
 
 /**
- * Mongo Schema properties validator.
+ * Server Schema properties validator.
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -77,7 +77,7 @@ class Validator
         /** Update */
         else {
             foreach ( $json as $key => $value ) {
-                if ( $property = $this->property->getProperty($key) ) {
+                if ( $property = $this->property->get($key) ) {
                     $validator = new Validator($property);
                     $json->offsetSet($key, $validator->validateType($value, false));
                 }

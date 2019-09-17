@@ -3,11 +3,9 @@
 namespace Chukdo\Db\Mongo;
 
 use MongoDB\BSON\Regex;
-use MongoDB\Collection as MongoDbCollection;
-use MongoDB\Driver\ReadPreference;
 
 /**
- * Mongo Where.
+ * Server Where.
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -15,11 +13,6 @@ use MongoDB\Driver\ReadPreference;
  */
 Class Where
 {
-    /**
-     * @var Collection
-     */
-    protected $collection;
-
     /**
      * @var array
      */
@@ -29,49 +22,6 @@ Class Where
      * @var array
      */
     protected $orWhere = [];
-
-    /**
-     * Index constructor.
-     * @param Collection $collection
-     */
-    public function __construct( Collection $collection )
-    {
-        $this->collection = $collection;
-    }
-
-    /**
-     * @param int $readPreference
-     * ReadPreference::RP_PRIMARY = 1,
-     * RP_SECONDARY = 2,
-     * RP_PRIMARY_PREFERRED = 5,
-     * RP_SECONDARY_PREFERRED = 6,
-     * RP_NEAREST = 10
-     * @return Where
-     */
-    public function setReadPreference( int $readPreference ): self
-    {
-        $this->collection->mongo()
-            ->mongoManager()
-            ->selectServer(new ReadPreference($readPreference));
-
-        return $this;
-    }
-
-    /**
-     * @return Collection
-     */
-    public function collection(): Collection
-    {
-        return $this->collection;
-    }
-
-    /**
-     * @return MongoDbCollection
-     */
-    public function mongoCollection(): MongoDbCollection
-    {
-        return $this->collection()->mongoCollection();
-    }
 
     /**
      * @param string $field
@@ -177,13 +127,14 @@ Class Where
 
     /**
      * @param string $field
+     * @param string $operator
      * @param        $value
      * @param null   $value2
-     * @return Find
+     * @return $this
      */
-    public function orWhere( string $field, $value, $value2 = null ): self
+    public function orWhere( string $field, string $operator, $value, $value2 = null ): self
     {
-        $this->orWhere[ $field ] = $this->subQuery($field, $value, $value2);
+        $this->orWhere[ $field ] = $this->subQuery($field, $operator, $value, $value2);
 
         return $this;
     }

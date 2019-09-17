@@ -3,6 +3,7 @@
 
 namespace Chukdo\Db\Mongo;
 
+use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use MongoDB\Driver\Cursor as MongoDbCursor;
 use Iterator;
 use IteratorIterator;
@@ -39,10 +40,10 @@ class Cursor implements Iterator
 
     /**
      * Cursor constructor.
-     * @param Collection        $collection
-     * @param Traversable       $cursor
+     * @param CollectionInterface $collection
+     * @param Traversable         $cursor
      */
-    public function __construct( Collection $collection, Traversable $cursor )
+    public function __construct( CollectionInterface $collection, Traversable $cursor )
     {
         $this->collection = $collection;
         $this->cursor     = $cursor;

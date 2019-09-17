@@ -4,9 +4,7 @@ namespace Chukdo\Db\Mongo\Record;
 
 use Exception;
 use DateTime;
-use Chukdo\Db\Mongo\Index;
 use Chukdo\Db\Mongo\MongoException;
-use Chukdo\Db\Mongo\Schema\Schema;
 use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
 use Chukdo\Db\Mongo\Collection;
@@ -15,7 +13,7 @@ use MongoDB\Driver\Session as MongoSession;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
- * Mongo Record.
+ * Server Record.
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -67,7 +65,7 @@ Class Record extends Json implements RecordInterface
      */
     public function delete( MongoSession $session = null ): RecordInterface
     {
-        $write = $this->collection->write()
+        $write = $this->collection()->write()
             ->setSession($session);
 
         if ( ( $id = $this->id() ) !== null ) {
@@ -105,7 +103,7 @@ Class Record extends Json implements RecordInterface
      */
     public function moveTo( string $collection, MongoSession $session = null ): RecordInterface
     {
-        $write = $this->collection->write()
+        $write = $this->collection()->write()
             ->setSession($session);
 
         if ( ( $id = $this->id() ) !== null ) {
@@ -127,51 +125,6 @@ Class Record extends Json implements RecordInterface
     }
 
     /**
-     * Initialise le modele en injectant le schema et les index
-     */
-    public function init()
-    {
-        $this->index()
-            ->drop();
-        $this->initIndex();
-        $this->schema()
-            ->drop();
-        $this->initSchema();
-    }
-
-    /**
-     * @return Index
-     */
-    public function index(): Index
-    {
-        return $this->collection()
-            ->index();
-    }
-
-    /**
-     * Création des index
-     */
-    public function initIndex()
-    {
-    }
-
-    /**
-     * @return Schema
-     */
-    public function schema(): Schema
-    {
-        return $this->collection()
-            ->schema();
-    }
-
-    /**
-     * Création des schema de validation des données
-     */
-    public function initSchema()
-    {
-    }
-
-    /**
      * @return JsonInterface
      */
     public function record(): JsonInterface
@@ -184,7 +137,6 @@ Class Record extends Json implements RecordInterface
         });
     }
 
-
     /**
      * @param MongoSession|null $session
      * @return Record
@@ -193,7 +145,7 @@ Class Record extends Json implements RecordInterface
     public function save( MongoSession $session = null ): RecordInterface
     {
         $insert = false;
-        $write  = $this->collection->write()
+        $write  = $this->collection()->write()
             ->setSession($session)
             ->setAll($this->record());
 

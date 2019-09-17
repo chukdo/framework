@@ -9,7 +9,7 @@ use Chukdo\Helper\Arr;
 use Chukdo\Helper\Str;
 
 /**
- * Mongo Link .
+ * Server Link .
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -64,7 +64,7 @@ Class Link
         }
 
         if ( $db != $dbName ) {
-            $this->database = $database->mongo()
+            $this->database = $database->server()
                 ->database($db);
         }
 

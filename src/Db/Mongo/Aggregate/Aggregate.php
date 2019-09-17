@@ -10,7 +10,7 @@ use Chukdo\Json\Json;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
- * Mongo Aggregate Group.
+ * Server Aggregate Group.
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -79,7 +79,7 @@ Class Aggregate
     {
         $options = array_merge($this->options, $options);
 
-        return new Cursor($this->collection, $this->collection->mongoCollection()
+        return new Cursor($this->collection, $this->collection->client()
             ->aggregate($this->projection(), $options));
     }
 
@@ -125,7 +125,7 @@ Class Aggregate
      */
     public function explain(): JsonInterface
     {
-        return new Json(new Cursor($this->collection, $this->collection->mongoCollection()
+        return new Json(new Cursor($this->collection, $this->collection->client()
             ->aggregate($this->projection(), [
                 'explain'   => true,
                 'useCursor' => true,

@@ -35,7 +35,7 @@ Class Index
         $indexes = new Json();
 
         foreach ( $this->collection()
-            ->mongoCollection()
+            ->client()
             ->listIndexes() as $index ) {
             $indexes->offsetSet($index[ 'name' ], $index[ 'key' ]);
         }
@@ -74,7 +74,7 @@ Class Index
         ];
 
         $this->collection()
-            ->mongoCollection()
+            ->client()
             ->createIndex([ $field => $order ], [
                 'unique' => $unique,
                 'name'   => $name,
@@ -91,7 +91,7 @@ Class Index
         try {
             foreach ( $this->index as $index ) {
                 $this->collection()
-                    ->mongoCollection()
+                    ->client()
                     ->createIndex([ $index[ 'field' ] => $index[ 'order' ] ], [
                         'unique' => $index[ 'unique' ],
                         'name'   => $index[ 'name' ],
@@ -112,7 +112,7 @@ Class Index
     {
         try {
             $this->collection()
-                ->mongoCollection()
+                ->client()
                 ->dropIndexes();
 
             return true;
@@ -129,7 +129,7 @@ Class Index
     {
         try {
             $this->collection()
-                ->mongoCollection()
+                ->client()
                 ->dropIndex($name);
 
             return true;

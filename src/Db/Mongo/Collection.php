@@ -2,6 +2,7 @@
 
 Namespace Chukdo\DB\Mongo;
 
+use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Contracts\Db\Record as RecordInterface;
 use Chukdo\Db\Mongo\Record\Record;
@@ -17,20 +18,21 @@ use MongoDB\BSON\UTCDateTime;
 use MongoDB\BSON\Timestamp;
 use ReflectionClass;
 use ReflectionException;
+use Exception;
 
 /**
- * Mongo Mongo Collect.
+ * Server Server Collect.
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Collection
+Class Collection implements CollectionInterface
 {
     /**
-     * @var Mongo
+     * @var Server
      */
-    protected $mongo;
+    protected $server;
 
     /**
      * @var Database
@@ -40,25 +42,25 @@ Class Collection
     /**
      * @var MongoDbCollection
      */
-    protected $collection;
+    protected $client;
 
     /**
-     * Collect constructor.
-     * @param Mongo  $mongo
-     * @param string $database
-     * @param string $collection
+     * Collection constructor.
+     * @param Database $database
+     * @param string   $collection
      */
-    public function __construct( Mongo $mongo, string $database, string $collection )
+    public function __construct( Database $database, string $collection )
     {
-        $this->mongo      = $mongo;
-        $this->database   = $database;
-        $this->collection = new MongoDbCollection($mongo->mongoManager(), $database, $collection);
+        $this->database = $database;
+        $this->client   = new MongoDbCollection($database->server()
+            ->client(), $database->name(), $collection);
     }
 
     /**
      * @param string|null $field
      * @param             $value
      * @return mixed
+     * @throws Exception
      */
     public static function filterOut( ?string $field, $value )
     {
@@ -66,7 +68,7 @@ Class Collection
             return $value->__toString();
         }
         elseif ( $value instanceof Timestamp ) {
-            return $value->getTimestamp();
+            return ( new DateTime() )->setTimestamp((int) (string) $value);
         }
         elseif ( $value instanceof UTCDateTime ) {
             return $value->toDateTime();
@@ -78,7 +80,7 @@ Class Collection
     /**
      * @param string|null $field
      * @param             $value
-     * @return ObjectId|UTCDateTime
+     * @return mixed
      */
     public static function filterIn( ?string $field, $value )
     {
@@ -93,69 +95,6 @@ Class Collection
         }
 
         return $value;
-    }
-
-    /**
-     * @return JsonInterface
-     */
-    public function stat(): JsonInterface
-    {
-        $stats = $this->mongo()
-            ->command([ 'collStats' => $this->name() ], $this->databaseName())
-            ->getIndex(0, new Json())
-            ->filter(function( $k, $v )
-            {
-                if ( is_scalar($v) ) {
-                    return $v;
-                }
-
-                return false;
-            })
-            ->clean();
-
-        return $stats;
-    }
-
-    /**
-     * @return Mongo
-     */
-    public function mongo(): Mongo
-    {
-        return $this->mongo;
-    }
-
-    /**
-     * @return string
-     */
-    public function name(): string
-    {
-        return $this->mongoCollection()
-            ->getCollectionName();
-    }
-
-    /**
-     * @return string
-     */
-    public function databaseName(): string
-    {
-        return $this->mongoCollection()
-            ->getDatabaseName();
-    }
-
-    /**
-     * @return MongoDbCollection
-     */
-    public function mongoCollection(): MongoDbCollection
-    {
-        return $this->collection;
-    }
-
-    /**
-     * @return Schema
-     */
-    public function schema(): Schema
-    {
-        return new Schema($this);
     }
 
     /**
@@ -178,44 +117,20 @@ Class Collection
     }
 
     /**
-     * @return JsonInterface
+     * @return string
      */
-    public function info(): JsonInterface
+    public function name(): string
     {
-        $json = $this->mongo()
-            ->command([
-                'listCollections' => 1,
-                'filter'          => [ 'name' => $this->name() ],
-            ], $this->databaseName());
-
-        return $json->get('0.options.validator.$jsonSchema', new Json());
+        return $this->client()
+            ->getCollectionName();
     }
 
     /**
-     * @return Database
+     * @return MongoDbCollection
      */
-    public function database(): Database
+    public function client(): MongoDbCollection
     {
-        return new Database($this->mongo(), $this->databaseName());
-    }
-
-    /**
-     * @return bool
-     */
-    public function drop(): bool
-    {
-        $drop = $this->mongoCollection()
-            ->drop();
-
-        return $drop[ 'ok' ] == 1;
-    }
-
-    /**
-     * @return Json
-     */
-    public function index(): Index
-    {
-        return new Index($this);
+        return $this->client;
     }
 
     /**
@@ -224,18 +139,73 @@ Class Collection
      */
     public function rename( string $newName ): bool
     {
-        $rename = $this->mongo()
-            ->command([
-                'renameCollection' => $this->databaseName() . '.' . $this->name(),
-                'to'               => $this->databaseName() . '.' . $newName,
-            ])
-            ->offsetGet('ok');
+        return $this->database()
+                   ->server()
+                   ->command([
+                       'renameCollection' => $this->database()
+                                                 ->name() . '.' . $this->name(),
+                       'to'               => $this->database()
+                                                 ->name() . '.' . $newName,
+                   ])
+                   ->offsetGet('ok') == 1;
+    }
 
-        if ( $rename == 1 ) {
-            return true;
-        }
+    /**
+     * @return Database
+     */
+    public function database(): Database
+    {
+        return $this->database;
+    }
 
-        return false;
+    /**
+     * @return bool
+     */
+    public function drop(): bool
+    {
+        $drop = $this->client()
+            ->drop();
+
+        return $drop[ 'ok' ] == 1;
+    }
+
+    /**
+     * @return Find
+     */
+    public function find(): Find
+    {
+        return new Find($this);
+    }
+
+    /**
+     * @return JsonInterface
+     */
+    public function info(): JsonInterface
+    {
+        $stats = $this->database()
+            ->server()
+            ->command([ 'collStats' => $this->name() ], $this->database()
+                ->name())
+            ->getIndex(0, new Json())
+            ->filter(function( $k, $v )
+            {
+                if ( is_scalar($v) ) {
+                    return $v;
+                }
+
+                return false;
+            })
+            ->clean();
+
+        return $stats;
+    }
+
+    /**
+     * @return Schema
+     */
+    public function schema(): Schema
+    {
+        return new Schema($this);
     }
 
     /**
@@ -247,18 +217,18 @@ Class Collection
     }
 
     /**
+     * @return Index
+     */
+    public function index(): Index
+    {
+        return new Index($this);
+    }
+
+    /**
      * @return Aggregate
      */
     public function aggregate(): Aggregate
     {
         return new Aggregate($this);
-    }
-
-    /**
-     * @return Find
-     */
-    public function find(): Find
-    {
-        return new Find($this);
     }
 }

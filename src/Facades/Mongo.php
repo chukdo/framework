@@ -8,12 +8,12 @@ namespace Chukdo\Facades;
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
  * @since         08/01/2019
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
- * @mixin \Chukdo\Db\Mongo\Mongo
+ * @mixin \Chukdo\Db\Mongo\Server
  */
 class Mongo extends Facade
 {
     public static function name(): string
     {
-        return \Chukdo\Db\Mongo\Mongo::class;
+        return \Chukdo\Db\Mongo\Server::class;
     }
 }

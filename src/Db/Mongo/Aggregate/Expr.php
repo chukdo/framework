@@ -3,7 +3,7 @@
 namespace Chukdo\Db\Mongo\Aggregate;
 
 /**
- * Mongo Aggregate Expression Facading.
+ * Server Aggregate Expression Facading.
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019

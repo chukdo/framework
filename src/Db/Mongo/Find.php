@@ -2,22 +2,31 @@
 
 namespace Chukdo\Db\Mongo;
 
+use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\Helper\Arr;
 use Chukdo\Json\Json;
 use Chukdo\Db\Mongo\Record\Record;
 use Chukdo\Db\Mongo\Record\RecordList;
+use Chukdo\Contracts\Db\Find as FindInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Contracts\Db\Record as RecordInterface;
+use Chukdo\Contracts\Db\RecordList as RecordListInterface;
+use MongoDB\Driver\ReadPreference;
 
 /**
- * Mongo Find.
+ * Server Find.
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Find extends Where
+Class Find extends Where implements FindInterface
 {
+    /**
+     * @var CollectionInterface
+     */
+    protected $collection;
+
     /**
      * @var array
      */
@@ -54,6 +63,156 @@ Class Find extends Where
     protected $hiddenId = false;
 
     /**
+     * Where constructor.
+     * @param CollectionInterface $collection
+     */
+    public function __construct( Collection $collection )
+    {
+        $this->collection = $collection;
+    }
+
+    /**
+     * ReadPreference::RP_PRIMARY = 1,
+     * RP_SECONDARY = 2,
+     * RP_PRIMARY_PREFERRED = 5,
+     * RP_SECONDARY_PREFERRED = 6,
+     * RP_NEAREST = 10
+     * @param int $readPreference
+     * @return Find
+     */
+    public function setReadPreference( int $readPreference ): self
+    {
+        $this->collection()
+            ->database()
+            ->server()
+            ->client()
+            ->selectServer(new ReadPreference($readPreference));
+
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function collection(): Collection
+    {
+        return $this->collection;
+    }
+
+    /**
+     * @return int
+     */
+    public function count(): int
+    {
+        return (int) $this->collection()
+            ->client()
+            ->countDocuments($this->filter());
+    }
+
+    /**
+     * @return JsonInterface
+     */
+    public function explain(): JsonInterface
+    {
+        $explain = $this->collection()
+            ->database()
+            ->server()
+            ->command([
+                'explain' => [
+                    'find'   => $this->collection()
+                        ->name(),
+                    'filter' => $this->filter(),
+                ],
+            ]);
+
+        $json = new Json();
+
+        $json->offsetSet('queryPlanner', $explain->get('0.queryPlanner'));
+        $json->offsetSet('executionStats', $explain->get('0.executionStats'));
+
+        return $json;
+    }
+
+    /**
+     * @param bool $idAsKey
+     * @return RecordListInterface
+     */
+    public function all( bool $idAsKey = false ): RecordListInterface
+    {
+        $recordList = new RecordList($this->collection());
+
+        foreach ( $this->cursor() as $key => $value ) {
+            if ( $idAsKey ) {
+                $recordList->offsetSet($value->offsetGet('_id'), $value);
+            }
+            else {
+                $recordList->offsetSet($key, $value);
+            }
+        }
+
+        foreach ( $this->link as $link ) {
+            $recordList = $link->hydrate($recordList);
+        }
+
+        /** Suppression des ID defini par without */
+        if ( $this->hiddenId ) {
+            foreach ( $recordList as $key => $value ) {
+                $value->offsetUnset('_id');
+            }
+        }
+
+        return $recordList;
+    }
+
+    /**
+     * @return Cursor
+     */
+    public function cursor(): Cursor
+    {
+        $options = array_merge($this->projection(), $this->options);
+
+        return new Cursor($this->collection(), $this->collection()
+            ->client()
+            ->find($this->filter(), $options));
+    }
+
+    /**
+     * @return array
+     */
+    public function projection(): array
+    {
+        $projection = [
+            'projection'      => $this->projection,
+            'noCursorTimeout' => false,
+        ];
+
+        if ( !empty($this->sort) ) {
+            $projection[ 'sort' ] = $this->sort;
+        }
+
+        if ( $this->skip > 0 ) {
+            $projection[ 'skip' ] = $this->skip;
+        }
+
+        if ( $this->limit > 0 ) {
+            $projection[ 'limit' ] = $this->limit;
+        }
+
+        return $projection;
+    }
+
+    /**
+     * @param string $field
+     * @return JsonInterface
+     */
+    public function distinct( string $field ): JsonInterface
+    {
+        return new Json($this->collection()
+            ->client()
+            ->distinct($field, $this->filter()));
+    }
+
+    /**
      * @param string      $field
      * @param array       $with
      * @param array       $without
@@ -62,24 +221,12 @@ Class Find extends Where
      */
     public function link( string $field, array $with = [], array $without = [], string $linked = null ): self
     {
-        $link = new Link($this->collection()->database(), $field);
+        $link = new Link($this->collection()
+            ->database(), $field);
 
         $this->link[] = $link->with($with)
             ->without($without)
             ->setLinkedName($linked);
-
-        return $this;
-    }
-
-    /**
-     * @param array $with
-     * @param array $without
-     * @return Find
-     */
-    public function project( array $with = [], array $without = [] ): self
-    {
-        $this->with($with);
-        $this->with($without);
 
         return $this;
     }
@@ -145,27 +292,6 @@ Class Find extends Where
     }
 
     /**
-     * @return JsonInterface
-     */
-    public function explain(): JsonInterface
-    {
-        $explain = $this->collection()->mongo()
-            ->command([
-                'explain' => [
-                    'find'   => $this->collection()->name(),
-                    'filter' => $this->filter(),
-                ],
-            ]);
-
-        $json = new Json();
-
-        $json->offsetSet('queryPlanner', $explain->get('0.queryPlanner'));
-        $json->offsetSet('executionStats', $explain->get('0.executionStats'));
-
-        return $json;
-    }
-
-    /**
      * @return Record
      */
     public function one(): RecordInterface
@@ -189,17 +315,6 @@ Class Find extends Where
     }
 
     /**
-     * @return Cursor
-     */
-    public function cursor(): Cursor
-    {
-        $options = array_merge($this->projection(), $this->options);
-
-        return new Cursor($this->collection(), $this->mongoCollection()
-            ->find($this->filter(), $options));
-    }
-
-    /**
      * @param int $limit
      * @return Find
      */
@@ -208,80 +323,5 @@ Class Find extends Where
         $this->limit = $limit;
 
         return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function projection(): array
-    {
-        $projection = [
-            'projection'      => $this->projection,
-            'noCursorTimeout' => false,
-        ];
-
-        if ( !empty($this->sort) ) {
-            $projection[ 'sort' ] = $this->sort;
-        }
-
-        if ( $this->skip > 0 ) {
-            $projection[ 'skip' ] = $this->skip;
-        }
-
-        if ( $this->limit > 0 ) {
-            $projection[ 'limit' ] = $this->limit;
-        }
-
-        return $projection;
-    }
-
-    /**
-     * @param bool $idAsKey
-     * @return RecordList
-     */
-    public function all( bool $idAsKey = false ): RecordList
-    {
-        $recordList = new RecordList($this->collection());
-
-        foreach ( $this->cursor() as $key => $value ) {
-            if ( $idAsKey ) {
-                $recordList->offsetSet($value->offsetGet('_id'), $value);
-            }
-            else {
-                $recordList->offsetSet($key, $value);
-            }
-        }
-
-        foreach ( $this->link as $link ) {
-            $recordList = $link->hydrate($recordList);
-        }
-
-        /** Suppression des ID defini par without */
-        if ( $this->hiddenId ) {
-            foreach ( $recordList as $key => $value ) {
-                $value->offsetUnset('_id');
-            }
-        }
-
-        return $recordList;
-    }
-
-    /**
-     * @return int
-     */
-    public function count(): int
-    {
-        return (int) $this->mongoCollection()
-            ->countDocuments($this->filter());
-    }
-
-    /**
-     * @param string $field
-     * @return JsonInterface
-     */
-    public function distinct( string $field ): JsonInterface
-    {
-        return new Json($this->mongoCollection()
-            ->distinct($field, $this->filter()));
     }
 }

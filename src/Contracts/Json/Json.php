@@ -44,6 +44,12 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
     public function collect(): Collect;
 
     /**
+     * @param $key
+     * @return Json
+     */
+    public function coll( $key): JsonInterface;
+
+    /**
      * @return $this
      */
     public function all();

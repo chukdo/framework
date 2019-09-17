@@ -54,6 +54,23 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
+     * @param $key
+     * @return JsonInterface
+     */
+    public function coll( $key): JsonInterface
+    {
+        $coll = new Json();
+
+        foreach ($this as $offsetKey => $offsetValue) {
+            if ($key == $offsetKey) {
+                $coll->append($offsetValue);
+            }
+        }
+
+        return $coll;
+    }
+
+    /**
      * @param mixed $key
      * @param mixed $value
      * @return JsonInterface

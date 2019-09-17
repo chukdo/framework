@@ -3,10 +3,6 @@
 namespace Chukdo\Contracts\Db;
 
 use Chukdo\Contracts\Json\Json as JsonInterface;
-use Chukdo\DB\Mongo\Collection;
-use Chukdo\Db\Mongo\Index;
-use Chukdo\Db\Mongo\Schema\Schema;
-use MongoDB\Driver\Session as MongoSession;
 
 /**
  * Interface de gestion des documents JSON.
@@ -18,34 +14,9 @@ use MongoDB\Driver\Session as MongoSession;
 interface Record extends JsonInterface
 {
     /**
-     * @return Collection
+     * @return mixed
      */
-    public function collection(): Collection;
-
-    /**
-     * Initialise le modele en injectant le schema et les index
-     */
-    public function init();
-
-    /**
-     * Création des index
-     */
-    public function initIndex();
-
-    /**
-     * Création des schema de validation des données
-     */
-    public function initSchema();
-
-    /**
-     * @return Index
-     */
-    public function index(): Index;
-
-    /**
-     * @return Schema
-     */
-    public function schema(): Schema;
+    public function collection();
 
     /**
      * @return string|null
@@ -53,10 +24,9 @@ interface Record extends JsonInterface
     public function id(): ?string;
 
     /**
-     * @param MongoSession|null $session
      * @return Record
      */
-    public function save( MongoSession $session = null ): self;
+    public function save(): self;
 
     /**
      * @return JsonInterface
@@ -64,10 +34,9 @@ interface Record extends JsonInterface
     public function record(): JsonInterface;
 
     /**
-     * @param MongoSession|null $session
      * @return Record
      */
-    public function delete( MongoSession $session = null ): self;
+    public function delete(): self;
 
     /**
      * @param string $collection

@@ -39,7 +39,10 @@ class App extends Service
      */
     public function __construct()
     {
+        parent::__construct();
         $this->instance('\Chukdo\Bootstrap\App', $this);
+        $this->instance('\Chukdo\Conf\Conf', new Conf());
+        $this->instance('\Chukdo\Conf\Lang', new Lang());
     }
 
     /**
@@ -47,6 +50,10 @@ class App extends Service
      */
     public function dd( $data )
     {
+        if ( is_null($data) ) {
+            die('Null');
+        }
+
         die(php_sapi_name() == 'cli'
             ? To::text($data)
             : To::html($data, null, null, true));
@@ -86,12 +93,10 @@ class App extends Service
 
     /**
      * @return Conf
-     * @throws ServiceException
-     * @throws \ReflectionException
      */
     public function conf(): Conf
     {
-        return $this->make('Chukdo\Conf\Conf');
+        return $this->getInstance('Chukdo\Conf\Conf');
     }
 
     /**
@@ -146,12 +151,10 @@ class App extends Service
 
     /**
      * @return Lang
-     * @throws ServiceException
-     * @throws \ReflectionException
      */
     public function lang(): Lang
     {
-        return $this->make('Chukdo\Conf\Lang');
+        return $this->getInstance('Chukdo\Conf\Lang');
     }
 
     /**

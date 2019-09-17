@@ -2,6 +2,7 @@
 
 namespace Chukdo\Db\Mongo\Schema;
 
+use Chukdo\Contracts\Db\Property as PropertyInterface;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Arr;
 use Chukdo\Helper\Arr as ArrHelper;
@@ -9,13 +10,13 @@ use Chukdo\Json\Json;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
- * Mongo Schema properties.
+ * Server Schema properties.
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class Property
+class Property implements PropertyInterface
 {
     /**
      * @var Json
@@ -337,9 +338,9 @@ class Property
 
     /**
      * @param string $name
-     * @return $this|null
+     * @return Property|null
      */
-    public function getProperty( string $name ): ?Property
+    public function get( string $name ): ?Property
     {
         if ( Str::notContain($name, '.') ) {
             return $this->properties()
@@ -352,8 +353,8 @@ class Property
         $get       = $this->properties()
             ->offsetGet($firstPath);
 
-        if ( $get instanceof Property ) {
-            return $get->getProperty($endPath);
+        if ( $get instanceof PropertyInterface ) {
+            return $get->get($endPath);
         }
 
         return null;
@@ -364,10 +365,14 @@ class Property
      * @param array  $options
      * @return Property
      */
-    public function setProperty( string $name, array $options = [] ): Property
+    public function set( string $name, array $options = [] ): Property
     {
-        return $this->properties()
-            ->offsetGetOrSet($name, new Property($options, $name));
+        $property = new Property($options, $name);
+
+        $this->properties()
+            ->offsetGetOrSet($name, $property);
+
+        return $property;
     }
 
     /**
@@ -401,12 +406,12 @@ class Property
     /**
      * @return array
      */
-    public function get(): array
+    public function toArray(): array
     {
         return $this->property->filterRecursive(function( $k, $v )
         {
             return $v instanceof Property
-                ? $v->get()
+                ? $v->toArray()
                 : $v;
         })
             ->toArray();
@@ -421,7 +426,7 @@ class Property
     }
 
     /**
-     * @return string|array|null
+     * @return mixed|string|null
      */
     public function type()
     {

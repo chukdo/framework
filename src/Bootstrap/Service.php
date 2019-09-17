@@ -8,6 +8,7 @@ use ArrayAccess;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionParameter;
+use ReflectionException;
 
 /**
  * Gestion des injections de dependance.
@@ -90,8 +91,7 @@ class Service implements ArrayAccess
      */
     protected function formatNameSpace( string $name ): string
     {
-        return trim($name,
-            '\\');
+        return trim($name, '\\');
     }
 
     /**
@@ -112,8 +112,8 @@ class Service implements ArrayAccess
     /**
      * @param mixed $key
      * @return mixed|object|null
+     * @throws ReflectionException
      * @throws ServiceException
-     * @throws \ReflectionException
      */
     public function offsetGet( $key )
     {
@@ -123,8 +123,8 @@ class Service implements ArrayAccess
     /**
      * @param string $name
      * @return mixed|object|null
+     * @throws ReflectionException
      * @throws ServiceException
-     * @throws \ReflectionException
      */
     public function make( string $name )
     {
@@ -143,7 +143,7 @@ class Service implements ArrayAccess
     /**
      * Retourne une instance lié.
      * @param string $name
-     * @return object|null
+     * @return mixed|null
      */
     public function getInstance( string $name )
     {
@@ -187,8 +187,8 @@ class Service implements ArrayAccess
     /**
      * @param string $name
      * @return mixed|object
+     * @throws ReflectionException
      * @throws ServiceException
-     * @throws \ReflectionException
      */
     private function getClosure( string $name )
     {
@@ -230,8 +230,8 @@ class Service implements ArrayAccess
      * @param string $class
      * @param array  $args
      * @return object
+     * @throws ReflectionException
      * @throws ServiceException
-     * @throws \ReflectionException
      */
     private function resolveService( string $class, array $args = [] )
     {
@@ -250,53 +250,24 @@ class Service implements ArrayAccess
     }
 
     /**
-     * @param string $arg
-     * @return mixed|object|string
-     * @throws ServiceException
-     * @throws \ReflectionException
-     */
-    private function resolveServiceArg( string $arg )
-    {
-        $firstPart = substr($arg, 0, 1);
-        $lastPart  = substr($arg, 1);
-
-        if ( $firstPart == '&' ) {
-            return $this->make($lastPart);
-        }
-        elseif ( $firstPart == '@' ) {
-            return $this->conf()->offsetGet($lastPart);
-        }
-
-        return $arg;
-    }
-
-    /**
-     * @return Conf
-     */
-    public function conf(): Conf
-    {
-        return new Conf();
-    }
-
-    /**
      * @param string $class
      * @param array  $args
      * @return object
+     * @throws ReflectionException
      * @throws ServiceException
-     * @throws \ReflectionException
      */
     private function resolveClass( string $class, array $args = [] )
     {
         $reflector = new ReflectionClass($class);
 
-        /* C'est n'est pas une classe on genere une exception */
+        /** C'est n'est pas une classe on genere une exception */
         if ( !$reflector->isInstantiable() ) {
             throw new ServiceException(sprintf("[%s] is not a class", $class));
         }
 
         $constructor = $reflector->getConstructor();
 
-        /* pas de constructeur donc pas de parametres à gerer */
+        /** pas de constructeur donc pas de parametres à gerer */
         if ( is_null($constructor) ) {
             return new $class();
         }
@@ -309,10 +280,32 @@ class Service implements ArrayAccess
     }
 
     /**
+     * @param string $arg
+     * @return mixed|object|string|null
+     * @throws ReflectionException
+     * @throws ServiceException
+     */
+    private function resolveServiceArg( string $arg )
+    {
+        $firstPart = substr($arg, 0, 1);
+        $lastPart  = substr($arg, 1);
+
+        if ( $firstPart == '&' ) {
+            return $this->make($lastPart);
+        }
+        elseif ( $firstPart == '@' ) {
+            return $this->conf()
+                ->offsetGet($lastPart);
+        }
+
+        return $arg;
+    }
+
+    /**
      * @param ReflectionMethod $constructor
      * @return array
+     * @throws ReflectionException
      * @throws ServiceException
-     * @throws \ReflectionException
      */
     private function resolveArgs( ReflectionMethod $constructor ): array
     {
@@ -327,27 +320,35 @@ class Service implements ArrayAccess
     }
 
     /**
+     * @return Conf
+     */
+    public function conf(): Conf
+    {
+        return new Conf();
+    }
+
+    /**
      * @param ReflectionParameter $parameter
-     * @return function|mixed
+     * @return mixed|object|null
+     * @throws ReflectionException
      * @throws ServiceException
-     * @throws \ReflectionException
      */
     private function resolveArg( ReflectionParameter $parameter )
     {
         $name  = $parameter->getName();
         $class = $parameter->getClass();
 
-        /* Le parametre est un objet on cherche à le resoudre  */
+        /** Le parametre est un objet on cherche à le resoudre  */
         if ( $cname = $parameter->getClass() ) {
             return $this->make($cname->name);
 
-            /* Le parametre a une valeur par defaut que l'on injecte */
         }
+        /** Le parametre a une valeur par defaut que l'on injecte */
         elseif ( $parameter->isDefaultValueAvailable() ) {
             return $parameter->getDefaultValue();
         }
 
-        /* On ne peut pas injecter le parametre, cela genere une exception     */
+        /** On ne peut pas injecter le parametre, cela genere une exception     */
         throw new ServiceException(sprintf("Unable to resolve [%s] on class [%s].", $name, $class));
     }
 

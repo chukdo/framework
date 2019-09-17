@@ -6,9 +6,10 @@ use Chukdo\Json\Json;
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
 use Chukdo\Contracts\Json\Json as JsonInterface;
+use Elasticsearch\Common\Exceptions\Missing404Exception;
 
 /**
- * Mongo Mongo.
+ * Server Server.
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -45,6 +46,15 @@ Class Elastic
     }
 
     /**
+     * @return bool
+     */
+    public function ping(): bool
+    {
+        return $this->client()
+            ->ping();
+    }
+
+    /**
      * @return Client
      */
     public function client(): Client
@@ -53,11 +63,12 @@ Class Elastic
     }
 
     /**
-     * @return bool
+     * @return string
      */
-    public function ping(): bool
+    public function version(): string
     {
-        return $this->client()->ping();
+        return (string) $this->status()
+            ->get('version.number');
     }
 
     /**
@@ -65,29 +76,32 @@ Class Elastic
      */
     public function status(): JsonInterface
     {
-        return new Json($this->client()->info());
+        return new Json($this->client()
+            ->info());
     }
 
     /**
-     * @return string
+     * @param string $collection
+     * @return Collection
      */
-    public function version(): string
+    public function collection( string $collection ): Collection
     {
-        return (string) $this->status()->get('version.number');
+        return $this->createCollection($collection);
     }
 
     /**
-     * @return JsonInterface
+     * @param string $collection
+     * @return Collection
      */
-    public function collections(): JsonInterface
+    public function createCollection( string $collection ): Collection
     {
-        $list = new Json();
-
-        foreach ( $this->client()->cat()->indices(['index' => '*']) as $indice ) {
-            $list->append($indice['index']);
+        if ( !$this->collectionExist($collection) ) {
+            $this->client()
+                ->indices()
+                ->create([ 'index' => $collection ]);
         }
 
-        return $list;
+        return new Collection($this, $collection);
     }
 
     /**
@@ -106,24 +120,35 @@ Class Elastic
     }
 
     /**
-     * @param string $collection
-     * @return Collection
+     * @return JsonInterface
      */
-    public function createCollection( string $collection ): Collection
+    public function collections(): JsonInterface
     {
-        if ( !$this->collectionExist($collection) ) {
-            $this->client()->indices()->create(['index' => $collection]);
+        $list = new Json();
+
+        foreach ( $this->client()
+            ->cat()
+            ->indices([ 'index' => '*' ]) as $indice ) {
+            $list->append($indice[ 'index' ]);
         }
 
-        return $this->collection($collection);
+        return $list;
     }
 
     /**
      * @param string $collection
-     * @return Collection
+     * @return bool
      */
-    public function collection( string $collection ): Collection
+    public function dropCollection( string $collection ): bool
     {
-        return new Collection($this, $collection);
+        try {
+            $this->client()
+                ->indices()
+                ->delete([ 'index' => $collection ]);
+
+            return true;
+        } catch ( Missing404Exception $e ) {
+            return false;
+        }
     }
 }

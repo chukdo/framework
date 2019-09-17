@@ -2,10 +2,18 @@
 
 Namespace Chukdo\DB\Elastic;
 
+use Chukdo\Db\Elastic\Schema\Schema;
+use Chukdo\Helper\Is;
+use Chukdo\Helper\Str;
+use Chukdo\Json\Json;
 use Chukdo\Contracts\Json\Json as JsonInterface;
+use DateTime;
+use Elasticsearch\Client;
+use Elasticsearch\Common\Exceptions\Missing404Exception;
+use Elasticsearch\Namespaces\IndicesNamespace;
 
 /**
- * Mongo Mongo Collect.
+ * Server Server Collect.
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -32,24 +40,38 @@ Class Collection
     {
         $this->elastic    = $elastic;
         $this->collection = $collection;
-
-
     }
 
     /**
-     * @return Elastic
+     * @param string|null $field
+     * @param             $value
+     * @return DateTime
+     * @throws \Exception
      */
-    public function Elastic(): Elastic
+    public static function filterOut( ?string $field, $value )
     {
-        return $this->elastic;
+        if ( Str::contain($field, 'date') ) {
+            return (new DateTime())->setTimestamp(1000 * (int) (string) $value);
+        }
+
+        return $value;
     }
 
     /**
-     * @return string
+     * @param string|null $field
+     * @param             $value
+     * @return mixed
      */
-    public function name(): string
+    public static function filterIn( ?string $field, $value )
     {
-        return $this->collection;
+        if ( $value instanceof DateTime ) {
+            $value = $value->getTimestamp() * 1000;
+        }
+        elseif ( Str::contain($field, 'date') && Is::scalar($value) ) {
+            $value = 1000 * (int) $value;
+        }
+
+        return $value;
     }
 
     /**
@@ -80,17 +102,59 @@ Class Collection
     }
 
     /**
+     * @return string
+     */
+    public function name(): string
+    {
+        return $this->collection;
+    }
+
+    /**
      * @return JsonInterface
      */
-    public function info(): JsonInterface
+    public function stat(): JsonInterface
     {
-        $json = $this->mongo()
-            ->command([
-                'listCollections' => 1,
-                'filter'          => [ 'name' => $this->name() ],
-            ], $this->databaseName());
+        $stats = new Json($this->indices()
+            ->stats([ 'index' => $this->name() ]));
 
-        return $json->get('0.options.validator.$jsonSchema', new Json());
+        return $stats->get('indices.' . $this->name(), new Json());
+    }
+
+    /**
+     * @return IndicesNamespace
+     */
+    public function indices(): IndicesNamespace
+    {
+        return $this->client()
+            ->indices();
+    }
+
+    /**
+     * @return Client
+     */
+    public function client(): Client
+    {
+        return $this->elastic()
+            ->client();
+    }
+
+    /**
+     * @return Elastic
+     */
+    public function elastic(): Elastic
+    {
+        return $this->elastic;
+    }
+
+    /**
+     * @return JsonInterface
+     */
+    public function properties(): JsonInterface
+    {
+        $info = new Json($this->indices()
+            ->getMapping([ 'index' => $this->name() ]));
+
+        return $info->get($this->name() . '.mappings', new Json());
     }
 
     /**
@@ -98,10 +162,16 @@ Class Collection
      */
     public function drop(): bool
     {
-        $drop = $this->mongoCollection()
-            ->drop();
+        try {
+            $this->elastic()
+                ->client()
+                ->indices()
+                ->delete([ 'index' => $this->name() ]);
 
-        return $drop[ 'ok' ] == 1;
+            return true;
+        } catch ( Missing404Exception $e ) {
+            return false;
+        }
     }
 
     /**
@@ -110,18 +180,22 @@ Class Collection
      */
     public function rename( string $newName ): bool
     {
-        $rename = $this->mongo()
-            ->command([
-                'renameCollection' => $this->databaseName() . '.' . $this->name(),
-                'to'               => $this->databaseName() . '.' . $newName,
-            ])
-            ->offsetGet('ok');
+        $this->indices()
+            ->delete([ 'index' => $newName ]);
 
-        if ( $rename == 1 ) {
-            return true;
-        }
+        // getThisSchema
+        // createCollection newCollection
+        // setThisSchema to newCollection
+        // reIndex
 
-        return false;
+        $this->elastic()
+            ->client()
+            ->reindex([
+                'source' => [ 'index' => $this->collection ],
+                'dest'   => [ 'index' => $newName ],
+            ]);
+
+        return true;
     }
 
     /**

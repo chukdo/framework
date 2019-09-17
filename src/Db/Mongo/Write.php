@@ -2,6 +2,8 @@
 
 namespace Chukdo\Db\Mongo;
 
+use Chukdo\Contracts\Db\Collection as CollectionInterface;
+use Chukdo\Contracts\Db\Write as WriteInterface;
 use Chukdo\Db\Mongo\Schema\Validator;
 use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
@@ -11,14 +13,19 @@ use MongoDB\Operation\FindOneAndUpdate;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
- * Mongo Write.
+ * Server Write.
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Write extends Where
+Class Write extends Where implements WriteInterface
 {
+    /**
+     * @var CollectionInterface
+     */
+    protected $collection;
+
     /**
      * @var Json
      */
@@ -29,15 +36,15 @@ Class Write extends Where
      */
     protected $options = [];
 
-    /**
-     * Index constructor.
-     * @param Collection $collection
-     */
-    public function __construct( Collection $collection )
-    {
-        $this->fields = new Json();
 
-        parent::__construct($collection);
+    /**
+     * Where constructor.
+     * @param CollectionInterface $collection
+     */
+    public function __construct( CollectionInterface $collection )
+    {
+        $this->fields     = new Json();
+        $this->collection = $collection;
     }
 
     /**
@@ -78,7 +85,7 @@ Class Write extends Where
     }
 
     /**
-     * @return Session
+     * @return Write
      */
     public function startTransaction(): self
     {
@@ -98,15 +105,93 @@ Class Write extends Where
         }
         else {
             $mongo = $this->collection()
-                ->mongo()
-                ->mongoManager();
+                ->database()
+                ->server()
+                ->client();
 
             return $this->options[ 'session' ] = $mongo->startSession();
         }
     }
 
     /**
-     * @return Session
+     * @return Collection
+     */
+    public function collection(): Collection
+    {
+        return $this->collection;
+    }
+
+    /**
+     * @return int
+     */
+    public function delete(): int
+    {
+        return (int) $this->collection()
+            ->client()
+            ->deleteMany($this->filter(), $this->options())
+            ->getDeletedCount();
+    }
+
+    /**
+     * @return array
+     */
+    public function options(): array
+    {
+        return $this->options;
+    }
+
+    /**
+     * @return bool
+     */
+    public function deleteOne(): bool
+    {
+        return (bool) $this->collection()
+            ->client()
+            ->deleteOne($this->filter(), $this->options())
+            ->getDeletedCount();
+    }
+
+    /**
+     * @return JsonInterface
+     */
+    public function deleteOneAndGet(): JsonInterface
+    {
+        $json = new Json($this->collection()
+            ->client()
+            ->findOneAndDelete($this->filter(), $this->options()));
+
+        return $json->filterRecursive(function( $k, $v )
+        {
+            return Collection::filterOut($k, $v);
+        });
+    }
+
+    /**
+     * @return string|null
+     */
+    public function insert(): ?string
+    {
+        return (string) $this->collection()
+            ->client()
+            ->insertOne($this->validatedInsertFields(), $this->options())
+            ->getInsertedId();
+    }
+
+    /**
+     * @return array
+     */
+    public function validatedInsertFields(): array
+    {
+        $set       = $this->fields->offsetGet('$set');
+        $validator = new Validator($this->collection()
+            ->schema()
+            ->property());
+
+        return $validator->validateDataToInsert($set);
+    }
+
+    /**
+     * @return Write
      */
     public function commitTransaction(): self
     {
@@ -117,7 +202,7 @@ Class Write extends Where
     }
 
     /**
-     * @return Session
+     * @return Write
      */
     public function abortTransaction(): self
     {
@@ -138,48 +223,13 @@ Class Write extends Where
     }
 
     /**
-     * @return int
+     * @param string $field
+     * @return Write
      */
-    public function delete(): int
+    public function pop( string $field ): self
     {
-        return (int) $this->mongoCollection()
-            ->deleteMany($this->filter(), $this->options())
-            ->getDeletedCount();
-    }
-
-    /**
-     * @return array
-     */
-    public function options(): array
-    {
-        return $this->options;
-    }
-
-    /**
-     * @return bool
-     */
-    public function deleteOne(): bool
-    {
-        return (bool) $this->mongoCollection()
-            ->deleteOne($this->filter(), $this->options())
-            ->getDeletedCount();
-    }
-
-    /**
-     * @return JsonInterface
-     */
-    public function deleteOneAndGet(): JsonInterface
-    {
-        $json = new Json($this->mongoCollection()
-            ->findOneAndDelete($this->filter(), $this->options()));
-
-        return $json->filterRecursive(function( $k, $v )
-        {
-            return Collection::filterOut($k, $v);
-        });
-    }
-
-    /**
+        return $this->field('pop', $field, 1);
+    }    /**
      * @param iterable $values
      * @return Write
      */
@@ -190,54 +240,6 @@ Class Write extends Where
         }
 
         return $this;
-    }
-
-    /**
-     * @param string $field
-     * @param        $value
-     * @return Write
-     */
-    public function set( string $field, $value ): self
-    {
-        return $this->field('set', $field, $value);
-    }
-
-    /**
-     * @param string $keyword
-     * @param string $field
-     * @param        $value
-     * @return Write
-     */
-    protected function field( string $keyword, string $field, $value ): self
-    {
-        $keyword = '$' . $keyword;
-
-        if ( Is::iterable($value) ) {
-            $values = [];
-
-            foreach ( $value as $k => $v ) {
-                $values[ $k ] = Collection::filterIn($k, $v);
-            }
-
-            $value = $values;
-        }
-        else {
-            $value = Collection::filterIn($field, $value);
-        }
-
-        $this->fields->offsetGetOrSet($keyword)
-            ->offsetSet($field, $value);
-
-        return $this;
-    }
-
-    /**
-     * @param string $field
-     * @return Write
-     */
-    public function pop( string $field ): self
-    {
-        return $this->field('pop', $field, 1);
     }
 
     /**
@@ -269,6 +271,14 @@ Class Write extends Where
         return $this->field('addToSet', $field, [
             '$each' => $values,
         ]);
+    }    /**
+     * @param string $field
+     * @param        $value
+     * @return Write
+     */
+    public function set( string $field, $value ): self
+    {
+        return $this->field('set', $field, $value);
     }
 
     /**
@@ -395,6 +405,33 @@ Class Write extends Where
         }
 
         return $this->field('push', $field, $value);
+    }    /**
+     * @param string $keyword
+     * @param string $field
+     * @param        $value
+     * @return Write
+     */
+    protected function field( string $keyword, string $field, $value ): self
+    {
+        $keyword = '$' . $keyword;
+
+        if ( Is::iterable($value) ) {
+            $values = [];
+
+            foreach ( $value as $k => $v ) {
+                $values[ $k ] = Collection::filterIn($k, $v);
+            }
+
+            $value = $values;
+        }
+        else {
+            $value = Collection::filterIn($field, $value);
+        }
+
+        $this->fields->offsetGetOrSet($keyword)
+            ->offsetSet($field, $value);
+
+        return $this;
     }
 
     /**
@@ -466,34 +503,19 @@ Class Write extends Where
         return $this->field('rename', $oldName, $newName);
     }
 
-    /**
-     * @return string|null
-     */
-    public function insert(): ?string
-    {
-        return (string) $this->mongoCollection()
-            ->insertOne($this->validatedInsertFields(), $this->options())
-            ->getInsertedId();
-    }
 
-    /**
-     * @return array
-     */
-    public function validatedInsertFields(): array
-    {
-        $set       = $this->fields->offsetGet('$set');
-        $validator = new Validator($this->collection->schema()
-            ->property());
 
-        return $validator->validateDataToInsert($set);
-    }
+
+
+
 
     /**
      * @return int
      */
     public function update(): int
     {
-        return (int) $this->mongoCollection()
+        return (int) $this->collection()
+            ->client()
             ->updateMany($this->filter(), $this->validatedUpdateFields(), $this->options())
             ->getModifiedCount();
     }
@@ -557,7 +579,8 @@ Class Write extends Where
             'upsert' => true,
         ], $this->options());
 
-        return (string) $this->mongoCollection()
+        return (string) $this->collection()
+            ->client()
             ->updateOne($this->filter(), $this->validatedUpdateFields(), $options)
             ->getUpsertedId();
     }
@@ -567,7 +590,8 @@ Class Write extends Where
      */
     public function updateOne(): bool
     {
-        return (bool) $this->mongoCollection()
+        return (bool) $this->collection()
+            ->client()
             ->updateOne($this->filter(), $this->validatedUpdateFields(), $this->options())
             ->getModifiedCount();
     }
@@ -585,7 +609,8 @@ Class Write extends Where
                 : FindOneAndUpdate::RETURN_DOCUMENT_AFTER,
         ], $this->options());
 
-        $json = new Json($this->mongoCollection()
+        $json = new Json($this->collection()
+            ->client()
             ->findOneAndUpdate($this->filter(), $this->validatedUpdateFields(), $options));
 
         return $json->filterRecursive(function( $k, $v )

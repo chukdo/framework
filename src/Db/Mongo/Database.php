@@ -5,35 +5,36 @@ Namespace Chukdo\DB\Mongo;
 use Chukdo\Json\Json;
 use MongoDB\Database as MongoDbDatabase;
 use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\Contracts\Db\Database as DatabaseInterface;
 
 /**
- * Mongo Mongo Database.
+ * Server Server Database.
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Database
+Class Database implements DatabaseInterface
 {
     /**
-     * @var Mongo
+     * @var Server
      */
-    protected $mongo;
+    protected $server;
 
     /**
      * @var MongoDbDatabase
      */
-    protected $database;
+    protected $client;
 
     /**
      * Database constructor.
-     * @param Mongo  $mongo
+     * @param Server $server
      * @param string $database
      */
-    public function __construct( Mongo $mongo, string $database )
+    public function __construct( Server $server, string $database )
     {
-        $this->mongo    = $mongo;
-        $this->database = new MongoDbDatabase($mongo->mongoManager(), $database);
+        $this->server = $server;
+        $this->client = new MongoDbDatabase($server->client(), $database);
     }
 
     /**
@@ -41,7 +42,7 @@ Class Database
      */
     public function repair(): bool
     {
-        return $this->mongo()
+        return $this->server()
                    ->command([
                        'repairDatabase' => 1,
                    ], $this->name())
@@ -49,11 +50,11 @@ Class Database
     }
 
     /**
-     * @return Mongo
+     * @return Server
      */
-    public function mongo(): Mongo
+    public function server(): Server
     {
-        return $this->mongo;
+        return $this->server;
     }
 
     /**
@@ -61,24 +62,83 @@ Class Database
      */
     public function name(): string
     {
-        return $this->mongoDatabase()
+        return $this->client()
             ->getDatabaseName();
     }
 
     /**
      * @return MongoDbDatabase
      */
-    public function mongoDatabase(): MongoDbDatabase
+    public function client(): MongoDbDatabase
     {
-        return $this->database;
+        return $this->client;
+    }
+
+    /**
+     * @param string $collection
+     * @return Collection
+     */
+    public function collection( string $collection ): Collection
+    {
+        return new Collection($this, $collection);
+    }
+
+    /**
+     * @param string $collection
+     * @return Collection
+     */
+    public function createCollection( string $collection ): Collection
+    {
+        if ( !$this->collectionExist($collection) ) {
+            $this->client()
+                ->createCollection($collection);
+        }
+
+        return $this->collection($collection);
+    }
+
+    /**
+     * @param string $collection
+     * @return bool
+     */
+    public function collectionExist( string $collection ): bool
+    {
+        return $this->collections()
+            ->in($collection);
     }
 
     /**
      * @return JsonInterface
      */
-    public function stat(): JsonInterface
+    public function collections(): JsonInterface
     {
-        $stats = $this->mongo()
+        $list = new Json();
+
+        foreach ( $this->client()
+            ->listCollections() as $collection ) {
+            $list->append($collection->getName());
+        }
+
+        return $list;
+    }
+
+    /**
+     * @return bool
+     */
+    public function drop(): bool
+    {
+        $drop = $this->client()
+            ->drop();
+
+        return $drop[ 'ok' ] == 1;
+    }
+
+    /**
+     * @return JsonInterface
+     */
+    public function info(): JsonInterface
+    {
+        $stats = $this->server()
             ->command([ 'dbStats' => 1 ], $this->name())
             ->getIndex(0, new Json())
             ->filter(function( $k, $v )
@@ -92,70 +152,5 @@ Class Database
             ->clean();
 
         return $stats;
-    }
-
-    /**
-     * @return bool
-     */
-    public function drop(): bool
-    {
-        $drop = $this->mongoDatabase()
-            ->drop();
-
-        return $drop[ 'ok' ] == 1;
-    }
-
-    /**
-     * @return JsonInterface
-     */
-    public function collections(): JsonInterface
-    {
-        $list = new Json();
-
-        foreach ( $this->mongoDatabase()
-            ->listCollections() as $collection ) {
-            $list->append($collection->getName());
-        }
-
-        return $list;
-    }
-
-    /**
-     * @param string $collection
-     * @return Collection
-     */
-    public function createCollection( string $collection ): Collection
-    {
-        if ( !$this->collectionExist($collection) ) {
-            $this->mongoDatabase()
-                ->createCollection($collection);
-        }
-
-        return $this->collection($collection);
-    }
-
-    /**
-     * @param string $collection
-     * @return bool
-     */
-    public function collectionExist( string $collection ): bool
-    {
-        foreach ( $this->mongoDatabase()
-            ->listCollections() as $coll ) {
-            if ( $coll->getName() == $collection ) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param string $collection
-     * @return Collection
-     */
-    public function collection( string $collection ): Collection
-    {
-        return new Collection($this->mongo(), $this->name(), $collection);
     }
 }
