@@ -2,6 +2,7 @@
 
 namespace Chukdo\Db\Elastic\Schema;
 
+use Chukdo\Contracts\Db\Property as PropertyInterface;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Arr;
 use Chukdo\Json\Json;
@@ -14,7 +15,7 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class Property
+class Property implements PropertyInterface
 {
     /**
      * @var Json
@@ -145,7 +146,7 @@ class Property
      * @param string $name
      * @return $this|null
      */
-    public function getProperty( string $name ): ?Property
+    public function get( string $name ): ?Property
     {
         if ( Str::notContain($name, '.') ) {
             return $this->properties()
@@ -159,7 +160,7 @@ class Property
             ->offsetGet($firstPath);
 
         if ( $get instanceof Property ) {
-            return $get->getProperty($endPath);
+            return $get->get($endPath);
         }
 
         return null;
@@ -170,7 +171,7 @@ class Property
      * @param array  $options
      * @return Property
      */
-    public function setProperty( string $name, array $options = [] ): Property
+    public function set( string $name, array $options = [] ): Property
     {
         return $this->properties()
             ->offsetGetOrSet($name, new Property($options, $name));
@@ -199,12 +200,12 @@ class Property
     /**
      * @return array
      */
-    public function get(): array
+    public function toArray(): array
     {
         return $this->property->filterRecursive(function( $k, $v )
         {
             return $v instanceof Property
-                ? $v->get()
+                ? $v->toArray()
                 : $v;
         })
             ->toArray();

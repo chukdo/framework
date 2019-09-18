@@ -31,13 +31,6 @@ interface Server
     public function ping(): bool;
 
     /**
-     * @param array  $args
-     * @param string $db
-     * @return JsonInterface
-     */
-    public function command(array $args, string $db = ''): JsonInterface;
-
-    /**
      * @return JsonInterface
      */
     public function status(): JsonInterface;

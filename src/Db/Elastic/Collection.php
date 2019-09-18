@@ -3,10 +3,12 @@
 Namespace Chukdo\DB\Elastic;
 
 use Chukdo\Db\Elastic\Schema\Schema;
+use Chukdo\DB\Elastic\Database;
 use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
 use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use DateTime;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
@@ -19,12 +21,12 @@ use Elasticsearch\Namespaces\IndicesNamespace;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Collection
+Class Collection implements CollectionInterface
 {
     /**
-     * @var Elastic
+     * @var \Chukdo\DB\Elastic\Database
      */
-    protected $elastic;
+    protected $database;
 
     /**
      * @var string
@@ -33,12 +35,12 @@ Class Collection
 
     /**
      * Collection constructor.
-     * @param Elastic $elastic
-     * @param string  $collection
+     * @param \Chukdo\DB\Elastic\Database $database
+     * @param string                      $collection
      */
-    public function __construct( Elastic $elastic, string $collection )
+    public function __construct( Database $database, string $collection )
     {
-        $this->elastic    = $elastic;
+        $this->database   = $database;
         $this->collection = $collection;
     }
 
@@ -51,7 +53,7 @@ Class Collection
     public static function filterOut( ?string $field, $value )
     {
         if ( Str::contain($field, 'date') ) {
-            return (new DateTime())->setTimestamp(1000 * (int) (string) $value);
+            return ( new DateTime() )->setTimestamp(1000 * (int) (string) $value);
         }
 
         return $value;
@@ -72,14 +74,6 @@ Class Collection
         }
 
         return $value;
-    }
-
-    /**
-     * @return Schema
-     */
-    public function schema(): Schema
-    {
-        return new Schema($this);
     }
 
     /**
@@ -110,77 +104,13 @@ Class Collection
     }
 
     /**
-     * @return JsonInterface
-     */
-    public function stat(): JsonInterface
-    {
-        $stats = new Json($this->indices()
-            ->stats([ 'index' => $this->name() ]));
-
-        return $stats->get('indices.' . $this->name(), new Json());
-    }
-
-    /**
-     * @return IndicesNamespace
-     */
-    public function indices(): IndicesNamespace
-    {
-        return $this->client()
-            ->indices();
-    }
-
-    /**
-     * @return Client
-     */
-    public function client(): Client
-    {
-        return $this->elastic()
-            ->client();
-    }
-
-    /**
-     * @return Elastic
-     */
-    public function elastic(): Elastic
-    {
-        return $this->elastic;
-    }
-
-    /**
-     * @return JsonInterface
-     */
-    public function properties(): JsonInterface
-    {
-        $info = new Json($this->indices()
-            ->getMapping([ 'index' => $this->name() ]));
-
-        return $info->get($this->name() . '.mappings', new Json());
-    }
-
-    /**
-     * @return bool
-     */
-    public function drop(): bool
-    {
-        try {
-            $this->elastic()
-                ->client()
-                ->indices()
-                ->delete([ 'index' => $this->name() ]);
-
-            return true;
-        } catch ( Missing404Exception $e ) {
-            return false;
-        }
-    }
-
-    /**
      * @param string $newName
      * @return bool
      */
     public function rename( string $newName ): bool
     {
-        $this->indices()
+        $this->client()
+            ->indices()
             ->delete([ 'index' => $newName ]);
 
         // getThisSchema
@@ -188,8 +118,7 @@ Class Collection
         // setThisSchema to newCollection
         // reIndex
 
-        $this->elastic()
-            ->client()
+        $this->client()
             ->reindex([
                 'source' => [ 'index' => $this->collection ],
                 'dest'   => [ 'index' => $newName ],
@@ -199,11 +128,42 @@ Class Collection
     }
 
     /**
-     * @return Write
+     * @return Client
      */
-    public function write(): Write
+    public function client(): Client
     {
-        return new Write($this);
+        return $this->database()
+            ->client();
+    }
+
+    /**
+     * @return \Chukdo\DB\Elastic\Database
+     */
+    public function database(): Database
+    {
+        return $this->database;
+    }
+
+    /**
+     * @return bool
+     */
+    public function drop(): bool
+    {
+        try {
+            $this->client()
+                ->indices()
+                ->delete([ 'index' => $this->fullName() ]);
+
+            return true;
+        } catch ( Missing404Exception $e ) {
+            return false;
+        }
+    }
+
+    public function fullName(): string
+    {
+        return $this->database()
+                   ->prefixName() . $this->name();
     }
 
     /**
@@ -212,5 +172,33 @@ Class Collection
     public function find(): Find
     {
         return new Find($this);
+    }
+
+    /**
+     * @return JsonInterface
+     */
+    public function info(): JsonInterface
+    {
+        $stats = new Json($this->client()
+            ->indices()
+            ->stats([ 'index' => $this->name() ]));
+
+        return $stats->get('indices.' . $this->fullName(), new Json());
+    }
+
+    /**
+     * @return Schema
+     */
+    public function schema(): Schema
+    {
+        return new Schema($this);
+    }
+
+    /**
+     * @return Write
+     */
+    public function write(): Write
+    {
+        return new Write($this);
     }
 }

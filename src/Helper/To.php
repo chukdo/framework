@@ -334,8 +334,8 @@ final class To
                 $v = $v->format('d-m-Y H:i:s');
             }
 
-            $html .= '<tr><td style="background:#eee;padding:5px;border:1px solid #eee;width:' . strlen($k) * 9 . 'px;">'
-                     . $k . '</td><td  style="padding:5px;border:1px solid #eee;">' . $v . '</td></tr>';
+            $html .= '<tr><td style="background:#eee;padding:5px;border:1px solid #ddd;width:' . strlen($k) * 9 . 'px;">'
+                     . $k . '</td><td  style="padding:5px;border:1px solid #ddd;">' . $v . '</td></tr>';
         }
 
         return '<table id="ToHtml" style="' . $style . '">' . $html . '</table>';

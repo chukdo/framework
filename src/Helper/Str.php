@@ -76,6 +76,26 @@ final class Str
     }
 
     /**
+     * @param string|null $haystack La chaîne dans laquelle on doit chercher
+     * @param string|null $needle le debut de chaine à verifier
+     * @return bool
+     */
+    public static function startWith(?string $haystack, ?string $needle): bool
+    {
+        return substr($haystack, 0, strlen($needle)) == $needle;
+    }
+
+    /**
+     * @param string|null $haystack La chaîne dans laquelle on doit chercher
+     * @param string|null $needle la fin de chaine à verifier
+     * @return bool
+     */
+    public static function endWith(?string $haystack, ?string $needle): bool
+    {
+        return substr($haystack, strlen($needle)) == $needle;
+    }
+
+    /**
      * @param string|null $delimiter
      * @param string|null $string
      * @param int|null    $length

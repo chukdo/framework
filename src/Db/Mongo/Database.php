@@ -31,10 +31,10 @@ Class Database implements DatabaseInterface
      * @param Server $server
      * @param string $database
      */
-    public function __construct( Server $server, string $database )
+    public function __construct( Server $server, string $database = null )
     {
         $this->server = $server;
-        $this->client = new MongoDbDatabase($server->client(), $database);
+        $this->client = new MongoDbDatabase($server->client(), $database ?: 'main');
     }
 
     /**
@@ -58,9 +58,9 @@ Class Database implements DatabaseInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function name(): string
+    public function name(): ?string
     {
         return $this->client()
             ->getDatabaseName();

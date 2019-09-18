@@ -24,9 +24,9 @@ interface Database
     public function server();
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function name(): string;
+    public function name(): ?string;
 
     /**
      * @return JsonInterface

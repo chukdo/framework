@@ -86,7 +86,8 @@ class Schema implements SchemaInterface
      */
     public function get( string $name ): ?Property
     {
-        return $this->property->get($name);
+        return $this->property()
+            ->get($name);
     }
 
     /**
@@ -96,7 +97,8 @@ class Schema implements SchemaInterface
      */
     public function set( string $name, array $options = [] ): Property
     {
-        return $this->property->set($name, $options);
+        return $this->property()
+            ->set($name, $options);
     }
 
     /**
@@ -112,7 +114,8 @@ class Schema implements SchemaInterface
      */
     public function properties(): JsonInterface
     {
-        return $this->property->properties();
+        return $this->property()
+            ->properties();
     }
 
     /**
@@ -142,7 +145,7 @@ class Schema implements SchemaInterface
      */
     public function toArray(): array
     {
-        return $this->property
+        return $this->property()
             ->toArray();
     }
 
