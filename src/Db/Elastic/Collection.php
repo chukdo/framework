@@ -3,7 +3,6 @@
 Namespace Chukdo\DB\Elastic;
 
 use Chukdo\Db\Elastic\Schema\Schema;
-use Chukdo\DB\Elastic\Database;
 use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
@@ -12,7 +11,7 @@ use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use DateTime;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
-use Elasticsearch\Namespaces\IndicesNamespace;
+use Throwable;
 
 /**
  * Server Server Collect.
@@ -24,7 +23,7 @@ use Elasticsearch\Namespaces\IndicesNamespace;
 Class Collection implements CollectionInterface
 {
     /**
-     * @var \Chukdo\DB\Elastic\Database
+     * @var Database
      */
     protected $database;
 
@@ -35,8 +34,8 @@ Class Collection implements CollectionInterface
 
     /**
      * Collection constructor.
-     * @param \Chukdo\DB\Elastic\Database $database
-     * @param string                      $collection
+     * @param Database $database
+     * @param string   $collection
      */
     public function __construct( Database $database, string $collection )
     {
@@ -156,6 +155,8 @@ Class Collection implements CollectionInterface
 
             return true;
         } catch ( Missing404Exception $e ) {
+            return true;
+        } catch ( Throwable $e ) {
             return false;
         }
     }

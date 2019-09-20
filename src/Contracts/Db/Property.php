@@ -27,11 +27,12 @@ interface Property
     public function get( string $name );
 
     /**
-     * @param string $name
-     * @param array  $options
+     * @param string      $name
+     * @param string|null $type
+     * @param array       $options
      * @return mixed
      */
-    public function set( string $name, array $options = [] );
+    public function set( string $name, string $type = null,  array $options = [] );
 
     /**
      * @return JsonInterface

@@ -60,4 +60,10 @@ interface Database
      * @return bool
      */
     public function collectionExist( string $collection ): bool;
+
+    /**
+     * @param string $collection
+     * @return bool
+     */
+    public function dropCollection(string $collection): bool;
 }

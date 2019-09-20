@@ -90,18 +90,21 @@ class Schema implements SchemaInterface
     public function get( string $name ): ?Property
     {
         return $this->property()
-            ->toArray($name);
+            ->get($name);
     }
 
     /**
-     * @param string $name
-     * @param array  $options
-     * @return Property
+     * @param string      $name
+     * @param string|null $type
+     * @param array       $options
+     * @return Schema
      */
-    public function set( string $name, array $options = [] ): Property
+    public function set( string $name, string $type = null,  array $options = [] ): self
     {
-        return $this->property()
-            ->set($name, $options);
+        $this->property()
+            ->set($name, $type, $options);
+
+        return $this;
     }
 
     /**
@@ -117,14 +120,16 @@ class Schema implements SchemaInterface
      */
     public function save(): bool
     {
-        return $this->collection()
+        $save = new Json($this->collection()
             ->client()
             ->indices()
             ->putMapping([
                 'index' => $this->collection()
                     ->name(),
                 'body'  => $this->toArray(),
-            ]);
+            ]));
+
+        return $save->offsetGet('acknowledged') == 1;
     }
 
     /**

@@ -167,14 +167,21 @@ class Property implements PropertyInterface
     }
 
     /**
-     * @param string $name
-     * @param array  $options
+     * @param string      $name
+     * @param string|null $type
+     * @param array       $options
      * @return Property
      */
-    public function set( string $name, array $options = [] ): Property
+    public function set( string $name, string $type = null,  array $options = [] ): Property
     {
+        $property = new Property($options, $name);
+
+        if ($type) {
+            $property->setType($type);
+        }
+
         return $this->properties()
-            ->offsetGetOrSet($name, new Property($options, $name));
+            ->offsetGetOrSet($name, $property);
     }
 
     /**

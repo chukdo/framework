@@ -34,7 +34,8 @@ Class Database implements DatabaseInterface
     public function __construct( Server $server, string $database = null )
     {
         $this->server = $server;
-        $this->client = new MongoDbDatabase($server->client(), $database ?: 'main');
+        $this->client = new MongoDbDatabase($server->client(), $database
+            ?: 'main');
     }
 
     /**
@@ -81,6 +82,18 @@ Class Database implements DatabaseInterface
     public function collection( string $collection ): Collection
     {
         return new Collection($this, $collection);
+    }
+
+    /**
+     * @param string $collection
+     * @return bool
+     */
+    public function dropCollection( string $collection ): bool
+    {
+        $drop = $this->client()
+            ->dropCollection($collection);
+
+        return $drop[ 'ok' ] == 1;
     }
 
     /**

@@ -7,6 +7,8 @@ use Chukdo\Json\Json;
 use Elasticsearch\Client;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Contracts\Db\Database as DatabaseInterface;
+use Throwable;
+use Elasticsearch\Common\Exceptions\Missing404Exception;
 
 /**
  * Server Server Database.
@@ -154,6 +156,25 @@ Class Database implements DatabaseInterface
         }
 
         return $list;
+    }
+
+    /**
+     * @param string $collection
+     * @return bool
+     */
+    public function dropCollection( string $collection ): bool
+    {
+        try {
+            $this->client()
+                ->indices()
+                ->delete([ 'index' => $this->prefixName() . $collection ]);
+
+            return true;
+        } catch ( Missing404Exception $e ) {
+            return true;
+        } catch (Throwable $e) {
+            return false;
+        }
     }
 
     /**
