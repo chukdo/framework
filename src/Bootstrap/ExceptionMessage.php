@@ -33,6 +33,7 @@ class ExceptionMessage
 
     /**
      * ExceptionMessage constructor.
+     *
      * @param Throwable $e
      * @param string    $env
      */
@@ -46,14 +47,14 @@ class ExceptionMessage
         }
 
         foreach ( $e->getTrace() as $trace ) {
-            $trace = array_merge([
+            $trace = array_merge( [
                 'file'     => null,
                 'line'     => null,
                 'class'    => null,
                 'type'     => null,
                 'function' => null,
             ],
-                $trace);
+                $trace );
             $file  = $trace[ 'file' ];
             $line  = $trace[ 'line' ];
 
@@ -62,33 +63,34 @@ class ExceptionMessage
                 'File' => $file,
                 'Line' => $line,
                 'Php'  => $file && $line
-                    ? $this->getCode($trace[ 'file' ], $trace[ 'line' ])
+                    ? $this->getCode( $trace[ 'file' ], $trace[ 'line' ] )
                     : '',
             ];
         }
 
-        $this->message[ 'Call' ]  = get_class($e);
+        $this->message[ 'Call' ]  = get_class( $e );
         $this->message[ 'Error' ] = $e->getMessage();
         $this->message[ 'Code' ]  = $e->getCode();
         $this->message[ 'File' ]  = $e->getFile();
         $this->message[ 'Line' ]  = $e->getLine();
-        $this->message[ 'Php' ]   = $this->getCode($e->getFile(), $e->getLine());
+        $this->message[ 'Php' ]   = $this->getCode( $e->getFile(), $e->getLine() );
         $this->message[ 'Trace' ] = $backTrace;
     }
 
     /**
      * @param string $file
      * @param int    $line
+     *
      * @return string
      */
     protected function getCode( string $file, int $line ): string
     {
         $code = '';
-        $spl  = new SplFileObject($file);
+        $spl  = new SplFileObject( $file );
 
-        for ( $i = -7 ; $i < 3 ; ++$i ) {
+        for ( $i = -7; $i < 3; ++$i ) {
             try {
-                $spl->seek($line + $i);
+                $spl->seek( $line + $i );
                 $code .= ( $line + $i + 1 ) . ( $i == -1
                         ? '> '
                         : ': ' ) . $spl->current() . "\n";
@@ -96,11 +98,11 @@ class ExceptionMessage
             }
         }
 
-        $code = highlight_string('<?php ' . $code,
-            true);
-        $code = str_replace('&lt;?php&nbsp;',
+        $code = highlight_string( '<?php ' . $code,
+            true );
+        $code = str_replace( '&lt;?php&nbsp;',
             '',
-            $code);
+            $code );
         $code = '<span style="line-height:0.6rem">' . $code . '</span>';
 
         return $code;
@@ -121,102 +123,106 @@ class ExceptionMessage
 
         switch ( $render ) {
             case 'cli':
-                $contentType = Http::mimeContentType('text');
-                $content     = $this->renderCli($this->message);
+                $contentType = Http::mimeContentType( 'text' );
+                $content     = $this->renderCli( $this->message );
                 break;
             case 'xml':
-                $contentType = Http::mimeContentType('xml');
-                $content     = $this->renderXml($this->message);
+                $contentType = Http::mimeContentType( 'xml' );
+                $content     = $this->renderXml( $this->message );
                 break;
             case 'json':
-                $contentType = Http::mimeContentType('json');
-                $content     = $this->renderJson($this->message);
+                $contentType = Http::mimeContentType( 'json' );
+                $content     = $this->renderJson( $this->message );
                 break;
             case 'html':
             default:
-                $contentType = Http::mimeContentType('html');
-                $content     = $this->renderHtml($this->message);;
+                $contentType = Http::mimeContentType( 'html' );
+                $content     = $this->renderHtml( $this->message );;
         }
 
         try {
-            $response->status(500)
-                ->header('Content-Type', $contentType . '; charset=utf-8')
-                ->content($content)
+            $response->status( 500 )
+                ->header( 'Content-Type', $contentType . '; charset=utf-8' )
+                ->content( $content )
                 ->send()
                 ->end();
-        } catch (Throwable $e) {
-            die($content);
+        } catch ( Throwable $e ) {
+            die( $content );
         }
 
     }
 
     /**
      * @param array $message
+     *
      * @return string
      */
-    protected function renderXml(array $message): string
+    protected function renderCli( array $message ): string
     {
-        return ( new Xml() )->import($message)
+        $climate = new CLImate();
+        $climate->output->defaultTo( 'buffer' );
+        $climate->border();
+        $climate->red()
+            ->out( strtoupper( $message[ 'Call' ]
+                ?: 'Exception' ) );
+        $climate->border();
+        $padding = $climate->padding( 7 );
+        $padding->label( 'Code' )
+            ->result( $message[ 'Code' ] );
+        $padding->label( 'Message' )
+            ->result( $message[ 'Error' ] );
+        $padding->label( 'File' )
+            ->result( $message[ 'File' ] );
+        $padding->label( 'Line' )
+            ->result( $message[ 'Line' ] );
+
+        $backTrace = $message[ 'Trace' ];
+
+        if ( is_array( $backTrace ) ) {
+            foreach ( $backTrace as $k => $trace ) {
+                unset( $backTrace[ $k ][ 'Php' ] );
+            }
+            $padding->label( 'Trace' );
+            $climate->json( $backTrace );
+            $climate->border();
+        }
+
+        return $climate->output->get( 'buffer' )
+            ->get();
+    }
+
+    /**
+     * @param array $message
+     *
+     * @return string
+     */
+    protected function renderXml( array $message ): string
+    {
+        return ( new Xml() )->import( $message )
             ->toXml()
             ->toXmlString();
     }
 
     /**
      * @param array $message
+     *
      * @return string
      */
-    protected function renderJson(array $message): string
+    protected function renderJson( array $message ): string
     {
-        return ( new Json($message) )->toJson(true);
+        return ( new Json( $message ) )->toJson( true );
     }
 
     /**
      * @param array $message
+     *
      * @return string
      */
-    protected function renderHtml(array $message): string
+    protected function renderHtml( array $message ): string
     {
         $title = $message[ 'Call' ];
-        unset($message[ 'Call' ]);
+        unset( $message[ 'Call' ] );
 
-        return To::html($message, $title, '#B30000');
-    }
-
-    /**
-     * @param array $message
-     * @return string
-     */
-    protected function renderCli(array $message): string
-    {
-        $climate = new CLImate();
-        $climate->output->defaultTo('buffer');
-        $climate->border();
-        $climate->red()
-            ->out(strtoupper($message[ 'Call' ]
-                ?: 'Exception'));
-        $climate->border();
-        $padding = $climate->padding(7);
-        $padding->label('Code')
-            ->result($message[ 'Code' ]);
-        $padding->label('Message')
-            ->result($message[ 'Error' ]);
-        $padding->label('File')
-            ->result($message[ 'File' ]);
-        $padding->label('Line')
-            ->result($message[ 'Line' ]);
-
-        $backTrace = $message[ 'Trace' ];
-
-        if ( is_array($backTrace) ) {
-            foreach ( $backTrace as $k => $trace ) {
-                unset($backTrace[ $k ][ 'Php' ]);
-            }
-            $padding->label('Trace');
-            $climate->json($backTrace);
-            $climate->border();
-        }
-
-        return $climate->output->get('buffer')
-            ->get();
+        return To::html( $message, $title, '#B30000' );
     }
 }

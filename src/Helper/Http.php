@@ -20,6 +20,7 @@ final class Http
 
     /**
      * @param string $name
+     *
      * @return string
      */
     public static function mimeContentType( string $name ): string
@@ -61,19 +62,19 @@ final class Http
             'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
         ];
 
-        $ext = Str::extension($name);
+        $ext = Str::extension( $name );
 
-        if ( array_key_exists($ext,
-            $mimeTypes) ) {
+        if ( array_key_exists( $ext,
+            $mimeTypes ) ) {
             return $mimeTypes[ $ext ];
-        }
-        else {
+        } else {
             return 'application/octet-stream';
         }
     }
 
     /**
      * @param string|null $ua
+     *
      * @return array
      */
     public static function browser( string $ua = null ): array
@@ -86,17 +87,16 @@ final class Http
             'bot'      => null,
         ];
 
-        $ua               = strtolower($ua);
-        $browser[ 'bot' ] = Str::match('/baiduspider|googlebot|yandexbot|bingbot|lynx|wget|curl/',
-            $ua);
-        $is               = function( $contain, $name = false ) use ( $ua, &$browser )
-        {
-            if ( Str::contain($ua,
-                $contain) ) {
+        $ua               = strtolower( $ua );
+        $browser[ 'bot' ] = Str::match( '/baiduspider|googlebot|yandexbot|bingbot|lynx|wget|curl/',
+            $ua );
+        $is               = function( $contain, $name = false ) use ( $ua, &$browser ) {
+            if ( Str::contain( $ua,
+                $contain ) ) {
                 $browser[ 'browser' ] = $name
                     ?: $contain;
-                $browser[ 'version' ] = Str::match('/' . $contain . '[\/\s](\d+)/',
-                    $ua);
+                $browser[ 'version' ] = Str::match( '/' . $contain . '[\/\s](\d+)/',
+                    $ua );
 
                 return true;
             }
@@ -105,19 +105,19 @@ final class Http
         };
 
         /* Browser & Version */
-        if ( !$is('firefox') ) {
-            if ( !$is('edge',
-                'msie') ) {
-                if ( !$is('msie') ) {
-                    if ( !$is('trident',
-                        'msie') ) {
-                        if ( !$is('opera') ) {
-                            if ( !$is('opr',
-                                'opera') ) {
-                                if ( !$is('chromium',
-                                    'chrome') ) {
-                                    if ( !$is('chrome') ) {
-                                        $is('safari');
+        if ( !$is( 'firefox' ) ) {
+            if ( !$is( 'edge',
+                'msie' ) ) {
+                if ( !$is( 'msie' ) ) {
+                    if ( !$is( 'trident',
+                        'msie' ) ) {
+                        if ( !$is( 'opera' ) ) {
+                            if ( !$is( 'opr',
+                                'opera' ) ) {
+                                if ( !$is( 'chromium',
+                                    'chrome' ) ) {
+                                    if ( !$is( 'chrome' ) ) {
+                                        $is( 'safari' );
                                     }
                                 }
                             }
@@ -128,28 +128,25 @@ final class Http
         }
 
         /* Platform */
-        if ( Str::contain($ua,
-            'windows') ) {
+        if ( Str::contain( $ua,
+            'windows' ) ) {
             $browser[ 'platform' ] = 'windows';
-        }
-        elseif ( Str::contain($ua,
-            'linux') ) {
+        } else if ( Str::contain( $ua,
+            'linux' ) ) {
             $browser[ 'platform' ] = 'linux';
-        }
-        elseif ( Str::contain($ua,
-            'mac') ) {
+        } else if ( Str::contain( $ua,
+            'mac' ) ) {
             $browser[ 'platform' ] = 'osx';
         }
 
         /* Mobile */
-        if ( Str::contain($ua,
-                'ipad')
-             || Str::contain($ua,
-                'iphone') ) {
+        if ( Str::contain( $ua,
+                'ipad' )
+            || Str::contain( $ua,
+                'iphone' ) ) {
             $browser[ 'mobile' ] = 'ios';
-        }
-        elseif ( Str::contain($ua,
-            'android') ) {
+        } else if ( Str::contain( $ua,
+            'android' ) ) {
             $browser[ 'mobile' ] = 'android';
         }
 

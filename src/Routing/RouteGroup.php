@@ -26,6 +26,7 @@ class RouteGroup
 
     /**
      * RouteGroup constructor.
+     *
      * @param Router $router
      */
     public function __construct( Router $router )
@@ -36,12 +37,13 @@ class RouteGroup
 
     /**
      * @param array $middlewares
+     *
      * @return RouteGroup
      */
     public function middleware( array $middlewares ): self
     {
         $this->attributes()
-            ->setMiddleware($middlewares);
+            ->setMiddleware( $middlewares );
 
         return $this;
     }
@@ -57,24 +59,26 @@ class RouteGroup
     /**
      * @param array                         $validators
      * @param ErrorMiddlewareInterface|null $errorMiddleware
+     *
      * @return RouteGroup
      */
     public function validator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
     {
         $this->attributes()
-            ->setValidator($validators, $errorMiddleware);
+            ->setValidator( $validators, $errorMiddleware );
 
         return $this;
     }
 
     /**
      * @param string|null $prefix
+     *
      * @return RouteGroup
      */
     public function prefix( ?string $prefix ): self
     {
         $this->attributes()
-            ->setPrefix($prefix);
+            ->setPrefix( $prefix );
 
         return $this;
     }
@@ -87,12 +91,12 @@ class RouteGroup
         $attributes = $this->router->attributes()
             ->get();
         $this->router->attributes()
-            ->add($this->attributes()
-                ->get());
+            ->add( $this->attributes()
+                ->get() );
 
         ( $closure )();
 
         $this->router->attributes()
-            ->set($attributes);
+            ->set( $attributes );
     }
 }

@@ -43,34 +43,37 @@ class Request
 
     /**
      * Request constructor.
+     *
      * @param App $app
+     *
      * @throws ReflectionException
      * @throws ServiceException
      */
     public function __construct( App $app )
     {
         $this->app    = $app;
-        $this->inputs = $app->make('Chukdo\Http\Input', true);
+        $this->inputs = $app->make( 'Chukdo\Http\Input', true );
         $this->header = new Header();
-        $this->url    = new Url(HttpRequest::uri());
+        $this->url    = new Url( HttpRequest::uri() );
 
-        $this->header->setHeader('Content-Type',
-            HttpRequest::server('CONTENT_TYPE',
-                ''));
-        $this->header->setHeader('Content-Length',
-            HttpRequest::server('CONTENT_LENGTH',
-                ''));
-        $this->header->setHeaders(HttpRequest::headers());
+        $this->header->setHeader( 'Content-Type',
+            HttpRequest::server( 'CONTENT_TYPE',
+                '' ) );
+        $this->header->setHeader( 'Content-Length',
+            HttpRequest::server( 'CONTENT_LENGTH',
+                '' ) );
+        $this->header->setHeaders( HttpRequest::headers() );
     }
 
     /**
      * @param             $name
      * @param string|null $default
+     *
      * @return string|null
      */
     public function server( $name, string $default = null ): ?string
     {
-        return HttpRequest::server($name, $default);
+        return HttpRequest::server( $name, $default );
     }
 
     /**
@@ -84,6 +87,7 @@ class Request
     /**
      * @param string $key
      * @param null   $default
+     *
      * @return string|null
      * @throws ReflectionException
      * @throws ServiceException
@@ -91,12 +95,13 @@ class Request
     public function conf( string $key, $default = null ): ?string
     {
         return $this->app->conf()
-            ->offsetGet($key, $default);
+            ->offsetGet( $key, $default );
     }
 
     /**
      * @param string $key
      * @param null   $default
+     *
      * @return string|null
      * @throws ReflectionException
      * @throws ServiceException
@@ -104,19 +109,20 @@ class Request
     public function lang( string $key, $default = null ): ?string
     {
         return $this->app->lang()
-            ->offsetGet('validation.' . $key, $default);
+            ->offsetGet( 'validation.' . $key, $default );
     }
 
     /**
      * @param array $rules
+     *
      * @return Validator
      * @throws ReflectionException
      * @throws ServiceException
      */
     public function validate( array $rules ): Validator
     {
-        $validator = $this->app->make('Chukdo\Validation\Validator');
-        $validator->registerRules($rules);
+        $validator = $this->app->make( 'Chukdo\Validation\Validator' );
+        $validator->registerRules( $rules );
         $validator->validate();
 
         return $validator;
@@ -126,13 +132,14 @@ class Request
      * @param string      $name
      * @param string|null $allowedMimeTypes
      * @param int|null    $maxFileSize
+     *
      * @return FileUploaded
      */
     public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): FileUploaded
     {
-        return $this->inputs->file($name,
+        return $this->inputs->file( $name,
             $allowedMimeTypes,
-            $maxFileSize);
+            $maxFileSize );
     }
 
     /**
@@ -145,56 +152,62 @@ class Request
 
     /**
      * @param string $name
+     *
      * @return mixed|null
      */
     public function input( string $name )
     {
-        return $this->inputs->get($name);
+        return $this->inputs->get( $name );
     }
 
     /**
      * @param mixed ...$offsets
+     *
      * @return JsonInterface
      */
     public function with( ...$offsets ): JsonInterface
     {
-        return $this->inputs->with($offsets);
+        return $this->inputs->with( $offsets );
     }
 
     /**
      * @param mixed ...$offsets
+     *
      * @return JsonInterface
      */
     public function without( ...$offsets ): JsonInterface
     {
-        return $this->inputs->without($offsets);
+        return $this->inputs->without( $offsets );
     }
 
     /**
      * @param string $path
+     *
      * @return bool
      */
     public function filled( string $path ): bool
     {
-        return $this->inputs->filled($path);
+        return $this->inputs->filled( $path );
     }
 
     /**
      * @param string $path
+     *
      * @return bool
      */
     public function exists( string $path ): bool
     {
-        return $this->inputs->exists($path);
+        return $this->inputs->exists( $path );
     }
 
     /**
      * @param string $path
+     *
      * @return JsonInterface
      */
     public function wildcard( string $path ): JsonInterface
     {
-        return $this->inputs->wildcard($path);
+        return $this->inputs->wildcard( $path );
     }
 
     /**
@@ -202,7 +215,7 @@ class Request
      */
     public function type(): ?string
     {
-        return $this->header->getHeader('Content-Type');
+        return $this->header->getHeader( 'Content-Type' );
     }
 
     /**
@@ -210,7 +223,7 @@ class Request
      */
     public function length(): ?string
     {
-        return $this->header->getHeader('Content-Length');
+        return $this->header->getHeader( 'Content-Length' );
     }
 
     /**
@@ -218,10 +231,10 @@ class Request
      */
     public function from(): ?string
     {
-        return parse_url(HttpRequest::server('HTTP_ORIGIN')
-            ?: HttpRequest::server('HTTP_REFERER')
-                ?: HttpRequest::server('REMOTE_ADDR'),
-            PHP_URL_HOST);
+        return parse_url( HttpRequest::server( 'HTTP_ORIGIN' )
+            ?: HttpRequest::server( 'HTTP_REFERER' )
+                ?: HttpRequest::server( 'REMOTE_ADDR' ),
+            PHP_URL_HOST );
     }
 
     /**
@@ -233,15 +246,15 @@ class Request
             return 'cli';
         }
 
-        $render = Str::extension($this->url()
-            ->getPath());
+        $render = Str::extension( $this->url()
+            ->getPath() );
 
         if ( $render ) {
             return $render;
         }
 
         if ( $accept = $this->header()
-            ->getHeader('Accepts') ) {
+            ->getHeader( 'Accepts' ) ) {
             $renders = [
                 'json' => 'json',
                 'xml'  => 'xml',
@@ -250,7 +263,7 @@ class Request
             ];
 
             foreach ( $renders as $contain => $render ) {
-                if ( Str::contain($accept, $contain) ) {
+                if ( Str::contain( $accept, $contain ) ) {
                     return $render;
                 }
             }

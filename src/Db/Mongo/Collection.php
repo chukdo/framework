@@ -46,19 +46,21 @@ Class Collection implements CollectionInterface
 
     /**
      * Collection constructor.
+     *
      * @param Database $database
      * @param string   $collection
      */
     public function __construct( Database $database, string $collection )
     {
         $this->database = $database;
-        $this->client   = new MongoDbCollection($database->server()
-            ->client(), $database->name(), $collection);
+        $this->client   = new MongoDbCollection( $database->server()
+            ->client(), $database->name(), $collection );
     }
 
     /**
      * @param string|null $field
      * @param             $value
+     *
      * @return mixed
      * @throws Exception
      */
@@ -66,11 +68,9 @@ Class Collection implements CollectionInterface
     {
         if ( $value instanceof ObjectId ) {
             return $value->__toString();
-        }
-        elseif ( $value instanceof Timestamp ) {
-            return ( new DateTime() )->setTimestamp((int) (string) $value);
-        }
-        elseif ( $value instanceof UTCDateTime ) {
+        } else if ( $value instanceof Timestamp ) {
+            return ( new DateTime() )->setTimestamp( (int) (string) $value );
+        } else if ( $value instanceof UTCDateTime ) {
             return $value->toDateTime();
         }
 
@@ -80,18 +80,17 @@ Class Collection implements CollectionInterface
     /**
      * @param string|null $field
      * @param             $value
+     *
      * @return mixed
      */
     public static function filterIn( ?string $field, $value )
     {
-        if ( $field === '_id' && Is::string($value) ) {
-            $value = new ObjectId($value);
-        }
-        elseif ( $value instanceof DateTime ) {
-            $value = new UTCDateTime($value->getTimestamp() * 1000);
-        }
-        elseif ( Str::contain($field, 'date') && Is::scalar($value) ) {
-            $value = new UTCDateTime(1000 * (int) $value);
+        if ( $field === '_id' && Is::string( $value ) ) {
+            $value = new ObjectId( $value );
+        } else if ( $value instanceof DateTime ) {
+            $value = new UTCDateTime( $value->getTimestamp() * 1000 );
+        } else if ( Str::contain( $field, 'date' ) && Is::scalar( $value ) ) {
+            $value = new UTCDateTime( 1000 * (int) $value );
         }
 
         return $value;
@@ -99,20 +98,21 @@ Class Collection implements CollectionInterface
 
     /**
      * @param $data
+     *
      * @return RecordInterface
      */
     public function record( $data ): RecordInterface
     {
         try {
-            $reflector = new ReflectionClass('\App\Model\\' . $this->name());
+            $reflector = new ReflectionClass( '\App\Model\\' . $this->name() );
 
-            return $reflector->newInstanceArgs([
+            return $reflector->newInstanceArgs( [
                 $this,
                 $data,
-            ]);
+            ] );
 
         } catch ( ReflectionException $e ) {
-            return new Record($this, $data);
+            return new Record( $this, $data );
         }
     }
 
@@ -134,20 +134,26 @@ Class Collection implements CollectionInterface
     }
 
     /**
-     * @param string $newName
+     * @param string      $collection
+     * @param string|null $database
+     *
      * @return bool
      */
-    public function rename( string $newName ): bool
+    public function rename( string $collection, string $database = null ): bool
     {
+        $old = $this->database()
+                ->name() . '.' . $this->name();
+        $new = $database
+            ?: $this->database()
+                ->name() . '.' . $collection;
+
         return $this->database()
-                   ->server()
-                   ->command([
-                       'renameCollection' => $this->database()
-                                                 ->name() . '.' . $this->name(),
-                       'to'               => $this->database()
-                                                 ->name() . '.' . $newName,
-                   ])
-                   ->offsetGet('ok') == 1;
+                ->server()
+                ->command( [
+                    'renameCollection' => $old,
+                    'to'               => $new,
+                ] )
+                ->offsetGet( 'ok' ) == 1;
     }
 
     /**
@@ -174,7 +180,7 @@ Class Collection implements CollectionInterface
      */
     public function find(): Find
     {
-        return new Find($this);
+        return new Find( $this );
     }
 
     /**
@@ -184,17 +190,16 @@ Class Collection implements CollectionInterface
     {
         $stats = $this->database()
             ->server()
-            ->command([ 'collStats' => $this->name() ], $this->database()
-                ->name())
-            ->getIndex(0, new Json())
-            ->filter(function( $k, $v )
-            {
-                if ( is_scalar($v) ) {
+            ->command( [ 'collStats' => $this->name() ], $this->database()
+                ->name() )
+            ->getIndex( 0, new Json() )
+            ->filter( function( $k, $v ) {
+                if ( is_scalar( $v ) ) {
                     return $v;
                 }
 
                 return false;
-            })
+            } )
             ->clean();
 
         return $stats;
@@ -205,7 +210,7 @@ Class Collection implements CollectionInterface
      */
     public function schema(): Schema
     {
-        return new Schema($this);
+        return new Schema( $this );
     }
 
     /**
@@ -213,7 +218,7 @@ Class Collection implements CollectionInterface
      */
     public function write(): Write
     {
-        return new Write($this);
+        return new Write( $this );
     }
 
     /**
@@ -221,7 +226,7 @@ Class Collection implements CollectionInterface
      */
     public function index(): Index
     {
-        return new Index($this);
+        return new Index( $this );
     }
 
     /**
@@ -229,6 +234,6 @@ Class Collection implements CollectionInterface
      */
     public function aggregate(): Aggregate
     {
-        return new Aggregate($this);
+        return new Aggregate( $this );
     }
 }

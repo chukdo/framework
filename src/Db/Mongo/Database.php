@@ -28,14 +28,15 @@ Class Database implements DatabaseInterface
 
     /**
      * Database constructor.
+     *
      * @param Server $server
      * @param string $database
      */
     public function __construct( Server $server, string $database = null )
     {
         $this->server = $server;
-        $this->client = new MongoDbDatabase($server->client(), $database
-            ?: 'main');
+        $this->client = new MongoDbDatabase( $server->client(), $database
+            ?: 'main' );
     }
 
     /**
@@ -44,10 +45,10 @@ Class Database implements DatabaseInterface
     public function repair(): bool
     {
         return $this->server()
-                   ->command([
-                       'repairDatabase' => 1,
-                   ], $this->name())
-                   ->get('0.ok') == 1;
+                ->command( [
+                    'repairDatabase' => 1,
+                ], $this->name() )
+                ->get( '0.ok' ) == 1;
     }
 
     /**
@@ -77,47 +78,51 @@ Class Database implements DatabaseInterface
 
     /**
      * @param string $collection
+     *
      * @return Collection
      */
     public function collection( string $collection ): Collection
     {
-        return new Collection($this, $collection);
+        return new Collection( $this, $collection );
     }
 
     /**
      * @param string $collection
+     *
      * @return bool
      */
     public function dropCollection( string $collection ): bool
     {
         $drop = $this->client()
-            ->dropCollection($collection);
+            ->dropCollection( $collection );
 
         return $drop[ 'ok' ] == 1;
     }
 
     /**
      * @param string $collection
+     *
      * @return Collection
      */
     public function createCollection( string $collection ): Collection
     {
-        if ( !$this->collectionExist($collection) ) {
+        if ( !$this->collectionExist( $collection ) ) {
             $this->client()
-                ->createCollection($collection);
+                ->createCollection( $collection );
         }
 
-        return $this->collection($collection);
+        return $this->collection( $collection );
     }
 
     /**
      * @param string $collection
+     *
      * @return bool
      */
     public function collectionExist( string $collection ): bool
     {
         return $this->collections()
-            ->in($collection);
+            ->in( $collection );
     }
 
     /**
@@ -129,7 +134,7 @@ Class Database implements DatabaseInterface
 
         foreach ( $this->client()
             ->listCollections() as $collection ) {
-            $list->append($collection->getName());
+            $list->append( $collection->getName() );
         }
 
         return $list;
@@ -152,16 +157,15 @@ Class Database implements DatabaseInterface
     public function info(): JsonInterface
     {
         $stats = $this->server()
-            ->command([ 'dbStats' => 1 ], $this->name())
-            ->getIndex(0, new Json())
-            ->filter(function( $k, $v )
-            {
-                if ( is_scalar($v) ) {
+            ->command( [ 'dbStats' => 1 ], $this->name() )
+            ->getIndex( 0, new Json() )
+            ->filter( function( $k, $v ) {
+                if ( is_scalar( $v ) ) {
                     return $v;
                 }
 
                 return false;
-            })
+            } )
             ->clean();
 
         return $stats;

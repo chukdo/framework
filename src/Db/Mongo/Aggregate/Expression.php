@@ -26,6 +26,7 @@ Class Expression
 
     /**
      * Expression constructor.
+     *
      * @param string                  $name
      * @param Expression|string|array $expression
      */
@@ -37,6 +38,7 @@ Class Expression
 
     /**
      * @param Expression|string|array $expression
+     *
      * @return string|array|null
      */
     public static function parseExpression( $expression )
@@ -45,18 +47,15 @@ Class Expression
 
         if ( $expression instanceof Expression ) {
             $parsed = $expression->projection();
-        }
-        elseif ( Is::arr($expression) ) {
+        } else if ( Is::arr( $expression ) ) {
             $parsed = [];
 
             foreach ( $expression as $key => $exp ) {
-                $parsed[ $key ] = self::parseExpression($exp);
+                $parsed[ $key ] = self::parseExpression( $exp );
             }
-        }
-        elseif ( Is::string($expression) ) {
+        } else if ( Is::string( $expression ) ) {
             $parsed = '$' . $expression;
-        }
-        else {
+        } else {
             $parsed = $expression;
         }
 
@@ -68,7 +67,7 @@ Class Expression
      */
     public function projection(): array
     {
-        return [ '$' . $this->name => $this->parseExpression($this->expression) ];
+        return [ '$' . $this->name => $this->parseExpression( $this->expression ) ];
     }
 
 }

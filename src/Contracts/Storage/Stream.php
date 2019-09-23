@@ -19,30 +19,38 @@ interface Stream
 
     /**
      * Ajoute du contenu au debut du fichier (et le ramene à 0 s'il existe avant).
+     *
      * @param string $content
+     *
      * @return bool
      */
     public function streamSet( string $content ): bool;
 
     /**
      * Ajoute du contenu à la fin du fichier.
+     *
      * @param string $content
+     *
      * @return bool
      */
     public function streamAppend( string $content ): bool;
 
     /**
      * Retourne une portion du fichier du fichier.
+     *
      * @param int $offset
      * @param int $length
+     *
      * @return string|null
      */
     public function streamGetRange( int $offset, int $length ): ?string;
 
     /**
      * Ecris une portion du fichier en commencant à l'offet défini.
+     *
      * @param int    $offset
      * @param string $content
+     *
      * @return bool
      */
     public function streamSetRange( int $offset, string $content ): bool;
@@ -67,28 +75,36 @@ interface Stream
 
     /**
      * Renomme le fichier.
+     *
      * @param string $newkey
+     *
      * @return bool
      */
     public function streamRename( string $newkey ): bool;
 
     /**
      * Defini ou retourne la derniere date d'acces au fichier.
+     *
      * @param bool $time timestamp
+     *
      * @return int
      */
     public function streamAccessTime( $time = null ): int;
 
     /**
      * Defini ou retourne la date de creation du fichier.
+     *
      * @param bool $time timestamp
+     *
      * @return int
      */
     public function streamCreatedTime( $time = false ): int;
 
     /**
      * Defini ou retourne la derniere date de modification au fichier.
+     *
      * @param bool $time timestamp
+     *
      * @return int
      */
     public function streamModifiedTime( $time = false ): int;
@@ -100,7 +116,9 @@ interface Stream
 
     /**
      * Crée un dossier.
+     *
      * @param bool $recursive
+     *
      * @return bool
      */
     public function streamSetDir( bool $recursive ): bool;

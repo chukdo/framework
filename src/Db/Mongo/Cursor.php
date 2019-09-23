@@ -39,6 +39,7 @@ class Cursor implements Iterator
 
     /**
      * Cursor constructor.
+     *
      * @param Collection  $collection
      * @param Traversable $cursor
      */
@@ -47,13 +48,13 @@ class Cursor implements Iterator
         $this->collection = $collection;
         $this->cursor     = $cursor;
 
-        $this->cursor->setTypeMap([
+        $this->cursor->setTypeMap( [
             'root'     => 'array',
             'document' => 'array',
             'array'    => 'array',
-        ]);
+        ] );
 
-        $this->iterator = new IteratorIterator($this->cursor);
+        $this->iterator = new IteratorIterator( $this->cursor );
 
         $this->iterator->rewind();
     }
@@ -74,7 +75,7 @@ class Cursor implements Iterator
      */
     public function current()
     {
-        return $this->collection->record($this->iterator->current());
+        return $this->collection->record( $this->iterator->current() );
     }
 
     /**

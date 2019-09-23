@@ -15,6 +15,7 @@ interface Server
 {
     /**
      * Server constructor.
+     *
      * @param string|null $dsn
      * @param string|null $database
      */
@@ -48,12 +49,14 @@ interface Server
     /**
      * @param string      $collection
      * @param string|null $database
+     *
      * @return mixed
      */
     public function collection( string $collection, string $database = null );
 
     /**
      * @param string|null $database
+     *
      * @return mixed
      */
     public function database( string $database = null );

@@ -62,6 +62,7 @@ class Logger implements LoggerInterface
     /**
      * Constructeur
      * Initialise l'objet.
+     *
      * @param string $name       nom de l'instance de log
      * @param array  $handlers   liste des gestionnaires
      * @param array  $processors liste des processus
@@ -71,36 +72,40 @@ class Logger implements LoggerInterface
         $this->name = $name;
 
         foreach ( $handlers as $handler ) {
-            $this->pushHandler($handler);
+            $this->pushHandler( $handler );
         }
 
         foreach ( $processors as $processor ) {
-            $this->pushProcessor($processor);
+            $this->pushProcessor( $processor );
         }
     }
 
     /**
      * Ajoute un gestionnaire de log à la pile des gestionnaires de logs.
+     *
      * @param HandlerInterface $handler
+     *
      * @return $this
      */
     public function pushHandler( HandlerInterface $handler ): self
     {
-        array_push($this->handlers,
-            $handler);
+        array_push( $this->handlers,
+            $handler );
 
         return $this;
     }
 
     /**
      * Ajoute un processeur de modification des enregistrements de log à la pile des processeurs de logs.
+     *
      * @param ProcessorInterface $processor
+     *
      * @return $this
      */
     public function pushProcessor( ProcessorInterface $processor ): self
     {
-        array_push($this->processors,
-            $processor);
+        array_push( $this->processors,
+            $processor );
 
         return $this;
     }
@@ -117,50 +122,53 @@ class Logger implements LoggerInterface
     /**
      * @param string $message
      * @param array  $context
+     *
      * @return bool
      * @throws LoggerException
      */
     public function alert( string $message, array $context = [] ): bool
     {
-        return $this->log(self::ALERT,
+        return $this->log( self::ALERT,
             $message,
-            $context);
+            $context );
     }
 
     /**
      * @param int    $level
      * @param string $message
      * @param array  $context
+     *
      * @return bool
      * @throws LoggerException
      */
     public function log( int $level, string $message, array $context = [] ): bool
     {
-        if ( empty($this->handlers) ) {
-            throw new LoggerException('You tried to log record from an empty handler stack.');
+        if ( empty( $this->handlers ) ) {
+            throw new LoggerException( 'You tried to log record from an empty handler stack.' );
         }
 
-        if ( !isset(self::$levels[ $level ]) ) {
-            throw new LoggerException(sprintf("You tried to log record with unknown level [%s]", $level));
+        if ( !isset( self::$levels[ $level ] ) ) {
+            throw new LoggerException( sprintf( "You tried to log record with unknown level [%s]", $level ) );
         }
 
         $record = [
-            'message'   => $this->interpolate($message,
-                $context),
+            'message'   => $this->interpolate( $message,
+                $context ),
             'level'     => $level,
-            'levelname' => $this->getLevel($level),
+            'levelname' => $this->getLevel( $level ),
             'channel'   => $this->getName(),
             'date'      => time(),
             'extra'     => [],
             'formatted' => null,
         ];
 
-        return $this->handleRecord($this->processRecord($record));
+        return $this->handleRecord( $this->processRecord( $record ) );
     }
 
     /**
      * @param string $message
      * @param array  $context
+     *
      * @return string
      */
     public function interpolate( string $message, array $context = [] ): string
@@ -168,20 +176,21 @@ class Logger implements LoggerInterface
         $replace = [];
 
         foreach ( $context as $key => $val ) {
-            if ( !is_array($val)
-                 && ( !is_object($val)
-                      || method_exists($val,
-                        '__toString') ) ) {
+            if ( !is_array( $val )
+                && ( !is_object( $val )
+                    || method_exists( $val,
+                        '__toString' ) ) ) {
                 $replace[ '{' . $key . '}' ] = $val;
             }
         }
 
-        return strtr($message,
-            $replace);
+        return strtr( $message,
+            $replace );
     }
 
     /**
      * @param int $level
+     *
      * @return string
      */
     public static function getLevel( int $level ): string
@@ -199,18 +208,21 @@ class Logger implements LoggerInterface
 
     /**
      * @param string $name
+     *
      * @return Logger
      */
     public function setName( string $name ): self
     {
-        $this->name = ucfirst(strtolower($name));
+        $this->name = ucfirst( strtolower( $name ) );
 
         return $this;
     }
 
     /**
      * Envoi l'enregistrement aupres des gestionnaires de logs.
+     *
      * @param array $record
+     *
      * @return bool true si un gestionnaire à traiter l'enregistrement false sinon
      */
     public function handleRecord( array $record ): bool
@@ -218,7 +230,7 @@ class Logger implements LoggerInterface
         $handle = 0;
 
         foreach ( $this->handlers as $handler ) {
-            $handle += (int) $handler->handle($record);
+            $handle += (int) $handler->handle( $record );
         }
 
         return $handle > 0;
@@ -226,13 +238,15 @@ class Logger implements LoggerInterface
 
     /**
      * Modifie / ajoute des données à un enregistrement.
+     *
      * @param array $record
+     *
      * @return array
      */
     public function processRecord( array $record ): array
     {
         foreach ( $this->processors as $processor ) {
-            $record = $processor->processRecord($record);
+            $record = $processor->processRecord( $record );
         }
 
         return $record;
@@ -241,91 +255,98 @@ class Logger implements LoggerInterface
     /**
      * @param string $message
      * @param array  $context
+     *
      * @return bool
      * @throws LoggerException
      */
     public function critical( string $message, array $context = [] ): bool
     {
-        return $this->log(self::CRITICAL,
+        return $this->log( self::CRITICAL,
             $message,
-            $context);
+            $context );
     }
 
     /**
      * @param string $message
      * @param array  $context
+     *
      * @return bool
      * @throws LoggerException
      */
     public function debug( string $message, array $context = [] ): bool
     {
-        return $this->log(self::DEBUG,
+        return $this->log( self::DEBUG,
             $message,
-            $context);
+            $context );
     }
 
     /**
      * @param string $message
      * @param array  $context
+     *
      * @return bool
      * @throws LoggerException
      */
     public function emergency( string $message, array $context = [] ): bool
     {
-        return $this->log(self::EMERGENCY,
+        return $this->log( self::EMERGENCY,
             $message,
-            $context);
+            $context );
     }
 
     /**
      * @param string $message
      * @param array  $context
+     *
      * @return bool
      * @throws LoggerException
      */
     public function error( string $message, array $context = [] ): bool
     {
-        return $this->log(self::ERROR,
+        return $this->log( self::ERROR,
             $message,
-            $context);
+            $context );
     }
 
     /**
      * @param string $message
      * @param array  $context
+     *
      * @return bool
      * @throws LoggerException
      */
     public function info( string $message, array $context = [] ): bool
     {
-        return $this->log(self::INFO,
+        return $this->log( self::INFO,
             $message,
-            $context);
+            $context );
     }
 
     /**
      * @param string $message
      * @param array  $context
+     *
      * @return bool
      * @throws LoggerException
      */
     public function notice( string $message, array $context = [] ): bool
     {
-        return $this->log(self::NOTICE,
+        return $this->log( self::NOTICE,
             $message,
-            $context);
+            $context );
     }
 
     /**
      * @param string $message
      * @param array  $context
+     *
      * @return bool
      * @throws LoggerException
      */
     public function warning( string $message, array $context = [] ): bool
     {
-        return $this->log(self::WARNING,
+        return $this->log( self::WARNING,
             $message,
-            $context);
+            $context );
     }
 }

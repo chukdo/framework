@@ -24,6 +24,7 @@ class ZipcodeValidate implements ValidateInterface
 
     /**
      * @param array $attributes
+     *
      * @return self
      */
     public function attributes( array $attributes ): ValidateInterface
@@ -33,11 +34,12 @@ class ZipcodeValidate implements ValidateInterface
 
     /**
      * @param $input
+     *
      * @return bool
      */
     public function validate( $input ): bool
     {
-        if ( Str::match('/^\d{5}$/', $input) ) {
+        if ( Str::match( '/^\d{5}$/', $input ) ) {
             return true;
         }
 

@@ -93,6 +93,7 @@ class RouteAttributes
 
     /**
      * @param ErrorMiddlewareInterface|null $errorMiddleware
+     *
      * @return RouteAttributes
      */
     public function setErrorMiddleware( ErrorMiddlewareInterface $errorMiddleware = null ): self
@@ -112,13 +113,14 @@ class RouteAttributes
 
     /**
      * @param string|null $prefix
+     *
      * @return RouteAttributes
      */
     public function setPrefix( ?string $prefix ): self
     {
-        $prefix = trim($prefix, '/');
+        $prefix = trim( $prefix, '/' );
 
-        if ( strlen($prefix) > 0 ) {
+        if ( strlen( $prefix ) > 0 ) {
             $this->prefix .= '/' . $prefix;
         }
 
@@ -127,39 +129,42 @@ class RouteAttributes
 
     /**
      * @param array $attributes
+     *
      * @return RouteAttributes
      */
     public function set( array $attributes ): self
     {
         $this->reset()
-            ->add($attributes);
+            ->add( $attributes );
 
         return $this;
     }
 
     /**
      * @param array $attributes
+     *
      * @return RouteAttributes
      */
     public function add( array $attributes ): self
     {
-        $attributes = array_merge([
+        $attributes = array_merge( [
             'middleware'      => [],
             'validator'       => [],
             'errorMiddleware' => null,
             'prefix'          => '',
         ],
-            $attributes);
+            $attributes );
 
-        $this->setMiddleware($attributes[ 'middleware' ]);
-        $this->setValidator($attributes[ 'validator' ], $attributes[ 'errorMiddleware' ]);
-        $this->setPrefix($attributes[ 'prefix' ]);
+        $this->setMiddleware( $attributes[ 'middleware' ] );
+        $this->setValidator( $attributes[ 'validator' ], $attributes[ 'errorMiddleware' ] );
+        $this->setPrefix( $attributes[ 'prefix' ] );
 
         return $this;
     }
 
     /**
      * @param array $middlewares
+     *
      * @return RouteAttributes
      */
     public function setMiddleware( array $middlewares ): self
@@ -174,6 +179,7 @@ class RouteAttributes
     /**
      * @param array                         $validators
      * @param ErrorMiddlewareInterface|null $errorMiddleware
+     *
      * @return RouteAttributes
      */
     public function setValidator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
@@ -181,7 +187,7 @@ class RouteAttributes
         $this->errorMiddleware = $errorMiddleware;
 
         foreach ( $validators as $key => $validator ) {
-            $this->validators[$key] = $validator;
+            $this->validators[ $key ] = $validator;
         }
 
         return $this;

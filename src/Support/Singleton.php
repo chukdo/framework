@@ -26,18 +26,20 @@ class Singleton
 
     /**
      * invoque des méthodes inaccessibles dans un contexte statique.
+     *
      * @param string $name
      * @param array  $args
+     *
      * @return mixed
      */
     public static function __callStatic( $name, $args )
     {
-        return call_user_func_array([
+        return call_user_func_array( [
             self::getInstance(),
-            trim($name,
-                '_'),
+            trim( $name,
+                '_' ),
         ],
-            $args);
+            $args );
     }
 
     /**
@@ -47,7 +49,7 @@ class Singleton
      */
     public static function getInstance()
     {
-        if ( is_null(self::$singletonInstance) ) {
+        if ( is_null( self::$singletonInstance ) ) {
             self::$singletonInstance = new static();
         }
 

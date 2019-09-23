@@ -24,6 +24,7 @@ class PhoneValidate implements ValidateInterface
 
     /**
      * @param array $attributes
+     *
      * @return self
      */
     public function attributes( array $attributes ): ValidateInterface
@@ -33,11 +34,12 @@ class PhoneValidate implements ValidateInterface
 
     /**
      * @param $input
+     *
      * @return bool
      */
     public function validate( $input ): bool
     {
-        if ( Str::match('/^[0-9]{8,16}$/', $input) ) {
+        if ( Str::match( '/^[0-9]{8,16}$/', $input ) ) {
             return true;
         }
 

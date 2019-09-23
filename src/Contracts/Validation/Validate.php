@@ -18,12 +18,14 @@ interface Validate
 
     /**
      * @param array $attributes
+     *
      * @return self
      */
     public function attributes( array $attributes ): Validate;
 
     /**
      * @param $input
+     *
      * @return bool
      */
     public function validate( $input ): bool;

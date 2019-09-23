@@ -23,6 +23,7 @@ Class AddFields
 
     /**
      * Group constructor.
+     *
      * @param Aggregate $aggregate
      */
     public function __construct( Aggregate $aggregate )
@@ -33,11 +34,12 @@ Class AddFields
     /**
      * @param string $field
      * @param        $expression
+     *
      * @return AddFields
      */
     public function addField( string $field, $expression ): self
     {
-        $this->addFields[ $field ] = Expression::parseExpression($expression);
+        $this->addFields[ $field ] = Expression::parseExpression( $expression );
 
         return $this;
     }

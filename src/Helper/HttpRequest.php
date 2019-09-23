@@ -27,7 +27,22 @@ final class HttpRequest
     {
         return Cli::runningInConsole()
             ? 'CLI'
-            : self::request('httpverb', self::server('REQUEST_METHOD'));
+            : self::request( 'httpverb', self::server( 'REQUEST_METHOD' ) );
+    }
+
+    /**
+     * @param             $name
+     * @param string|null $default
+     *
+     * @return string|null
+     */
+    public static function request( $name, string $default = null ): ?string
+    {
+        $request = self::all();
+
+        return isset( $request[ $name ] )
+            ? $request[ $name ]
+            : $default;
     }
 
     /**
@@ -41,27 +56,14 @@ final class HttpRequest
     }
 
     /**
-     * @param             $name
-     * @param string|null $default
-     * @return string|null
-     */
-    public static function request( $name, string $default = null ): ?string
-    {
-        $request = self::all();
-
-        return isset($request[ $name ])
-            ? $request[ $name ]
-            : $default;
-    }
-
-    /**
      * @param string      $name
      * @param string|null $default
+     *
      * @return string|null
      */
     public static function server( string $name, string $default = null ): ?string
     {
-        return isset($_SERVER[ $name ])
+        return isset( $_SERVER[ $name ] )
             ? $_SERVER[ $name ]
             : $default;
     }
@@ -71,8 +73,8 @@ final class HttpRequest
      */
     public static function secured(): bool
     {
-        return self::server('HTTPS') || self::server('SERVER_PORT') == '443'
-               || self::server('REQUEST_SCHEME') == 'https';
+        return self::server( 'HTTPS' ) || self::server( 'SERVER_PORT' ) == '443'
+            || self::server( 'REQUEST_SCHEME' ) == 'https';
     }
 
     /**
@@ -80,7 +82,7 @@ final class HttpRequest
      */
     public static function ajax(): bool
     {
-        return self::server('HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest';
+        return self::server( 'HTTP_X_REQUESTED_WITH' ) === 'XMLHttpRequest';
     }
 
     /**
@@ -88,7 +90,7 @@ final class HttpRequest
      */
     public static function userAgent(): ?string
     {
-        return self::server('HTTP_USER_AGENT');
+        return self::server( 'HTTP_USER_AGENT' );
     }
 
     /**
@@ -98,7 +100,7 @@ final class HttpRequest
     {
         return Cli::runningInConsole()
             ? 'cli'
-            : Str::extension(self::uri());
+            : Str::extension( self::uri() );
     }
 
     /**
@@ -108,7 +110,7 @@ final class HttpRequest
     {
         return Cli::runningInConsole()
             ? Cli::uri()
-            : self::server('SCRIPT_URI');
+            : self::server( 'SCRIPT_URI' );
     }
 
     /**
@@ -116,7 +118,7 @@ final class HttpRequest
      */
     public static function host(): string
     {
-        return self::server('HTTP_HOST');
+        return self::server( 'HTTP_HOST' );
     }
 
     /**
@@ -124,7 +126,7 @@ final class HttpRequest
      */
     public static function tld(): string
     {
-        return (new Url(self::uri()))->getTld();
+        return ( new Url( self::uri() ) )->getTld();
     }
 
     /**
@@ -132,7 +134,7 @@ final class HttpRequest
      */
     public static function domain(): string
     {
-        return (new Url(self::uri()))->getDomain();
+        return ( new Url( self::uri() ) )->getDomain();
     }
 
     /**
@@ -140,7 +142,7 @@ final class HttpRequest
      */
     public static function subDomain(): string
     {
-        return (new Url(self::uri()))->getSubDomain();
+        return ( new Url( self::uri() ) )->getSubDomain();
     }
 
     /**
@@ -148,7 +150,7 @@ final class HttpRequest
      */
     public static function cookies(): array
     {
-        return (array) self::server('HTTP_COOKIE');
+        return (array) self::server( 'HTTP_COOKIE' );
     }
 
     /**
@@ -159,8 +161,8 @@ final class HttpRequest
         $headers = [];
 
         foreach ( $_SERVER as $key => $value ) {
-            if ( $name = Str::match('/^HTTP_(.*)/',
-                $key) ) {
+            if ( $name = Str::match( '/^HTTP_(.*)/',
+                $key ) ) {
                 switch ( $name ) {
                     case 'HOST':
                     case 'COOKIE':

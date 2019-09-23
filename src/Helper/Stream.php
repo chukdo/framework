@@ -24,20 +24,21 @@ final class Stream
      */
     public static function register( string $name, string $class ): void
     {
-        if ( self::exists($name) ) {
-            stream_wrapper_unregister($name);
+        if ( self::exists( $name ) ) {
+            stream_wrapper_unregister( $name );
         }
-        stream_wrapper_register($name,
-            $class);
+        stream_wrapper_register( $name,
+            $class );
     }
 
     /**
      * @param string $name
+     *
      * @return bool
      */
     public static function exists( string $name ): bool
     {
-        return (bool) in_array($name,
-            stream_get_wrappers());
+        return (bool) in_array( $name,
+            stream_get_wrappers() );
     }
 }

@@ -5,6 +5,7 @@ namespace Chukdo\Middleware;
 use Chukdo\Contracts\Middleware\Middleware as MiddlewareInterface;
 use Chukdo\Http\Request;
 use Chukdo\Http\Response;
+use Throwable;
 
 class Dispatcher
 {
@@ -35,6 +36,7 @@ class Dispatcher
 
     /**
      * Dispatcher constructor.
+     *
      * @param Request  $request
      * @param Response $response
      */
@@ -47,12 +49,13 @@ class Dispatcher
     /**
      * @param string $name
      * @param null   $value
+     *
      * @return mixed
      */
     public function attribute( string $name, $value = null )
     {
         if ( $value === null ) {
-            return isset($this->attributes[ $name ])
+            return isset( $this->attributes[ $name ] )
                 ? $this->attributes[ $name ]
                 : null;
         }
@@ -70,12 +73,13 @@ class Dispatcher
 
     /**
      * @param array $middlewares
+     *
      * @return Dispatcher
      */
     public function pipes( array $middlewares ): self
     {
         foreach ( $middlewares as $middleware ) {
-            $this->pipe($middleware);
+            $this->pipe( $middleware );
         }
 
         return $this;
@@ -83,31 +87,31 @@ class Dispatcher
 
     /**
      * @param string|MiddlewareInterface $middleware
+     *
      * @return Dispatcher
      */
     public function pipe( $middleware ): self
     {
-        if ( is_string($middleware) ) {
-            if ( substr($middleware, 0, 1) == '@' ) {
+        if ( is_string( $middleware ) ) {
+            if ( substr( $middleware, 0, 1 ) == '@' ) {
 
                 try {
                     $confMiddleware = $this->request()
-                        ->conf(substr($middleware, 1));
+                        ->conf( substr( $middleware, 1 ) );
                     $middleware     = new $confMiddleware();
-                } catch ( \Throwable $e ) {
+                } catch ( Throwable $e ) {
                 }
-            }
-            else {
+            } else {
                 $middleware = new $middleware();
             }
         }
 
         if ( $middleware instanceof MiddlewareInterface ) {
-            array_unshift($this->middlewares, $middleware);
+            array_unshift( $this->middlewares, $middleware );
             return $this;
         }
 
-        throw new MiddlewareException('Dispatcher::pipe need Middleware or Middleware string representation');
+        throw new MiddlewareException( 'Dispatcher::pipe need Middleware or Middleware string representation' );
     }
 
     /**
@@ -126,11 +130,11 @@ class Dispatcher
         $middleware = $this->middleware();
         $this->index++;
 
-        if ( is_null($middleware) ) {
+        if ( is_null( $middleware ) ) {
             return $this->response;
         }
 
-        return $middleware->process($this);
+        return $middleware->process( $this );
     }
 
     /**
@@ -138,7 +142,7 @@ class Dispatcher
      */
     private function middleware()
     {
-        if ( isset($this->middlewares[ $this->index ]) ) {
+        if ( isset( $this->middlewares[ $this->index ] ) ) {
             return $this->middlewares[ $this->index ];
         }
 

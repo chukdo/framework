@@ -3,6 +3,7 @@
 namespace Chukdo\Logger\Handlers;
 
 use Chukdo\Contracts\Db\Redis as RedisInterface;
+use Exception;
 
 /**
  * Gestionnaire de log pour Redis.
@@ -25,6 +26,7 @@ class RedisHandler extends AbstractHandler
 
     /**
      * RedisHandler constructor.
+     *
      * @param RedisInterface|null $redis
      * @param string|null         $key
      */
@@ -48,16 +50,17 @@ class RedisHandler extends AbstractHandler
 
     /**
      * @param string $record
+     *
      * @return bool
      */
     public function write( $record ): bool
     {
         try {
-            $this->redis->rpush($this->key,
-                $record);
+            $this->redis->rpush( $this->key,
+                $record );
 
             return true;
-        } catch ( \Exception $e ) {
+        } catch ( Exception $e ) {
             return false;
         }
     }

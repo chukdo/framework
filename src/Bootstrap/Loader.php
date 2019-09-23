@@ -37,10 +37,10 @@ class Loader
      */
     public function register(): self
     {
-        spl_autoload_register([
+        spl_autoload_register( [
             $this,
             'loadClass',
-        ]);
+        ] );
 
         return $this;
     }
@@ -51,24 +51,26 @@ class Loader
      */
     public function unregister(): self
     {
-        spl_autoload_unregister([
+        spl_autoload_unregister( [
             $this,
             'loadClass',
-        ]);
+        ] );
 
         return $this;
     }
 
     /**
      * Registers a set namespaces.
+     *
      * @param array $namespaces array($namespace => $paths)
+     *
      * @return Loader
      */
     public function registerNameSpaces( array $namespaces ): self
     {
         foreach ( $namespaces as $ns => $paths ) {
-            $this->registerNameSpace($ns,
-                $paths);
+            $this->registerNameSpace( $ns,
+                $paths );
         }
 
         return $this;
@@ -77,35 +79,36 @@ class Loader
     /**
      * Registers a set of PSR-4 directories for a given namespace, either
      * appending or prepending to the ones previously set for this namespace.
+     *
      * @param string       $ns      The namespace
      * @param array|string $paths   The base directories
      * @param bool         $prepend Whether to prepend the directories
+     *
      * @return Loader
      */
     public function registerNameSpace( string $ns, $paths, bool $prepend = false ): self
     {
         /** normalize namespace */
-        $ns = trim($ns,
-            '\\');
+        $ns = trim( $ns,
+            '\\' );
 
         foreach ( (array) $paths as $path ) {
             /** normalize the base directory with a separator */
-            $path = rtrim($path,
-                    DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+            $path = rtrim( $path,
+                    DIRECTORY_SEPARATOR ) . DIRECTORY_SEPARATOR;
 
             /* initialize the namespace array */
-            if ( isset($this->namespaces[ $ns ]) === false ) {
+            if ( isset( $this->namespaces[ $ns ] ) === false ) {
                 $this->namespaces[ $ns ] = [];
             }
 
             /* retain the base directory for the namespace */
             if ( $prepend ) {
-                array_unshift($this->namespaces[ $ns ],
-                    $path);
-            }
-            else {
-                array_push($this->namespaces[ $ns ],
-                    $path);
+                array_unshift( $this->namespaces[ $ns ],
+                    $path );
+            } else {
+                array_push( $this->namespaces[ $ns ],
+                    $path );
             }
         }
 
@@ -114,26 +117,28 @@ class Loader
 
     /**
      * Loads the class file for a given class name.
+     *
      * @param string $nsclass the fully-qualified class name
+     *
      * @return bool true on success, or false on failure
      */
     public function loadClass( string $nsclass ): bool
     {
-        $ns      = explode('\\',
-            $nsclass);
+        $ns      = explode( '\\',
+            $nsclass );
         $class   = [];
-        $class[] = array_pop($ns);
+        $class[] = array_pop( $ns );
 
-        while ( !empty($ns) ) {
-            if ( $this->loadFile(implode('\\',
-                $ns),
-                implode('\\',
-                    $class)) ) {
+        while ( !empty( $ns ) ) {
+            if ( $this->loadFile( implode( '\\',
+                $ns ),
+                implode( '\\',
+                    $class ) ) ) {
                 return true;
             }
 
-            array_unshift($class,
-                array_pop($ns));
+            array_unshift( $class,
+                array_pop( $ns ) );
         }
 
         return false;
@@ -141,22 +146,24 @@ class Loader
 
     /**
      * Load the file for a namespace and class.
+     *
      * @param string $ns    the namespace
      * @param string $class class name
+     *
      * @return bool boolean false if no file can be loaded, or true if the file that was loaded
      */
     protected function loadFile( string $ns, string $class ): bool
     {
-        if ( !isset($this->namespaces[ $ns ]) ) {
+        if ( !isset( $this->namespaces[ $ns ] ) ) {
             return false;
         }
 
         foreach ( $this->namespaces[ $ns ] as $path ) {
-            $file = $path . str_replace('\\',
+            $file = $path . str_replace( '\\',
                     DIRECTORY_SEPARATOR,
-                    $class) . '.php';
+                    $class ) . '.php';
 
-            if ( $this->requireFile($file) ) {
+            if ( $this->requireFile( $file ) ) {
                 $this->log[ $class ] = $file;
 
                 return true;
@@ -168,12 +175,14 @@ class Loader
 
     /**
      * If a file exists, require it from the file system.
+     *
      * @param string $file the file to require
+     *
      * @return bool true if the file exists, false if not
      */
     protected function requireFile( string $file ): bool
     {
-        if ( file_exists($file) ) {
+        if ( file_exists( $file ) ) {
             require $file;
 
             return true;

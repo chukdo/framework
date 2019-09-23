@@ -24,6 +24,7 @@ class IntFilter implements FilterInterface
 
     /**
      * @param array $attributes
+     *
      * @return self
      */
     public function attributes( array $attributes ): FilterInterface
@@ -33,11 +34,12 @@ class IntFilter implements FilterInterface
 
     /**
      * @param $input
+     *
      * @return mixed
      */
     public function filter( $input )
     {
-        if ( Str::match('/^[0-9]+$/', $input) ) {
+        if ( Str::match( '/^[0-9]+$/', $input ) ) {
             return (int) $input;
         }
 

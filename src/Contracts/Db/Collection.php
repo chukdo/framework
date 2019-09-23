@@ -39,10 +39,12 @@ interface Collection
     public function drop(): bool;
 
     /**
-     * @param string $newName
+     * @param string      $collection
+     * @param string|null $database
+     *
      * @return bool
      */
-    public function rename( string $newName ): bool;
+    public function rename( string $collection, string $database = null ): bool;
 
     /**
      * @return mixed

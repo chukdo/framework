@@ -26,17 +26,18 @@ class ElasticHandler extends AbstractHandler
 
     /**
      * ElasticHandler constructor.
+     *
      * @param string|null $dsn
      */
     public function __construct( ?string $dsn )
     {
         $this->dsn     = $dsn;
         $this->elastic = ClientBuilder::create()
-            ->setHosts(explode(',',
-                $dsn))
+            ->setHosts( explode( ',',
+                $dsn ) )
             ->build();
 
-        $this->setFormatter(new NullFormatter());
+        $this->setFormatter( new NullFormatter() );
 
         parent::__construct();
     }
@@ -49,21 +50,22 @@ class ElasticHandler extends AbstractHandler
 
     /**
      * @param array $record
+     *
      * @return bool
      */
     public function write( $record ): bool
     {
-        $this->init($record[ 'channel' ]);
+        $this->init( $record[ 'channel' ] );
 
-        $write = $this->elastic->index([
+        $write = $this->elastic->index( [
             'index' => $record[ 'channel' ],
             'type'  => 'search',
-            'id'    => uniqid('',
-                true),
+            'id'    => uniqid( '',
+                true ),
             'body'  => $record,
-        ]);
+        ] );
 
-        return !isset($write[ 'error' ]);
+        return !isset( $write[ 'error' ] );
     }
 
     /**
@@ -72,11 +74,11 @@ class ElasticHandler extends AbstractHandler
     protected function init( string $channel ): void
     {
         if ( !$this->elastic->indices()
-            ->exists([
+            ->exists( [
                 'index' => $channel,
-            ]) ) {
+            ] ) ) {
             $this->elastic->indices()
-                ->create([
+                ->create( [
                     'index' => $channel,
                     'body'  => [
                         'mappings' => [
@@ -90,7 +92,7 @@ class ElasticHandler extends AbstractHandler
                             ],
                         ],
                     ],
-                ]);
+                ] );
         }
     }
 }

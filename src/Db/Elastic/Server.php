@@ -34,6 +34,7 @@ Class Server implements ServerInterface
 
     /**
      * Server constructor.
+     *
      * @param string|null $dsn
      * @param string|null $database
      * @param bool        $synchronous
@@ -44,11 +45,11 @@ Class Server implements ServerInterface
             ?: 'localhost:9200';
         $this->database = $database;
         $this->client   = ClientBuilder::create()
-            ->setHosts(explode(',',
-                $this->dsn))
-            ->setHandler($synchronous
+            ->setHosts( explode( ',',
+                $this->dsn ) )
+            ->setHandler( $synchronous
                 ? ClientBuilder::singleHandler()
-                : ClientBuilder::multiHandler())
+                : ClientBuilder::multiHandler() )
             ->build();
     }
 
@@ -62,30 +63,18 @@ Class Server implements ServerInterface
     }
 
     /**
-     * @return JsonInterface
-     */
-    public function status(): JsonInterface
-    {
-        return new Json($this->client()
-            ->info());
-    }
-
-    /**
-     * @return string
-     */
-    public function version(): string
-    {
-        return (string) $this->status()
-            ->get('version.number');
-    }
-
-
-    /**
      * @return Client
      */
     public function client(): Client
     {
         return $this->client;
+    }    /**
+     * @return JsonInterface
+     */
+    public function status(): JsonInterface
+    {
+        return new Json( $this->client()
+            ->info() );
     }
 
     /**
@@ -97,31 +86,44 @@ Class Server implements ServerInterface
 
         foreach ( $this->client()
             ->cat()
-            ->indices([ 'index' => '*' ]) as $indice ) {
-            $databases->append($indice[ 'index' ]);
+            ->indices( [ 'index' => '*' ] ) as $indice ) {
+            $databases->append( $indice[ 'index' ] );
         }
 
         return $databases;
+    }    /**
+     * @return string
+     */
+    public function version(): string
+    {
+        return (string) $this->status()
+            ->get( 'version.number' );
     }
 
     /**
      * @param string      $collection
      * @param string|null $database
+     *
      * @return Collection
      */
     public function collection( string $collection, string $database = null ): Collection
     {
-        return $this->database($database)
-            ->collection($collection);
+        return $this->database( $database )
+            ->collection( $collection );
     }
 
     /**
      * @param string|null $database
+     *
      * @return Database
      */
     public function database( string $database = null ): Database
     {
-        return new Database($this, $database
-            ?: $this->database);
+        return new Database( $this, $database
+            ?: $this->database );
     }
+
+
+
+
 }

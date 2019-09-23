@@ -20,6 +20,7 @@ Class Index
 
     /**
      * Index constructor.
+     *
      * @param Collection $collection
      */
     public function __construct( Collection $collection )
@@ -37,7 +38,7 @@ Class Index
         foreach ( $this->collection()
             ->client()
             ->listIndexes() as $index ) {
-            $indexes->offsetSet($index[ 'name' ], $index[ 'key' ]);
+            $indexes->offsetSet( $index[ 'name' ], $index[ 'key' ] );
         }
 
         return $indexes;
@@ -55,6 +56,7 @@ Class Index
      * @param string $field
      * @param string $order
      * @param bool   $unique
+     *
      * @return Index
      */
     public function set( string $field, string $order = 'desc', bool $unique = false ): self
@@ -75,10 +77,10 @@ Class Index
 
         $this->collection()
             ->client()
-            ->createIndex([ $field => $order ], [
+            ->createIndex( [ $field => $order ], [
                 'unique' => $unique,
                 'name'   => $name,
-            ]);
+            ] );
 
         return $this;
     }
@@ -92,10 +94,10 @@ Class Index
             foreach ( $this->index as $index ) {
                 $this->collection()
                     ->client()
-                    ->createIndex([ $index[ 'field' ] => $index[ 'order' ] ], [
+                    ->createIndex( [ $index[ 'field' ] => $index[ 'order' ] ], [
                         'unique' => $index[ 'unique' ],
                         'name'   => $index[ 'name' ],
-                    ]);
+                    ] );
             }
 
             return true;
@@ -123,6 +125,7 @@ Class Index
 
     /**
      * @param string $name
+     *
      * @return bool
      */
     public function delete( string $name ): bool
@@ -130,7 +133,7 @@ Class Index
         try {
             $this->collection()
                 ->client()
-                ->dropIndex($name);
+                ->dropIndex( $name );
 
             return true;
         } catch ( Exception $e ) {

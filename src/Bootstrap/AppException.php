@@ -2,6 +2,8 @@
 
 namespace Chukdo\Bootstrap;
 
+use RuntimeException;
+
 /**
  * Gestion des exceptions.
  * @version       1.0.0
@@ -9,6 +11,6 @@ namespace Chukdo\Bootstrap;
  * @since         08/01/2019
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class AppException extends \RuntimeException
+class AppException extends RuntimeException
 {
 }

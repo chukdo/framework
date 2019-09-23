@@ -37,7 +37,7 @@ abstract class AbstractHandler implements HandlerInterface
      */
     public function __construct()
     {
-        $this->setLevels(array_keys(Logger::getLevels()));
+        $this->setLevels( array_keys( Logger::getLevels() ) );
     }
 
     /**
@@ -50,18 +50,19 @@ abstract class AbstractHandler implements HandlerInterface
 
     /**
      * @param array $record
+     *
      * @return bool
      */
     public function handle( array $record ): bool
     {
-        if ( $this->isHandling($record) ) {
-            $record = $this->processRecord($record);
+        if ( $this->isHandling( $record ) ) {
+            $record = $this->processRecord( $record );
 
             if ( !$this->formatter ) {
-                $this->setFormatter(new JsonStringFormatter());
+                $this->setFormatter( new JsonStringFormatter() );
             }
 
-            return $this->write($this->formatter->formatRecord($record));
+            return $this->write( $this->formatter->formatRecord( $record ) );
         }
 
         return false;
@@ -69,22 +70,24 @@ abstract class AbstractHandler implements HandlerInterface
 
     /**
      * @param array $record
+     *
      * @return bool
      */
     public function isHandling( array $record ): bool
     {
-        return in_array($record[ 'level' ],
-            $this->levels);
+        return in_array( $record[ 'level' ],
+            $this->levels );
     }
 
     /**
      * @param array $record
+     *
      * @return array
      */
     public function processRecord( array $record ): array
     {
         foreach ( $this->processors as $processor ) {
-            $record = $processor->processRecord($record);
+            $record = $processor->processRecord( $record );
         }
 
         return $record;
@@ -92,6 +95,7 @@ abstract class AbstractHandler implements HandlerInterface
 
     /**
      * @param FormatterInterface $formatter
+     *
      * @return HandlerInterface
      */
     public function setFormatter( FormatterInterface $formatter ): HandlerInterface
@@ -103,18 +107,20 @@ abstract class AbstractHandler implements HandlerInterface
 
     /**
      * @param $record
+     *
      * @return bool
      */
     abstract protected function write( $record ): bool;
 
     /**
      * @param ProcessorInterface $processor
+     *
      * @return HandlerInterface
      */
     public function pushProcessor( ProcessorInterface $processor ): HandlerInterface
     {
-        array_push($this->processors,
-            $processor);
+        array_push( $this->processors,
+            $processor );
 
         return $this;
     }

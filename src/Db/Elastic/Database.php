@@ -36,6 +36,7 @@ Class Database implements DatabaseInterface
 
     /**
      * Database constructor.
+     *
      * @param Server      $server
      * @param string|null $database
      */
@@ -80,7 +81,7 @@ Class Database implements DatabaseInterface
         $drop = true;
 
         foreach ( $this->collections() as $collection ) {
-            $drop .= $this->collection($collection)
+            $drop .= $this->collection( $collection )
                 ->drop();
         }
 
@@ -97,30 +98,33 @@ Class Database implements DatabaseInterface
 
     /**
      * @param string $collection
+     *
      * @return Collection
      */
     public function collection( string $collection ): Collection
     {
-        return new Collection($this, $collection);
+        return new Collection( $this, $collection );
     }
 
     /**
      * @param string $collection
+     *
      * @return Collection
      */
     public function createCollection( string $collection ): Collection
     {
-        if ( !$this->collectionExist($collection) ) {
+        if ( !$this->collectionExist( $collection ) ) {
             $this->client()
                 ->indices()
-                ->create([ 'index' => $collection ]);
+                ->create( [ 'index' => $collection ] );
         }
 
-        return $this->collection($collection);
+        return $this->collection( $collection );
     }
 
     /**
      * @param string $collection
+     *
      * @return bool
      */
     public function collectionExist( string $collection ): bool
@@ -146,12 +150,11 @@ Class Database implements DatabaseInterface
 
         foreach ( $indices as $indice ) {
             if ( $this->name() !== null ) {
-                if ( Str::startWith($indice[ 'index' ], $this->name() . '_') ) {
-                    $list->append($indice[ 'index' ]);
+                if ( Str::startWith( $indice[ 'index' ], $this->name() . '_' ) ) {
+                    $list->append( $indice[ 'index' ] );
                 }
-            }
-            else {
-                $list->append($indice[ 'index' ]);
+            } else {
+                $list->append( $indice[ 'index' ] );
             }
         }
 
@@ -160,6 +163,7 @@ Class Database implements DatabaseInterface
 
     /**
      * @param string $collection
+     *
      * @return bool
      */
     public function dropCollection( string $collection ): bool
@@ -167,12 +171,12 @@ Class Database implements DatabaseInterface
         try {
             $this->client()
                 ->indices()
-                ->delete([ 'index' => $this->prefixName() . $collection ]);
+                ->delete( [ 'index' => $this->prefixName() . $collection ] );
 
             return true;
         } catch ( Missing404Exception $e ) {
             return true;
-        } catch (Throwable $e) {
+        } catch ( Throwable $e ) {
             return false;
         }
     }
@@ -182,15 +186,15 @@ Class Database implements DatabaseInterface
      */
     public function info(): JsonInterface
     {
-        $stats = new Json($this->client()
+        $stats = new Json( $this->client()
             ->indices()
-            ->stats([ 'index' => '*' ]));
+            ->stats( [ 'index' => '*' ] ) );
 
         $info = new Json();
 
-        foreach ( $stats->offsetGet('indices') as $key => $indice ) {
-            if ( Str::startWith($key, $this->name()) ) {
-                $info->offsetSet($key, $indice->offsetGet('total'));
+        foreach ( $stats->offsetGet( 'indices' ) as $key => $indice ) {
+            if ( Str::startWith( $key, $this->name() ) ) {
+                $info->offsetSet( $key, $indice->offsetGet( 'total' ) );
             }
         }
 

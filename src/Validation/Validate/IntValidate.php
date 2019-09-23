@@ -33,13 +33,14 @@ class IntValidate implements ValidateInterface
 
     /**
      * @param array $attributes
+     *
      * @return self
      */
     public function attributes( array $attributes ): ValidateInterface
     {
-        $attributes = array_pad($attributes,
+        $attributes = array_pad( $attributes,
             2,
-            0);
+            0 );
         $this->min  = $attributes[ 0 ];
         $this->max  = $attributes[ 1 ]
             ?: $attributes[ 0 ]
@@ -50,11 +51,12 @@ class IntValidate implements ValidateInterface
 
     /**
      * @param $input
+     *
      * @return bool
      */
     public function validate( $input ): bool
     {
-        if ( is_int($input) ) {
+        if ( is_int( $input ) ) {
             if ( $input >= $this->min && $input <= $this->max ) {
                 return true;
             }

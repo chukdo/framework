@@ -18,6 +18,7 @@ class FileHandler extends AbstractHandler
 
     /**
      * FileHandler constructor.
+     *
      * @param string $file
      */
     public function __construct( string $file )
@@ -37,15 +38,16 @@ class FileHandler extends AbstractHandler
 
     /**
      * @param string $record
+     *
      * @return bool
      */
     public function write( $record ): bool
     {
-        $fp = fopen($this->file, 'a');
-        $r  = fwrite($fp,
-            $record . "\n");
+        $fp = fopen( $this->file, 'a' );
+        $r  = fwrite( $fp,
+            $record . "\n" );
 
-        fclose($fp);
+        fclose( $fp );
 
         return (bool) $r;
     }

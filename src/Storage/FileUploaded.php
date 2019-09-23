@@ -35,6 +35,7 @@ class FileUploaded
 
     /**
      * FileUploaded constructor.
+     *
      * @param string      $name
      * @param string|null $allowedMimeTypes
      * @param int|null    $maxFileSize
@@ -43,16 +44,15 @@ class FileUploaded
     {
         $uploadedFiles = $this->normalizeUploadedFiles();
 
-        if ( isset($uploadedFiles[ $name ]) ) {
+        if ( isset( $uploadedFiles[ $name ] ) ) {
             $this->name         = $name;
             $this->uploadedFile = $uploadedFiles[ $name ];
 
-            $this->setMaxFileSize($maxFileSize);
-            $this->setAllowedMimeTypes($allowedMimeTypes);
+            $this->setMaxFileSize( $maxFileSize );
+            $this->setAllowedMimeTypes( $allowedMimeTypes );
 
-        }
-        else {
-            throw new FileUploadedException(sprintf('Uploaded file [%s] does not exist', $name));
+        } else {
+            throw new FileUploadedException( sprintf( 'Uploaded file [%s] does not exist', $name ) );
         }
     }
 
@@ -65,12 +65,11 @@ class FileUploaded
 
         foreach ( $_FILES as $name => $file ) {
             foreach ( $file as $type => $value ) {
-                if ( is_array($value) ) {
-                    foreach ( self::__normalizeUploadedFiles($value) as $nName => $nValue ) {
+                if ( is_array( $value ) ) {
+                    foreach ( self::__normalizeUploadedFiles( $value ) as $nName => $nValue ) {
                         $uploadedFiles[ $name . '.' . $nName ][ $type ] = $nValue;
                     }
-                }
-                else {
+                } else {
                     $uploadedFiles[ $name ][ $type ] = $value;
                 }
             }
@@ -80,7 +79,30 @@ class FileUploaded
     }
 
     /**
+     * @param array $array
+     *
+     * @return array
+     */
+    private static function __normalizeUploadedFiles( array $array ): array
+    {
+        $uploadedFiles = [];
+
+        foreach ( $array as $k => $v ) {
+            if ( is_array( $v ) ) {
+                foreach ( self::__normalizeUploadedFiles( $v ) as $_k => $_v ) {
+                    $uploadedFiles[ $k . '.' . $_k ] = $_v;
+                }
+            } else {
+                $uploadedFiles[ $k ] = $v;
+            }
+        }
+
+        return $uploadedFiles;
+    }
+
+    /**
      * @param int|null $maxFileSize
+     *
      * @return FileUploaded
      */
     public function setMaxFileSize( int $maxFileSize = null ): self
@@ -92,6 +114,7 @@ class FileUploaded
 
     /**
      * @param string|null $allowedMimeTypes
+     *
      * @return FileUploaded
      */
     public function setAllowedMimeTypes( string $allowedMimeTypes = null ): self
@@ -99,28 +122,6 @@ class FileUploaded
         $this->allowedMimeTypes = $allowedMimeTypes;
 
         return $this;
-    }
-
-    /**
-     * @param array $array
-     * @return array
-     */
-    private static function __normalizeUploadedFiles( array $array ): array
-    {
-        $uploadedFiles = [];
-
-        foreach ( $array as $k => $v ) {
-            if ( is_array($v) ) {
-                foreach ( self::__normalizeUploadedFiles($v) as $_k => $_v ) {
-                    $uploadedFiles[ $k . '.' . $_k ] = $_v;
-                }
-            }
-            else {
-                $uploadedFiles[ $k ] = $v;
-            }
-        }
-
-        return $uploadedFiles;
     }
 
     /**
@@ -136,7 +137,7 @@ class FileUploaded
      */
     public function extension(): string
     {
-        return Str::extension($this->uploadedFile[ 'name' ]);
+        return Str::extension( $this->uploadedFile[ 'name' ] );
     }
 
     /**
@@ -149,23 +150,23 @@ class FileUploaded
 
     /**
      * @param $path
+     *
      * @return bool
      */
     public function store( $path ): bool
     {
         if ( $this->isValid() ) {
-            if ( move_uploaded_file($this->path(), $path) ) {
+            if ( move_uploaded_file( $this->path(), $path ) ) {
                 return true;
-            }
-            else {
-                throw new FileUploadedException(sprintf('Can\'t store uploaded file [%s] to [%s]',
+            } else {
+                throw new FileUploadedException( sprintf( 'Can\'t store uploaded file [%s] to [%s]',
                     $this->name,
-                    $path));
+                    $path ) );
             }
         }
 
-        throw new FileUploadedException(sprintf('Uploaded file [%s] is not valid',
-            $this->name));
+        throw new FileUploadedException( sprintf( 'Uploaded file [%s] is not valid',
+            $this->name ) );
     }
 
     /**
@@ -174,14 +175,6 @@ class FileUploaded
     public function isValid(): bool
     {
         return $this->isValidSize() && $this->isValidMimeType();
-    }
-
-    /**
-     * @return string
-     */
-    public function path(): string
-    {
-        return (string) $this->uploadedFile[ 'tmp_name' ];
     }
 
     /**
@@ -197,13 +190,21 @@ class FileUploaded
     }
 
     /**
+     * @return int
+     */
+    public function size(): int
+    {
+        return (int) $this->uploadedFile[ 'size' ];
+    }
+
+    /**
      * @return bool
      */
     public function isValidMimeType(): bool
     {
         if ( $this->allowedMimeTypes ) {
-            foreach ( str::split($this->allowedMimeTypes, ',') as $allowedMimeType ) {
-                if ( preg_match("#$allowedMimeType#i", $this->mimeType()) ) {
+            foreach ( str::split( $this->allowedMimeTypes, ',' ) as $allowedMimeType ) {
+                if ( preg_match( "#$allowedMimeType#i", $this->mimeType() ) ) {
                     return true;
                 }
             }
@@ -215,18 +216,18 @@ class FileUploaded
     }
 
     /**
-     * @return int
-     */
-    public function size(): int
-    {
-        return (int) $this->uploadedFile[ 'size' ];
-    }
-
-    /**
      * @return string
      */
     public function mimeType(): string
     {
         return (string) $this->uploadedFile[ 'type' ];
+    }
+
+    /**
+     * @return string
+     */
+    public function path(): string
+    {
+        return (string) $this->uploadedFile[ 'tmp_name' ];
     }
 }

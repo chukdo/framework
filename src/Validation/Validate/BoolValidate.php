@@ -23,6 +23,7 @@ class BoolValidate implements ValidateInterface
 
     /**
      * @param array $attributes
+     *
      * @return self
      */
     public function attributes( array $attributes ): ValidateInterface
@@ -32,11 +33,12 @@ class BoolValidate implements ValidateInterface
 
     /**
      * @param $input
+     *
      * @return bool
      */
     public function validate( $input ): bool
     {
-        if ( is_bool($input) ) {
+        if ( is_bool( $input ) ) {
             return true;
         }
 

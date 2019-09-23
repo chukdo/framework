@@ -25,12 +25,13 @@ Class Match extends Where
 
     /**
      * Match constructor.
+     *
      * @param Aggregate  $aggregate
      * @param Collection $collection
      */
     public function __construct( Aggregate $aggregate, Collection $collection )
     {
-        parent::__construct($collection);
+        parent::__construct( $collection );
         $this->aggregate = $aggregate;
     }
 

@@ -29,21 +29,22 @@ class Schema implements SchemaInterface
 
     /**
      * Index constructor.
+     *
      * @param Collection $collection
      */
     public function __construct( Collection $collection )
     {
         $this->collection = $collection;
         $name             = $collection->fullName();
-        $info             = new Json($collection
+        $info             = new Json( $collection
             ->client()
             ->indices()
-            ->getMapping([ 'index' => $name ]));
-        $properties       = $info->get($name . '.mappings', new Json())
+            ->getMapping( [ 'index' => $name ] ) );
+        $properties       = $info->get( $name . '.mappings', new Json() )
             ->toArray();
 
 
-        $this->property = new Property($properties);
+        $this->property = new Property( $properties );
     }
 
     /**
@@ -71,11 +72,11 @@ class Schema implements SchemaInterface
             $this->collection()
                 ->client()
                 ->indices()
-                ->putMapping([
+                ->putMapping( [
                     'index' => $this->collection()
                         ->fullName(),
                     'body'  => [],
-                ]);
+                ] );
 
             return true;
         } catch ( Throwable $e ) {
@@ -85,24 +86,26 @@ class Schema implements SchemaInterface
 
     /**
      * @param string $name
+     *
      * @return Property|null
      */
     public function get( string $name ): ?Property
     {
         return $this->property()
-            ->get($name);
+            ->get( $name );
     }
 
     /**
      * @param string      $name
      * @param string|null $type
      * @param array       $options
+     *
      * @return Schema
      */
-    public function set( string $name, string $type = null,  array $options = [] ): self
+    public function set( string $name, string $type = null, array $options = [] ): self
     {
         $this->property()
-            ->set($name, $type, $options);
+            ->set( $name, $type, $options );
 
         return $this;
     }
@@ -120,16 +123,16 @@ class Schema implements SchemaInterface
      */
     public function save(): bool
     {
-        $save = new Json($this->collection()
+        $save = new Json( $this->collection()
             ->client()
             ->indices()
-            ->putMapping([
+            ->putMapping( [
                 'index' => $this->collection()
                     ->name(),
                 'body'  => $this->toArray(),
-            ]));
+            ] ) );
 
-        return $save->offsetGet('acknowledged') == 1;
+        return $save->offsetGet( 'acknowledged' ) == 1;
     }
 
     /**

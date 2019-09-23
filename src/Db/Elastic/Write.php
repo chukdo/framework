@@ -1,30 +1,49 @@
 <?php
 
-namespace Chukdo\Contracts\Db;
+namespace Chukdo\Db\Elastic;
 
 use Chukdo\Contracts\Db\Collection as CollectionInterface;
+use Chukdo\Contracts\Db\Write as WriteInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\Json\Json;
 
 /**
- * Interface d'ecriture de données.
- * @version       1.0.0
- * @copyright     licence MIT, Copyright (C) 2019 Domingo
- * @since         08/01/2019
- * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
+ * Server Write.
+ * @version      1.0.0
+ * @copyright    licence MIT, Copyright (C) 2019 Domingo
+ * @since        08/01/2019
+ * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-interface Write
+Class Write implements WriteInterface
 {
+    /**
+     * @var CollectionInterface
+     */
+    protected $collection;
+
+    /**
+     * @var Json
+     */
+    protected $fields;
+
     /**
      * Write constructor.
      *
-     * @param Collection $collection
+     * @param CollectionInterface $collection
      */
-    public function __construct( CollectionInterface $collection );
+    public function __construct( CollectionInterface $collection )
+    {
+        $this->fields     = new Json();
+        $this->collection = $collection;
+    }
 
     /**
      * @return Collection
      */
-    public function collection(): CollectionInterface;
+    public function collection(): CollectionInterface
+    {
+        return $this->collection;
+    }
 
     /**
      * @param string $field

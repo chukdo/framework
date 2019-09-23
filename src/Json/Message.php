@@ -22,13 +22,14 @@ class Message extends Json
 
     /**
      * Message constructor.
+     *
      * @param string $name
      */
     public function __construct( string $name )
     {
         $this->name = $name;
 
-        parent::__construct([]);
+        parent::__construct( [] );
     }
 
     /**
@@ -53,46 +54,48 @@ class Message extends Json
     /**
      * @param string|null $title
      * @param string|null $color
+     *
      * @return string
      */
     public function toConsole( string $title = null, string $color = null ): string
     {
         if ( !Cli::runningInConsole() ) {
-            throw new JsonException('You can call json::toConsole only in CLI mode.');
+            throw new JsonException( 'You can call json::toConsole only in CLI mode.' );
         }
 
         $climate = new CLImate();
-        $climate->output->defaultTo('buffer');
+        $climate->output->defaultTo( 'buffer' );
         $climate->border();
-        $climate->style->addCommand('colored', $color
-            ?: 'green');
-        $climate->colored(ucfirst($title
-            ?: $this->name));
+        $climate->style->addCommand( 'colored', $color
+            ?: 'green' );
+        $climate->colored( ucfirst( $title
+            ?: $this->name ) );
         $climate->border();
 
-        $padding = $climate->padding(15);
+        $padding = $climate->padding( 15 );
 
         foreach ( $this as $k => $v ) {
-            $padding->label($k)
-                ->result($v);
+            $padding->label( $k )
+                ->result( $v );
         }
 
         $climate->border();
 
-        return $climate->output->get('buffer')
+        return $climate->output->get( 'buffer' )
             ->get();
     }
 
     /**
      * @param string|null $title
      * @param string|null $color
+     *
      * @return string
      */
     public function toHtml( string $title = null, string $color = null ): string
     {
-        return To::html($this,
+        return To::html( $this,
             $title
                 ?: $this->name,
-            $color);
+            $color );
     }
 }

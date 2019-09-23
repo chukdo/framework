@@ -24,6 +24,7 @@ class BoolFilter implements FilterInterface
 
     /**
      * @param array $attributes
+     *
      * @return self
      */
     public function attributes( array $attributes ): FilterInterface
@@ -33,14 +34,14 @@ class BoolFilter implements FilterInterface
 
     /**
      * @param $input
+     *
      * @return mixed
      */
     public function filter( $input )
     {
         if ( $input === '0' ) {
             return false;
-        }
-        elseif ( $input === '1' ) {
+        } else if ( $input === '1' ) {
             return true;
         }
 

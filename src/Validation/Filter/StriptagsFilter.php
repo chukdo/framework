@@ -23,6 +23,7 @@ class StriptagsFilter implements FilterInterface
 
     /**
      * @param array $attributes
+     *
      * @return self
      */
     public function attributes( array $attributes ): FilterInterface
@@ -32,10 +33,11 @@ class StriptagsFilter implements FilterInterface
 
     /**
      * @param $input
+     *
      * @return mixed
      */
     public function filter( $input )
     {
-        return strip_tags($input);
+        return strip_tags( $input );
     }
 }

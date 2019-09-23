@@ -13,7 +13,9 @@ interface Processor
 {
     /**
      * Modifie / ajoute des données à un enregistrement.
+     *
      * @param array $record
+     *
      * @return array
      */
     public function processRecord( array $record ): array;

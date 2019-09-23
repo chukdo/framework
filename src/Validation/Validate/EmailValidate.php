@@ -23,6 +23,7 @@ class EmailValidate implements ValidateInterface
 
     /**
      * @param array $attributes
+     *
      * @return self
      */
     public function attributes( array $attributes ): ValidateInterface
@@ -32,11 +33,12 @@ class EmailValidate implements ValidateInterface
 
     /**
      * @param $input
+     *
      * @return bool
      */
     public function validate( $input ): bool
     {
-        if ( filter_var($input, FILTER_VALIDATE_EMAIL) ) {
+        if ( filter_var( $input, FILTER_VALIDATE_EMAIL ) ) {
             return true;
         }
 

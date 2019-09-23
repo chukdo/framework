@@ -21,101 +21,112 @@ class Expr
 {
     /**
      * @param $expression
+     *
      * @return Expression
      */
-    public static function multiply($expression): Expression
+    public static function multiply( $expression ): Expression
     {
-        return new Expression('multiply', $expression);
+        return new Expression( 'multiply', $expression );
     }
 
     /**
      * @param $expression
+     *
      * @return Expression
      */
-    public static function add($expression): Expression
+    public static function add( $expression ): Expression
     {
-        return new Expression('add', $expression);
+        return new Expression( 'add', $expression );
     }
 
     /**
      * @param $expression
+     *
      * @return Expression
      */
-    public static function sum($expression): Expression
+    public static function sum( $expression ): Expression
     {
-        return new Expression('sum', $expression);
+        return new Expression( 'sum', $expression );
     }
 
     /**
      * @param $expression
+     *
      * @return Expression
      */
-    public static function year($expression): Expression
+    public static function year( $expression ): Expression
     {
-        return new Expression('year', $expression);
+        return new Expression( 'year', $expression );
     }
 
     /**
      * @param $expression
+     *
      * @return Expression
      */
-    public static function month($expression): Expression
+    public static function month( $expression ): Expression
     {
-        return new Expression('month', $expression);
+        return new Expression( 'month', $expression );
     }
 
     /**
      * @param $expression
+     *
      * @return Expression
      */
-    public static function day($expression): Expression
+    public static function day( $expression ): Expression
     {
-        return new Expression('dayOfMonth', $expression);
+        return new Expression( 'dayOfMonth', $expression );
     }
 
     /**
      * @param $expression
+     *
      * @return Expression
      */
-    public static function last($expression): Expression
+    public static function last( $expression ): Expression
     {
-        return new Expression('last', $expression);
+        return new Expression( 'last', $expression );
     }
 
     /**
      * @param $expression
+     *
      * @return Expression
      */
-    public static function first($expression): Expression
+    public static function first( $expression ): Expression
     {
-        return new Expression('first', $expression);
+        return new Expression( 'first', $expression );
     }
 
     /**
      * @param $expression
+     *
      * @return Expression
      */
-    public static function avg($expression): Expression
+    public static function avg( $expression ): Expression
     {
-        return new Expression('avg', $expression);
+        return new Expression( 'avg', $expression );
     }
 
     /**
      * @param $expression
+     *
      * @return Expression
      */
-    public static function push($expression): Expression
+    public static function push( $expression ): Expression
     {
-        return new Expression('push', $expression);
+        return new Expression( 'push', $expression );
     }
 
     /**
      * @param $name
      * @param $expression
+     *
      * @return Expression
      */
     public static function __callStatic( $name, $expression ): Expression
     {
-        return new Expression($name, $expression);
+        return new Expression( $name, $expression );
     }
 }

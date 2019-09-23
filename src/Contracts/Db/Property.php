@@ -15,6 +15,7 @@ interface Property
 {
     /**
      * Property constructor.
+     *
      * @param array       $property
      * @param string|null $name
      */
@@ -22,6 +23,7 @@ interface Property
 
     /**
      * @param string $name
+     *
      * @return mixed
      */
     public function get( string $name );
@@ -30,9 +32,10 @@ interface Property
      * @param string      $name
      * @param string|null $type
      * @param array       $options
+     *
      * @return mixed
      */
-    public function set( string $name, string $type = null,  array $options = [] );
+    public function set( string $name, string $type = null, array $options = [] );
 
     /**
      * @return JsonInterface

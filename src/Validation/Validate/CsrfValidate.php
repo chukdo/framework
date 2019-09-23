@@ -29,6 +29,7 @@ class CsrfValidate implements ValidateInterface
 
     /**
      * @param array $attributes
+     *
      * @return self
      */
     public function attributes( array $attributes ): ValidateInterface
@@ -42,10 +43,11 @@ class CsrfValidate implements ValidateInterface
 
     /**
      * @param $input
+     *
      * @return bool
      */
     public function validate( $input ): bool
     {
-        return Crypto::decodeCsrf($input, $this->salt);
+        return Crypto::decodeCsrf( $input, $this->salt );
     }
 }

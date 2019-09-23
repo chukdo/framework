@@ -22,6 +22,7 @@ Class RecordList extends Json implements RecordListInterface
 
     /**
      * RecordList constructor.
+     *
      * @param Collection $collection
      * @param null       $data
      */
@@ -29,7 +30,7 @@ Class RecordList extends Json implements RecordListInterface
     {
         $this->collection = $collection;
 
-        parent::__construct($data, false);
+        parent::__construct( $data, false );
     }
 
     /**

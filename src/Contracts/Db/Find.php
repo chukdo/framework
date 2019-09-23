@@ -21,18 +21,21 @@ interface Find
      * @param array       $with
      * @param array       $without
      * @param string|null $linked
+     *
      * @return Find
      */
     public function link( string $field, array $with = [], array $without = [], string $linked = null );
 
     /**
      * @param mixed ...$fields
+     *
      * @return mixed
      */
     public function with( ...$fields );
 
     /**
      * @param mixed ...$fields
+     *
      * @return mixed
      */
     public function without( ...$fields );
@@ -40,12 +43,14 @@ interface Find
     /**
      * @param string $field
      * @param string $sort
+     *
      * @return mixed
      */
     public function sort( string $field, string $sort = 'ASC' );
 
     /**
      * @param int $skip
+     *
      * @return mixed
      */
     public function skip( int $skip );
@@ -57,12 +62,14 @@ interface Find
 
     /**
      * @param int $limit
+     *
      * @return mixed
      */
     public function limit( int $limit );
 
     /**
      * @param bool $idAsKey
+     *
      * @return mixed
      */
     public function all( bool $idAsKey = false );
@@ -77,6 +84,7 @@ interface Find
      * @param string $operator
      * @param        $value
      * @param null   $value2
+     *
      * @return $this
      */
     public function where( string $field, string $operator, $value, $value2 = null );
@@ -86,6 +94,7 @@ interface Find
      * @param string $operator
      * @param        $value
      * @param null   $value2
+     *
      * @return $this
      */
     public function orWhere( string $field, string $operator, $value, $value2 = null );

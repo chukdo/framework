@@ -2,11 +2,13 @@
 
 namespace Chukdo\Validation;
 
+use Chukdo\Bootstrap\ServiceException;
 use Chukdo\Contracts\Validation\Filter as FilterInterface;
 use Chukdo\Contracts\Validation\Validate as ValidateInterface;
 use Chukdo\Http\Request;
 use Chukdo\Http\Input;
 use Chukdo\Json\Message;
+use ReflectionException;
 
 /**
  * Validation de données.
@@ -54,24 +56,26 @@ class Validator
 
     /**
      * Validator constructor.
+     *
      * @param Request $request
      */
     public function __construct( Request $request )
     {
         $this->request   = $request;
-        $this->error     = new Message('error', $request->render());
-        $this->validated = new Input([]);
+        $this->error     = new Message( 'error', $request->render() );
+        $this->validated = new Input( [] );
         $this->inputs    = $request->inputs();
     }
 
     /**
      * @param array $rules
+     *
      * @return Validator
      */
     public function registerRules( array $rules ): self
     {
         foreach ( $rules as $path => $rule ) {
-            $this->rules[] = new Rule($this, $path, $rule);
+            $this->rules[] = new Rule( $this, $path, $rule );
         }
 
         return $this;
@@ -79,12 +83,13 @@ class Validator
 
     /**
      * @param array $validators
+     *
      * @return Validator
      */
     public function registerValidators( array $validators ): self
     {
         foreach ( $validators as $validator ) {
-            $this->registerValidator($validator);
+            $this->registerValidator( $validator );
         }
 
         return $this;
@@ -92,6 +97,7 @@ class Validator
 
     /**
      * @param ValidateInterface $validator
+     *
      * @return Validator
      */
     public function registerValidator( ValidateInterface $validator ): self
@@ -103,12 +109,13 @@ class Validator
 
     /**
      * @param array $filters
+     *
      * @return Validator
      */
     public function registerFilters( array $filters ): self
     {
         foreach ( $filters as $filter ) {
-            $this->registerFilter($filter);
+            $this->registerFilter( $filter );
         }
 
         return $this;
@@ -116,6 +123,7 @@ class Validator
 
     /**
      * @param FilterInterface $filter
+     *
      * @return Validator
      */
     public function registerFilter( FilterInterface $filter ): self
@@ -165,11 +173,12 @@ class Validator
 
     /**
      * @param string $filter
+     *
      * @return FilterInterface|null
      */
     public function filter( string $filter ): ?FilterInterface
     {
-        if ( isset($this->filters[ $filter ]) ) {
+        if ( isset( $this->filters[ $filter ] ) ) {
             return $this->filters[ $filter ];
         }
 
@@ -186,11 +195,12 @@ class Validator
 
     /**
      * @param string $validator
+     *
      * @return ValidateInterface|null
      */
     public function validator( string $validator ): ?ValidateInterface
     {
-        if ( isset($this->validators[ $validator ]) ) {
+        if ( isset( $this->validators[ $validator ] ) ) {
             return $this->validators[ $validator ];
         }
 
@@ -231,12 +241,13 @@ class Validator
 
     /**
      * @param string $key
+     *
      * @return string
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
+     * @throws ServiceException
+     * @throws ReflectionException
      */
     public function message( string $key ): string
     {
-        return $this->request->lang($key, sprintf('Validation message [%s] cannot be found', $key));
+        return $this->request->lang( $key, sprintf( 'Validation message [%s] cannot be found', $key ) );
     }
 }

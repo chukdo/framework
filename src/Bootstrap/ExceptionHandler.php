@@ -22,6 +22,7 @@ class ExceptionHandler implements Handler
 
     /**
      * ExceptionHandler constructor.
+     *
      * @param App $app
      */
     public function __construct( App $app )
@@ -34,9 +35,9 @@ class ExceptionHandler implements Handler
      */
     public function render( Throwable $e ): void
     {
-        $message = new ExceptionMessage($e, $this->app->env());
+        $message = new ExceptionMessage( $e, $this->app->env() );
 
-        die($message->render());
+        die( $message->render() );
     }
 
     /**
@@ -45,8 +46,8 @@ class ExceptionHandler implements Handler
     public function report( Throwable $e ): void
     {
         try {
-            $this->app->make('ExceptionLogger')
-                ->emergency('#' . $e->getCode() . ' ' . $e->getMessage() . ' ' . $e->getFile() . '(' . $e->getLine() . ')');
+            $this->app->make( 'ExceptionLogger' )
+                ->emergency( '#' . $e->getCode() . ' ' . $e->getMessage() . ' ' . $e->getFile() . '(' . $e->getLine() . ')' );
         } catch ( Throwable $e ) {
         }
 

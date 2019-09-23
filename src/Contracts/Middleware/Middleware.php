@@ -16,6 +16,7 @@ interface Middleware
 {
     /**
      * @param Dispatcher $dispatcher
+     *
      * @return Response
      */
     public function process( Dispatcher $dispatcher ): Response;

@@ -13,7 +13,9 @@ interface Formatter
 {
     /**
      * Formatte un enregistrement.
+     *
      * @param array $record
+     *
      * @return mixed
      */
     public function formatRecord( array $record );

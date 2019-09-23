@@ -23,23 +23,25 @@ Class Group
 
     /**
      * Group constructor.
+     *
      * @param Aggregate $aggregate
      * @param           $expression
      */
     public function __construct( Aggregate $aggregate, $expression )
     {
         $this->aggregate      = $aggregate;
-        $this->group[ '_id' ] = Expression::parseExpression($expression);
+        $this->group[ '_id' ] = Expression::parseExpression( $expression );
     }
 
     /**
      * @param string $field
      * @param        $expression
+     *
      * @return Group
      */
     public function calculate( string $field, $expression ): self
     {
-        $this->group[ $field ] = Expression::parseExpression($expression);
+        $this->group[ $field ] = Expression::parseExpression( $expression );
 
         return $this;
     }

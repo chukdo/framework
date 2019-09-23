@@ -40,6 +40,7 @@ interface Record extends JsonInterface
 
     /**
      * @param string $collection
+     *
      * @return mixed
      */
     public function moveTo( string $collection ): self;

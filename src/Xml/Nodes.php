@@ -16,16 +16,17 @@ class Nodes extends Json
     /**
      * @param string $name
      * @param array  $params
+     *
      * @return $this|void
      */
     public function __call( string $name, array $params = [] )
     {
         foreach ( $this as $node ) {
-            call_user_func_array([
+            call_user_func_array( [
                 $node,
                 $name,
             ],
-                $params);
+                $params );
         }
 
         return $this;

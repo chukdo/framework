@@ -17,36 +17,40 @@ class Xml extends Node
 {
     /**
      * Document XML.
+     *
      * @param object DOMDocument
      */
     protected $xml;
 
     /**
      * Buffer de linearisation.
+     *
      * @param string
      */
     private $buffer;
 
     /**
      * Xml constructor.
+     *
      * @param string $name
      * @param string $uri
      */
     public function __construct( string $name = 'xml', string $uri = '' )
     {
-        $this->xml                     = new DOMDocument('1.0', 'UTF-8');
+        $this->xml                     = new DOMDocument( '1.0', 'UTF-8' );
         $this->xml->formatOutput       = false;
         $this->xml->preserveWhiteSpace = false;
 
-        parent::__construct($this->xml->appendChild($uri !== ''
-            ? $this->xml->createElementNS($uri,
-                $name)
-            : $this->xml->createElement($name)));
+        parent::__construct( $this->xml->appendChild( $uri !== ''
+            ? $this->xml->createElementNS( $uri,
+                $name )
+            : $this->xml->createElement( $name ) ) );
     }
 
     /**
      * @param string $file
      * @param bool   $html
+     *
      * @return Xml
      * @throws XmlException
      */
@@ -56,14 +60,14 @@ class Xml extends Node
             $xml = new Xml();
             $html === false
                 ? $xml->doc()
-                ->load($file)
+                ->load( $file )
                 : $xml->doc()
-                ->loadHTMLFile($file);
-            $xml->setElement($xml->doc()->documentElement);
+                ->loadHTMLFile( $file );
+            $xml->setElement( $xml->doc()->documentElement );
 
             return $xml;
         } catch ( Throwable $e ) {
-            throw new XmlException($e->getMessage(), $e->getCode(), $e);
+            throw new XmlException( $e->getMessage(), $e->getCode(), $e );
         }
     }
 
@@ -79,45 +83,22 @@ class Xml extends Node
      * @param string $name
      * @param string $value
      * @param string $uri
+     *
      * @return Node
      * @throws NodeException
      */
     public function wrap( string $name, string $value = '', string $uri = 'urn:void' ): Node
     {
         $childs = $this->childs();
-        $node   = $this->set($name,
+        $node   = $this->set( $name,
             $value,
-            $uri);
+            $uri );
 
         foreach ( $childs as $child ) {
-            $node->appendNode($child->element());
+            $node->appendNode( $child->element() );
         }
 
         return $this;
-    }
-
-    /**
-     * @param string $file
-     * @param bool   $html
-     * @return bool
-     */
-    public function saveToFile( string $file, bool $html = false ): bool
-    {
-        $dir = dirname($file);
-
-        if ( !is_dir($dir) ) {
-            if ( !mkdir($dir,
-                0777,
-                true) ) {
-                return false;
-            }
-        }
-
-        return $html
-            ? $this->doc()
-                ->saveHTMLFile($file)
-            : $this->doc()
-                ->save($file);
     }
 
     /**
@@ -127,6 +108,31 @@ class Xml extends Node
     {
         return $this->doc()
             ->saveXML();
+    }
+
+    /**
+     * @param string $file
+     * @param bool   $html
+     *
+     * @return bool
+     */
+    public function saveToFile( string $file, bool $html = false ): bool
+    {
+        $dir = dirname( $file );
+
+        if ( !is_dir( $dir ) ) {
+            if ( !mkdir( $dir,
+                0777,
+                true ) ) {
+                return false;
+            }
+        }
+
+        return $html
+            ? $this->doc()
+                ->saveHTMLFile( $file )
+            : $this->doc()
+                ->save( $file );
     }
 
     /**
@@ -141,6 +147,7 @@ class Xml extends Node
 
     /**
      * @param bool $html
+     *
      * @return string
      */
     public function saveToString( bool $html = false ): string
@@ -158,7 +165,7 @@ class Xml extends Node
      */
     public function __wakeup(): void
     {
-        $xml          = xml::loadFromString($this->buffer);
+        $xml          = xml::loadFromString( $this->buffer );
         $this->xml    = $xml->doc();
         $this->__node = $xml->element();
     }
@@ -166,6 +173,7 @@ class Xml extends Node
     /**
      * @param string $string
      * @param bool   $html
+     *
      * @return Xml
      * @throws XmlException
      */
@@ -175,15 +183,15 @@ class Xml extends Node
             $xml = new Xml();
             $html
                 ? $xml->doc()
-                ->loadHTML('<?xml encoding="UTF-8">' . $string,
-                    LIBXML_COMPACT)
+                ->loadHTML( '<?xml encoding="UTF-8">' . $string,
+                    LIBXML_COMPACT )
                 : $xml->doc()
-                ->loadXML($string);
-            $xml->setElement($xml->doc()->documentElement);
+                ->loadXML( $string );
+            $xml->setElement( $xml->doc()->documentElement );
 
             return $xml;
         } catch ( Exception $e ) {
-            throw new XmlException($e->getMessage(), $e->getCode(), $e);
+            throw new XmlException( $e->getMessage(), $e->getCode(), $e );
         }
     }
 }

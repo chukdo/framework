@@ -33,13 +33,14 @@ class StringValidate implements ValidateInterface
 
     /**
      * @param array $attributes
+     *
      * @return self
      */
     public function attributes( array $attributes ): ValidateInterface
     {
-        $attributes = array_pad($attributes,
+        $attributes = array_pad( $attributes,
             2,
-            0);
+            0 );
         $this->min  = $attributes[ 0 ];
         $this->max  = $attributes[ 1 ]
             ?: $attributes[ 0 ]
@@ -50,12 +51,13 @@ class StringValidate implements ValidateInterface
 
     /**
      * @param $input
+     *
      * @return bool
      */
     public function validate( $input ): bool
     {
-        if ( is_string($input) ) {
-            $len = strlen($input);
+        if ( is_string( $input ) ) {
+            $len = strlen( $input );
 
             if ( $len >= $this->min && $len <= $this->max ) {
                 return true;

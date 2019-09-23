@@ -28,6 +28,7 @@ class Schema implements SchemaInterface
 
     /**
      * Schema constructor.
+     *
      * @param Collection $collection
      */
     public function __construct( Collection $collection )
@@ -35,13 +36,13 @@ class Schema implements SchemaInterface
         $this->collection = $collection;
         $db               = $collection->database();
         $json             = $db->server()
-            ->command([
+            ->command( [
                 'listCollections' => 1,
                 'filter'          => [ 'name' => $collection->name() ],
-            ], $db->name());
+            ], $db->name() );
 
-        $this->property = new Property($json->get('0.options.validator.$jsonSchema', new Json())
-            ->toArray());
+        $this->property = new Property( $json->get( '0.options.validator.$jsonSchema', new Json() )
+            ->toArray() );
     }
 
     /**
@@ -65,13 +66,13 @@ class Schema implements SchemaInterface
             'validationAction' => 'error',
         ];
 
-        $save = new Json($this->collection()
+        $save = new Json( $this->collection()
             ->database()
             ->client()
-            ->modifyCollection($this->collection()
-                ->name(), $schema));
+            ->modifyCollection( $this->collection()
+                ->name(), $schema ) );
 
-        if ( $save->offsetGet('ok') == 1 ) {
+        if ( $save->offsetGet( 'ok' ) == 1 ) {
             $this->property = new Property();
 
             return true;
@@ -82,24 +83,26 @@ class Schema implements SchemaInterface
 
     /**
      * @param string $name
+     *
      * @return Property|null
      */
     public function get( string $name ): ?Property
     {
         return $this->property()
-            ->get($name);
+            ->get( $name );
     }
 
     /**
      * @param string      $name
      * @param string|null $type
      * @param array       $options
+     *
      * @return Schema
      */
     public function set( string $name, string $type = null, array $options = [] ): self
     {
         $this->property()
-            ->set($name, $type, $options);
+            ->set( $name, $type, $options );
 
         return $this;
     }
@@ -134,13 +137,13 @@ class Schema implements SchemaInterface
             'validationAction' => 'error',
         ];
 
-        $save = new Json($this->collection()
+        $save = new Json( $this->collection()
             ->database()
             ->client()
-            ->modifyCollection($this->collection()
-                ->name(), $schema));
+            ->modifyCollection( $this->collection()
+                ->name(), $schema ) );
 
-        return $save->offsetGet('ok') == 1;
+        return $save->offsetGet( 'ok' ) == 1;
     }
 
     /**

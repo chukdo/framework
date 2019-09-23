@@ -6,6 +6,7 @@ use Chukdo\Conf\Conf;
 use Chukdo\Conf\Lang;
 use Chukdo\Helper\To;
 use Closure;
+use ReflectionException;
 
 /**
  * Initialisation de l'application.
@@ -40,9 +41,9 @@ class App extends Service
     public function __construct()
     {
         parent::__construct();
-        $this->instance('\Chukdo\Bootstrap\App', $this);
-        $this->instance('\Chukdo\Conf\Conf', new Conf());
-        $this->instance('\Chukdo\Conf\Lang', new Lang());
+        $this->instance( '\Chukdo\Bootstrap\App', $this );
+        $this->instance( '\Chukdo\Conf\Conf', new Conf() );
+        $this->instance( '\Chukdo\Conf\Lang', new Lang() );
     }
 
     /**
@@ -50,13 +51,13 @@ class App extends Service
      */
     public function dd( $data )
     {
-        if ( is_null($data) ) {
-            die('Null');
+        if ( is_null( $data ) ) {
+            die( 'Null' );
         }
 
-        die(php_sapi_name() == 'cli'
-            ? To::text($data)
-            : To::html($data, null, null, true));
+        die( php_sapi_name() == 'cli'
+            ? To::text( $data )
+            : To::html( $data, null, null, true ) );
     }
 
     /**
@@ -64,7 +65,7 @@ class App extends Service
      */
     public function registerHandleExceptions(): self
     {
-        new HandleExceptions($this);
+        new HandleExceptions( $this );
 
         return $this;
     }
@@ -75,11 +76,12 @@ class App extends Service
      */
     public function env(): ?string
     {
-        return getenv('CHUKDO');
+        return getenv( 'CHUKDO' );
     }
 
     /**
      * @param string|null $channel
+     *
      * @return string
      */
     public function channel( string $channel = null ): string
@@ -96,25 +98,26 @@ class App extends Service
      */
     public function conf(): Conf
     {
-        return $this->getInstance('Chukdo\Conf\Conf');
+        return $this->getInstance( 'Chukdo\Conf\Conf' );
     }
 
     /**
      * @param string $name
      * @param bool   $bindInstance
+     *
      * @return mixed|object|null
      * @throws ServiceException
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function make( string $name, bool $bindInstance = false )
     {
-        $alias      = $this->getAlias($name);
-        $bindObject = parent::make($alias);
+        $alias      = $this->getAlias( $name );
+        $bindObject = parent::make( $alias );
 
-        $this->resolve($alias, $bindObject);
+        $this->resolve( $alias, $bindObject );
 
         if ( $bindInstance == true ) {
-            $this->instance($name, $bindObject);
+            $this->instance( $name, $bindObject );
         }
 
         return $bindObject;
@@ -122,11 +125,12 @@ class App extends Service
 
     /**
      * @param string $name
+     *
      * @return string
      */
     public function getAlias( string $name ): string
     {
-        return isset(self::$aliases[ $name ])
+        return isset( self::$aliases[ $name ] )
             ? self::$aliases[ $name ]
             : $name;
     }
@@ -134,16 +138,17 @@ class App extends Service
     /**
      * @param string $name
      * @param        $bindObject
+     *
      * @return App
      */
     protected function resolve( string $name, $bindObject ): self
     {
-        if ( isset($this->resolving[ '__ANY__' ]) ) {
-            $this->resolving[ '__ANY__' ]($bindObject, $name);
+        if ( isset( $this->resolving[ '__ANY__' ] ) ) {
+            $this->resolving[ '__ANY__' ]( $bindObject, $name );
         }
 
-        if ( isset($this->resolving[ $name ]) ) {
-            $this->resolving[ $name ]($bindObject, $name);
+        if ( isset( $this->resolving[ $name ] ) ) {
+            $this->resolving[ $name ]( $bindObject, $name );
         }
 
         return $this;
@@ -154,12 +159,13 @@ class App extends Service
      */
     public function lang(): Lang
     {
-        return $this->getInstance('Chukdo\Conf\Lang');
+        return $this->getInstance( 'Chukdo\Conf\Lang' );
     }
 
     /**
      * @param string $name
      * @param string $alias
+     *
      * @return App
      */
     public function setAlias( string $name, string $alias ): self
@@ -178,12 +184,13 @@ class App extends Service
 
     /**
      * @param array|null $services
+     *
      * @return App
      */
     public function registerServices( array $services = null ): self
     {
         foreach ( $services as $service ) {
-            $this->registerService($service);
+            $this->registerService( $service );
         }
 
         return $this;
@@ -191,11 +198,12 @@ class App extends Service
 
     /**
      * @param string $name
+     *
      * @return App
      */
     public function registerService( string $name ): self
     {
-        $instance = new $name($this);
+        $instance = new $name( $this );
         $instance->register();
 
         return $this;
@@ -203,7 +211,9 @@ class App extends Service
 
     /**
      * Ecoute la resolution de tous les objets.
+     *
      * @param Closure $closure
+     *
      * @return App
      */
     public function resolvingAny( Closure $closure ): self
@@ -215,8 +225,10 @@ class App extends Service
 
     /**
      * Ecoute la resolution d'un objet.
+     *
      * @param string  $name
      * @param Closure $closure
+     *
      * @return App
      */
     public function resolving( string $name, Closure $closure ): self

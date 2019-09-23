@@ -1,6 +1,6 @@
 <?php
 
-namespace Chukdo\Db\Mongo;
+namespace Chukdo\Db\Elastic;
 
 use MongoDB\BSON\Regex;
 

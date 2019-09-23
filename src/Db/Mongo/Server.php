@@ -35,6 +35,7 @@ Class Server implements ServerInterface
 
     /**
      * Server constructor.
+     *
      * @param string|null $dsn
      * @param string|null $database
      */
@@ -42,13 +43,14 @@ Class Server implements ServerInterface
     {
         $this->dsn      = $dsn
             ?: 'mongodb://127.0.0.1:27017';
-        $this->client   = new Manager($dsn);
+        $this->client   = new Manager( $dsn );
         $this->database = $database;
     }
 
     /**
      * @param string $name
      * @param array  $hosts array of hosts
+     *
      * @return bool
      */
     public function ReplicatSetInitiate( string $name, array $hosts ): bool
@@ -62,26 +64,27 @@ Class Server implements ServerInterface
             ];
         }
 
-        return $this->command([
+        return $this->command( [
                 'replSetInitiate' => [
                     '_id'     => $name,
                     'members' => $members,
                 ],
-            ])
-                   ->get('ok') == 1;
+            ] )
+                ->get( 'ok' ) == 1;
     }
 
     /**
      * @param array  $args
      * @param string $db
+     *
      * @return JsonInterface
      */
     public function command( array $args, string $db = 'admin' ): JsonInterface
     {
         try {
-            $args = new Command($args);
-            $json = new Json($this->client()
-                ->executeCommand($db, $args));
+            $args = new Command( $args );
+            $json = new Json( $this->client()
+                ->executeCommand( $db, $args ) );
 
             return $json;
         } catch ( Exception $e ) {
@@ -101,22 +104,24 @@ Class Server implements ServerInterface
     /**
      * @param string      $collection
      * @param string|null $database
+     *
      * @return Collection
      */
     public function collection( string $collection, string $database = null ): Collection
     {
-        return $this->database($database)
-            ->collection($collection);
+        return $this->database( $database )
+            ->collection( $collection );
     }
 
     /**
      * @param string|null $database
+     *
      * @return Database
      */
     public function database( string $database = null ): Database
     {
-        return new Database($this, $database
-            ?: $this->database);
+        return new Database( $this, $database
+            ?: $this->database );
     }
 
     /**
@@ -124,9 +129,9 @@ Class Server implements ServerInterface
      */
     public function databases(): JsonInterface
     {
-        return $this->command([ 'listDatabases' => 1 ])
-            ->get('0.databases')
-            ->coll('name');
+        return $this->command( [ 'listDatabases' => 1 ] )
+            ->get( '0.databases' )
+            ->coll( 'name' );
     }
 
     /**
@@ -134,8 +139,8 @@ Class Server implements ServerInterface
      */
     public function ping(): bool
     {
-        return $this->command([ 'ping' => 1 ])
-                   ->get('0.ok') == 1;
+        return $this->command( [ 'ping' => 1 ] )
+                ->get( '0.ok' ) == 1;
     }
 
     /**
@@ -143,16 +148,15 @@ Class Server implements ServerInterface
      */
     public function status(): JsonInterface
     {
-        $status = $this->command([ 'serverStatus' => 1 ])
-            ->getIndex('0', new Json())
-            ->filter(function( $k, $v )
-            {
-                if ( is_scalar($v) ) {
+        $status = $this->command( [ 'serverStatus' => 1 ] )
+            ->getIndex( '0', new Json() )
+            ->filter( function( $k, $v ) {
+                if ( is_scalar( $v ) ) {
                     return $v;
                 }
 
                 return false;
-            })
+            } )
             ->clean();
 
         return $status;
@@ -163,8 +167,8 @@ Class Server implements ServerInterface
      */
     public function version(): ?string
     {
-        return $this->command([ 'buildInfo' => 1 ])
-            ->get('0.version');
+        return $this->command( [ 'buildInfo' => 1 ] )
+            ->get( '0.version' );
     }
 
     /**
@@ -172,16 +176,15 @@ Class Server implements ServerInterface
      */
     public function ReplicatSetStatus(): JsonInterface
     {
-        $status = $this->command([ 'replSetGetStatus' => 1 ])
-            ->getIndex('0', new Json())
-            ->filter(function( $k, $v )
-            {
-                if ( is_scalar($v) ) {
+        $status = $this->command( [ 'replSetGetStatus' => 1 ] )
+            ->getIndex( '0', new Json() )
+            ->filter( function( $k, $v ) {
+                if ( is_scalar( $v ) ) {
                     return $v;
                 }
 
                 return false;
-            })
+            } )
             ->clean();
 
         return $status;
@@ -189,14 +192,15 @@ Class Server implements ServerInterface
 
     /**
      * @param int $op
+     *
      * @return bool
      */
     public function kill( int $op ): bool
     {
-        return $this->command([
+        return $this->command( [
                 'killOp' => 1,
                 'op'     => $op,
-            ])
-                   ->get('ok') == 1;
+            ] )
+                ->get( 'ok' ) == 1;
     }
 }

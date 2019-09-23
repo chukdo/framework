@@ -24,6 +24,7 @@ class FloatFilter implements FilterInterface
 
     /**
      * @param array $attributes
+     *
      * @return self
      */
     public function attributes( array $attributes ): FilterInterface
@@ -33,18 +34,19 @@ class FloatFilter implements FilterInterface
 
     /**
      * @param $input
+     *
      * @return mixed
      */
     public function filter( $input )
     {
-        if ( Str::match('/^[0-9 .,]+$/', $input) ) {
-            $input = str_replace(' ', '', $input);
+        if ( Str::match( '/^[0-9 .,]+$/', $input ) ) {
+            $input = str_replace( ' ', '', $input );
 
-            if ( Str::contain($input, '.') && Str::contain($input, ',') ) {
-                $input = str_replace('.', '', $input);
+            if ( Str::contain( $input, '.' ) && Str::contain( $input, ',' ) ) {
+                $input = str_replace( '.', '', $input );
             }
 
-            $input = str_replace(',', '.', $input);
+            $input = str_replace( ',', '.', $input );
 
             return (float) $input;
         }

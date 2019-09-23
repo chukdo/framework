@@ -29,6 +29,7 @@ class Property implements PropertyInterface
 
     /**
      * Property constructor.
+     *
      * @param array       $property
      * @param string|null $name
      */
@@ -40,19 +41,19 @@ class Property implements PropertyInterface
         foreach ( $property as $key => $value ) {
             switch ( $key ) {
                 case 'properties' :
-                    $this->setProperties((array) $value);
+                    $this->setProperties( (array) $value );
                     break;
                 case 'type' :
-                    $this->setType($value);
+                    $this->setType( $value );
                     break;
                 case 'copy_to' :
-                    $this->setCopyTo($value);
+                    $this->setCopyTo( $value );
                     break;
                 case 'analyser' :
-                    $this->setAnalyser($value);
+                    $this->setAnalyser( $value );
                     break;
                 case 'fields' :
-                    $this->setFields($value);
+                    $this->setFields( $value );
                     break;
             }
         }
@@ -60,14 +61,15 @@ class Property implements PropertyInterface
 
     /**
      * @param array $value
+     *
      * @return $this
      */
     public function setProperties( array $value ): self
     {
-        $properties = $this->property->offsetGetOrSet('properties', []);
+        $properties = $this->property->offsetGetOrSet( 'properties', [] );
 
         foreach ( $value as $k => $v ) {
-            $properties->offsetSet($k, new Property((array) $v, $k));
+            $properties->offsetSet( $k, new Property( (array) $v, $k ) );
         }
 
         return $this;
@@ -76,12 +78,14 @@ class Property implements PropertyInterface
     /**
      * text | keyword | int | float | boolean | date | ip | completion ...
      * https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html
+     *
      * @param string $value
+     *
      * @return Property
      */
     public function setType( string $value ): self
     {
-        $this->property->offsetSet('type', $value);
+        $this->property->offsetSet( 'type', $value );
 
         return $this;
     }
@@ -89,11 +93,12 @@ class Property implements PropertyInterface
     /**
      * https://www.elastic.co/guide/en/elasticsearch/reference/current/copy-to.html
      * @param string $value
+     *
      * @return $this
      */
     public function setCopyTo( $value ): self
     {
-        $this->property->offsetSet('copy_to', (array) $value);
+        $this->property->offsetSet( 'copy_to', (array) $value );
 
         return $this;
     }
@@ -101,11 +106,12 @@ class Property implements PropertyInterface
     /**
      * https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer.html
      * @param string $value
+     *
      * @return $this
      */
     public function setAnalyser( string $value ): self
     {
-        $this->property->offsetSet('analyser', $value);
+        $this->property->offsetSet( 'analyser', $value );
 
         return $this;
     }
@@ -113,14 +119,15 @@ class Property implements PropertyInterface
     /**
      * https://www.elastic.co/guide/en/elasticsearch/reference/current/multi-fields.html
      * @param array $value
+     *
      * @return $this
      */
     public function setFields( array $value ): self
     {
-        $properties = $this->property->offsetGetOrSet('fields', []);
+        $properties = $this->property->offsetGetOrSet( 'fields', [] );
 
         foreach ( $value as $k => $v ) {
-            $properties->offsetSet($k, new Property((array) $v, $k));
+            $properties->offsetSet( $k, new Property( (array) $v, $k ) );
         }
 
         return $this;
@@ -139,49 +146,32 @@ class Property implements PropertyInterface
      */
     public function fields(): ?Property
     {
-        return $this->property->offsetGet('fields');
+        return $this->property->offsetGet( 'fields' );
     }
 
     /**
      * @param string $name
+     *
      * @return $this|null
      */
     public function get( string $name ): ?Property
     {
-        if ( Str::notContain($name, '.') ) {
+        if ( Str::notContain( $name, '.' ) ) {
             return $this->properties()
-                ->offsetGet($name);
+                ->offsetGet( $name );
         }
 
-        $arr       = new Arr(Str::split($name, '.'));
+        $arr       = new Arr( Str::split( $name, '.' ) );
         $firstPath = $arr->getFirstAndRemove();
-        $endPath   = $arr->join('.');
+        $endPath   = $arr->join( '.' );
         $get       = $this->properties()
-            ->offsetGet($firstPath);
+            ->offsetGet( $firstPath );
 
         if ( $get instanceof Property ) {
-            return $get->get($endPath);
+            return $get->get( $endPath );
         }
 
         return null;
-    }
-
-    /**
-     * @param string      $name
-     * @param string|null $type
-     * @param array       $options
-     * @return Property
-     */
-    public function set( string $name, string $type = null,  array $options = [] ): Property
-    {
-        $property = new Property($options, $name);
-
-        if ($type) {
-            $property->setType($type);
-        }
-
-        return $this->properties()
-            ->offsetGetOrSet($name, $property);
     }
 
     /**
@@ -189,19 +179,26 @@ class Property implements PropertyInterface
      */
     public function properties(): JsonInterface
     {
-        return $this->property->offsetGetOrSet('properties', []);
+        return $this->property->offsetGetOrSet( 'properties', [] );
     }
 
     /**
-     * @param string $name
-     * @return $this
+     * @param string      $name
+     * @param string|null $type
+     * @param array       $options
+     *
+     * @return Property
      */
-    public function unsetProperty( string $name ): self
+    public function set( string $name, string $type = null, array $options = [] ): Property
     {
-        $this->properties()
-            ->offsetUnset($name);
+        $property = new Property( $options, $name );
 
-        return $this;
+        if ( $type ) {
+            $property->setType( $type );
+        }
+
+        return $this->properties()
+            ->offsetGetOrSet( $name, $property );
     }
 
     /**
@@ -209,12 +206,11 @@ class Property implements PropertyInterface
      */
     public function toArray(): array
     {
-        return $this->property->filterRecursive(function( $k, $v )
-        {
+        return $this->property->filterRecursive( function( $k, $v ) {
             return $v instanceof Property
                 ? $v->toArray()
                 : $v;
-        })
+        } )
             ->toArray();
     }
 
@@ -231,7 +227,20 @@ class Property implements PropertyInterface
      */
     public function type(): ?string
     {
-        return $this->property->offsetGet('type');
+        return $this->property->offsetGet( 'type' );
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return $this
+     */
+    public function unsetProperty( string $name ): self
+    {
+        $this->properties()
+            ->offsetUnset( $name );
+
+        return $this;
     }
 
     /**
@@ -239,7 +248,7 @@ class Property implements PropertyInterface
      */
     public function analyser(): ?string
     {
-        return $this->property->offsetGet('analyser');
+        return $this->property->offsetGet( 'analyser' );
     }
 
     /**
@@ -247,6 +256,6 @@ class Property implements PropertyInterface
      */
     public function copyTo(): ?string
     {
-        return $this->property->offsetGet('copy_to');
+        return $this->property->offsetGet( 'copy_to' );
     }
 }

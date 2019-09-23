@@ -2,6 +2,7 @@
 
 namespace Chukdo\Routing;
 
+use Chukdo\Bootstrap\ServiceException;
 use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
 use Chukdo\Http\Response;
 use Chukdo\Middleware\ClosureMiddleware;
@@ -9,6 +10,7 @@ use Chukdo\Middleware\ControlerMiddleware;
 use Closure;
 use Chukdo\Bootstrap\App;
 use Chukdo\Http\Request;
+use ReflectionException;
 
 /**
  * Gestion des Routes.
@@ -51,48 +53,52 @@ class Router
 
     /**
      * Router constructor.
+     *
      * @param App $app
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
+     *
+     * @throws ServiceException
+     * @throws ReflectionException
      */
     public function __construct( App $app )
     {
         $this->app        = $app;
-        $this->request    = $app->make('Chukdo\Http\Request');
-        $this->response   = $this->app->make('Chukdo\Http\Response');
+        $this->request    = $app->make( 'Chukdo\Http\Request' );
+        $this->response   = $this->app->make( 'Chukdo\Http\Response' );
         $this->attributes = new RouteAttributes();
-        $this->fallback   = function()
-        {
-            throw new RouteException('No valid route');
+        $this->fallback   = function() {
+            throw new RouteException( 'No valid route' );
         };
     }
 
     /**
      * @param array $middlewares
+     *
      * @return RouteGroup
      */
     public function middleware( array $middlewares ): RouteGroup
     {
-        return ( new RouteGroup($this) )->middleware($middlewares);
+        return ( new RouteGroup( $this ) )->middleware( $middlewares );
     }
 
     /**
      * @param array                         $validators
      * @param ErrorMiddlewareInterface|null $errorMiddleware
+     *
      * @return RouteGroup
      */
     public function validator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): RouteGroup
     {
-        return ( new RouteGroup($this) )->validator($validators, $errorMiddleware);
+        return ( new RouteGroup( $this ) )->validator( $validators, $errorMiddleware );
     }
 
     /**
      * @param string|null $prefix
+     *
      * @return RouteGroup
      */
     public function prefix( ?string $prefix ): RouteGroup
     {
-        return ( new RouteGroup($this) )->prefix($prefix);
+        return ( new RouteGroup( $this ) )->prefix( $prefix );
     }
 
     /**
@@ -114,35 +120,35 @@ class Router
     /**
      * @param string $uri
      * @param        $closure
+     *
      * @return Route
      */
     public function get( string $uri, $closure ): Route
     {
-        return $this->stack('GET', $uri, $closure);
+        return $this->stack( 'GET', $uri, $closure );
     }
 
     /**
      * @param string $method
      * @param string $uri
      * @param        $closure
+     *
      * @return Route
      */
     public function stack( string $method, string $uri, $closure ): Route
     {
         if ( $closure instanceof Closure ) {
-            $appMiddleware = new ClosureMiddleware($closure);
-        }
-        elseif ( is_string($closure) ) {
-            $appMiddleware = new ControlerMiddleware($closure);
-        }
-        else {
-            throw new RouteException('Router stack need a Closure or a String');
+            $appMiddleware = new ClosureMiddleware( $closure );
+        } else if ( is_string( $closure ) ) {
+            $appMiddleware = new ControlerMiddleware( $closure );
+        } else {
+            throw new RouteException( 'Router stack need a Closure or a String' );
         }
 
-        $route = new Route($method, $uri, $this->request, $appMiddleware);
+        $route = new Route( $method, $uri, $this->request, $appMiddleware );
         $route->attributes()
-            ->set($this->attributes()
-                ->get());
+            ->set( $this->attributes()
+                ->get() );
 
         $this->stack[] = $route;
 
@@ -160,51 +166,56 @@ class Router
     /**
      * @param string $uri
      * @param        $closure
+     *
      * @return Route
      */
     public function post( string $uri, $closure ): Route
     {
-        return $this->stack('POST', $uri, $closure);
+        return $this->stack( 'POST', $uri, $closure );
     }
 
     /**
      * @param string $uri
      * @param        $closure
+     *
      * @return Route
      */
     public function put( string $uri, $closure ): Route
     {
-        return $this->stack('PUT', $uri, $closure);
+        return $this->stack( 'PUT', $uri, $closure );
     }
 
     /**
      * @param string $uri
      * @param        $closure
+     *
      * @return Route
      */
     public function delete( string $uri, $closure ): Route
     {
-        return $this->stack('DELETE', $uri, $closure);
+        return $this->stack( 'DELETE', $uri, $closure );
     }
 
     /**
      * @param string $uri
      * @param        $closure
+     *
      * @return Route
      */
     public function any( string $uri, $closure ): Route
     {
-        return $this->stack('ALL', $uri, $closure);
+        return $this->stack( 'ALL', $uri, $closure );
     }
 
     /**
      * @param string $uri
      * @param        $closure
+     *
      * @return Route
      */
     public function console( string $uri, $closure ): Route
     {
-        return $this->stack('CLI', $uri, $closure);
+        return $this->stack( 'CLI', $uri, $closure );
     }
 
     /**
@@ -214,16 +225,17 @@ class Router
     {
         foreach ( $this->stack as $route ) {
             if ( $route->match() ) {
-                return $route->dispatcher($this->response)
+                return $route->dispatcher( $this->response )
                     ->send();
             }
         }
 
-        ( $this->fallback )($this->request, $this->response);
+        ( $this->fallback )( $this->request, $this->response );
     }
 
     /**
      * @param Closure $fallback
+     *
      * @return Router
      */
     public function fallback( Closure $fallback ): self

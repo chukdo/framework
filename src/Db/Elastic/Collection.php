@@ -3,6 +3,7 @@
 Namespace Chukdo\DB\Elastic;
 
 use Chukdo\Db\Elastic\Schema\Schema;
+use Chukdo\Facades\App;
 use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
@@ -11,6 +12,7 @@ use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use DateTime;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
+use Exception;
 use Throwable;
 
 /**
@@ -34,6 +36,7 @@ Class Collection implements CollectionInterface
 
     /**
      * Collection constructor.
+     *
      * @param Database $database
      * @param string   $collection
      */
@@ -46,13 +49,14 @@ Class Collection implements CollectionInterface
     /**
      * @param string|null $field
      * @param             $value
+     *
      * @return DateTime
-     * @throws \Exception
+     * @throws Exception
      */
     public static function filterOut( ?string $field, $value )
     {
-        if ( Str::contain($field, 'date') ) {
-            return ( new DateTime() )->setTimestamp(1000 * (int) (string) $value);
+        if ( Str::contain( $field, 'date' ) ) {
+            return ( new DateTime() )->setTimestamp( 1000 * (int) (string) $value );
         }
 
         return $value;
@@ -61,14 +65,14 @@ Class Collection implements CollectionInterface
     /**
      * @param string|null $field
      * @param             $value
+     *
      * @return mixed
      */
     public static function filterIn( ?string $field, $value )
     {
         if ( $value instanceof DateTime ) {
             $value = $value->getTimestamp() * 1000;
-        }
-        elseif ( Str::contain($field, 'date') && Is::scalar($value) ) {
+        } else if ( Str::contain( $field, 'date' ) && Is::scalar( $value ) ) {
             $value = 1000 * (int) $value;
         }
 
@@ -77,20 +81,21 @@ Class Collection implements CollectionInterface
 
     /**
      * @param $data
+     *
      * @return RecordInterface
      */
     public function record( $data ): RecordInterface
     {
         try {
-            $reflector = new ReflectionClass('\App\Model\\' . $this->name());
+            $reflector = new ReflectionClass( '\App\Model\\' . $this->name() );
 
-            return $reflector->newInstanceArgs([
+            return $reflector->newInstanceArgs( [
                 $this,
                 $data,
-            ]);
+            ] );
 
         } catch ( ReflectionException $e ) {
-            return new Record($this, $data);
+            return new Record( $this, $data );
         }
     }
 
@@ -103,27 +108,48 @@ Class Collection implements CollectionInterface
     }
 
     /**
-     * @param string $newName
+     * @param string      $collection
+     * @param string|null $database
+     *
      * @return bool
      */
-    public function rename( string $newName ): bool
+    public function rename( string $collection, string $database = null ): bool
     {
-        $this->client()
-            ->indices()
-            ->delete([ 'index' => $newName ]);
+        $database = $database
+            ?: $this->database()
+                    ->name();
 
-        // getThisSchema
-        // createCollection newCollection
-        // setThisSchema to newCollection
-        // reIndex
+        $newCollection = $this->database()
+                              ->server()
+                              ->database( $database )
+                              ->createCollection( $collection );
 
-        $this->client()
-            ->reindex([
-                'source' => [ 'index' => $this->collection ],
-                'dest'   => [ 'index' => $newName ],
-            ]);
+        $newCollection->client()
+                      ->indices()
+                      ->putMapping( [
+                          'index' => $newCollection->fullName(),
+                          'body'  => $this->schema()
+                                          ->toArray(),
+                      ] );
 
-        return true;
+        try {
+            $this->client()
+                 ->reindex( [ 'body' => [
+                     'source' => [ 'index' => $this->fullName() ],
+                     'dest'   => [ 'index' => $newCollection->fullName() ],
+                 ] ] );
+            $this->drop();
+        } catch ( Exception $e ) {
+            return false;
+        }
+    }
+
+    /**
+     * @return Database
+     */
+    public function database(): Database
+    {
+        return $this->database;
     }
 
     /**
@@ -132,15 +158,24 @@ Class Collection implements CollectionInterface
     public function client(): Client
     {
         return $this->database()
-            ->client();
+                    ->client();
     }
 
     /**
-     * @return \Chukdo\DB\Elastic\Database
+     * @return string
      */
-    public function database(): Database
+    public function fullName(): string
     {
-        return $this->database;
+        return $this->database()
+                    ->prefixName() . $this->name();
+    }
+
+    /**
+     * @return Schema
+     */
+    public function schema(): Schema
+    {
+        return new Schema( $this );
     }
 
     /**
@@ -150,8 +185,8 @@ Class Collection implements CollectionInterface
     {
         try {
             $this->client()
-                ->indices()
-                ->delete([ 'index' => $this->fullName() ]);
+                 ->indices()
+                 ->delete( [ 'index' => $this->fullName() ] );
 
             return true;
         } catch ( Missing404Exception $e ) {
@@ -161,18 +196,12 @@ Class Collection implements CollectionInterface
         }
     }
 
-    public function fullName(): string
-    {
-        return $this->database()
-                   ->prefixName() . $this->name();
-    }
-
     /**
      * @return Find
      */
     public function find(): Find
     {
-        return new Find($this);
+        return new Find( $this );
     }
 
     /**
@@ -180,19 +209,11 @@ Class Collection implements CollectionInterface
      */
     public function info(): JsonInterface
     {
-        $stats = new Json($this->client()
-            ->indices()
-            ->stats([ 'index' => $this->name() ]));
+        $stats = new Json( $this->client()
+                                ->indices()
+                                ->stats( [ 'index' => $this->name() ] ) );
 
-        return $stats->get('indices.' . $this->fullName(), new Json());
-    }
-
-    /**
-     * @return Schema
-     */
-    public function schema(): Schema
-    {
-        return new Schema($this);
+        return $stats->get( 'indices.' . $this->fullName(), new Json() );
     }
 
     /**
@@ -200,6 +221,6 @@ Class Collection implements CollectionInterface
      */
     public function write(): Write
     {
-        return new Write($this);
+        return new Write( $this );
     }
 }

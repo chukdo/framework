@@ -3,6 +3,8 @@
 namespace Chukdo\Facades;
 
 use Chukdo\Bootstrap\App;
+use Chukdo\Bootstrap\ServiceException;
+use ReflectionException;
 
 /**
  * Initialisation d'une facade.
@@ -15,7 +17,7 @@ class Facade
 {
     /**
      * Instance App.
-     * @var \Chukdo\Bootstrap\App
+     * @var App
      */
     protected static $app;
 
@@ -27,13 +29,14 @@ class Facade
 
     /**
      * Attache APP (extension de service) à la facade pour la resolution des injections de dependance.
+     *
      * @param App        $app
      * @param array|null $alias
      */
     public static function setFacadeApplication( App $app, array $alias = null ): void
     {
         static::$app = $app;
-        self::registerAlias($alias);
+        self::registerAlias( $alias );
     }
 
     /**
@@ -42,7 +45,7 @@ class Facade
     public static function registerAlias( array $alias = null ): void
     {
         foreach ( $alias as $name => $class ) {
-            self::setClassAlias($name, $class);
+            self::setClassAlias( $name, $class );
         }
     }
 
@@ -52,7 +55,7 @@ class Facade
      */
     public static function setClassAlias( string $name, string $class ): void
     {
-        class_alias($class, $name);
+        class_alias( $class, $name );
     }
 
     /**
@@ -66,25 +69,27 @@ class Facade
     /**
      * @return mixed
      * @throws FacadeException
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
+     * @throws ServiceException
+     * @throws ReflectionException
      */
     public static function object()
     {
-        return static::getInstance(static::name());
+        return static::getInstance( static::name() );
     }
 
     /**
      * Retourne l'instance resolu attaché à un nom.
+     *
      * @param string $name
+     *
      * @return mixed
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
+     * @throws ServiceException
+     * @throws ReflectionException
      */
     public static function getInstance( string $name )
     {
-        if ( !isset(static::$facades[ $name ]) ) {
-            static::$facades[ $name ] = static::$app->make($name, true);
+        if ( !isset( static::$facades[ $name ] ) ) {
+            static::$facades[ $name ] = static::$app->make( $name, true );
         }
 
         return static::$facades[ $name ];
@@ -96,32 +101,33 @@ class Facade
      */
     public static function name(): string
     {
-        throw new FacadeException("Facade does not implement 'Name' method.");
+        throw new FacadeException( "Facade does not implement 'Name' method." );
     }
 
     /**
      * @param string $method
      * @param array  $args
+     *
      * @return mixed
      * @throws FacadeException
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
+     * @throws ServiceException
+     * @throws ReflectionException
      */
     public static function __callStatic( string $method, array $args = [] )
     {
         $name     = static::name();
-        $instance = static::getInstance($name);
+        $instance = static::getInstance( $name );
 
-        if ( !method_exists($instance, $method) && !method_exists($instance, '__call') ) {
+        if ( !method_exists( $instance, $method ) && !method_exists( $instance, '__call' ) ) {
             $class = get_called_class();
 
-            throw new FacadeException(sprintf("[%s] does not implement [%s] method.", $class, $method));
+            throw new FacadeException( sprintf( "[%s] does not implement [%s] method.", $class, $method ) );
         }
 
-        return call_user_func_array([
+        return call_user_func_array( [
             $instance,
             $method,
         ],
-            $args);
+            $args );
     }
 }

@@ -27,7 +27,7 @@ final class Cli
     {
         $inputs = self::argv();
 
-        return isset($inputs[ 0 ])
+        return isset( $inputs[ 0 ] )
             ? $inputs[ 0 ]
             : null;
     }
@@ -39,15 +39,14 @@ final class Cli
     {
         $key    = 0;
         $inputs = [];
-        $argv   = isset($_SERVER[ 'argv' ])
+        $argv   = isset( $_SERVER[ 'argv' ] )
             ? $_SERVER[ 'argv' ]
             : [];
 
         foreach ( $argv as $k => $arg ) {
-            if ( substr($arg, 0, 1) == '-' ) {
-                $key = trim($arg, '-');
-            }
-            else {
+            if ( substr( $arg, 0, 1 ) == '-' ) {
+                $key = trim( $arg, '-' );
+            } else {
                 $inputs[ $key ] = $arg;
             }
 
@@ -63,8 +62,8 @@ final class Cli
     {
         $inputs = self::argv();
 
-        if ( isset($inputs[ 0 ]) ) {
-            unset($inputs[ 0 ]);
+        if ( isset( $inputs[ 0 ] ) ) {
+            unset( $inputs[ 0 ] );
         }
 
         return $inputs;

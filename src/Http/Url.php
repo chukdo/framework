@@ -30,6 +30,7 @@ class Url
 
     /**
      * Url constructor.
+     *
      * @param string|null $url
      * @param string|null $defaultScheme
      */
@@ -37,17 +38,18 @@ class Url
     {
         if ( $url ) {
             if ( $defaultScheme ) {
-                if ( !Str::match('/^[a-z0-9]+:\/\//', $url) ) {
+                if ( !Str::match( '/^[a-z0-9]+:\/\//', $url ) ) {
                     $url = $defaultScheme . '://' . $url;
                 }
             }
 
-            $this->parseUrl($url);
+            $this->parseUrl( $url );
         }
     }
 
     /**
      * @param string $url
+     *
      * @return Url
      */
     public function parseUrl( string $url ): Url
@@ -63,23 +65,24 @@ class Url
             'fragment' => '',
         ];
 
-        $url = array_merge($mergeUrl,
-            (array) parse_url($url));
+        $url = array_merge( $mergeUrl,
+            (array) parse_url( $url ) );
 
-        $this->setScheme($url[ 'scheme' ])
-            ->setHost($url[ 'host' ])
-            ->setPort($url[ 'port' ])
-            ->setUser($url[ 'user' ])
-            ->setPass($url[ 'pass' ])
-            ->setPath($url[ 'path' ])
-            ->setQuery($url[ 'query' ])
-            ->SetFragment($url[ 'fragment' ]);
+        $this->setScheme( $url[ 'scheme' ] )
+            ->setHost( $url[ 'host' ] )
+            ->setPort( $url[ 'port' ] )
+            ->setUser( $url[ 'user' ] )
+            ->setPass( $url[ 'pass' ] )
+            ->setPath( $url[ 'path' ] )
+            ->setQuery( $url[ 'query' ] )
+            ->SetFragment( $url[ 'fragment' ] );
 
         return $this;
     }
 
     /**
      * @param string $fragment
+     *
      * @return Url
      */
     public function setFragment( string $fragment ): Url
@@ -91,85 +94,33 @@ class Url
 
     /**
      * @param string $query
+     *
      * @return Url
      */
     public function setQuery( string $query ): Url
     {
-        parse_str($query,
-            $this->url[ 'input' ]);
+        parse_str( $query,
+            $this->url[ 'input' ] );
 
         return $this;
     }
 
     /**
      * @param string $path
+     *
      * @return Url
      */
     public function setPath( string $path ): Url
     {
-        $this->setDir(dirname($path));
-        $this->setFile(basename($path));
-
-        return $this;
-    }
-
-    /**
-     * @param string $pass
-     * @return Url
-     */
-    public function setPass( string $pass ): Url
-    {
-        $this->url[ 'pass' ] = $pass;
-
-        return $this;
-    }
-
-    /**
-     * @param string $user
-     * @return Url
-     */
-    public function setUser( string $user ): Url
-    {
-        $this->url[ 'user' ] = $user;
-
-        return $this;
-    }
-
-    /**
-     * @param string $port
-     * @return Url
-     */
-    public function setPort( string $port ): Url
-    {
-        $this->url[ 'port' ] = $port;
-
-        return $this;
-    }
-
-    /**
-     * @param string $host
-     * @return Url
-     */
-    public function setHost( string $host ): Url
-    {
-        $this->url[ 'host' ] = $host;
-
-        return $this;
-    }
-
-    /**
-     * @param string $scheme
-     * @return Url
-     */
-    public function setScheme( string $scheme ): Url
-    {
-        $this->url[ 'scheme' ] = $scheme;
+        $this->setDir( dirname( $path ) );
+        $this->setFile( basename( $path ) );
 
         return $this;
     }
 
     /**
      * @param string $dir
+     *
      * @return Url
      */
     public function setDir( string $dir ): Url
@@ -181,6 +132,7 @@ class Url
 
     /**
      * @param string $file
+     *
      * @return Url
      */
     public function setFile( string $file ): Url
@@ -191,8 +143,69 @@ class Url
     }
 
     /**
+     * @param string $pass
+     *
+     * @return Url
+     */
+    public function setPass( string $pass ): Url
+    {
+        $this->url[ 'pass' ] = $pass;
+
+        return $this;
+    }
+
+    /**
+     * @param string $user
+     *
+     * @return Url
+     */
+    public function setUser( string $user ): Url
+    {
+        $this->url[ 'user' ] = $user;
+
+        return $this;
+    }
+
+    /**
+     * @param string $port
+     *
+     * @return Url
+     */
+    public function setPort( string $port ): Url
+    {
+        $this->url[ 'port' ] = $port;
+
+        return $this;
+    }
+
+    /**
+     * @param string $host
+     *
+     * @return Url
+     */
+    public function setHost( string $host ): Url
+    {
+        $this->url[ 'host' ] = $host;
+
+        return $this;
+    }
+
+    /**
+     * @param string $scheme
+     *
+     * @return Url
+     */
+    public function setScheme( string $scheme ): Url
+    {
+        $this->url[ 'scheme' ] = $scheme;
+
+        return $this;
+    }
+
+    /**
      * @param string $key
      * @param string $value
+     *
      * @return Url
      */
     public function setInput( string $key, string $value ): Url
@@ -204,11 +217,12 @@ class Url
 
     /**
      * @param string $key
+     *
      * @return string
      */
     public function getInput( string $key ): string
     {
-        return isset($this->url[ 'input' ][ $key ])
+        return isset( $this->url[ 'input' ][ $key ] )
             ? $this->url[ 'input' ][ $key ]
             : '';
     }
@@ -220,7 +234,7 @@ class Url
     {
         $subDomains = $this->getSubDomains();
 
-        return reset($subDomains);
+        return reset( $subDomains );
     }
 
     /**
@@ -229,10 +243,10 @@ class Url
     public function getSubDomains(): array
     {
         $domainAndTld = '.' . $this->getDomain() . '.' . $this->getTld();
-        $host         = str_replace('www.', '', $this->getHost());
+        $host         = str_replace( 'www.', '', $this->getHost() );
 
-        if ( Str::contain($host, $domainAndTld) ) {
-            return explode('.', str_replace($domainAndTld, '', $host));
+        if ( Str::contain( $host, $domainAndTld ) ) {
+            return explode( '.', str_replace( $domainAndTld, '', $host ) );
         }
 
         return [];
@@ -246,10 +260,10 @@ class Url
         $tld  = '.' . $this->getTld();
         $host = $this->getHost();
 
-        if ( Str::contain($host, '.') ) {
-            $domain = explode('.', str_replace($tld, '', $host));
+        if ( Str::contain( $host, '.' ) ) {
+            $domain = explode( '.', str_replace( $tld, '', $host ) );
 
-            return end($domain);
+            return end( $domain );
         }
 
         return null;
@@ -260,12 +274,12 @@ class Url
      */
     public function getTld(): ?string
     {
-        $tld = explode('.', substr($this->getHost(), strlen($this->getHost()) - 8));
-        array_shift($tld);
+        $tld = explode( '.', substr( $this->getHost(), strlen( $this->getHost() ) - 8 ) );
+        array_shift( $tld );
 
-        return empty($tld)
+        return empty( $tld )
             ? null
-            : implode('.', $tld);
+            : implode( '.', $tld );
     }
 
     /**
@@ -301,38 +315,6 @@ class Url
     /**
      * @return string
      */
-    public function buildPath(): string
-    {
-        return $this->getPath();
-    }
-
-    /**
-     * @return string
-     */
-    public function buildQuery(): string
-    {
-        if ( $query = $this->getQuery() ) {
-            return '?' . $query;
-        }
-
-        return '';
-    }
-
-    /**
-     * @return string
-     */
-    public function buildFragment(): string
-    {
-        if ( $fragment = $this->getFragment() ) {
-            return '#' . $fragment;
-        }
-
-        return '';
-    }
-
-    /**
-     * @return string
-     */
     public function buildScheme(): string
     {
         if ( $scheme = $this->getScheme() ) {
@@ -340,6 +322,14 @@ class Url
         }
 
         return '';
+    }
+
+    /**
+     * @return string
+     */
+    public function getScheme(): string
+    {
+        return $this->url[ 'scheme' ];
     }
 
     /**
@@ -356,6 +346,22 @@ class Url
         }
 
         return '';
+    }
+
+    /**
+     * @return string
+     */
+    public function getUser(): string
+    {
+        return $this->url[ 'user' ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getPass(): string
+    {
+        return $this->url[ 'pass' ];
     }
 
     /**
@@ -381,57 +387,25 @@ class Url
     /**
      * @return string
      */
-    public function getPath(): string
-    {
-        return rtrim($this->getDir(), '/') . '/' . $this->getFile();
-    }
-
-    /**
-     * @return string
-     */
-    public function getQuery(): string
-    {
-        return http_build_query($this->url[ 'input' ]);
-    }
-
-    /**
-     * @return string
-     */
-    public function getFragment(): string
-    {
-        return $this->url[ 'fragment' ];
-    }
-
-    /**
-     * @return string
-     */
-    public function getScheme(): string
-    {
-        return $this->url[ 'scheme' ];
-    }
-
-    /**
-     * @return string
-     */
-    public function getUser(): string
-    {
-        return $this->url[ 'user' ];
-    }
-
-    /**
-     * @return string
-     */
-    public function getPass(): string
-    {
-        return $this->url[ 'pass' ];
-    }
-
-    /**
-     * @return string
-     */
     public function getPort(): String
     {
         return $this->url[ 'port' ];
+    }
+
+    /**
+     * @return string
+     */
+    public function buildPath(): string
+    {
+        return $this->getPath();
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath(): string
+    {
+        return rtrim( $this->getDir(), '/' ) . '/' . $this->getFile();
     }
 
     /**
@@ -448,5 +422,45 @@ class Url
     public function getFile(): string
     {
         return $this->url[ 'file' ];
+    }
+
+    /**
+     * @return string
+     */
+    public function buildQuery(): string
+    {
+        if ( $query = $this->getQuery() ) {
+            return '?' . $query;
+        }
+
+        return '';
+    }
+
+    /**
+     * @return string
+     */
+    public function getQuery(): string
+    {
+        return http_build_query( $this->url[ 'input' ] );
+    }
+
+    /**
+     * @return string
+     */
+    public function buildFragment(): string
+    {
+        if ( $fragment = $this->getFragment() ) {
+            return '#' . $fragment;
+        }
+
+        return '';
+    }
+
+    /**
+     * @return string
+     */
+    public function getFragment(): string
+    {
+        return $this->url[ 'fragment' ];
     }
 }

@@ -14,13 +14,14 @@ final class Arr
 {
     /**
      * @param array $args
+     *
      * @return array
      */
     public static function spreadArgs( array $args ): array
     {
-        if (isset($args[0])) {
-            if (is_array($args[0])) {
-                return $args[0];
+        if ( isset( $args[ 0 ] ) ) {
+            if ( is_array( $args[ 0 ] ) ) {
+                return $args[ 0 ];
             }
         }
 

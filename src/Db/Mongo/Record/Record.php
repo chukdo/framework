@@ -43,48 +43,41 @@ Class Record extends Json implements RecordInterface
 
     /**
      * Record constructor.
+     *
      * @param Collection $collection
      * @param null       $data
      */
     public function __construct( Collection $collection, $data = null )
     {
-        parent::__construct($data, false);
-        parent::__construct($this->filterRecursive(function( $k, $v )
-        {
-            return Collection::filterOut($k, $v);
-        }), false);
+        parent::__construct( $data, false );
+        parent::__construct( $this->filterRecursive( function( $k, $v ) {
+            return Collection::filterOut( $k, $v );
+        } ), false );
 
         $this->collection = $collection;
-        $this->id         = $this->offsetGet('_id');
+        $this->id         = $this->offsetGet( '_id' );
     }
 
     /**
      * @param MongoSession|null $session
+     *
      * @return Record
      * @throws Exception
      */
     public function delete( MongoSession $session = null ): RecordInterface
     {
         $write = $this->collection()->write()
-            ->setSession($session);
+            ->setSession( $session );
 
         if ( ( $id = $this->id() ) !== null ) {
-            $write->where('_id', '=', $id);
+            $write->where( '_id', '=', $id );
 
             $write->deleteOne();
 
             return $this;
         }
 
-        throw new MongoException('No ID to delete Record');
-    }
-
-    /**
-     * @return string|null
-     */
-    public function id(): ?string
-    {
-        return $this->id;
+        throw new MongoException( 'No ID to delete Record' );
     }
 
     /**
@@ -96,32 +89,41 @@ Class Record extends Json implements RecordInterface
     }
 
     /**
+     * @return string|null
+     */
+    public function id(): ?string
+    {
+        return $this->id;
+    }
+
+    /**
      * @param string            $collection
      * @param MongoSession|null $session
+     *
      * @return Record
      * @throws Exception
      */
     public function moveTo( string $collection, MongoSession $session = null ): RecordInterface
     {
         $write = $this->collection()->write()
-            ->setSession($session);
+            ->setSession( $session );
 
         if ( ( $id = $this->id() ) !== null ) {
-            $write->where('_id', '=', $id);
+            $write->where( '_id', '=', $id );
 
             $this->collection()
                 ->database()
-                ->collection($collection)
+                ->collection( $collection )
                 ->write()
-                ->setSession($session)
-                ->setAll($write->deleteOneAndGet())
-                ->set('date_archived', new DateTime())
+                ->setSession( $session )
+                ->setAll( $write->deleteOneAndGet() )
+                ->set( 'date_archived', new DateTime() )
                 ->insert();
 
             return $this;
         }
 
-        throw new MongoException('No ID to delete Record');
+        throw new MongoException( 'No ID to delete Record' );
     }
 
     /**
@@ -129,16 +131,16 @@ Class Record extends Json implements RecordInterface
      */
     public function record(): JsonInterface
     {
-        return $this->filterRecursive(function( $k, $v )
-        {
-            return !Is::RecordInterface($v)
+        return $this->filterRecursive( function( $k, $v ) {
+            return !Is::RecordInterface( $v )
                 ? $v
                 : null;
-        });
+        } );
     }
 
     /**
      * @param MongoSession|null $session
+     *
      * @return Record
      * @throws Exception
      */
@@ -146,36 +148,34 @@ Class Record extends Json implements RecordInterface
     {
         $insert = false;
         $write  = $this->collection()->write()
-            ->setSession($session)
-            ->setAll($this->record());
+            ->setSession( $session )
+            ->setAll( $this->record() );
 
         /** Option Auto Date */
         if ( $this->autoDateRecord ) {
-            $write->setOnInsert('date_created', new DateTime())
-                ->set('date_modified', new DateTime());
+            $write->setOnInsert( 'date_created', new DateTime() )
+                ->set( 'date_modified', new DateTime() );
         }
 
         /** Insert */
         if ( $this->id() === null ) {
             $insert   = true;
             $this->id = $write->insert();
-            $this->offsetSet('_id', $this->id());
-        }
-
-        /** Update */
+            $this->offsetSet( '_id', $this->id() );
+        } /** Update */
         else {
-            $write->where('_id', '=', $this->id())
+            $write->where( '_id', '=', $this->id() )
                 ->updateOne();
         }
 
         /** Option Versioning */
         if ( $this->versioningCollection ) {
-            $this->versionning($session, $insert
+            $this->versionning( $session, $insert
                 ? $this->record()
                 : $this->collection()
                     ->find()
-                    ->where('_id', '=', $this->id())
-                    ->one());
+                    ->where( '_id', '=', $this->id() )
+                    ->one() );
         }
 
         return $this;
@@ -184,6 +184,7 @@ Class Record extends Json implements RecordInterface
     /**
      * @param MongoSession|null $session
      * @param JsonInterface     $record
+     *
      * @return Record
      * @throws Exception
      */
@@ -192,16 +193,16 @@ Class Record extends Json implements RecordInterface
         $db = $this->collection()
             ->database();
 
-        if ( $session && $this->versioningCollection && !$db->collectionExist($this->versioningCollection) ) {
+        if ( $session && $this->versioningCollection && !$db->collectionExist( $this->versioningCollection ) ) {
             $session->abortTransaction();
-            throw new MongoException(sprintf('Aborting transaction, Versioning collection [%s] no exist', $this->versioningCollection));
+            throw new MongoException( sprintf( 'Aborting transaction, Versioning collection [%s] no exist', $this->versioningCollection ) );
         }
 
-        $db->collection($this->versioningCollection)
+        $db->collection( $this->versioningCollection )
             ->write()
-            ->setSession($session)
-            ->setAll($record)
-            ->set('date_versioning', new DateTime())
+            ->setSession( $session )
+            ->setAll( $record )
+            ->set( 'date_versioning', new DateTime() )
             ->insert();
 
         return $this;

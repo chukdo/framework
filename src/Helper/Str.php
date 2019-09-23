@@ -17,18 +17,19 @@ final class Str
 {
     /**
      * @param string $name
+     *
      * @return string
      */
     public static function extension( string $name ): string
     {
-        $name = strtolower($name);
-        $pos  = strrpos($name,
-            '.');
+        $name = strtolower( $name );
+        $pos  = strrpos( $name,
+            '.' );
 
         if ( $pos !== false ) {
-            return substr($name,
-                strrpos($name,
-                    '.') + 1);
+            return substr( $name,
+                strrpos( $name,
+                    '.' ) + 1 );
         }
 
         return $name;
@@ -36,14 +37,15 @@ final class Str
 
     /**
      * @param $value
+     *
      * @return string
      */
-    public static function type( $value): string
+    public static function type( $value ): string
     {
-        $type = gettype($value);
+        $type = gettype( $value );
 
-        if ($type == 'object') {
-            return get_class($value);
+        if ( $type == 'object' ) {
+            return get_class( $value );
         }
 
         return $type;
@@ -51,62 +53,69 @@ final class Str
 
     /**
      * Verifie si une chaine de caractere ne contient pas une autre chaine de caractere.
+     *
      * @param string|null $haystack La chaîne dans laquelle on doit chercher
      * @param string|null $needle   valeur recherché
+     *
      * @return bool
      */
     public static function notContain( ?string $haystack, ?string $needle ): bool
     {
-        return !self::contain($haystack,
-            $needle);
+        return !self::contain( $haystack,
+            $needle );
     }
 
     /**
      * Verifie si une chaine de caractere contient une autre chaine de caractere.
+     *
      * @param string|null $haystack La chaîne dans laquelle on doit chercher
      * @param string|null $needle   valeur recherché
+     *
      * @return bool
      */
     public static function contain( ?string $haystack, ?string $needle ): bool
     {
-        return strpos($haystack,
-            $needle) === false
+        return strpos( $haystack,
+            $needle ) === false
             ? false
             : true;
     }
 
     /**
      * @param string|null $haystack La chaîne dans laquelle on doit chercher
-     * @param string|null $needle le debut de chaine à verifier
+     * @param string|null $needle   le debut de chaine à verifier
+     *
      * @return bool
      */
-    public static function startWith(?string $haystack, ?string $needle): bool
+    public static function startWith( ?string $haystack, ?string $needle ): bool
     {
-        return substr($haystack, 0, strlen($needle)) == $needle;
+        return substr( $haystack, 0, strlen( $needle ) ) == $needle;
     }
 
     /**
      * @param string|null $haystack La chaîne dans laquelle on doit chercher
-     * @param string|null $needle la fin de chaine à verifier
+     * @param string|null $needle   la fin de chaine à verifier
+     *
      * @return bool
      */
-    public static function endWith(?string $haystack, ?string $needle): bool
+    public static function endWith( ?string $haystack, ?string $needle ): bool
     {
-        return substr($haystack, strlen($needle)) == $needle;
+        return substr( $haystack, strlen( $needle ) ) == $needle;
     }
 
     /**
      * @param string|null $delimiter
      * @param string|null $string
      * @param int|null    $length
+     *
      * @return array
      */
     public static function explode( ?string $delimiter, ?string $string, int $length = null ): array
     {
-        $explode = explode($delimiter, $string);
+        $explode = explode( $delimiter, $string );
 
         if ( $explode !== false ) {
-            if ( count($explode) == 1 ) {
+            if ( count( $explode ) == 1 ) {
                 if ( $explode[ 0 ] === "" ) {
                     $explode = [];
                 }
@@ -114,7 +123,7 @@ final class Str
         }
 
         if ( $length ) {
-            return array_pad($explode, $length, null);
+            return array_pad( $explode, $length, null );
         }
 
         return $explode;
@@ -122,18 +131,19 @@ final class Str
 
     /**
      * Retourne un caractere d'une chaine en fonction de sa position.
+     *
      * @param string $string
      * @param int    $index
+     *
      * @return string
      */
     public static function charAt( string $string, int $index ): string
     {
-        if ( $index < strlen($string) ) {
-            return substr($string,
+        if ( $index < strlen( $string ) ) {
+            return substr( $string,
                 $index,
-                1);
-        }
-        else {
+                1 );
+        } else {
             return -1;
         }
     }
@@ -141,30 +151,31 @@ final class Str
     /**
      * @param string $pattern
      * @param string $value
+     *
      * @return Json
      */
     public static function matchAll( string $pattern, string $value ): JsonInterface
     {
         $match   = new Json();
         $matches = [];
-        preg_match_all($pattern,
+        preg_match_all( $pattern,
             $value,
             $matches,
-            PREG_SET_ORDER);
+            PREG_SET_ORDER );
 
         foreach ( $matches as $k => $array ) {
-            switch ( count($array) ) {
+            switch ( count( $array ) ) {
                 case 0:
                     break;
                 case 1:
-                    $match->append($array[ 0 ]);
+                    $match->append( $array[ 0 ] );
                     break;
                 case 2:
-                    $match->append($array[ 1 ]);
+                    $match->append( $array[ 1 ] );
                     break;
                 default:
-                    array_shift($array);
-                    $match->append($array);
+                    array_shift( $array );
+                    $match->append( $array );
             }
         }
 
@@ -174,16 +185,17 @@ final class Str
     /**
      * @param string $pattern
      * @param string $value
+     *
      * @return Json|string|null
      */
     public static function match( string $pattern, string $value )
     {
         $match = [];
-        preg_match($pattern,
+        preg_match( $pattern,
             $value,
-            $match);
+            $match );
 
-        switch ( count($match) ) {
+        switch ( count( $match ) ) {
             case 0:
                 return null;
             case 1:
@@ -191,9 +203,9 @@ final class Str
             case 2:
                 return $match[ 1 ];
             default:
-                array_shift($match);
+                array_shift( $match );
 
-                return new Json($match);
+                return new Json( $match );
         }
     }
 
@@ -202,16 +214,17 @@ final class Str
      * @param string   $delimiter
      * @param int|null $pad
      * @param null     $padValue
+     *
      * @return array
      */
     public static function split( string $value, string $delimiter, int $pad = null, $padValue = null ): array
     {
-        $split = explode($delimiter, $value);
+        $split = explode( $delimiter, $value );
 
         if ( $pad ) {
-            $split = array_pad($split,
+            $split = array_pad( $split,
                 $pad,
-                $padValue);
+                $padValue );
         }
 
         return $split;
@@ -220,103 +233,105 @@ final class Str
     /**
      * @param array  $value
      * @param string $glue
+     *
      * @return string
      */
     public static function join( array $value, string $glue ): string
     {
-        return implode($glue, $value);
+        return implode( $glue, $value );
     }
 
     /**
      * @param int|null $time
+     *
      * @return string
      */
     public static function time( int $time = null ): string
     {
         if ( $time < 0.1 ) {
-            return round($time * 1000, 3) . ' Micro-secondes';
-        }
-        elseif ( $time < 1 ) {
-            return round($time * 1000, 3) . ' Milli-secondes';
-        }
-        elseif ( $time ) {
-            return round($time, 3) . ' Secondes';
-        }
-        else {
+            return round( $time * 1000, 3 ) . ' Micro-secondes';
+        } else if ( $time < 1 ) {
+            return round( $time * 1000, 3 ) . ' Milli-secondes';
+        } else if ( $time ) {
+            return round( $time, 3 ) . ' Secondes';
+        } else {
             return '0';
         }
     }
 
     /**
      * @param int $mem
+     *
      * @return string
      */
     public static function memory( int $mem = null ): string
     {
         if ( $mem < 1024 ) {
             return $mem . ' Octets';
-        }
-        elseif ( $mem < 1048576 ) {
-            return round($mem / 1024, 2) . ' Kilo-octets';
-        }
-        elseif ( $mem ) {
-            return round($mem / 1048576, 2) . ' Mega-octets';
-        }
-        else {
+        } else if ( $mem < 1048576 ) {
+            return round( $mem / 1024, 2 ) . ' Kilo-octets';
+        } else if ( $mem ) {
+            return round( $mem / 1048576, 2 ) . ' Mega-octets';
+        } else {
             return '0';
         }
     }
 
     /**
      * @param string|null $prefix
+     *
      * @return string
      */
     public static function uid( string $prefix = null ): string
     {
-        return $prefix . md5(uniqid(rand(), true));
+        return $prefix . md5( uniqid( rand(), true ) );
     }
 
     /**
      * @param string $value
+     *
      * @return string
      */
     public static function stripSpaceBetweenTag( string $value ): string
     {
-        return self::trim(preg_replace('/>[\s|\t|\r|\n]+</', '><', $value));
+        return self::trim( preg_replace( '/>[\s|\t|\r|\n]+</', '><', $value ) );
     }
 
     /**
      * @param string $value
+     *
      * @return string
      */
     public static function trim( string $value ): string
     {
-        $value = self::replace('/\n|\r|\t/', ' ', $value);
-        $value = self::replace('/\s{2,}/', ' ', $value);
+        $value = self::replace( '/\n|\r|\t/', ' ', $value );
+        $value = self::replace( '/\s{2,}/', ' ', $value );
 
-        return trim($value);
+        return trim( $value );
     }
 
     /**
      * @param        $pattern
      * @param        $replacement
      * @param string $value
+     *
      * @return string
      */
     public static function replace( $pattern, $replacement, string $value ): string
     {
-        return preg_replace($pattern, $replacement, $value);
+        return preg_replace( $pattern, $replacement, $value );
     }
 
     /**
      * @param string $value
      * @param int    $len
+     *
      * @return string
      */
     public static function ellipsis( string $value, int $len ): string
     {
-        if ( strlen($value) > $len ) {
-            return substr($value, 0, $len) . '...';
+        if ( strlen( $value ) > $len ) {
+            return substr( $value, 0, $len ) . '...';
         }
 
         return $value;
@@ -324,33 +339,36 @@ final class Str
 
     /**
      * @param string $value
+     *
      * @return string
      */
     public static function allDigit( string $value ): string
     {
-        return self::replace('/[^\d]/u', '', $value);
+        return self::replace( '/[^\d]/u', '', $value );
     }
 
     /**
      * @param string $value
+     *
      * @return string
      */
     public static function allText( string $value ): string
     {
-        $text = trim(strtolower(self::replace('/[^[:alnum:]]/u',
+        $text = trim( strtolower( self::replace( '/[^[:alnum:]]/u',
             ' ',
-            self::removeSpecialChars(self::stripTag($value)))));
+            self::removeSpecialChars( self::stripTag( $value ) ) ) ) );
 
         return $text;
     }
 
     /**
      * @param string $value
+     *
      * @return string
      */
     public static function removeSpecialChars( string $value ): string
     {
-        return self::replace([
+        return self::replace( [
             '/[éèêë]/iu',
             '/[àäâ]/iu',
             '/[ùüû]/iu',
@@ -372,44 +390,47 @@ final class Str
                 '.',
                 'oe',
             ],
-            self::trim($value));
+            self::trim( $value ) );
     }
 
     /**
      * @param string $value
      * @param string $tag
      * @param string $replacement
+     *
      * @return string
      */
     public static function stripTag( string $value, string $tag = null, string $replacement = null ): string
     {
-        return self::replace('/<\/?\s*' . $tag . '[^>]*>/',
+        return self::replace( '/<\/?\s*' . $tag . '[^>]*>/',
             $replacement
                 ?: ' ',
-            $value);
+            $value );
     }
 
     /**
      * @param string $value
+     *
      * @return string
      */
     public static function allSentence( string $value ): string
     {
-        $text = trim(strtolower(self::replace('/[^[:alnum:]_;:\., ]/u',
+        $text = trim( strtolower( self::replace( '/[^[:alnum:]_;:\., ]/u',
             ' ',
-            self::removeSpecialChars(self::stripTag($value)))));
+            self::removeSpecialChars( self::stripTag( $value ) ) ) ) );
 
         return $text;
     }
 
     /**
      * @param string $value
+     *
      * @return string
      */
     public static function removeWhiteSpace( string $value ): string
     {
-        return self::replace('/ /',
+        return self::replace( '/ /',
             '',
-            $value);
+            $value );
     }
 }

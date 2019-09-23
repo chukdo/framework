@@ -34,6 +34,7 @@ class FileValidate implements ValidateInterface
 
     /**
      * @param array $attributes
+     *
      * @return self
      */
     public function attributes( array $attributes ): ValidateInterface
@@ -41,26 +42,26 @@ class FileValidate implements ValidateInterface
         foreach ( $attributes as $attr ) {
             if ( (string) (int) $attr === $attr ) {
                 $this->maxFileSize = 1024 * 1024 * (int) $attr;
-            }
-            else {
+            } else {
                 $this->allowedMimeTypes .= $attr . ',';
             }
         }
 
-        $this->allowedMimeTypes = trim($this->allowedMimeTypes, ',');
+        $this->allowedMimeTypes = trim( $this->allowedMimeTypes, ',' );
 
         return $this;
     }
 
     /**
      * @param $input
+     *
      * @return bool
      */
     public function validate( $input ): bool
     {
         if ( $input instanceof FileUploaded ) {
-            $input->setAllowedMimeTypes($this->allowedMimeTypes);
-            $input->setMaxFileSize($this->maxFileSize);
+            $input->setAllowedMimeTypes( $this->allowedMimeTypes );
+            $input->setMaxFileSize( $this->maxFileSize );
 
             return $input->isValid();
         }

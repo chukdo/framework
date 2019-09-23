@@ -2,6 +2,8 @@
 
 namespace Chukdo\Json;
 
+use Iterator;
+
 /**
  * Manipulation des tableaux.
  * @version      1.0.0
@@ -9,7 +11,7 @@ namespace Chukdo\Json;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class Arr implements \Iterator
+class Arr implements Iterator
 {
     /**
      * @var array
@@ -23,11 +25,12 @@ class Arr implements \Iterator
 
     /**
      * Arr constructor.
+     *
      * @param array $arr
      */
     public function __construct( array $arr = [] )
     {
-        $this->arr = array_values($arr);
+        $this->arr = array_values( $arr );
     }
 
     /**
@@ -56,7 +59,7 @@ class Arr implements \Iterator
      */
     public function valid(): bool
     {
-        return isset($this->arr[ $this->offset ]);
+        return isset( $this->arr[ $this->offset ] );
     }
 
     /**
@@ -64,7 +67,7 @@ class Arr implements \Iterator
      */
     public function count(): int
     {
-        return count($this->arr);
+        return count( $this->arr );
     }
 
     /**
@@ -72,17 +75,18 @@ class Arr implements \Iterator
      */
     public function empty(): bool
     {
-        return count($this->arr) === 0;
+        return count( $this->arr ) === 0;
     }
 
     /**
      * @param iterable $merge
+     *
      * @return Arr
      */
     public function merge( Iterable $merge ): self
     {
         foreach ( $merge as $append ) {
-            $this->append($append);
+            $this->append( $append );
         }
 
         return $this;
@@ -90,6 +94,7 @@ class Arr implements \Iterator
 
     /**
      * @param $append
+     *
      * @return Arr
      */
     public function append( $append ): self
@@ -101,12 +106,13 @@ class Arr implements \Iterator
 
     /**
      * @param string $glue
+     *
      * @return string
      */
     public function join( string $glue ): string
     {
-        return implode($glue,
-            $this->arr);
+        return implode( $glue,
+            $this->arr );
     }
 
     /**
@@ -114,7 +120,7 @@ class Arr implements \Iterator
      */
     public function getFirst()
     {
-        $first = reset($this->arr);
+        $first = reset( $this->arr );
 
         return $first
             ?: null;
@@ -125,7 +131,7 @@ class Arr implements \Iterator
      */
     public function getLast()
     {
-        $end = end($this->arr);
+        $end = end( $this->arr );
 
         return $end
             ?: null;
@@ -138,7 +144,7 @@ class Arr implements \Iterator
     {
         $this->rewind();
 
-        return array_shift($this->arr);
+        return array_shift( $this->arr );
     }
 
     public function rewind(): void
@@ -153,7 +159,7 @@ class Arr implements \Iterator
     {
         $this->rewind();
 
-        return array_pop($this->arr);
+        return array_pop( $this->arr );
     }
 
     /**
@@ -165,7 +171,7 @@ class Arr implements \Iterator
         $next   = $this->getNext();
 
         if ( $next !== null ) {
-            unset($this->arr[ $offset ]);
+            unset( $this->arr[ $offset ] );
 
             return $next;
         }
@@ -178,7 +184,7 @@ class Arr implements \Iterator
      */
     public function getNext()
     {
-        if ( isset($this->arr[ $this->offset ]) ) {
+        if ( isset( $this->arr[ $this->offset ] ) ) {
             return $this->arr[ $this->offset++ ];
         }
 

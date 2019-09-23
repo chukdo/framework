@@ -48,28 +48,31 @@ class View
 
     /**
      * View constructor.
+     *
      * @param string|null   $folder
      * @param Response|null $response
      */
     public function __construct( string $folder = null, Response $response = null )
     {
-        $this->setDefaultFolder($folder);
-        $this->setResponseHandler($response);
+        $this->setDefaultFolder( $folder );
+        $this->setResponseHandler( $response );
     }
 
     /**
      * @param string|null $folder
+     *
      * @return View
      */
     public function setDefaultFolder( string $folder = null ): self
     {
-        $this->defaultFolder = rtrim($folder, '/');
+        $this->defaultFolder = rtrim( $folder, '/' );
 
         return $this;
     }
 
     /**
      * @param Response|null $response
+     *
      * @return View
      */
     public function setResponseHandler( Response $response = null ): self
@@ -98,33 +101,36 @@ class View
     /**
      * @param string $name
      * @param string $folder
+     *
      * @return View
      */
     public function addFolder( string $name, string $folder ): self
     {
-        $this->folders[ $name ] = rtrim($folder, '/');
+        $this->folders[ $name ] = rtrim( $folder, '/' );
 
         return $this;
     }
 
     /**
      * @param string $template
+     *
      * @return bool
      */
     public function exists( string $template ): bool
     {
-        return $this->path($template)[ 'exists' ];
+        return $this->path( $template )[ 'exists' ];
     }
 
     /**
      * @param string $template
+     *
      * @return array|null
      */
     public function path( string $template ): ?array
     {
-        list($folder, $name) = Str::split($template,
+        list( $folder, $name ) = Str::split( $template,
             '::',
-            2);
+            2 );
 
         $r = [
             'folder' => null,
@@ -137,17 +143,16 @@ class View
             $r[ 'folder' ] = $folder;
             $r[ 'name' ]   = $name;
 
-            if ( isset($this->folders[ $folder ]) ) {
+            if ( isset( $this->folders[ $folder ] ) ) {
                 $r[ 'file' ]   = $this->folders[ $folder ] . '/' . $name . '.html';
-                $r[ 'exists' ] = file_exists($r[ 'file' ]);
+                $r[ 'exists' ] = file_exists( $r[ 'file' ] );
             }
-        }
-        else {
+        } else {
             $r[ 'name' ] = $folder;
 
             if ( $this->defaultFolder ) {
                 $r[ 'file' ]   = $this->defaultFolder . '/' . $folder . '.html';
-                $r[ 'exists' ] = file_exists($r[ 'file' ]);
+                $r[ 'exists' ] = file_exists( $r[ 'file' ] );
             }
         }
 
@@ -157,14 +162,14 @@ class View
     /**
      * @param iterable          $data
      * @param array|string|null $templates
+     *
      * @return View
      */
     public function addData( Iterable $data, $templates = null ): self
     {
         if ( $templates == null ) {
             $this->sharedData = $data;
-        }
-        else {
+        } else {
             foreach ( (array) $templates as $template ) {
                 $this->sharedTemplateData[ $template ] = $data;
             }
@@ -175,28 +180,28 @@ class View
 
     /**
      * @param string|null $template
+     *
      * @return iterable|null
      */
     public function getData( string $template = null ): ?iterable
     {
         if ( $template == null ) {
             return $this->sharedData;
-        }
-        elseif ( isset($this->sharedTemplateData[ $template ]) ) {
+        } else if ( isset( $this->sharedTemplateData[ $template ] ) ) {
             return $this->sharedTemplateData[ $template ];
-        }
-        else {
+        } else {
             return null;
         }
     }
 
     /**
      * @param Functions $functions
+     *
      * @return View
      */
     public function loadFunction( Functions $functions ): self
     {
-        $functions->register($this);
+        $functions->register( $this );
 
         return $this;
     }
@@ -204,6 +209,7 @@ class View
     /**
      * @param string  $name
      * @param Closure $closure
+     *
      * @return View
      */
     public function registerFunction( string $name, Closure $closure ): self
@@ -223,55 +229,60 @@ class View
 
     /**
      * @param string $function
+     *
      * @return Closure
      */
     public function callRegisteredFunction( string $function ): Closure
     {
-        if ( $this->isRegisteredFunction($function) ) {
+        if ( $this->isRegisteredFunction( $function ) ) {
             return $this->functions[ $function ];
         }
 
-        throw new ViewException(sprintf('Method [%s] is not a template registered function',
-            $function));
+        throw new ViewException( sprintf( 'Method [%s] is not a template registered function',
+            $function ) );
     }
 
     /**
      * @param string $function
+     *
      * @return bool
      */
     public function isRegisteredFunction( string $function ): bool
     {
-        return isset($this->functions[ $function ]);
+        return isset( $this->functions[ $function ] );
     }
 
     /**
      * @param string        $template
      * @param iterable|null $data
+     *
      * @return string
      */
     public function renderToString( string $template, iterable $data = null ): string
     {
-        return (string) $this->make($template, $data);
+        return (string) $this->make( $template, $data );
     }
 
     /**
      * @param string        $template
      * @param iterable|null $data
-     * @return Response
-     */
-    public function render( string $template, iterable $data = null ) : Response
-    {
-        return $this->make($template, $data)
-            ->render();
-    }
-
-    /**
-     * @param string        $template
-     * @param iterable|null $data
+     *
      * @return Template
      */
     public function make( string $template, iterable $data = null ): Template
     {
-        return new Template($template, $data, $this);
+        return new Template( $template, $data, $this );
+    }
+
+    /**
+     * @param string        $template
+     * @param iterable|null $data
+     *
+     * @return Response
+     */
+    public function render( string $template, iterable $data = null ): Response
+    {
+        return $this->make( $template, $data )
+            ->render();
     }
 }

@@ -2,10 +2,12 @@
 
 namespace Chukdo\Middleware;
 
+use Chukdo\Bootstrap\ServiceException;
 use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
 use Chukdo\Contracts\Middleware\Middleware as MiddlewareInterface;
 use Chukdo\Http\Response;
 use Closure;
+use ReflectionException;
 
 class ValidatorMiddleware implements MiddlewareInterface
 {
@@ -21,6 +23,7 @@ class ValidatorMiddleware implements MiddlewareInterface
 
     /**
      * ValidatorMiddleware constructor.
+     *
      * @param array                         $validators
      * @param ErrorMiddlewareInterface|null $errorMiddleware
      */
@@ -34,22 +37,23 @@ class ValidatorMiddleware implements MiddlewareInterface
 
     /**
      * @param Dispatcher $dispatcher
+     *
      * @return Response
-     * @throws \Chukdo\Bootstrap\ServiceException
-     * @throws \ReflectionException
+     * @throws ServiceException
+     * @throws ReflectionException
      */
     public function process( Dispatcher $dispatcher ): Response
     {
         $validate = $dispatcher->request()
-            ->validate($this->validators);
+            ->validate( $this->validators );
 
         if ( $validate->fails() ) {
             return ( $this->errorMiddleware
-                ?: new ErrorMiddleware() )->errorMessage($validate->errors())
-                ->process($dispatcher);
+                ?: new ErrorMiddleware() )->errorMessage( $validate->errors() )
+                ->process( $dispatcher );
         }
 
-        $dispatcher->attribute('inputs', $validate->validated());
+        $dispatcher->attribute( 'inputs', $validate->validated() );
 
         return $dispatcher->handle();
     }

@@ -15,6 +15,7 @@ interface ErrorMiddleware extends Middleware
 {
     /**
      * @param Message $errors
+     *
      * @return ErrorMiddleware
      */
     public function errorMessage( Message $errors ): self;
