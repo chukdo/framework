@@ -80,6 +80,14 @@ Class Collection implements CollectionInterface
     }
 
     /**
+     * @return string
+     */
+    public function id(): string
+    {
+        return sha1( uniqid( '', true ) );
+    }
+
+    /**
      * @param $data
      *
      * @return RecordInterface
@@ -110,10 +118,11 @@ Class Collection implements CollectionInterface
     /**
      * @param string      $collection
      * @param string|null $database
+     * @param Schema|null $schema
      *
-     * @return bool
+     * @return Collection
      */
-    public function rename( string $collection, string $database = null ): bool
+    public function rename( string $collection, string $database = null, Schema $schema = null ): Collection
     {
         $database = $database
             ?: $this->database()
@@ -122,26 +131,28 @@ Class Collection implements CollectionInterface
         $newCollection = $this->database()
                               ->server()
                               ->database( $database )
+                              ->dropCollection( $collection )
                               ->createCollection( $collection );
 
         $newCollection->client()
                       ->indices()
                       ->putMapping( [
                           'index' => $newCollection->fullName(),
-                          'body'  => $this->schema()
-                                          ->toArray(),
+                          'body'  => $schema
+                              ? $schema->toArray()
+                              : $this->schema()
+                                     ->toArray(),
                       ] );
-
-        try {
-            $this->client()
-                 ->reindex( [ 'body' => [
+        $this->client()
+             ->reindex( [
+                 'body' => [
                      'source' => [ 'index' => $this->fullName() ],
                      'dest'   => [ 'index' => $newCollection->fullName() ],
-                 ] ] );
-            $this->drop();
-        } catch ( Exception $e ) {
-            return false;
-        }
+                 ],
+             ] );
+        $this->drop();
+
+        return $newCollection;
     }
 
     /**

@@ -2,9 +2,9 @@
 
 namespace Chukdo\Db\Elastic;
 
-use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\Contracts\Db\Write as WriteInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
 
 /**
@@ -14,10 +14,10 @@ use Chukdo\Json\Json;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Write implements WriteInterface
+Class Write extends Where implements WriteInterface
 {
     /**
-     * @var CollectionInterface
+     * @var Collection
      */
     protected $collection;
 
@@ -29,9 +29,9 @@ Class Write implements WriteInterface
     /**
      * Write constructor.
      *
-     * @param CollectionInterface $collection
+     * @param Collection $collection
      */
-    public function __construct( CollectionInterface $collection )
+    public function __construct( Collection $collection )
     {
         $this->fields     = new Json();
         $this->collection = $collection;
@@ -40,37 +40,32 @@ Class Write implements WriteInterface
     /**
      * @return Collection
      */
-    public function collection(): CollectionInterface
+    public function collection(): Collection
     {
         return $this->collection;
     }
 
     /**
-     * @param string $field
-     * @param string $operator
-     * @param        $value
-     * @param null   $value2
-     *
-     * @return $this
+     * @return JsonInterface
      */
-    public function where( string $field, string $operator, $value, $value2 = null );
-
-    /**
-     * @param string $field
-     * @param string $operator
-     * @param        $value
-     * @param null   $value2
-     *
-     * @return $this
-     */
-    public function orWhere( string $field, string $operator, $value, $value2 = null );
+    public function fields(): JsonInterface
+    {
+        return $this->fields;
+    }
 
     /**
      * @param iterable $values
      *
      * @return Write
      */
-    public function setAll( iterable $values );
+    public function setAll( iterable $values )
+    {
+        foreach ( $values as $field => $value ) {
+            $this->set( $field, $value );
+        }
+
+        return $this;
+    }
 
     /**
      * @param string $field
@@ -78,47 +73,136 @@ Class Write implements WriteInterface
      *
      * @return Write
      */
-    public function set( string $field, $value );
+    public function set( string $field, $value )
+    {
+        $this->fields->offsetSet( $field, $this->filterValues( $field, $value ) );
+
+        return $this;
+    }
+
+    /**
+     * @param $field
+     * @param $value
+     *
+     * @return array|mixed
+     */
+    protected function filterValues( $field, $value )
+    {
+        if ( Is::iterable( $value ) ) {
+            $values = [];
+
+            foreach ( $value as $k => $v ) {
+                $values[ $k ] = $this->filterValues( $k, $v );
+            }
+
+            $value = $values;
+        } else {
+            $value = Collection::filterIn( $field, $value );
+        }
+
+        return $value;
+    }
 
     /**
      * @return int
      */
-    public function delete(): int;
+    public function delete(): int
+    {
+        $command = $this->collection()
+                        ->client()
+                        ->deleteByQuery( [
+                            'index' => $this->collection()
+                                            ->fullName(),
+                            'body'  => [
+                                'query' => [
+                                    'bool' => $this->filter(),
+                                ],
+                            ],
+                        ] );
+
+        return (int) $command[ 'deleted' ];
+    }
 
     /**
      * @return bool
      */
-    public function deleteOne(): bool;
+    public function deleteOne(): bool
+    {
+        $command = $this->collection()
+                        ->client()
+                        ->deleteByQuery( [
+                            'index'    => $this->collection()
+                                               ->fullName(),
+                            'body'     => [
+                                'query' => [
+                                    'bool' => $this->filter(),
+                                ],
+                            ],
+                            'size' => 1,
+                        ] );
+
+        return $command[ 'deleted' ] == 1;
+    }
 
     /**
      * @return JsonInterface
      */
-    public function deleteOneAndGet(): JsonInterface;
+    public function deleteOneAndGet(): JsonInterface
+    {
+
+    }
 
     /**
      * @return int
      */
-    public function update(): int;
+    public function update(): int
+    {
+
+    }
 
     /**
      * @return bool
      */
-    public function updateOne(): bool;
+    public function updateOne(): bool
+    {
+
+    }
 
     /**
      * @param bool $before
      *
      * @return JsonInterface
      */
-    public function updateOneAndGet( bool $before = false ): JsonInterface;
+    public function updateOneAndGet( bool $before = false ): JsonInterface
+    {
+
+    }
 
     /**
      * @return string|null
      */
-    public function updateOrInsert(): ?string;
+    public function updateOrInsert(): ?string
+    {
+
+    }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function insert(): ?string;
+    public function insert(): string
+    {
+        $id = $this->collection()
+                   ->id();
+        $this->collection()
+             ->client()
+             ->index( [
+                 'index' => $this->collection()
+                                 ->fullName(),
+                 'id'    => $id,
+                 'body'  => $this->fields()
+                                 ->toArray(),
+             ] );
+
+        return $id;
+    }
 }

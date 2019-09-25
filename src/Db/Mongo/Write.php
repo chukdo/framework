@@ -2,7 +2,6 @@
 
 namespace Chukdo\Db\Mongo;
 
-use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\Contracts\Db\Write as WriteInterface;
 use Chukdo\Db\Mongo\Schema\Validator;
 use Chukdo\Helper\Is;
@@ -22,7 +21,7 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
 Class Write extends Where implements WriteInterface
 {
     /**
-     * @var CollectionInterface
+     * @var Collection
      */
     protected $collection;
 
@@ -38,11 +37,11 @@ Class Write extends Where implements WriteInterface
 
 
     /**
-     * Where constructor.
+     * Write constructor.
      *
-     * @param CollectionInterface $collection
+     * @param $collection
      */
-    public function __construct( CollectionInterface $collection )
+    public function __construct( Collection $collection )
     {
         $this->fields     = new Json();
         $this->collection = $collection;
@@ -167,9 +166,9 @@ Class Write extends Where implements WriteInterface
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function insert(): ?string
+    public function insert(): string
     {
         return (string) $this->collection()
                              ->client()
@@ -224,13 +223,25 @@ Class Write extends Where implements WriteInterface
      */
     protected function field( string $keyword, string $field, $value ): self
     {
-        $keyword = '$' . $keyword;
+        $this->fields->offsetGetOrSet( '$' . $keyword )
+                     ->offsetSet( $field, $this->filterValues( $field, $value ) );
 
+        return $this;
+    }
+
+    /**
+     * @param $field
+     * @param $value
+     *
+     * @return array|mixed
+     */
+    protected function filterValues( $field, $value )
+    {
         if ( Is::iterable( $value ) ) {
             $values = [];
 
             foreach ( $value as $k => $v ) {
-                $values[ $k ] = Collection::filterIn( $k, $v );
+                $values[ $k ] = $this->filterValues( $k, $v );
             }
 
             $value = $values;
@@ -238,10 +249,7 @@ Class Write extends Where implements WriteInterface
             $value = Collection::filterIn( $field, $value );
         }
 
-        $this->fields->offsetGetOrSet( $keyword )
-                     ->offsetSet( $field, $value );
-
-        return $this;
+        return $value;
     }
 
     /**

@@ -67,7 +67,7 @@ interface Database
     /**
      * @param string $collection
      *
-     * @return bool
+     * @return mixed
      */
-    public function dropCollection( string $collection ): bool;
+    public function dropCollection( string $collection );
 }

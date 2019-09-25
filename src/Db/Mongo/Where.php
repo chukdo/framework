@@ -72,11 +72,13 @@ Class Where
                     '$gt' => Collection::filterIn( $field, $value ),
                     '$lt' => Collection::filterIn( $field, $value2 ),
                 ];
+                break;
             case '<=>' :
                 return [
                     '$gte' => Collection::filterIn( $field, $value ),
                     '$lte' => Collection::filterIn( $field, $value2 ),
                 ];
+                break;
             case 'in':
                 $in = [];
 
@@ -105,10 +107,13 @@ Class Where
                         $value2,
                     ],
                 ];
+                break;
             case 'size':
                 return [ '$size' => $value ];
+                break;
             case 'exist':
                 return [ '$exists' => $value ];
+                break;
             case 'regex':
                 return [
                     '$regex' => new Regex( $value, $value2

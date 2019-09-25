@@ -30,11 +30,6 @@ use Exception;
 Class Collection implements CollectionInterface
 {
     /**
-     * @var Server
-     */
-    protected $server;
-
-    /**
      * @var Database
      */
     protected $database;
@@ -54,7 +49,7 @@ Class Collection implements CollectionInterface
     {
         $this->database = $database;
         $this->client   = new MongoDbCollection( $database->server()
-            ->client(), $database->name(), $collection );
+                                                          ->client(), $database->name(), $collection );
     }
 
     /**
@@ -97,6 +92,14 @@ Class Collection implements CollectionInterface
     }
 
     /**
+     * @return ObjectId
+     */
+    public function id(): ObjectId
+    {
+        return new ObjectId();
+    }
+
+    /**
      * @param $data
      *
      * @return RecordInterface
@@ -122,7 +125,7 @@ Class Collection implements CollectionInterface
     public function name(): string
     {
         return $this->client()
-            ->getCollectionName();
+                    ->getCollectionName();
     }
 
     /**
@@ -137,23 +140,33 @@ Class Collection implements CollectionInterface
      * @param string      $collection
      * @param string|null $database
      *
-     * @return bool
+     * @return $this
      */
-    public function rename( string $collection, string $database = null ): bool
+    public function rename( string $collection, string $database = null ): self
     {
-        $old = $this->database()
-                ->name() . '.' . $this->name();
-        $new = $database
-            ?: $this->database()
-                ->name() . '.' . $collection;
+        $oldDatabase   = $this->database()
+                              ->name();
+        $oldCollection = $this->name();
+        $old           = $oldDatabase . '.' . $oldCollection;
+        $newDatabase   = $database
+            ?: $oldDatabase;
+        $newCollection = $collection;
+        $new           = $newDatabase . '.' . $newCollection;
+        $command       = $this->database()
+                              ->server()
+                              ->command( [
+                                  'renameCollection' => $old,
+                                  'to'               => $new,
+                              ] );
 
-        return $this->database()
-                ->server()
-                ->command( [
-                    'renameCollection' => $old,
-                    'to'               => $new,
-                ] )
-                ->offsetGet( 'ok' ) == 1;
+        if ( $command->offsetGet( 'ok' ) == 1 ) {
+            return $this->database()
+                        ->server()
+                        ->database( $newDatabase )
+                        ->collection( $newCollection );
+        }
+
+        throw new MongoException( sprintf( 'Impossible de renommer la collection [%s] vers [%s]', $old, $new ) );
     }
 
     /**
@@ -170,7 +183,7 @@ Class Collection implements CollectionInterface
     public function drop(): bool
     {
         $drop = $this->client()
-            ->drop();
+                     ->drop();
 
         return $drop[ 'ok' ] == 1;
     }
@@ -189,18 +202,18 @@ Class Collection implements CollectionInterface
     public function info(): JsonInterface
     {
         $stats = $this->database()
-            ->server()
-            ->command( [ 'collStats' => $this->name() ], $this->database()
-                ->name() )
-            ->getIndex( 0, new Json() )
-            ->filter( function( $k, $v ) {
-                if ( is_scalar( $v ) ) {
-                    return $v;
-                }
+                      ->server()
+                      ->command( [ 'collStats' => $this->name() ], $this->database()
+                                                                        ->name() )
+                      ->getIndex( 0, new Json() )
+                      ->filter( function( $k, $v ) {
+                          if ( is_scalar( $v ) ) {
+                              return $v;
+                          }
 
-                return false;
-            } )
-            ->clean();
+                          return false;
+                      } )
+                      ->clean();
 
         return $stats;
     }

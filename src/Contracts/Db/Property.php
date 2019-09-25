@@ -38,6 +38,13 @@ interface Property
     public function set( string $name, string $type = null, array $options = [] );
 
     /**
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function unset( string $name );
+
+    /**
      * @return JsonInterface
      */
     public function properties(): JsonInterface;

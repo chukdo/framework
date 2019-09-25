@@ -96,6 +96,18 @@ class Schema implements SchemaInterface
     }
 
     /**
+     * @param string $name
+     *
+     * @return $this
+     */
+    public function unset( string $name ): self
+    {
+        $this->property()->unset($name);
+
+        return $this;
+    }
+
+    /**
      * @param string      $name
      * @param string|null $type
      * @param array       $options

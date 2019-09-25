@@ -42,9 +42,9 @@ interface Collection
      * @param string      $collection
      * @param string|null $database
      *
-     * @return bool
+     * @return mixed
      */
-    public function rename( string $collection, string $database = null ): bool;
+    public function rename( string $collection, string $database = null );
 
     /**
      * @return mixed
@@ -60,4 +60,9 @@ interface Collection
      * @return mixed
      */
     public function find();
+
+    /**
+     * @return mixed
+     */
+    public function id();
 }

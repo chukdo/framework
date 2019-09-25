@@ -2,7 +2,6 @@
 
 namespace Chukdo\Contracts\Db;
 
-use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
@@ -15,16 +14,9 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
 interface Write
 {
     /**
-     * Write constructor.
-     *
-     * @param Collection $collection
+     * @return mixed
      */
-    public function __construct( CollectionInterface $collection );
-
-    /**
-     * @return Collection
-     */
-    public function collection(): CollectionInterface;
+    public function collection();
 
     /**
      * @param string $field

@@ -89,14 +89,14 @@ Class Database implements DatabaseInterface
     /**
      * @param string $collection
      *
-     * @return bool
+     * @return $this
      */
-    public function dropCollection( string $collection ): bool
+    public function dropCollection( string $collection ): self
     {
-        $drop = $this->client()
+        $this->client()
             ->dropCollection( $collection );
 
-        return $drop[ 'ok' ] == 1;
+        return $this;
     }
 
     /**

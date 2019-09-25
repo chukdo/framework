@@ -197,8 +197,10 @@ class Property implements PropertyInterface
             $property->setType( $type );
         }
 
-        return $this->properties()
-            ->offsetGetOrSet( $name, $property );
+        $this->properties()
+            ->offsetSet( $name, $property );
+
+        return $property;
     }
 
     /**
@@ -235,7 +237,7 @@ class Property implements PropertyInterface
      *
      * @return $this
      */
-    public function unsetProperty( string $name ): self
+    public function unset( string $name ): self
     {
         $this->properties()
             ->offsetUnset( $name );
