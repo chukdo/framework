@@ -128,18 +128,20 @@ Class Write extends Where implements WriteInterface
      */
     public function deleteOne(): bool
     {
+        $query = [
+            'index' => $this->collection()
+                            ->fullName(),
+            'body'  => [
+                'query' => [
+                    'bool' => $this->filter(),
+                ],
+            ],
+            'size'  => 1,
+        ];
+
         $command = $this->collection()
                         ->client()
-                        ->deleteByQuery( [
-                            'index'    => $this->collection()
-                                               ->fullName(),
-                            'body'     => [
-                                'query' => [
-                                    'bool' => $this->filter(),
-                                ],
-                            ],
-                            'size' => 1,
-                        ] );
+                        ->deleteByQuery( $query );
 
         return $command[ 'deleted' ] == 1;
     }
@@ -149,7 +151,26 @@ Class Write extends Where implements WriteInterface
      */
     public function deleteOneAndGet(): JsonInterface
     {
+        $query = [
+            'index' => $this->collection()
+                            ->fullName(),
+            'body'  => [
+                'query' => [
+                    'bool' => $this->filter(),
+                ],
+            ],
+        ];
 
+        $json = new Json( $this->collection()
+                               ->client()
+                               ->search( $query ) );
+        $get  = $json->get( 'hits.hits.0._source', new Json() );
+
+        if ( $get->count() > 0 ) {
+            $this->deleteOne();
+        }
+
+        return $get;
     }
 
     /**
@@ -158,6 +179,36 @@ Class Write extends Where implements WriteInterface
     public function update(): int
     {
 
+    }
+
+    public function updateTest()
+    {
+        $query   = [
+            'index' => $this->collection()
+                            ->fullName(),
+            'body'  => [
+                'query'  => [
+                    'bool' => $this->filter(),
+                ],
+                'script' => [
+                    'source' => 'ctx._source.age="789";ctx._source.info.b.h=["1","cd"];ctx._source.info.b.g.add("15");ctx._source.z=params.uf',
+                    'params' => [
+                        'uf' => [
+                            'titi' => 'tutu',
+                            'bibi' => 'bubu'
+                        ]
+                    ]
+                ]
+            ],
+        ];
+
+        $command = $this->collection()
+                        ->client()
+                        ->updateByQuery( $query );
+
+        echo '<pre>';
+        print_r( $command );
+        exit;
     }
 
     /**
