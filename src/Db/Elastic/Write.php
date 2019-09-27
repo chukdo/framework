@@ -392,8 +392,7 @@ Class Write extends Where implements WriteInterface
 			],
 			'conflicts' => 'proceed',
 		];
-		echo '<pre>';
-		print_r( $query );
+
 		$command = $this->collection()
 						->client()
 						->updateByQuery( $query );
@@ -408,7 +407,19 @@ Class Write extends Where implements WriteInterface
 	 */
 	public function updateOneAndGet( bool $before = false ): JsonInterface
 	{
+		if ( $before ) {
+			$get = $this->getOne();
 
+			$this->updateOne();
+		} else {
+			$this->updateOne();
+
+			$get = $this->getOne();
+		}
+
+		// ne fonctionne pas !!!!
+
+		return $get;
 	}
 
 	/**
