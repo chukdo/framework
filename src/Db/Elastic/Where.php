@@ -11,206 +11,212 @@ namespace Chukdo\Db\Elastic;
  */
 Class Where
 {
-    /**
-     * @var array
-     */
-    protected $where = [];
+	/**
+	 * @var array
+	 */
+	protected $where = [];
 
-    /**
-     * @param string $field
-     * @param string $operator
-     * @param        $value
-     * @param null   $value2
-     *
-     * @return $this
-     */
-    public function where( string $field, string $operator, $value, $value2 = null ): self
-    {
-        $keyword = 'must';
+	/**
+	 * @param string $field
+	 * @param string $operator
+	 * @param null   $value
+	 * @param null   $value2
+	 *
+	 * @return $this
+	 */
+	public function where( string $field, string $operator, $value = null, $value2 = null ): self
+	{
+		$keyword = 'must';
 
-        switch ( $operator ) {
-            case '==' :
-                $keyword = 'filter';
-                break;
-            case '!==' :
-            case '!=' :
-            case '!in' :
-                $keyword = 'must_not';
-                break;
-        }
+		switch ( $operator ) {
+			case '==' :
+				$keyword = 'filter';
+				break;
+			case '!==' :
+			case '!=' :
+			case '!in' :
+			case '!exists' :
+				$keyword = 'must_not';
+				break;
+		}
 
-        $this->where = array_merge_recursive(
-            $this->where, [
-            $keyword => $this->subQuery( $field, $operator, $value, $value2 ),
-        ] );
+		if ( !isset( $this->where[ $keyword ] ) ) {
+			$this->where[ $keyword ] = [];
+		}
 
-        return $this;
-    }
+		$this->where[ $keyword ][] = $this->subQuery( $field, $operator, $value, $value2 );
 
-    /**
-     * @param string $field
-     * @param string $operator
-     * @param        $value
-     * @param null   $value2
-     *
-     * @return array
-     */
-    protected function subQuery( string $field, string $operator, $value, $value2 = null ): array
-    {
-        switch ( $operator ) {
-            case '==' :
-            case '!==' :
-            case '=' :
-            case '!=' :
-                return [
-                    'term' => [
-                        $field => Collection::filterIn( $field, $value ),
-                    ],
-                ];
-                break;
-            case '>' :
-                return [
-                    'range' => [
-                        $field => [
-                            'gt' => Collection::filterIn( $field, $value ),
-                        ],
-                    ],
-                ];
-                break;
-            case '>=':
-                return [
-                    'range' => [
-                        $field => [
-                            'gte' => Collection::filterIn( $field, $value ),
-                        ],
-                    ],
-                ];
-                break;
-            case '<':
-                return [
-                    'range' => [
-                        $field => [
-                            'lt' => Collection::filterIn( $field, $value ),
-                        ],
-                    ],
-                ];
-                break;
-            case '<=':
-                return [
-                    'range' => [
-                        $field => [
-                            'lte' => Collection::filterIn( $field, $value ),
-                        ],
-                    ],
-                ];
-                break;
-            case '<>' :
-                return [
-                    'range' => [
-                        $field => [
-                            'gt' => Collection::filterIn( $field, $value ),
-                            'lt' => Collection::filterIn( $field, $value ),
-                        ],
-                    ],
-                ];
-                break;
-            case '<=>' :
-                return [
-                    'range' => [
-                        $field => [
-                            'gte' => Collection::filterIn( $field, $value ),
-                            'lte' => Collection::filterIn( $field, $value ),
-                        ],
-                    ],
-                ];
-                break;
-            case 'in':
-            case '!in':
-                $in = [];
+		return $this;
+	}
 
-                foreach ( $value as $k => $v ) {
-                    $in[ $k ] = Collection::filterIn( $field, $v );
-                }
+	/**
+	 * @param string $field
+	 * @param string $operator
+	 * @param null   $value
+	 * @param null   $value2
+	 *
+	 * @return array
+	 */
+	protected function subQuery( string $field, string $operator, $value = null, $value2 = null ): array
+	{
+		switch ( $operator ) {
+			case '==' :
+			case '!==' :
+			case '=' :
+			case '!=' :
+				return [
+					'term' => [
+						$field => Collection::filterIn( $field, $value ),
+					],
+				];
+				break;
+			case '>' :
+				return [
+					'range' => [
+						$field => [
+							'gt' => Collection::filterIn( $field, $value ),
+						],
+					],
+				];
+				break;
+			case '>=':
+				return [
+					'range' => [
+						$field => [
+							'gte' => Collection::filterIn( $field, $value ),
+						],
+					],
+				];
+				break;
+			case '<':
+				return [
+					'range' => [
+						$field => [
+							'lt' => Collection::filterIn( $field, $value ),
+						],
+					],
+				];
+				break;
+			case '<=':
+				return [
+					'range' => [
+						$field => [
+							'lte' => Collection::filterIn( $field, $value ),
+						],
+					],
+				];
+				break;
+			case '<>' :
+				return [
+					'range' => [
+						$field => [
+							'gt' => Collection::filterIn( $field, $value ),
+							'lt' => Collection::filterIn( $field, $value ),
+						],
+					],
+				];
+				break;
+			case '<=>' :
+				return [
+					'range' => [
+						$field => [
+							'gte' => Collection::filterIn( $field, $value ),
+							'lte' => Collection::filterIn( $field, $value ),
+						],
+					],
+				];
+				break;
+			case 'in':
+			case '!in':
+				$in = [];
 
-                return [
-                    'terms' => [
-                        $field => $in,
-                    ],
-                ];
-                break;
-            case 'size':
-                return [
-                    '
+				foreach ( $value as $k => $v ) {
+					$in[ $k ] = Collection::filterIn( $field, $v );
+				}
+
+				return [
+					'terms' => [
+						$field => $in,
+					],
+				];
+				break;
+			case 'size':
+				return [
+					'
                 script' => [
-                        'script' => 'doc[\'' . $field . '\']values.size() = ' . $value,
-                    ],
-                ];
-                break;
-            case 'exist':
-                return [
-                    'exists' => [
-                        $field => $value,
-                    ],
-                ];
-                break;
-            case 'regex':
-                return [
-                    'regexp' => [
-                        $field => [
-                            'value' => $value,
-                            'flags' => $value2 ?: 'ALL',
-                        ],
-                    ],
-                ];
-                break;
-            case 'match':
-                return [
-                    'match' => [
-                        $field => $value,
-                    ],
-                ];
-                break;
-            default :
-                throw new ElasticException( sprintf( "Unknown operator [%s]", $operator ) );
-        }
-    }
+						'script' => 'doc[\'' . $field . '\']values.size() = ' . $value,
+					],
+				];
+				break;
+			case 'exists':
+			case '!exists':
+				return [
+					'exists' => [
+						'field' => $field,
+					],
+				];
+				break;
+			case 'regex':
+				return [
+					'regexp' => [
+						$field => [
+							'value' => $value,
+							'flags' => $value2
+								?: 'ALL',
+						],
+					],
+				];
+				break;
+			case 'match':
+				return [
+					'match' => [
+						$field => $value,
+					],
+				];
+				break;
+			default :
+				throw new ElasticException( sprintf( "Unknown operator [%s]", $operator ) );
+		}
+	}
 
-    /**
-     * @param string $field
-     * @param string $operator
-     * @param        $value
-     * @param null   $value2
-     *
-     * @return $this
-     */
-    public function orWhere( string $field, string $operator, $value, $value2 = null ): self
-    {
-        $keyword = 'should';
+	/**
+	 * @param string $field
+	 * @param string $operator
+	 * @param null   $value
+	 * @param null   $value2
+	 *
+	 * @return $this
+	 */
+	public function orWhere( string $field, string $operator, $value = null, $value2 = null ): self
+	{
+		$keyword = 'should';
 
-        switch ( $operator ) {
-            case '==' :
-                $keyword = 'filter';
-                break;
-            case '!==' :
-            case '!=' :
-            case '!in' :
-                $keyword = 'should_not';
-                break;
-        }
+		switch ( $operator ) {
+			case '==' :
+				$keyword = 'filter';
+				break;
+			case '!==' :
+			case '!=' :
+			case '!in' :
+			case '!exists' :
+				$keyword = 'should_not';
+				break;
+		}
 
-        $this->where = array_merge_recursive(
-            $this->where, [
-            $keyword => $this->subQuery( $field, $operator, $value, $value2 ),
-        ] );
+		if ( !isset( $this->where[ $keyword ] ) ) {
+			$this->where[ $keyword ] = [];
+		}
 
-        return $this;
-    }
+		$this->where[ $keyword ][] = $this->subQuery( $field, $operator, $value, $value2 );
 
-    /**
-     * @return array
-     */
-    public function filter(): array
-    {
-        return  $this->where;
-    }
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function filter(): array
+	{
+		return $this->where;
+	}
 }

@@ -13,12 +13,12 @@ use Chukdo\Storage\FileUploaded;
  */
 interface Input
 {
-    /**
-     * @param string      $name
-     * @param string|null $allowedMimeTypes
-     * @param int|null    $maxFileSize
-     *
-     * @return FileUploaded|null
-     */
-    public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): ?FileUploaded;
+	/**
+	 * @param string      $name
+	 * @param string|null $allowedMimeTypes
+	 * @param int|null    $maxFileSize
+	 *
+	 * @return FileUploaded|null
+	 */
+	public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): ?FileUploaded;
 }

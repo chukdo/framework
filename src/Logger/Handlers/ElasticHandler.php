@@ -14,85 +14,85 @@ use Elasticsearch\ClientBuilder;
  */
 class ElasticHandler extends AbstractHandler
 {
-    /**
-     * @var ClientBuilder
-     */
-    protected $elastic;
+	/**
+	 * @var ClientBuilder
+	 */
+	protected $elastic;
 
-    /**
-     * @var string
-     */
-    private $dsn = '';
+	/**
+	 * @var string
+	 */
+	private $dsn = '';
 
-    /**
-     * ElasticHandler constructor.
-     *
-     * @param string|null $dsn
-     */
-    public function __construct( ?string $dsn )
-    {
-        $this->dsn     = $dsn;
-        $this->elastic = ClientBuilder::create()
-            ->setHosts( explode( ',',
-                $dsn ) )
-            ->build();
+	/**
+	 * ElasticHandler constructor.
+	 *
+	 * @param string|null $dsn
+	 */
+	public function __construct( ?string $dsn )
+	{
+		$this->dsn     = $dsn;
+		$this->elastic = ClientBuilder::create()
+									  ->setHosts( explode( ',',
+										  $dsn ) )
+									  ->build();
 
-        $this->setFormatter( new NullFormatter() );
+		$this->setFormatter( new NullFormatter() );
 
-        parent::__construct();
-    }
+		parent::__construct();
+	}
 
-    public function __destruct()
-    {
-        $this->dsn     = null;
-        $this->elastic = null;
-    }
+	public function __destruct()
+	{
+		$this->dsn     = null;
+		$this->elastic = null;
+	}
 
-    /**
-     * @param array $record
-     *
-     * @return bool
-     */
-    public function write( $record ): bool
-    {
-        $this->init( $record[ 'channel' ] );
+	/**
+	 * @param array $record
+	 *
+	 * @return bool
+	 */
+	public function write( $record ): bool
+	{
+		$this->init( $record[ 'channel' ] );
 
-        $write = $this->elastic->index( [
-            'index' => $record[ 'channel' ],
-            'type'  => 'search',
-            'id'    => uniqid( '',
-                true ),
-            'body'  => $record,
-        ] );
+		$write = $this->elastic->index( [
+			'index' => $record[ 'channel' ],
+			'type'  => 'search',
+			'id'    => uniqid( '',
+				true ),
+			'body'  => $record,
+		] );
 
-        return !isset( $write[ 'error' ] );
-    }
+		return !isset( $write[ 'error' ] );
+	}
 
-    /**
-     * @param string $channel
-     */
-    protected function init( string $channel ): void
-    {
-        if ( !$this->elastic->indices()
-            ->exists( [
-                'index' => $channel,
-            ] ) ) {
-            $this->elastic->indices()
-                ->create( [
-                    'index' => $channel,
-                    'body'  => [
-                        'mappings' => [
-                            'search' => [
-                                'properties' => [
-                                    'date' => [
-                                        'type'   => 'date',
-                                        'format' => 'epoch_second',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ] );
-        }
-    }
+	/**
+	 * @param string $channel
+	 */
+	protected function init( string $channel ): void
+	{
+		if ( !$this->elastic->indices()
+							->exists( [
+								'index' => $channel,
+							] ) ) {
+			$this->elastic->indices()
+						  ->create( [
+							  'index' => $channel,
+							  'body'  => [
+								  'mappings' => [
+									  'search' => [
+										  'properties' => [
+											  'date' => [
+												  'type'   => 'date',
+												  'format' => 'epoch_second',
+											  ],
+										  ],
+									  ],
+								  ],
+							  ],
+						  ] );
+		}
+	}
 }

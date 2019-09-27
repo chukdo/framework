@@ -11,49 +11,49 @@ namespace Chukdo\Db\Mongo\Aggregate;
  */
 Class AddFields
 {
-    /**
-     * @var array
-     */
-    protected $addFields = [];
+	/**
+	 * @var array
+	 */
+	protected $addFields = [];
 
-    /**
-     * @var Aggregate
-     */
-    protected $aggregate;
+	/**
+	 * @var Aggregate
+	 */
+	protected $aggregate;
 
-    /**
-     * Group constructor.
-     *
-     * @param Aggregate $aggregate
-     */
-    public function __construct( Aggregate $aggregate )
-    {
-        $this->aggregate = $aggregate;
-    }
+	/**
+	 * Group constructor.
+	 *
+	 * @param Aggregate $aggregate
+	 */
+	public function __construct( Aggregate $aggregate )
+	{
+		$this->aggregate = $aggregate;
+	}
 
-    /**
-     * @param string $field
-     * @param        $expression
-     *
-     * @return AddFields
-     */
-    public function addField( string $field, $expression ): self
-    {
-        $this->addFields[ $field ] = Expression::parseExpression( $expression );
+	/**
+	 * @param string $field
+	 * @param        $expression
+	 *
+	 * @return AddFields
+	 */
+	public function addField( string $field, $expression ): self
+	{
+		$this->addFields[ $field ] = Expression::parseExpression( $expression );
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * @return array
-     */
-    public function projection(): array
-    {
-        return $this->addFields;
-    }
+	/**
+	 * @return array
+	 */
+	public function projection(): array
+	{
+		return $this->addFields;
+	}
 
-    public function pipe(): Aggregate
-    {
-        return $this->aggregate;
-    }
+	public function pipe(): Aggregate
+	{
+		return $this->aggregate;
+	}
 }

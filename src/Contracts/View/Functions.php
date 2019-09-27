@@ -13,8 +13,8 @@ use Chukdo\View\View;
  */
 interface Functions
 {
-    /**
-     * @param View $view
-     */
-    public function register( View $view ): void;
+	/**
+	 * @param View $view
+	 */
+	public function register( View $view ): void;
 }

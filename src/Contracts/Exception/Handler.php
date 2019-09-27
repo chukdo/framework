@@ -13,13 +13,13 @@ use Throwable;
  */
 interface Handler
 {
-    /**
-     * @param Throwable $e
-     */
-    public function report( Throwable $e ): void;
+	/**
+	 * @param Throwable $e
+	 */
+	public function report( Throwable $e ): void;
 
-    /**
-     * @param Throwable $e
-     */
-    public function render( Throwable $e ): void;
+	/**
+	 * @param Throwable $e
+	 */
+	public function render( Throwable $e ): void;
 }

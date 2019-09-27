@@ -13,56 +13,56 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
  */
 interface Collection
 {
-    /**
-     * @return mixed
-     */
-    public function client();
+	/**
+	 * @return mixed
+	 */
+	public function client();
 
-    /**
-     * @return string
-     */
-    public function name(): string;
+	/**
+	 * @return string
+	 */
+	public function name(): string;
 
-    /**
-     * @return JsonInterface
-     */
-    public function info(): JsonInterface;
+	/**
+	 * @return JsonInterface
+	 */
+	public function info(): JsonInterface;
 
-    /**
-     * @return mixed
-     */
-    public function database();
+	/**
+	 * @return mixed
+	 */
+	public function database();
 
-    /**
-     * @return bool
-     */
-    public function drop(): bool;
+	/**
+	 * @return bool
+	 */
+	public function drop(): bool;
 
-    /**
-     * @param string      $collection
-     * @param string|null $database
-     *
-     * @return mixed
-     */
-    public function rename( string $collection, string $database = null );
+	/**
+	 * @param string      $collection
+	 * @param string|null $database
+	 *
+	 * @return mixed
+	 */
+	public function rename( string $collection, string $database = null );
 
-    /**
-     * @return mixed
-     */
-    public function schema();
+	/**
+	 * @return mixed
+	 */
+	public function schema();
 
-    /**
-     * @return mixed
-     */
-    public function write();
+	/**
+	 * @return mixed
+	 */
+	public function write();
 
-    /**
-     * @return mixed
-     */
-    public function find();
+	/**
+	 * @return mixed
+	 */
+	public function find();
 
-    /**
-     * @return mixed
-     */
-    public function id();
+	/**
+	 * @return mixed
+	 */
+	public function id();
 }

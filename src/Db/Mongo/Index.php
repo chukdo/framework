@@ -8,136 +8,136 @@ use Exception;
 
 Class Index
 {
-    /**
-     * @var Collection
-     */
-    protected $collection;
+	/**
+	 * @var Collection
+	 */
+	protected $collection;
 
-    /**
-     * @var array
-     */
-    protected $index;
+	/**
+	 * @var array
+	 */
+	protected $index;
 
-    /**
-     * Index constructor.
-     *
-     * @param Collection $collection
-     */
-    public function __construct( Collection $collection )
-    {
-        $this->collection = $collection;
-    }
+	/**
+	 * Index constructor.
+	 *
+	 * @param Collection $collection
+	 */
+	public function __construct( Collection $collection )
+	{
+		$this->collection = $collection;
+	}
 
-    /**
-     * @return JsonInterface
-     */
-    public function get(): JsonInterface
-    {
-        $indexes = new Json();
+	/**
+	 * @return JsonInterface
+	 */
+	public function get(): JsonInterface
+	{
+		$indexes = new Json();
 
-        foreach ( $this->collection()
-            ->client()
-            ->listIndexes() as $index ) {
-            $indexes->offsetSet( $index[ 'name' ], $index[ 'key' ] );
-        }
+		foreach ( $this->collection()
+					   ->client()
+					   ->listIndexes() as $index ) {
+			$indexes->offsetSet( $index[ 'name' ], $index[ 'key' ] );
+		}
 
-        return $indexes;
-    }
+		return $indexes;
+	}
 
-    /**
-     * @return Collection
-     */
-    protected function collection(): Collection
-    {
-        return $this->collection;
-    }
+	/**
+	 * @return Collection
+	 */
+	protected function collection(): Collection
+	{
+		return $this->collection;
+	}
 
-    /**
-     * @param string $field
-     * @param string $order
-     * @param bool   $unique
-     *
-     * @return Index
-     */
-    public function set( string $field, string $order = 'desc', bool $unique = false ): self
-    {
-        $name  = $unique
-            ? $field . '_unique'
-            : $field;
-        $order = $order == 'asc' || $order == 'ASC'
-            ? 1
-            : -1;
+	/**
+	 * @param string $field
+	 * @param string $order
+	 * @param bool   $unique
+	 *
+	 * @return Index
+	 */
+	public function set( string $field, string $order = 'desc', bool $unique = false ): self
+	{
+		$name  = $unique
+			? $field . '_unique'
+			: $field;
+		$order = $order == 'asc' || $order == 'ASC'
+			? 1
+			: -1;
 
-        $this->index[ $field ] = [
-            'name'   => $name,
-            'order'  => $order,
-            'field'  => $field,
-            'unique' => $unique,
-        ];
+		$this->index[ $field ] = [
+			'name'   => $name,
+			'order'  => $order,
+			'field'  => $field,
+			'unique' => $unique,
+		];
 
-        $this->collection()
-            ->client()
-            ->createIndex( [ $field => $order ], [
-                'unique' => $unique,
-                'name'   => $name,
-            ] );
+		$this->collection()
+			 ->client()
+			 ->createIndex( [ $field => $order ], [
+				 'unique' => $unique,
+				 'name'   => $name,
+			 ] );
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * @return bool
-     */
-    public function save(): bool
-    {
-        try {
-            foreach ( $this->index as $index ) {
-                $this->collection()
-                    ->client()
-                    ->createIndex( [ $index[ 'field' ] => $index[ 'order' ] ], [
-                        'unique' => $index[ 'unique' ],
-                        'name'   => $index[ 'name' ],
-                    ] );
-            }
+	/**
+	 * @return bool
+	 */
+	public function save(): bool
+	{
+		try {
+			foreach ( $this->index as $index ) {
+				$this->collection()
+					 ->client()
+					 ->createIndex( [ $index[ 'field' ] => $index[ 'order' ] ], [
+						 'unique' => $index[ 'unique' ],
+						 'name'   => $index[ 'name' ],
+					 ] );
+			}
 
-            return true;
-        } catch ( Exception $e ) {
-            return false;
-        }
+			return true;
+		} catch ( Exception $e ) {
+			return false;
+		}
 
-    }
+	}
 
-    /**
-     * @return bool
-     */
-    public function drop(): bool
-    {
-        try {
-            $this->collection()
-                ->client()
-                ->dropIndexes();
+	/**
+	 * @return bool
+	 */
+	public function drop(): bool
+	{
+		try {
+			$this->collection()
+				 ->client()
+				 ->dropIndexes();
 
-            return true;
-        } catch ( Exception $e ) {
-            return false;
-        }
-    }
+			return true;
+		} catch ( Exception $e ) {
+			return false;
+		}
+	}
 
-    /**
-     * @param string $name
-     *
-     * @return bool
-     */
-    public function delete( string $name ): bool
-    {
-        try {
-            $this->collection()
-                ->client()
-                ->dropIndex( $name );
+	/**
+	 * @param string $name
+	 *
+	 * @return bool
+	 */
+	public function delete( string $name ): bool
+	{
+		try {
+			$this->collection()
+				 ->client()
+				 ->dropIndex( $name );
 
-            return true;
-        } catch ( Exception $e ) {
-            return false;
-        }
-    }
+			return true;
+		} catch ( Exception $e ) {
+			return false;
+		}
+	}
 }

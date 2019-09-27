@@ -11,44 +11,44 @@ namespace Chukdo\Logger\Handlers;
  */
 class FileHandler extends AbstractHandler
 {
-    /**
-     * @var string
-     */
-    protected $file;
+	/**
+	 * @var string
+	 */
+	protected $file;
 
-    /**
-     * FileHandler constructor.
-     *
-     * @param string $file
-     */
-    public function __construct( string $file )
-    {
-        $this->file = $file;
+	/**
+	 * FileHandler constructor.
+	 *
+	 * @param string $file
+	 */
+	public function __construct( string $file )
+	{
+		$this->file = $file;
 
-        parent::__construct();
-    }
+		parent::__construct();
+	}
 
-    /**
-     * Destructeur.
-     */
-    public function __destruct()
-    {
-        $this->file = null;
-    }
+	/**
+	 * Destructeur.
+	 */
+	public function __destruct()
+	{
+		$this->file = null;
+	}
 
-    /**
-     * @param string $record
-     *
-     * @return bool
-     */
-    public function write( $record ): bool
-    {
-        $fp = fopen( $this->file, 'a' );
-        $r  = fwrite( $fp,
-            $record . "\n" );
+	/**
+	 * @param string $record
+	 *
+	 * @return bool
+	 */
+	public function write( $record ): bool
+	{
+		$fp = fopen( $this->file, 'a' );
+		$r  = fwrite( $fp,
+			$record . "\n" );
 
-        fclose( $fp );
+		fclose( $fp );
 
-        return (bool) $r;
-    }
+		return (bool) $r;
+	}
 }

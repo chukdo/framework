@@ -13,31 +13,31 @@ use Chukdo\Contracts\Validation\Filter as FilterInterface;
  */
 class StriptagsFilter implements FilterInterface
 {
-    /**
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'striptags';
-    }
+	/**
+	 * @return string
+	 */
+	public function name(): string
+	{
+		return 'striptags';
+	}
 
-    /**
-     * @param array $attributes
-     *
-     * @return self
-     */
-    public function attributes( array $attributes ): FilterInterface
-    {
-        return $this;
-    }
+	/**
+	 * @param array $attributes
+	 *
+	 * @return self
+	 */
+	public function attributes( array $attributes ): FilterInterface
+	{
+		return $this;
+	}
 
-    /**
-     * @param $input
-     *
-     * @return mixed
-     */
-    public function filter( $input )
-    {
-        return strip_tags( $input );
-    }
+	/**
+	 * @param $input
+	 *
+	 * @return mixed
+	 */
+	public function filter( $input )
+	{
+		return strip_tags( $input );
+	}
 }

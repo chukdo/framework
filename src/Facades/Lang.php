@@ -12,8 +12,8 @@ namespace Chukdo\Facades;
  */
 class Lang extends Facade
 {
-    public static function name(): string
-    {
-        return \Chukdo\Conf\Lang::class;
-    }
+	public static function name(): string
+	{
+		return \Chukdo\Conf\Lang::class;
+	}
 }

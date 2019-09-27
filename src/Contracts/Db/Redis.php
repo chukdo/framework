@@ -14,51 +14,51 @@ use Iterator;
  */
 interface Redis extends Iterator, Countable
 {
-    /**
-     * Lecture d'une reponse du serveur.
-     * @return mixed
-     */
-    public function read();
+	/**
+	 * Lecture d'une reponse du serveur.
+	 * @return mixed
+	 */
+	public function read();
 
-    /**
-     * Ecriture d'une commande basé sur le protocol unifié de Redis.
-     *
-     * @param string $c command
-     */
-    public function write( string $c );
+	/**
+	 * Ecriture d'une commande basé sur le protocol unifié de Redis.
+	 *
+	 * @param string $c command
+	 */
+	public function write( string $c );
 
-    /**
-     * Formate une commande Redis (protocol unifié de Redis).
-     *
-     * @param array $args arguments
-     *
-     * @return string
-     */
-    public function command( array $args );
+	/**
+	 * Formate une commande Redis (protocol unifié de Redis).
+	 *
+	 * @param array $args arguments
+	 *
+	 * @return string
+	 */
+	public function command( array $args );
 
-    /**
-     * Ecriture de commandes dans un pipeline (gain de performance).
-     *
-     * @param array $commands
-     *
-     * @return mixed
-     */
-    public function pipe( array $commands );
+	/**
+	 * Ecriture de commandes dans un pipeline (gain de performance).
+	 *
+	 * @param array $commands
+	 *
+	 * @return mixed
+	 */
+	public function pipe( array $commands );
 
-    /**
-     * Retourne les informations sur le serveur Redis.
-     *
-     * @param string|null $key information que l'on souhaite recuperer
-     *
-     * @return mixed
-     */
-    public function info( string $key = null );
+	/**
+	 * Retourne les informations sur le serveur Redis.
+	 *
+	 * @param string|null $key information que l'on souhaite recuperer
+	 *
+	 * @return mixed
+	 */
+	public function info( string $key = null );
 
-    /**
-     * @param string $name
-     * @param array  $args
-     *
-     * @return mixed
-     */
-    public function __call( string $name, array $args );
+	/**
+	 * @param string $name
+	 * @param array  $args
+	 *
+	 * @return mixed
+	 */
+	public function __call( string $name, array $args );
 }

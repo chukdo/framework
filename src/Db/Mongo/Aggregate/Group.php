@@ -11,51 +11,51 @@ namespace Chukdo\Db\Mongo\Aggregate;
  */
 Class Group
 {
-    /**
-     * @var array
-     */
-    protected $group = [];
+	/**
+	 * @var array
+	 */
+	protected $group = [];
 
-    /**
-     * @var Aggregate
-     */
-    protected $aggregate;
+	/**
+	 * @var Aggregate
+	 */
+	protected $aggregate;
 
-    /**
-     * Group constructor.
-     *
-     * @param Aggregate $aggregate
-     * @param           $expression
-     */
-    public function __construct( Aggregate $aggregate, $expression )
-    {
-        $this->aggregate      = $aggregate;
-        $this->group[ '_id' ] = Expression::parseExpression( $expression );
-    }
+	/**
+	 * Group constructor.
+	 *
+	 * @param Aggregate $aggregate
+	 * @param           $expression
+	 */
+	public function __construct( Aggregate $aggregate, $expression )
+	{
+		$this->aggregate      = $aggregate;
+		$this->group[ '_id' ] = Expression::parseExpression( $expression );
+	}
 
-    /**
-     * @param string $field
-     * @param        $expression
-     *
-     * @return Group
-     */
-    public function calculate( string $field, $expression ): self
-    {
-        $this->group[ $field ] = Expression::parseExpression( $expression );
+	/**
+	 * @param string $field
+	 * @param        $expression
+	 *
+	 * @return Group
+	 */
+	public function calculate( string $field, $expression ): self
+	{
+		$this->group[ $field ] = Expression::parseExpression( $expression );
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * @return array
-     */
-    public function projection(): array
-    {
-        return $this->group;
-    }
+	/**
+	 * @return array
+	 */
+	public function projection(): array
+	{
+		return $this->group;
+	}
 
-    public function pipe(): Aggregate
-    {
-        return $this->aggregate;
-    }
+	public function pipe(): Aggregate
+	{
+		return $this->aggregate;
+	}
 }

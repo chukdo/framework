@@ -15,29 +15,29 @@ use Chukdo\Db\Mongo\Collection;
  */
 Class RecordList extends Json implements RecordListInterface
 {
-    /**
-     * @var Collection
-     */
-    protected $collection;
+	/**
+	 * @var Collection
+	 */
+	protected $collection;
 
-    /**
-     * RecordList constructor.
-     *
-     * @param Collection $collection
-     * @param null       $data
-     */
-    public function __construct( Collection $collection, $data = null )
-    {
-        $this->collection = $collection;
+	/**
+	 * RecordList constructor.
+	 *
+	 * @param Collection $collection
+	 * @param null       $data
+	 */
+	public function __construct( Collection $collection, $data = null )
+	{
+		$this->collection = $collection;
 
-        parent::__construct( $data, false );
-    }
+		parent::__construct( $data, false );
+	}
 
-    /**
-     * @return Collection
-     */
-    public function collection(): Collection
-    {
-        return $this->collection;
-    }
+	/**
+	 * @return Collection
+	 */
+	public function collection(): Collection
+	{
+		return $this->collection;
+	}
 }

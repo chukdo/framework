@@ -13,54 +13,54 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
  */
 interface Property
 {
-    /**
-     * Property constructor.
-     *
-     * @param array       $property
-     * @param string|null $name
-     */
-    public function __construct( Array $property = [], string $name = null );
+	/**
+	 * Property constructor.
+	 *
+	 * @param array       $property
+	 * @param string|null $name
+	 */
+	public function __construct( Array $property = [], string $name = null );
 
-    /**
-     * @param string $name
-     *
-     * @return mixed
-     */
-    public function get( string $name );
+	/**
+	 * @param string $name
+	 *
+	 * @return mixed
+	 */
+	public function get( string $name );
 
-    /**
-     * @param string      $name
-     * @param string|null $type
-     * @param array       $options
-     *
-     * @return mixed
-     */
-    public function set( string $name, string $type = null, array $options = [] );
+	/**
+	 * @param string      $name
+	 * @param string|null $type
+	 * @param array       $options
+	 *
+	 * @return mixed
+	 */
+	public function set( string $name, string $type = null, array $options = [] );
 
-    /**
-     * @param string $name
-     *
-     * @return mixed
-     */
-    public function unset( string $name );
+	/**
+	 * @param string $name
+	 *
+	 * @return mixed
+	 */
+	public function unset( string $name );
 
-    /**
-     * @return JsonInterface
-     */
-    public function properties(): JsonInterface;
+	/**
+	 * @return JsonInterface
+	 */
+	public function properties(): JsonInterface;
 
-    /**
-     * @return mixed
-     */
-    public function type();
+	/**
+	 * @return mixed
+	 */
+	public function type();
 
-    /**
-     * @return string|null
-     */
-    public function name(): ?string;
+	/**
+	 * @return string|null
+	 */
+	public function name(): ?string;
 
-    /**
-     * @return array
-     */
-    public function toArray(): array;
+	/**
+	 * @return array
+	 */
+	public function toArray(): array;
 }

@@ -14,35 +14,35 @@ use Chukdo\Helper\Str;
  */
 class ZipcodeValidate implements ValidateInterface
 {
-    /**
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'zipcode';
-    }
+	/**
+	 * @return string
+	 */
+	public function name(): string
+	{
+		return 'zipcode';
+	}
 
-    /**
-     * @param array $attributes
-     *
-     * @return self
-     */
-    public function attributes( array $attributes ): ValidateInterface
-    {
-        return $this;
-    }
+	/**
+	 * @param array $attributes
+	 *
+	 * @return self
+	 */
+	public function attributes( array $attributes ): ValidateInterface
+	{
+		return $this;
+	}
 
-    /**
-     * @param $input
-     *
-     * @return bool
-     */
-    public function validate( $input ): bool
-    {
-        if ( Str::match( '/^\d{5}$/', $input ) ) {
-            return true;
-        }
+	/**
+	 * @param $input
+	 *
+	 * @return bool
+	 */
+	public function validate( $input ): bool
+	{
+		if ( Str::match( '/^\d{5}$/', $input ) ) {
+			return true;
+		}
 
-        return false;
-    }
+		return false;
+	}
 }

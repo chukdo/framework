@@ -13,61 +13,61 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
  */
 interface Database
 {
-    /**
-     * @return mixed
-     */
-    public function client();
+	/**
+	 * @return mixed
+	 */
+	public function client();
 
-    /**
-     * @return mixed
-     */
-    public function server();
+	/**
+	 * @return mixed
+	 */
+	public function server();
 
-    /**
-     * @return string|null
-     */
-    public function name(): ?string;
+	/**
+	 * @return string|null
+	 */
+	public function name(): ?string;
 
-    /**
-     * @return JsonInterface
-     */
-    public function info(): JsonInterface;
+	/**
+	 * @return JsonInterface
+	 */
+	public function info(): JsonInterface;
 
-    /**
-     * @return bool
-     */
-    public function drop(): bool;
+	/**
+	 * @return bool
+	 */
+	public function drop(): bool;
 
-    /**
-     * @return JsonInterface
-     */
-    public function collections(): JsonInterface;
+	/**
+	 * @return JsonInterface
+	 */
+	public function collections(): JsonInterface;
 
-    /**
-     * @param string $collection
-     *
-     * @return mixed
-     */
-    public function collection( string $collection );
+	/**
+	 * @param string $collection
+	 *
+	 * @return mixed
+	 */
+	public function collection( string $collection );
 
-    /**
-     * @param string $collection
-     *
-     * @return mixed
-     */
-    public function createCollection( string $collection );
+	/**
+	 * @param string $collection
+	 *
+	 * @return mixed
+	 */
+	public function createCollection( string $collection );
 
-    /**
-     * @param string $collection
-     *
-     * @return bool
-     */
-    public function collectionExist( string $collection ): bool;
+	/**
+	 * @param string $collection
+	 *
+	 * @return bool
+	 */
+	public function collectionExist( string $collection ): bool;
 
-    /**
-     * @param string $collection
-     *
-     * @return mixed
-     */
-    public function dropCollection( string $collection );
+	/**
+	 * @param string $collection
+	 *
+	 * @return mixed
+	 */
+	public function dropCollection( string $collection );
 }

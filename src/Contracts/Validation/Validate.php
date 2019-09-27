@@ -11,22 +11,22 @@ namespace Chukdo\Contracts\Validation;
  */
 interface Validate
 {
-    /**
-     * @return string
-     */
-    public function name(): string;
+	/**
+	 * @return string
+	 */
+	public function name(): string;
 
-    /**
-     * @param array $attributes
-     *
-     * @return self
-     */
-    public function attributes( array $attributes ): Validate;
+	/**
+	 * @param array $attributes
+	 *
+	 * @return self
+	 */
+	public function attributes( array $attributes ): Validate;
 
-    /**
-     * @param $input
-     *
-     * @return bool
-     */
-    public function validate( $input ): bool;
+	/**
+	 * @param $input
+	 *
+	 * @return bool
+	 */
+	public function validate( $input ): bool;
 }

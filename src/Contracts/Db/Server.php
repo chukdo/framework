@@ -13,51 +13,51 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
  */
 interface Server
 {
-    /**
-     * Server constructor.
-     *
-     * @param string|null $dsn
-     * @param string|null $database
-     */
-    public function __construct( string $dsn = null, string $database = null );
+	/**
+	 * Server constructor.
+	 *
+	 * @param string|null $dsn
+	 * @param string|null $database
+	 */
+	public function __construct( string $dsn = null, string $database = null );
 
-    /**
-     * @return mixed
-     */
-    public function client();
+	/**
+	 * @return mixed
+	 */
+	public function client();
 
-    /**
-     * @return bool
-     */
-    public function ping(): bool;
+	/**
+	 * @return bool
+	 */
+	public function ping(): bool;
 
-    /**
-     * @return JsonInterface
-     */
-    public function status(): JsonInterface;
+	/**
+	 * @return JsonInterface
+	 */
+	public function status(): JsonInterface;
 
-    /**
-     * @return string|null
-     */
-    public function version(): ?string;
+	/**
+	 * @return string|null
+	 */
+	public function version(): ?string;
 
-    /**
-     * @return JsonInterface
-     */
-    public function databases(): JsonInterface;
+	/**
+	 * @return JsonInterface
+	 */
+	public function databases(): JsonInterface;
 
-    /**
-     * @param string      $collection
-     * @param string|null $database
-     *
-     * @return mixed
-     */
-    public function collection( string $collection, string $database = null );
+	/**
+	 * @param string      $collection
+	 * @param string|null $database
+	 *
+	 * @return mixed
+	 */
+	public function collection( string $collection, string $database = null );
 
-    /**
-     * @param string|null $database
-     *
-     * @return mixed
-     */
-    public function database( string $database = null );
+	/**
+	 * @param string|null $database
+	 *
+	 * @return mixed
+	 */
+	public function database( string $database = null );
 }

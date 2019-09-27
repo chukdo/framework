@@ -12,8 +12,8 @@ namespace Chukdo\Facades;
  */
 class Request extends Facade
 {
-    public static function name(): string
-    {
-        return \Chukdo\Http\Request::class;
-    }
+	public static function name(): string
+	{
+		return \Chukdo\Http\Request::class;
+	}
 }

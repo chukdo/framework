@@ -16,244 +16,425 @@ use Chukdo\Json\Json;
  */
 Class Write extends Where implements WriteInterface
 {
-    /**
-     * @var Collection
-     */
-    protected $collection;
+	/**
+	 * @var Collection
+	 */
+	protected $collection;
 
-    /**
-     * @var Json
-     */
-    protected $fields;
+	/**
+	 * @var Json
+	 */
+	protected $fields;
 
-    /**
-     * Write constructor.
-     *
-     * @param Collection $collection
-     */
-    public function __construct( Collection $collection )
-    {
-        $this->fields     = new Json();
-        $this->collection = $collection;
-    }
+	/**
+	 * Write constructor.
+	 *
+	 * @param Collection $collection
+	 */
+	public function __construct( Collection $collection )
+	{
+		$this->fields     = new Json();
+		$this->collection = $collection;
+	}
 
-    /**
-     * @return Collection
-     */
-    public function collection(): Collection
-    {
-        return $this->collection;
-    }
+	/**
+	 * @return Collection
+	 */
+	public function collection(): Collection
+	{
+		return $this->collection;
+	}
 
-    /**
-     * @return JsonInterface
-     */
-    public function fields(): JsonInterface
-    {
-        return $this->fields;
-    }
+	/**
+	 * @return array
+	 */
+	public function validatedUpdateFields(): array
+	{
+		$source = '';
+		$params = [];
 
-    /**
-     * @param iterable $values
-     *
-     * @return Write
-     */
-    public function setAll( iterable $values )
-    {
-        foreach ( $values as $field => $value ) {
-            $this->set( $field, $value );
-        }
+		foreach ( $this->fields() as $type => $field ) {
+			foreach ( (array) $field as $key => $value ) {
+				if ( $key == '_id' ) {
+					continue;
+				}
 
-        return $this;
-    }
+				$hydrate = $this->hydrateUpdateFields( $type, $key, $value );
+				$source  .= $hydrate[ 'source' ];
 
-    /**
-     * @param string $field
-     * @param        $value
-     *
-     * @return Write
-     */
-    public function set( string $field, $value )
-    {
-        $this->fields->offsetSet( $field, $this->filterValues( $field, $value ) );
+				$params[ $hydrate[ 'param' ] ] = $value instanceof JsonInterface
+					? $value->toArray()
+					: $value;
+			}
+		}
 
-        return $this;
-    }
+		return [
+			'source' => $source,
+			'params' => $params,
+		];
+	}
 
-    /**
-     * @param $field
-     * @param $value
-     *
-     * @return array|mixed
-     */
-    protected function filterValues( $field, $value )
-    {
-        if ( Is::iterable( $value ) ) {
-            $values = [];
+	/**
+	 * @return JsonInterface
+	 */
+	public function fields(): JsonInterface
+	{
+		return $this->fields;
+	}
 
-            foreach ( $value as $k => $v ) {
-                $values[ $k ] = $this->filterValues( $k, $v );
-            }
+	/**
+	 * @param $type
+	 * @param $key
+	 * @param $value
+	 *
+	 * @return array
+	 */
+	protected function hydrateUpdateFields( $type, $key, $value ): array
+	{
+		$source = '';
+		$param  = str_replace( '.', '_', $key );
 
-            $value = $values;
-        } else {
-            $value = Collection::filterIn( $field, $value );
-        }
+		switch ( $type ) {
+			case 'set' :
+				$source = 'ctx._source.' . $key . '=params.' . $param . ';';
+				break;
+			case 'unset' :
+				$source = 'ctx._source.remove(\'' . $key . '\');';
+				break;
+			case 'inc' :
+				$source = 'ctx._source.' . $key . '+=params.' . $param . ';';
+				break;
+			case 'push':
+				$source = 'ctx._source.' . $key . '.add(params.' . $param . ');';
+				break;
+			case 'pull':
+				$source = 'if(ctx._source.' . $key . '.indexOf(params.' . $param . ') >= 0) {ctx._source.' . $key . '.remove(ctx._source.' . $key . '.indexOf(params.' . $param . '))} ';
+				break;
+			case 'addToSet':
+				$source = 'if(ctx._source.' . $key . '.contains(params.' . $param . ')) {ctx.op = \'noop\'} else {ctx._source.' . $key . '.add(params.' . $param . ')} ';
+				break;
+			default:
+				$source = 'ctx.op = \'none\'';
+		}
 
-        return $value;
-    }
+		return [
+			'source' => $source,
+			'param'  => $param,
+		];
+	}
 
-    /**
-     * @return int
-     */
-    public function delete(): int
-    {
-        $command = $this->collection()
-                        ->client()
-                        ->deleteByQuery( [
-                            'index' => $this->collection()
-                                            ->fullName(),
-                            'body'  => [
-                                'query' => [
-                                    'bool' => $this->filter(),
-                                ],
-                            ],
-                        ] );
+	/**
+	 * @param iterable $values
+	 *
+	 * @return Write
+	 */
+	public function setAll( iterable $values )
+	{
+		foreach ( $values as $field => $value ) {
+			$this->set( $field, $value );
+		}
 
-        return (int) $command[ 'deleted' ];
-    }
+		return $this;
+	}
 
-    /**
-     * @return bool
-     */
-    public function deleteOne(): bool
-    {
-        $query = [
-            'index' => $this->collection()
-                            ->fullName(),
-            'body'  => [
-                'query' => [
-                    'bool' => $this->filter(),
-                ],
-            ],
-            'size'  => 1,
-        ];
+	/**
+	 * @param string $field
+	 * @param        $value
+	 *
+	 * @return Write
+	 */
+	public function set( string $field, $value )
+	{
+		$this->field( 'set', $field, $value );
 
-        $command = $this->collection()
-                        ->client()
-                        ->deleteByQuery( $query );
+		return $this;
+	}
 
-        return $command[ 'deleted' ] == 1;
-    }
+	/**
+	 * @param string $keyword
+	 * @param string $field
+	 * @param        $value
+	 *
+	 * @return Write
+	 */
+	protected function field( string $keyword, string $field, $value ): self
+	{
+		$this->fields->offsetGetOrSet( $keyword )
+					 ->offsetSet( $field, $this->filterValues( $field, $value ) );
 
-    /**
-     * @return JsonInterface
-     */
-    public function deleteOneAndGet(): JsonInterface
-    {
-        $query = [
-            'index' => $this->collection()
-                            ->fullName(),
-            'body'  => [
-                'query' => [
-                    'bool' => $this->filter(),
-                ],
-            ],
-        ];
+		return $this;
+	}
 
-        $json = new Json( $this->collection()
-                               ->client()
-                               ->search( $query ) );
-        $get  = $json->get( 'hits.hits.0._source', new Json() );
+	/**
+	 * @param $field
+	 * @param $value
+	 *
+	 * @return array|mixed
+	 */
+	protected function filterValues( $field, $value )
+	{
+		if ( Is::iterable( $value ) ) {
+			$values = [];
 
-        if ( $get->count() > 0 ) {
-            $this->deleteOne();
-        }
+			foreach ( $value as $k => $v ) {
+				$values[ $k ] = $this->filterValues( $k, $v );
+			}
 
-        return $get;
-    }
+			$value = $values;
+		} else {
+			$value = Collection::filterIn( $field, $value );
+		}
 
-    /**
-     * @return int
-     */
-    public function update(): int
-    {
+		return $value;
+	}
 
-    }
+	/**
+	 * @param string $field
+	 *
+	 * @return $this|mixed
+	 */
+	public function unset( string $field )
+	{
+		$this->field( 'unset', $field, '' );
 
-    public function updateTest()
-    {
-        $query   = [
-            'index' => $this->collection()
-                            ->fullName(),
-            'body'  => [
-                'query'  => [
-                    'bool' => $this->filter(),
-                ],
-                'script' => [
-                    'source' => 'ctx._source.age="789";ctx._source.info.b.h=["1","cd"];ctx._source.info.b.g.add("15");ctx._source.z=params.uf',
-                    'params' => [
-                        'uf' => [
-                            'titi' => 'tutu',
-                            'bibi' => 'bubu'
-                        ]
-                    ]
-                ]
-            ],
-        ];
+		return $this;
+	}
 
-        $command = $this->collection()
-                        ->client()
-                        ->updateByQuery( $query );
+	/**
+	 * @param string $field
+	 * @param        $value
+	 *
+	 * @return Write
+	 */
+	public function push( string $field, $value )
+	{
+		$this->field( 'push', $field, $value );
 
-        echo '<pre>';
-        print_r( $command );
-        exit;
-    }
+		return $this;
+	}
 
-    /**
-     * @return bool
-     */
-    public function updateOne(): bool
-    {
+	/**
+	 * @param string $field
+	 * @param        $value
+	 *
+	 * @return Write
+	 */
+	public function addToSet( string $field, $value ): self
+	{
+		return $this->field( 'addToSet', $field, $value );
+	}
 
-    }
+	/**
+	 * @param string $field
+	 * @param        $value
+	 *
+	 * @return Write
+	 */
+	public function pull( string $field, $value )
+	{
+		$this->field( 'pull', $field, $value );
 
-    /**
-     * @param bool $before
-     *
-     * @return JsonInterface
-     */
-    public function updateOneAndGet( bool $before = false ): JsonInterface
-    {
+		return $this;
+	}
 
-    }
+	/**
+	 * @param string $field
+	 * @param int    $value
+	 *
+	 * @return $this|mixed
+	 */
+	public function inc( string $field, int $value )
+	{
+		$this->field( 'inc', $field, $value );
 
-    /**
-     * @return string|null
-     */
-    public function updateOrInsert(): ?string
-    {
+		return $this;
+	}
 
-    }
+	/**
+	 * @return int
+	 */
+	public function delete(): int
+	{
+		$command = $this->collection()
+						->client()
+						->deleteByQuery( [
+							'index' => $this->collection()
+											->fullName(),
+							'body'  => [
+								'query' => [
+									'bool' => $this->filter(),
+								],
+							],
+						] );
 
-    /**
-     * @return string
-     */
-    public function insert(): string
-    {
-        $id = $this->collection()
-                   ->id();
-        $this->collection()
-             ->client()
-             ->index( [
-                 'index' => $this->collection()
-                                 ->fullName(),
-                 'id'    => $id,
-                 'body'  => $this->fields()
-                                 ->toArray(),
-             ] );
+		return (int) $command[ 'deleted' ];
+	}
 
-        return $id;
-    }
+	/**
+	 * @return bool
+	 */
+	public function deleteOne(): bool
+	{
+		$query = [
+			'index' => $this->collection()
+							->fullName(),
+			'body'  => [
+				'query' => [
+					'bool' => $this->filter(),
+				],
+			],
+			'size'  => 1,
+		];
+
+		$command = $this->collection()
+						->client()
+						->deleteByQuery( $query );
+
+		return $command[ 'deleted' ] == 1;
+	}
+
+	/**
+	 * @return JsonInterface
+	 */
+	public function deleteOneAndGet(): JsonInterface
+	{
+		$get = $this->getOne();
+
+		if ( $get->count() > 0 ) {
+			$this->deleteOne();
+		}
+
+		return $get;
+	}
+
+	/**
+	 * @return JsonInterface
+	 */
+	protected function getOne(): JsonInterface
+	{
+		$query = [
+			'index' => $this->collection()
+							->fullName(),
+			'body'  => [
+				'query' => [
+					'bool' => $this->filter(),
+				],
+			],
+		];
+
+		$json   = new Json( $this->collection()
+								 ->client()
+								 ->search( $query ) );
+		$record = $json->get( 'hits.hits.0._source', new Json() )
+					   ->filterRecursive( function( $k, $v ) {
+						   return Collection::filterOut( $k, $v );
+					   } );
+
+		$record->offsetSet( '_id', $json->get( 'hits.hits.0._id' ) );
+
+		return $record;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function update(): int
+	{
+		$query = [
+			'index'     => $this->collection()
+								->fullName(),
+			'body'      => [
+				'query'  => [
+					'bool' => $this->filter(),
+				],
+				'script' => $this->validatedUpdateFields(),
+			],
+			'conflicts' => 'proceed',
+		];
+
+		$command = $this->collection()
+						->client()
+						->updateByQuery( $query );
+
+		return $command[ 'updated' ];
+	}
+
+
+	/**
+	 * @return array
+	 */
+	public function validatedInsertFields(): array
+	{
+		return (array) $this->fields()
+							->offsetGet( 'set' );
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function updateOne(): bool
+	{
+		$query = [
+			'index'     => $this->collection()
+								->fullName(),
+			'body'      => [
+				'query'  => [
+					'bool' => [
+						'must' => [
+							'term' => [
+								'_id' => $this->getOne()
+											  ->offsetGet( '_id' ),
+							],
+						],
+					],
+				],
+				'script' => $this->validatedUpdateFields(),
+			],
+			'conflicts' => 'proceed',
+		];
+		echo '<pre>';
+		print_r( $query );
+		$command = $this->collection()
+						->client()
+						->updateByQuery( $query );
+
+		return $command[ 'updated' ];
+	}
+
+	/**
+	 * @param bool $before
+	 *
+	 * @return JsonInterface
+	 */
+	public function updateOneAndGet( bool $before = false ): JsonInterface
+	{
+
+	}
+
+	/**
+	 * @return string|null
+	 */
+	public function updateOrInsert(): ?string
+	{
+
+	}
+
+	/**
+	 * @return string
+	 */
+	public function insert(): string
+	{
+		$id = $this->collection()
+				   ->id();
+		$this->collection()
+			 ->client()
+			 ->index( [
+				 'index' => $this->collection()
+								 ->fullName(),
+				 'id'    => $id,
+				 'body'  => $this->validatedInsertFields(),
+			 ] );
+
+		return $id;
+	}
 }

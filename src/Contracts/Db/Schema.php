@@ -13,56 +13,56 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
  */
 interface Schema
 {
-    /**
-     * @return Collection
-     */
-    public function collection();
+	/**
+	 * @return Collection
+	 */
+	public function collection();
 
-    /**
-     * @param string $name
-     *
-     * @return mixed
-     */
-    public function get( string $name );
+	/**
+	 * @param string $name
+	 *
+	 * @return mixed
+	 */
+	public function get( string $name );
 
-    /**
-     * @param string      $name
-     * @param string|null $type
-     * @param array       $options
-     *
-     * @return mixed
-     */
-    public function set( string $name, string $type = null, array $options = [] );
+	/**
+	 * @param string      $name
+	 * @param string|null $type
+	 * @param array       $options
+	 *
+	 * @return mixed
+	 */
+	public function set( string $name, string $type = null, array $options = [] );
 
-    /**
-     * @param string $name
-     *
-     * @return mixed
-     */
-    public function unset( string $name );
+	/**
+	 * @param string $name
+	 *
+	 * @return mixed
+	 */
+	public function unset( string $name );
 
-    /**
-     * @return mixed
-     */
-    public function property();
+	/**
+	 * @return mixed
+	 */
+	public function property();
 
-    /**
-     * @return JsonInterface
-     */
-    public function properties(): JsonInterface;
+	/**
+	 * @return JsonInterface
+	 */
+	public function properties(): JsonInterface;
 
-    /**
-     * @return bool
-     */
-    public function drop(): bool;
+	/**
+	 * @return bool
+	 */
+	public function drop(): bool;
 
-    /**
-     * @return bool
-     */
-    public function save(): bool;
+	/**
+	 * @return bool
+	 */
+	public function save(): bool;
 
-    /**
-     * @return array
-     */
-    public function toArray(): array;
+	/**
+	 * @return array
+	 */
+	public function toArray(): array;
 }

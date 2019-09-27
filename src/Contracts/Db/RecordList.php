@@ -13,8 +13,8 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
  */
 interface RecordList extends JsonInterface
 {
-    /**
-     * @return mixed
-     */
-    public function collection();
+	/**
+	 * @return mixed
+	 */
+	public function collection();
 }

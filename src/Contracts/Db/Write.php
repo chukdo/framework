@@ -13,85 +13,124 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
  */
 interface Write
 {
-    /**
-     * @return mixed
-     */
-    public function collection();
+	/**
+	 * @return mixed
+	 */
+	public function collection();
 
-    /**
-     * @param string $field
-     * @param string $operator
-     * @param        $value
-     * @param null   $value2
-     *
-     * @return $this
-     */
-    public function where( string $field, string $operator, $value, $value2 = null );
+	/**
+	 * @param string $field
+	 * @param string $operator
+	 * @param null   $value
+	 * @param null   $value2
+	 *
+	 * @return mixed
+	 */
+	public function where( string $field, string $operator, $value = null, $value2 = null );
 
-    /**
-     * @param string $field
-     * @param string $operator
-     * @param        $value
-     * @param null   $value2
-     *
-     * @return $this
-     */
-    public function orWhere( string $field, string $operator, $value, $value2 = null );
+	/**
+	 * @param string $field
+	 * @param string $operator
+	 * @param null   $value
+	 * @param null   $value2
+	 *
+	 * @return mixed
+	 */
+	public function orWhere( string $field, string $operator, $value = null, $value2 = null );
 
-    /**
-     * @param iterable $values
-     *
-     * @return Write
-     */
-    public function setAll( iterable $values );
+	/**
+	 * @param iterable $values
+	 *
+	 * @return mixed
+	 */
+	public function setAll( iterable $values );
 
-    /**
-     * @param string $field
-     * @param        $value
-     *
-     * @return Write
-     */
-    public function set( string $field, $value );
+	/**
+	 * @param string $field
+	 * @param        $value
+	 *
+	 * @return mixed
+	 */
+	public function set( string $field, $value );
 
-    /**
-     * @return int
-     */
-    public function delete(): int;
+	/**
+	 * @param string $field
+	 *
+	 * @return mixed
+	 */
+	public function unset( string $field );
 
-    /**
-     * @return bool
-     */
-    public function deleteOne(): bool;
+	/**
+	 * @param string $field
+	 * @param        $value
+	 *
+	 * @return mixed
+	 */
+	public function push( string $field, $value );
 
-    /**
-     * @return JsonInterface
-     */
-    public function deleteOneAndGet(): JsonInterface;
+	/**
+	 * @param string $field
+	 * @param        $value
+	 *
+	 * @return mixed
+	 */
+	public function pull( string $field, $value );
 
-    /**
-     * @return int
-     */
-    public function update(): int;
+	/**
+	 * @param string $field
+	 * @param        $value
+	 *
+	 * @return mixed
+	 */
+	public function addToSet( string $field, $value );
 
-    /**
-     * @return bool
-     */
-    public function updateOne(): bool;
+	/**
+	 * @param string $field
+	 * @param int    $value
+	 *
+	 * @return mixed
+	 */
+	public function inc( string $field, int $value );
 
-    /**
-     * @param bool $before
-     *
-     * @return JsonInterface
-     */
-    public function updateOneAndGet( bool $before = false ): JsonInterface;
+	/**
+	 * @return int
+	 */
+	public function delete(): int;
 
-    /**
-     * @return string|null
-     */
-    public function updateOrInsert(): ?string;
+	/**
+	 * @return bool
+	 */
+	public function deleteOne(): bool;
 
-    /**
-     * @return string|null
-     */
-    public function insert(): ?string;
+	/**
+	 * @return JsonInterface
+	 */
+	public function deleteOneAndGet(): JsonInterface;
+
+	/**
+	 * @return int
+	 */
+	public function update(): int;
+
+	/**
+	 * @return bool
+	 */
+	public function updateOne(): bool;
+
+	/**
+	 * @param bool $before
+	 *
+	 * @return JsonInterface
+	 */
+	public function updateOneAndGet( bool $before = false ): JsonInterface;
+
+	/**
+	 * @return string|null
+	 */
+	public function updateOrInsert(): ?string;
+
+	/**
+	 * @return string|null
+	 */
+	public function insert(): ?string;
 }

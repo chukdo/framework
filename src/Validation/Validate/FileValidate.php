@@ -14,58 +14,58 @@ use Chukdo\Storage\FileUploaded;
  */
 class FileValidate implements ValidateInterface
 {
-    /**
-     * @var int|null
-     */
-    protected $maxFileSize = null;
+	/**
+	 * @var int|null
+	 */
+	protected $maxFileSize = null;
 
-    /**
-     * @var string|null
-     */
-    protected $allowedMimeTypes = null;
+	/**
+	 * @var string|null
+	 */
+	protected $allowedMimeTypes = null;
 
-    /**
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'file';
-    }
+	/**
+	 * @return string
+	 */
+	public function name(): string
+	{
+		return 'file';
+	}
 
-    /**
-     * @param array $attributes
-     *
-     * @return self
-     */
-    public function attributes( array $attributes ): ValidateInterface
-    {
-        foreach ( $attributes as $attr ) {
-            if ( (string) (int) $attr === $attr ) {
-                $this->maxFileSize = 1024 * 1024 * (int) $attr;
-            } else {
-                $this->allowedMimeTypes .= $attr . ',';
-            }
-        }
+	/**
+	 * @param array $attributes
+	 *
+	 * @return self
+	 */
+	public function attributes( array $attributes ): ValidateInterface
+	{
+		foreach ( $attributes as $attr ) {
+			if ( (string) (int) $attr === $attr ) {
+				$this->maxFileSize = 1024 * 1024 * (int) $attr;
+			} else {
+				$this->allowedMimeTypes .= $attr . ',';
+			}
+		}
 
-        $this->allowedMimeTypes = trim( $this->allowedMimeTypes, ',' );
+		$this->allowedMimeTypes = trim( $this->allowedMimeTypes, ',' );
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * @param $input
-     *
-     * @return bool
-     */
-    public function validate( $input ): bool
-    {
-        if ( $input instanceof FileUploaded ) {
-            $input->setAllowedMimeTypes( $this->allowedMimeTypes );
-            $input->setMaxFileSize( $this->maxFileSize );
+	/**
+	 * @param $input
+	 *
+	 * @return bool
+	 */
+	public function validate( $input ): bool
+	{
+		if ( $input instanceof FileUploaded ) {
+			$input->setAllowedMimeTypes( $this->allowedMimeTypes );
+			$input->setMaxFileSize( $this->maxFileSize );
 
-            return $input->isValid();
-        }
+			return $input->isValid();
+		}
 
-        return false;
-    }
+		return false;
+	}
 }

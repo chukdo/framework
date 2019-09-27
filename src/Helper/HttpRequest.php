@@ -13,166 +13,166 @@ use Chukdo\Http\Url;
  */
 final class HttpRequest
 {
-    /**
-     * HttpRequest constructor.
-     */
-    private function __construct()
-    {
-    }
+	/**
+	 * HttpRequest constructor.
+	 */
+	private function __construct()
+	{
+	}
 
-    /**
-     * @return string|null
-     */
-    public static function method(): ?string
-    {
-        return Cli::runningInConsole()
-            ? 'CLI'
-            : self::request( 'httpverb', self::server( 'REQUEST_METHOD' ) );
-    }
+	/**
+	 * @return string|null
+	 */
+	public static function method(): ?string
+	{
+		return Cli::runningInConsole()
+			? 'CLI'
+			: self::request( 'httpverb', self::server( 'REQUEST_METHOD' ) );
+	}
 
-    /**
-     * @param             $name
-     * @param string|null $default
-     *
-     * @return string|null
-     */
-    public static function request( $name, string $default = null ): ?string
-    {
-        $request = self::all();
+	/**
+	 * @param             $name
+	 * @param string|null $default
+	 *
+	 * @return string|null
+	 */
+	public static function request( $name, string $default = null ): ?string
+	{
+		$request = self::all();
 
-        return isset( $request[ $name ] )
-            ? $request[ $name ]
-            : $default;
-    }
+		return isset( $request[ $name ] )
+			? $request[ $name ]
+			: $default;
+	}
 
-    /**
-     * @return array
-     */
-    public static function all(): array
-    {
-        return Cli::runningInConsole()
-            ? Cli::inputs()
-            : $_REQUEST;
-    }
+	/**
+	 * @return array
+	 */
+	public static function all(): array
+	{
+		return Cli::runningInConsole()
+			? Cli::inputs()
+			: $_REQUEST;
+	}
 
-    /**
-     * @param string      $name
-     * @param string|null $default
-     *
-     * @return string|null
-     */
-    public static function server( string $name, string $default = null ): ?string
-    {
-        return isset( $_SERVER[ $name ] )
-            ? $_SERVER[ $name ]
-            : $default;
-    }
+	/**
+	 * @param string      $name
+	 * @param string|null $default
+	 *
+	 * @return string|null
+	 */
+	public static function server( string $name, string $default = null ): ?string
+	{
+		return isset( $_SERVER[ $name ] )
+			? $_SERVER[ $name ]
+			: $default;
+	}
 
-    /**
-     * @return bool
-     */
-    public static function secured(): bool
-    {
-        return self::server( 'HTTPS' ) || self::server( 'SERVER_PORT' ) == '443'
-            || self::server( 'REQUEST_SCHEME' ) == 'https';
-    }
+	/**
+	 * @return bool
+	 */
+	public static function secured(): bool
+	{
+		return self::server( 'HTTPS' ) || self::server( 'SERVER_PORT' ) == '443'
+			|| self::server( 'REQUEST_SCHEME' ) == 'https';
+	}
 
-    /**
-     * @return bool
-     */
-    public static function ajax(): bool
-    {
-        return self::server( 'HTTP_X_REQUESTED_WITH' ) === 'XMLHttpRequest';
-    }
+	/**
+	 * @return bool
+	 */
+	public static function ajax(): bool
+	{
+		return self::server( 'HTTP_X_REQUESTED_WITH' ) === 'XMLHttpRequest';
+	}
 
-    /**
-     * @return string|null
-     */
-    public static function userAgent(): ?string
-    {
-        return self::server( 'HTTP_USER_AGENT' );
-    }
+	/**
+	 * @return string|null
+	 */
+	public static function userAgent(): ?string
+	{
+		return self::server( 'HTTP_USER_AGENT' );
+	}
 
-    /**
-     * @return string|null
-     */
-    public static function render(): ?string
-    {
-        return Cli::runningInConsole()
-            ? 'cli'
-            : Str::extension( self::uri() );
-    }
+	/**
+	 * @return string|null
+	 */
+	public static function render(): ?string
+	{
+		return Cli::runningInConsole()
+			? 'cli'
+			: Str::extension( self::uri() );
+	}
 
-    /**
-     * @return string|null
-     */
-    public static function uri(): ?string
-    {
-        return Cli::runningInConsole()
-            ? Cli::uri()
-            : self::server( 'SCRIPT_URI' );
-    }
+	/**
+	 * @return string|null
+	 */
+	public static function uri(): ?string
+	{
+		return Cli::runningInConsole()
+			? Cli::uri()
+			: self::server( 'SCRIPT_URI' );
+	}
 
-    /**
-     * @return string
-     */
-    public static function host(): string
-    {
-        return self::server( 'HTTP_HOST' );
-    }
+	/**
+	 * @return string
+	 */
+	public static function host(): string
+	{
+		return self::server( 'HTTP_HOST' );
+	}
 
-    /**
-     * @return string
-     */
-    public static function tld(): string
-    {
-        return ( new Url( self::uri() ) )->getTld();
-    }
+	/**
+	 * @return string
+	 */
+	public static function tld(): string
+	{
+		return ( new Url( self::uri() ) )->getTld();
+	}
 
-    /**
-     * @return string
-     */
-    public static function domain(): string
-    {
-        return ( new Url( self::uri() ) )->getDomain();
-    }
+	/**
+	 * @return string
+	 */
+	public static function domain(): string
+	{
+		return ( new Url( self::uri() ) )->getDomain();
+	}
 
-    /**
-     * @return string
-     */
-    public static function subDomain(): string
-    {
-        return ( new Url( self::uri() ) )->getSubDomain();
-    }
+	/**
+	 * @return string
+	 */
+	public static function subDomain(): string
+	{
+		return ( new Url( self::uri() ) )->getSubDomain();
+	}
 
-    /**
-     * @return array
-     */
-    public static function cookies(): array
-    {
-        return (array) self::server( 'HTTP_COOKIE' );
-    }
+	/**
+	 * @return array
+	 */
+	public static function cookies(): array
+	{
+		return (array) self::server( 'HTTP_COOKIE' );
+	}
 
-    /**
-     * @return array
-     */
-    public static function headers(): array
-    {
-        $headers = [];
+	/**
+	 * @return array
+	 */
+	public static function headers(): array
+	{
+		$headers = [];
 
-        foreach ( $_SERVER as $key => $value ) {
-            if ( $name = Str::match( '/^HTTP_(.*)/',
-                $key ) ) {
-                switch ( $name ) {
-                    case 'HOST':
-                    case 'COOKIE':
-                        break;
-                    default:
-                        $headers[ $name ] = $value;
-                }
-            }
-        }
+		foreach ( $_SERVER as $key => $value ) {
+			if ( $name = Str::match( '/^HTTP_(.*)/',
+				$key ) ) {
+				switch ( $name ) {
+					case 'HOST':
+					case 'COOKIE':
+						break;
+					default:
+						$headers[ $name ] = $value;
+				}
+			}
+		}
 
-        return $headers;
-    }
+		return $headers;
+	}
 }

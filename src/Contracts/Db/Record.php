@@ -13,35 +13,35 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
  */
 interface Record extends JsonInterface
 {
-    /**
-     * @return mixed
-     */
-    public function collection();
+	/**
+	 * @return mixed
+	 */
+	public function collection();
 
-    /**
-     * @return string|null
-     */
-    public function id(): ?string;
+	/**
+	 * @return string|null
+	 */
+	public function id(): ?string;
 
-    /**
-     * @return Record
-     */
-    public function save(): self;
+	/**
+	 * @return Record
+	 */
+	public function save(): self;
 
-    /**
-     * @return JsonInterface
-     */
-    public function record(): JsonInterface;
+	/**
+	 * @return JsonInterface
+	 */
+	public function record(): JsonInterface;
 
-    /**
-     * @return Record
-     */
-    public function delete(): self;
+	/**
+	 * @return Record
+	 */
+	public function delete(): self;
 
-    /**
-     * @param string $collection
-     *
-     * @return mixed
-     */
-    public function moveTo( string $collection ): self;
+	/**
+	 * @param string $collection
+	 *
+	 * @return mixed
+	 */
+	public function moveTo( string $collection ): self;
 }

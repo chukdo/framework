@@ -14,43 +14,43 @@ use Chukdo\Helper\Str;
  */
 class FloatFilter implements FilterInterface
 {
-    /**
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'float';
-    }
+	/**
+	 * @return string
+	 */
+	public function name(): string
+	{
+		return 'float';
+	}
 
-    /**
-     * @param array $attributes
-     *
-     * @return self
-     */
-    public function attributes( array $attributes ): FilterInterface
-    {
-        return $this;
-    }
+	/**
+	 * @param array $attributes
+	 *
+	 * @return self
+	 */
+	public function attributes( array $attributes ): FilterInterface
+	{
+		return $this;
+	}
 
-    /**
-     * @param $input
-     *
-     * @return mixed
-     */
-    public function filter( $input )
-    {
-        if ( Str::match( '/^[0-9 .,]+$/', $input ) ) {
-            $input = str_replace( ' ', '', $input );
+	/**
+	 * @param $input
+	 *
+	 * @return mixed
+	 */
+	public function filter( $input )
+	{
+		if ( Str::match( '/^[0-9 .,]+$/', $input ) ) {
+			$input = str_replace( ' ', '', $input );
 
-            if ( Str::contain( $input, '.' ) && Str::contain( $input, ',' ) ) {
-                $input = str_replace( '.', '', $input );
-            }
+			if ( Str::contain( $input, '.' ) && Str::contain( $input, ',' ) ) {
+				$input = str_replace( '.', '', $input );
+			}
 
-            $input = str_replace( ',', '.', $input );
+			$input = str_replace( ',', '.', $input );
 
-            return (float) $input;
-        }
+			return (float) $input;
+		}
 
-        return $input;
-    }
+		return $input;
+	}
 }

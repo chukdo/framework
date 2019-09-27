@@ -13,35 +13,35 @@ use Chukdo\Contracts\Validation\Validate as ValidateInterface;
  */
 class EmailValidate implements ValidateInterface
 {
-    /**
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'email';
-    }
+	/**
+	 * @return string
+	 */
+	public function name(): string
+	{
+		return 'email';
+	}
 
-    /**
-     * @param array $attributes
-     *
-     * @return self
-     */
-    public function attributes( array $attributes ): ValidateInterface
-    {
-        return $this;
-    }
+	/**
+	 * @param array $attributes
+	 *
+	 * @return self
+	 */
+	public function attributes( array $attributes ): ValidateInterface
+	{
+		return $this;
+	}
 
-    /**
-     * @param $input
-     *
-     * @return bool
-     */
-    public function validate( $input ): bool
-    {
-        if ( filter_var( $input, FILTER_VALIDATE_EMAIL ) ) {
-            return true;
-        }
+	/**
+	 * @param $input
+	 *
+	 * @return bool
+	 */
+	public function validate( $input ): bool
+	{
+		if ( filter_var( $input, FILTER_VALIDATE_EMAIL ) ) {
+			return true;
+		}
 
-        return false;
-    }
+		return false;
+	}
 }

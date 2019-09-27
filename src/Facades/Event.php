@@ -12,8 +12,8 @@ namespace Chukdo\Facades;
  */
 class Event extends Facade
 {
-    public static function name(): string
-    {
-        return \Chukdo\Event\Event::class;
-    }
+	public static function name(): string
+	{
+		return \Chukdo\Event\Event::class;
+	}
 }

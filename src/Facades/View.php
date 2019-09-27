@@ -12,8 +12,8 @@ namespace Chukdo\Facades;
  */
 class View extends Facade
 {
-    public static function name(): string
-    {
-        return \Chukdo\View\View::class;
-    }
+	public static function name(): string
+	{
+		return \Chukdo\View\View::class;
+	}
 }

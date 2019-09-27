@@ -14,28 +14,28 @@ use Chukdo\Json\Json;
  */
 class JsonStringFormatter implements FormatterInterface
 {
-    /**
-     * @param array $record
-     *
-     * @return mixed
-     */
-    public function formatRecord( array $record )
-    {
-        $json = new Json( [
-            'date'    => date( 'd/m/Y H:i:s', $record[ 'date' ] ),
-            'name'    => $record[ 'channel' ] . '.' . $record[ 'levelname' ],
-            'message' => str_replace( [
-                "\r\n",
-                "\r",
-                "\n",
-            ],
-                ' ',
-                $record[ 'message' ] ),
-            'extra'   => $record[ 'extra' ],
-            'time'    => $record[ 'date' ],
-            'level'   => $record[ 'level' ],
-        ] );
+	/**
+	 * @param array $record
+	 *
+	 * @return mixed
+	 */
+	public function formatRecord( array $record )
+	{
+		$json = new Json( [
+			'date'    => date( 'd/m/Y H:i:s', $record[ 'date' ] ),
+			'name'    => $record[ 'channel' ] . '.' . $record[ 'levelname' ],
+			'message' => str_replace( [
+				"\r\n",
+				"\r",
+				"\n",
+			],
+				' ',
+				$record[ 'message' ] ),
+			'extra'   => $record[ 'extra' ],
+			'time'    => $record[ 'date' ],
+			'level'   => $record[ 'level' ],
+		] );
 
-        return $json->toJson();
-    }
+		return $json->toJson();
+	}
 }

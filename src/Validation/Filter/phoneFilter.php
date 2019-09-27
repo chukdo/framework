@@ -14,48 +14,48 @@ use Chukdo\Helper\Str;
  */
 class PhoneFilter implements FilterInterface
 {
-    /**
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'phone';
-    }
+	/**
+	 * @return string
+	 */
+	public function name(): string
+	{
+		return 'phone';
+	}
 
-    /**
-     * @param array $attributes
-     *
-     * @return self
-     */
-    public function attributes( array $attributes ): FilterInterface
-    {
-        return $this;
-    }
+	/**
+	 * @param array $attributes
+	 *
+	 * @return self
+	 */
+	public function attributes( array $attributes ): FilterInterface
+	{
+		return $this;
+	}
 
-    /**
-     * @param $input
-     *
-     * @return mixed
-     */
-    public function filter( $input )
-    {
+	/**
+	 * @param $input
+	 *
+	 * @return mixed
+	 */
+	public function filter( $input )
+	{
 
-        if ( Str::match( '/^(?:(?:\+|00)\d{2}|0)\s{0,2}[1-9](?:[\s.-]{0,3}\d{2}){4}$/', $input ) ) {
-            return str_replace( [
-                '.',
-                ',',
-                ' ',
-                '+',
-            ],
-                [
-                    '',
-                    '',
-                    '',
-                    '00',
-                ],
-                $input );
-        }
+		if ( Str::match( '/^(?:(?:\+|00)\d{2}|0)\s{0,2}[1-9](?:[\s.-]{0,3}\d{2}){4}$/', $input ) ) {
+			return str_replace( [
+				'.',
+				',',
+				' ',
+				'+',
+			],
+				[
+					'',
+					'',
+					'',
+					'00',
+				],
+				$input );
+		}
 
-        return $input;
-    }
+		return $input;
+	}
 }

@@ -17,247 +17,247 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
  */
 class Property implements PropertyInterface
 {
-    /**
-     * @var Json
-     */
-    protected $property;
+	/**
+	 * @var Json
+	 */
+	protected $property;
 
-    /**
-     * @var string|null
-     */
-    protected $name = null;
+	/**
+	 * @var string|null
+	 */
+	protected $name = null;
 
-    /**
-     * Property constructor.
-     *
-     * @param array       $property
-     * @param string|null $name
-     */
-    public function __construct( Array $property = [], string $name = null )
-    {
-        $this->name     = $name;
-        $this->property = new Json();
+	/**
+	 * Property constructor.
+	 *
+	 * @param array       $property
+	 * @param string|null $name
+	 */
+	public function __construct( Array $property = [], string $name = null )
+	{
+		$this->name     = $name;
+		$this->property = new Json();
 
-        foreach ( $property as $key => $value ) {
-            switch ( $key ) {
-                case 'properties' :
-                    $this->setProperties( (array) $value );
-                    break;
-                case 'type' :
-                    $this->setType( $value );
-                    break;
-                case 'copy_to' :
-                    $this->setCopyTo( $value );
-                    break;
-                case 'analyser' :
-                    $this->setAnalyser( $value );
-                    break;
-                case 'fields' :
-                    $this->setFields( $value );
-                    break;
-            }
-        }
-    }
+		foreach ( $property as $key => $value ) {
+			switch ( $key ) {
+				case 'properties' :
+					$this->setProperties( (array) $value );
+					break;
+				case 'type' :
+					$this->setType( $value );
+					break;
+				case 'copy_to' :
+					$this->setCopyTo( $value );
+					break;
+				case 'analyser' :
+					$this->setAnalyser( $value );
+					break;
+				case 'fields' :
+					$this->setFields( $value );
+					break;
+			}
+		}
+	}
 
-    /**
-     * @param array $value
-     *
-     * @return $this
-     */
-    public function setProperties( array $value ): self
-    {
-        $properties = $this->property->offsetGetOrSet( 'properties', [] );
+	/**
+	 * @param array $value
+	 *
+	 * @return $this
+	 */
+	public function setProperties( array $value ): self
+	{
+		$properties = $this->property->offsetGetOrSet( 'properties', [] );
 
-        foreach ( $value as $k => $v ) {
-            $properties->offsetSet( $k, new Property( (array) $v, $k ) );
-        }
+		foreach ( $value as $k => $v ) {
+			$properties->offsetSet( $k, new Property( (array) $v, $k ) );
+		}
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * text | keyword | int | float | boolean | date | ip | completion ...
-     * https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html
-     *
-     * @param string $value
-     *
-     * @return Property
-     */
-    public function setType( string $value ): self
-    {
-        $this->property->offsetSet( 'type', $value );
+	/**
+	 * text | keyword | int | float | boolean | date | ip | completion ...
+	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html
+	 *
+	 * @param string $value
+	 *
+	 * @return Property
+	 */
+	public function setType( string $value ): self
+	{
+		$this->property->offsetSet( 'type', $value );
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * https://www.elastic.co/guide/en/elasticsearch/reference/current/copy-to.html
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function setCopyTo( $value ): self
-    {
-        $this->property->offsetSet( 'copy_to', (array) $value );
+	/**
+	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/copy-to.html
+	 * @param string $value
+	 *
+	 * @return $this
+	 */
+	public function setCopyTo( $value ): self
+	{
+		$this->property->offsetSet( 'copy_to', (array) $value );
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer.html
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function setAnalyser( string $value ): self
-    {
-        $this->property->offsetSet( 'analyser', $value );
+	/**
+	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer.html
+	 * @param string $value
+	 *
+	 * @return $this
+	 */
+	public function setAnalyser( string $value ): self
+	{
+		$this->property->offsetSet( 'analyser', $value );
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * https://www.elastic.co/guide/en/elasticsearch/reference/current/multi-fields.html
-     * @param array $value
-     *
-     * @return $this
-     */
-    public function setFields( array $value ): self
-    {
-        $properties = $this->property->offsetGetOrSet( 'fields', [] );
+	/**
+	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/multi-fields.html
+	 * @param array $value
+	 *
+	 * @return $this
+	 */
+	public function setFields( array $value ): self
+	{
+		$properties = $this->property->offsetGetOrSet( 'fields', [] );
 
-        foreach ( $value as $k => $v ) {
-            $properties->offsetSet( $k, new Property( (array) $v, $k ) );
-        }
+		foreach ( $value as $k => $v ) {
+			$properties->offsetSet( $k, new Property( (array) $v, $k ) );
+		}
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * @return int
-     */
-    public function count(): int
-    {
-        return $this->property->count();
-    }
+	/**
+	 * @return int
+	 */
+	public function count(): int
+	{
+		return $this->property->count();
+	}
 
-    /**
-     * @return $this|null
-     */
-    public function fields(): ?Property
-    {
-        return $this->property->offsetGet( 'fields' );
-    }
+	/**
+	 * @return $this|null
+	 */
+	public function fields(): ?Property
+	{
+		return $this->property->offsetGet( 'fields' );
+	}
 
-    /**
-     * @param string $name
-     *
-     * @return $this|null
-     */
-    public function get( string $name ): ?Property
-    {
-        if ( Str::notContain( $name, '.' ) ) {
-            return $this->properties()
-                ->offsetGet( $name );
-        }
+	/**
+	 * @param string $name
+	 *
+	 * @return $this|null
+	 */
+	public function get( string $name ): ?Property
+	{
+		if ( Str::notContain( $name, '.' ) ) {
+			return $this->properties()
+						->offsetGet( $name );
+		}
 
-        $arr       = new Arr( Str::split( $name, '.' ) );
-        $firstPath = $arr->getFirstAndRemove();
-        $endPath   = $arr->join( '.' );
-        $get       = $this->properties()
-            ->offsetGet( $firstPath );
+		$arr       = new Arr( Str::split( $name, '.' ) );
+		$firstPath = $arr->getFirstAndRemove();
+		$endPath   = $arr->join( '.' );
+		$get       = $this->properties()
+						  ->offsetGet( $firstPath );
 
-        if ( $get instanceof Property ) {
-            return $get->get( $endPath );
-        }
+		if ( $get instanceof Property ) {
+			return $get->get( $endPath );
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    /**
-     * @return JsonInterface
-     */
-    public function properties(): JsonInterface
-    {
-        return $this->property->offsetGetOrSet( 'properties', [] );
-    }
+	/**
+	 * @return JsonInterface
+	 */
+	public function properties(): JsonInterface
+	{
+		return $this->property->offsetGetOrSet( 'properties', [] );
+	}
 
-    /**
-     * @param string      $name
-     * @param string|null $type
-     * @param array       $options
-     *
-     * @return Property
-     */
-    public function set( string $name, string $type = null, array $options = [] ): Property
-    {
-        $property = new Property( $options, $name );
+	/**
+	 * @param string      $name
+	 * @param string|null $type
+	 * @param array       $options
+	 *
+	 * @return Property
+	 */
+	public function set( string $name, string $type = null, array $options = [] ): Property
+	{
+		$property = new Property( $options, $name );
 
-        if ( $type ) {
-            $property->setType( $type );
-        }
+		if ( $type ) {
+			$property->setType( $type );
+		}
 
-        $this->properties()
-            ->offsetSet( $name, $property );
+		$this->properties()
+			 ->offsetSet( $name, $property );
 
-        return $property;
-    }
+		return $property;
+	}
 
-    /**
-     * @return array
-     */
-    public function toArray(): array
-    {
-        return $this->property->filterRecursive( function( $k, $v ) {
-            return $v instanceof Property
-                ? $v->toArray()
-                : $v;
-        } )
-            ->toArray();
-    }
+	/**
+	 * @return array
+	 */
+	public function toArray(): array
+	{
+		return $this->property->filterRecursive( function( $k, $v ) {
+			return $v instanceof Property
+				? $v->toArray()
+				: $v;
+		} )
+							  ->toArray();
+	}
 
-    /**
-     * @return string|null
-     */
-    public function name(): ?string
-    {
-        return $this->name;
-    }
+	/**
+	 * @return string|null
+	 */
+	public function name(): ?string
+	{
+		return $this->name;
+	}
 
-    /**
-     * @return string|null
-     */
-    public function type(): ?string
-    {
-        return $this->property->offsetGet( 'type' );
-    }
+	/**
+	 * @return string|null
+	 */
+	public function type(): ?string
+	{
+		return $this->property->offsetGet( 'type' );
+	}
 
-    /**
-     * @param string $name
-     *
-     * @return $this
-     */
-    public function unset( string $name ): self
-    {
-        $this->properties()
-            ->offsetUnset( $name );
+	/**
+	 * @param string $name
+	 *
+	 * @return $this
+	 */
+	public function unset( string $name ): self
+	{
+		$this->properties()
+			 ->offsetUnset( $name );
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * @return string|null
-     */
-    public function analyser(): ?string
-    {
-        return $this->property->offsetGet( 'analyser' );
-    }
+	/**
+	 * @return string|null
+	 */
+	public function analyser(): ?string
+	{
+		return $this->property->offsetGet( 'analyser' );
+	}
 
-    /**
-     * @return string|null
-     */
-    public function copyTo(): ?string
-    {
-        return $this->property->offsetGet( 'copy_to' );
-    }
+	/**
+	 * @return string|null
+	 */
+	public function copyTo(): ?string
+	{
+		return $this->property->offsetGet( 'copy_to' );
+	}
 }

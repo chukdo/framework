@@ -7,40 +7,40 @@ use Chukdo\Http\Response;
 
 class ControlerMiddleware implements MiddlewareInterface
 {
-    /**
-     * @var string
-     */
-    protected $controler = '';
+	/**
+	 * @var string
+	 */
+	protected $controler = '';
 
-    /**
-     * @var string
-     */
-    protected $action = '';
+	/**
+	 * @var string
+	 */
+	protected $action = '';
 
-    /**
-     * ControlerMiddleware constructor.
-     *
-     * @param String $uri
-     */
-    public function __construct( String $uri )
-    {
-        list( $this->controler, $this->action ) = explode( '@', $uri );
-    }
+	/**
+	 * ControlerMiddleware constructor.
+	 *
+	 * @param String $uri
+	 */
+	public function __construct( String $uri )
+	{
+		list( $this->controler, $this->action ) = explode( '@', $uri );
+	}
 
-    /**
-     * @param Dispatcher $dispatcher
-     *
-     * @return Response
-     */
-    public function process( Dispatcher $dispatcher ): Response
-    {
-        $inputs = $dispatcher->attribute( 'inputs' )
-            ?: $dispatcher->request()
-                ->inputs();
+	/**
+	 * @param Dispatcher $dispatcher
+	 *
+	 * @return Response
+	 */
+	public function process( Dispatcher $dispatcher ): Response
+	{
+		$inputs = $dispatcher->attribute( 'inputs' )
+			?: $dispatcher->request()
+						  ->inputs();
 
-        $controler = $this->controler;
-        $action    = $this->action;
+		$controler = $this->controler;
+		$action    = $this->action;
 
-        return ( new $controler() )->$action( $inputs, $dispatcher->response() );
-    }
+		return ( new $controler() )->$action( $inputs, $dispatcher->response() );
+	}
 }

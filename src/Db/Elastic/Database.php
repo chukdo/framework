@@ -18,184 +18,184 @@ use Throwable;
  */
 Class Database implements DatabaseInterface
 {
-    /**
-     * @var Server
-     */
-    protected $server;
+	/**
+	 * @var Server
+	 */
+	protected $server;
 
-    /**
-     * @var Client
-     */
-    protected $client;
+	/**
+	 * @var Client
+	 */
+	protected $client;
 
-    /**
-     * @var string|null
-     */
-    protected $database = null;
+	/**
+	 * @var string|null
+	 */
+	protected $database = null;
 
-    /**
-     * Database constructor.
-     *
-     * @param Server      $server
-     * @param string|null $database
-     */
-    public function __construct( Server $server, string $database = null )
-    {
-        $this->database = $database;
-        $this->server   = $server;
-        $this->client   = $server->client();
-    }
+	/**
+	 * Database constructor.
+	 *
+	 * @param Server      $server
+	 * @param string|null $database
+	 */
+	public function __construct( Server $server, string $database = null )
+	{
+		$this->database = $database;
+		$this->server   = $server;
+		$this->client   = $server->client();
+	}
 
-    /**
-     * @return string|null
-     */
-    public function prefixName(): ?string
-    {
-        return $this->name() !== null
-            ? $this->name() . '_'
-            : null;
-    }
+	/**
+	 * @return string|null
+	 */
+	public function prefixName(): ?string
+	{
+		return $this->name() !== null
+			? $this->name() . '_'
+			: null;
+	}
 
-    /**
-     * @return string|null
-     */
-    public function name(): ?string
-    {
-        return $this->database;
-    }
+	/**
+	 * @return string|null
+	 */
+	public function name(): ?string
+	{
+		return $this->database;
+	}
 
-    /**
-     * @return Server
-     */
-    public function server(): Server
-    {
-        return $this->server;
-    }
+	/**
+	 * @return Server
+	 */
+	public function server(): Server
+	{
+		return $this->server;
+	}
 
-    /**
-     * @return bool
-     */
-    public function drop(): bool
-    {
-        $drop = true;
+	/**
+	 * @return bool
+	 */
+	public function drop(): bool
+	{
+		$drop = true;
 
-        foreach ( $this->collections() as $collection ) {
-            $drop .= $this->collection( $collection )
-                ->drop();
-        }
+		foreach ( $this->collections() as $collection ) {
+			$drop .= $this->collection( $collection )
+						  ->drop();
+		}
 
-        return $drop;
-    }
+		return $drop;
+	}
 
-    /**
-     * @return Client
-     */
-    public function client(): Client
-    {
-        return $this->client;
-    }
+	/**
+	 * @return Client
+	 */
+	public function client(): Client
+	{
+		return $this->client;
+	}
 
-    /**
-     * @param string $collection
-     *
-     * @return Collection
-     */
-    public function collection( string $collection ): Collection
-    {
-        return new Collection( $this, $collection );
-    }
+	/**
+	 * @param string $collection
+	 *
+	 * @return Collection
+	 */
+	public function collection( string $collection ): Collection
+	{
+		return new Collection( $this, $collection );
+	}
 
-    /**
-     * @param string $collection
-     *
-     * @return Collection
-     */
-    public function createCollection( string $collection ): Collection
-    {
-        if ( !$this->collectionExist( $collection ) ) {
-            $this->client()
-                ->indices()
-                ->create( [ 'index' => $collection ] );
-        }
+	/**
+	 * @param string $collection
+	 *
+	 * @return Collection
+	 */
+	public function createCollection( string $collection ): Collection
+	{
+		if ( !$this->collectionExist( $collection ) ) {
+			$this->client()
+				 ->indices()
+				 ->create( [ 'index' => $collection ] );
+		}
 
-        return $this->collection( $collection );
-    }
+		return $this->collection( $collection );
+	}
 
-    /**
-     * @param string $collection
-     *
-     * @return bool
-     */
-    public function collectionExist( string $collection ): bool
-    {
-        foreach ( $this->collections() as $coll ) {
-            if ( $coll == $collection ) {
-                return true;
-            }
-        }
+	/**
+	 * @param string $collection
+	 *
+	 * @return bool
+	 */
+	public function collectionExist( string $collection ): bool
+	{
+		foreach ( $this->collections() as $coll ) {
+			if ( $coll == $collection ) {
+				return true;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    /**
-     * @return JsonInterface
-     */
-    public function collections(): JsonInterface
-    {
-        $list    = new Json();
-        $indices = $this->client()
-            ->cat()
-            ->indices();
+	/**
+	 * @return JsonInterface
+	 */
+	public function collections(): JsonInterface
+	{
+		$list    = new Json();
+		$indices = $this->client()
+						->cat()
+						->indices();
 
-        foreach ( $indices as $indice ) {
-            if ( $this->name() !== null ) {
-                if ( Str::startWith( $indice[ 'index' ], $this->name() . '_' ) ) {
-                    $list->append( $indice[ 'index' ] );
-                }
-            } else {
-                $list->append( $indice[ 'index' ] );
-            }
-        }
+		foreach ( $indices as $indice ) {
+			if ( $this->name() !== null ) {
+				if ( Str::startWith( $indice[ 'index' ], $this->name() . '_' ) ) {
+					$list->append( $indice[ 'index' ] );
+				}
+			} else {
+				$list->append( $indice[ 'index' ] );
+			}
+		}
 
-        return $list;
-    }
+		return $list;
+	}
 
-    /**
-     * @param string $collection
-     *
-     * @return $this
-     */
-    public function dropCollection( string $collection ): self
-    {
-        try {
-            $this->client()
-                ->indices()
-                ->delete( [ 'index' => $this->prefixName() . $collection ] );
-        } catch ( Throwable $e ) {
-        }
+	/**
+	 * @param string $collection
+	 *
+	 * @return $this
+	 */
+	public function dropCollection( string $collection ): self
+	{
+		try {
+			$this->client()
+				 ->indices()
+				 ->delete( [ 'index' => $this->prefixName() . $collection ] );
+		} catch ( Throwable $e ) {
+		}
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * @return JsonInterface
-     */
-    public function info(): JsonInterface
-    {
-        $stats = new Json( $this->client()
-            ->indices()
-            ->stats( [ 'index' => '*' ] ) );
+	/**
+	 * @return JsonInterface
+	 */
+	public function info(): JsonInterface
+	{
+		$stats = new Json( $this->client()
+								->indices()
+								->stats( [ 'index' => '*' ] ) );
 
-        $info = new Json();
+		$info = new Json();
 
-        foreach ( $stats->offsetGet( 'indices' ) as $key => $indice ) {
-            if ( Str::startWith( $key, $this->name() ) ) {
-                $info->offsetSet( $key, $indice->offsetGet( 'total' ) );
-            }
-        }
+		foreach ( $stats->offsetGet( 'indices' ) as $key => $indice ) {
+			if ( Str::startWith( $key, $this->name() ) ) {
+				$info->offsetSet( $key, $indice->offsetGet( 'total' ) );
+			}
+		}
 
-        return $info;
-    }
+		return $info;
+	}
 
 
 }

@@ -13,30 +13,30 @@ use Chukdo\Db\Mongo\Aggregate\Aggregate;
  */
 Class Match extends Where
 {
-    /**
-     * @var Collection
-     */
-    protected $collection;
+	/**
+	 * @var Collection
+	 */
+	protected $collection;
 
-    /**
-     * @var Aggregate
-     */
-    protected $aggregate;
+	/**
+	 * @var Aggregate
+	 */
+	protected $aggregate;
 
-    /**
-     * Match constructor.
-     *
-     * @param Aggregate  $aggregate
-     * @param Collection $collection
-     */
-    public function __construct( Aggregate $aggregate, Collection $collection )
-    {
-        parent::__construct( $collection );
-        $this->aggregate = $aggregate;
-    }
+	/**
+	 * Match constructor.
+	 *
+	 * @param Aggregate  $aggregate
+	 * @param Collection $collection
+	 */
+	public function __construct( Aggregate $aggregate, Collection $collection )
+	{
+		parent::__construct( $collection );
+		$this->aggregate = $aggregate;
+	}
 
-    public function pipe(): Aggregate
-    {
-        return $this->aggregate;
-    }
+	public function pipe(): Aggregate
+	{
+		return $this->aggregate;
+	}
 }

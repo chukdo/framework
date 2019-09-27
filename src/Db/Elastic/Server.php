@@ -17,113 +17,115 @@ use Chukdo\Contracts\Db\Server as ServerInterface;
  */
 Class Server implements ServerInterface
 {
-    /**
-     * @var string|null
-     */
-    protected $dsn = null;
+	/**
+	 * @var string|null
+	 */
+	protected $dsn = null;
 
-    /**
-     * @var ClientBuilder
-     */
-    protected $client;
+	/**
+	 * @var ClientBuilder
+	 */
+	protected $client;
 
-    /**
-     * @var string|null
-     */
-    protected $database = null;
+	/**
+	 * @var string|null
+	 */
+	protected $database = null;
 
-    /**
-     * Server constructor.
-     *
-     * @param string|null $dsn
-     * @param string|null $database
-     * @param bool        $synchronous
-     */
-    public function __construct( string $dsn = null, string $database = null, bool $synchronous = true )
-    {
-        $this->dsn      = $dsn
-            ?: 'localhost:9200';
-        $this->database = $database;
-        $this->client   = ClientBuilder::create()
-            ->setHosts( explode( ',',
-                $this->dsn ) )
-            ->setHandler( $synchronous
-                ? ClientBuilder::singleHandler()
-                : ClientBuilder::multiHandler() )
-            ->build();
-    }
+	/**
+	 * Server constructor.
+	 *
+	 * @param string|null $dsn
+	 * @param string|null $database
+	 * @param bool        $synchronous
+	 */
+	public function __construct( string $dsn = null, string $database = null, bool $synchronous = true )
+	{
+		$this->dsn      = $dsn
+			?: 'localhost:9200';
+		$this->database = $database;
+		$this->client   = ClientBuilder::create()
+									   ->setHosts( explode( ',',
+										   $this->dsn ) )
+									   ->setHandler( $synchronous
+										   ? ClientBuilder::singleHandler()
+										   : ClientBuilder::multiHandler() )
+									   ->build();
+	}
 
-    /**
-     * @return bool
-     */
-    public function ping(): bool
-    {
-        return $this->client()
-            ->ping();
-    }
+	/**
+	 * @return bool
+	 */
+	public function ping(): bool
+	{
+		return $this->client()
+					->ping();
+	}
 
-    /**
-     * @return Client
-     */
-    public function client(): Client
-    {
-        return $this->client;
-    }    /**
-     * @return JsonInterface
-     */
-    public function status(): JsonInterface
-    {
-        return new Json( $this->client()
-            ->info() );
-    }
+	/**
+	 * @return Client
+	 */
+	public function client(): Client
+	{
+		return $this->client;
+	}
 
-    /**
-     * @return JsonInterface
-     */
-    public function databases(): JsonInterface
-    {
-        $databases = new Json();
+	/**
+	 * @return JsonInterface
+	 */
+	public function status(): JsonInterface
+	{
+		return new Json( $this->client()
+							  ->info() );
+	}
 
-        foreach ( $this->client()
-            ->cat()
-            ->indices( [ 'index' => '*' ] ) as $indice ) {
-            $databases->append( $indice[ 'index' ] );
-        }
+	/**
+	 * @return JsonInterface
+	 */
+	public function databases(): JsonInterface
+	{
+		$databases = new Json();
 
-        return $databases;
-    }    /**
-     * @return string
-     */
-    public function version(): string
-    {
-        return (string) $this->status()
-            ->get( 'version.number' );
-    }
+		foreach ( $this->client()
+					   ->cat()
+					   ->indices( [ 'index' => '*' ] ) as $indice ) {
+			$databases->append( $indice[ 'index' ] );
+		}
 
-    /**
-     * @param string      $collection
-     * @param string|null $database
-     *
-     * @return Collection
-     */
-    public function collection( string $collection, string $database = null ): Collection
-    {
-        return $this->database( $database )
-            ->collection( $collection );
-    }
+		return $databases;
+	}
 
-    /**
-     * @param string|null $database
-     *
-     * @return Database
-     */
-    public function database( string $database = null ): Database
-    {
-        return new Database( $this, $database
-            ?: $this->database );
-    }
+	/**
+	 * @return string
+	 */
+	public function version(): string
+	{
+		return (string) $this->status()
+							 ->get( 'version.number' );
+	}
 
+	/**
+	 * @param string      $collection
+	 * @param string|null $database
+	 *
+	 * @return Collection
+	 */
+	public function collection( string $collection, string $database = null ): Collection
+	{
+		return $this->database( $database )
+					->collection( $collection );
+	}
 
+	/**
+	 * @param string|null $database
+	 *
+	 * @return Database
+	 */
+	public function database( string $database = null ): Database
+	{
+		return new Database( $this, $database
+			?: $this->database );
+	}
 
 
 }

@@ -14,54 +14,54 @@ use Exception;
  */
 class RedisHandler extends AbstractHandler
 {
-    /**
-     * @var object
-     */
-    protected $redis;
+	/**
+	 * @var object
+	 */
+	protected $redis;
 
-    /**
-     * @var string
-     */
-    protected $key;
+	/**
+	 * @var string
+	 */
+	protected $key;
 
-    /**
-     * RedisHandler constructor.
-     *
-     * @param RedisInterface|null $redis
-     * @param string|null         $key
-     */
-    public function __construct( ?RedisInterface $redis, string $key = null )
-    {
-        $this->redis = $redis;
-        $this->key   = $key
-            ?: 'log';
+	/**
+	 * RedisHandler constructor.
+	 *
+	 * @param RedisInterface|null $redis
+	 * @param string|null         $key
+	 */
+	public function __construct( ?RedisInterface $redis, string $key = null )
+	{
+		$this->redis = $redis;
+		$this->key   = $key
+			?: 'log';
 
-        parent::__construct();
-    }
+		parent::__construct();
+	}
 
-    /**
-     * Destructeur.
-     */
-    public function __destruct()
-    {
-        $this->redis->__destruct();
-        $this->redis = null;
-    }
+	/**
+	 * Destructeur.
+	 */
+	public function __destruct()
+	{
+		$this->redis->__destruct();
+		$this->redis = null;
+	}
 
-    /**
-     * @param string $record
-     *
-     * @return bool
-     */
-    public function write( $record ): bool
-    {
-        try {
-            $this->redis->rpush( $this->key,
-                $record );
+	/**
+	 * @param string $record
+	 *
+	 * @return bool
+	 */
+	public function write( $record ): bool
+	{
+		try {
+			$this->redis->rpush( $this->key,
+				$record );
 
-            return true;
-        } catch ( Exception $e ) {
-            return false;
-        }
-    }
+			return true;
+		} catch ( Exception $e ) {
+			return false;
+		}
+	}
 }
