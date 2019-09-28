@@ -341,7 +341,7 @@ Class Write extends Where implements WriteInterface
 	 *
 	 * @return JsonInterface
 	 */
-	public function updateOneAndGet( bool $before = false ): JsonInterface
+	public function updateOneAndGet( bool $before = true ): JsonInterface
 	{
 		$options = array_merge( [
 			'projection'     => [],

@@ -96,6 +96,13 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
 	public function getIndex( int $key = 0, $default = null );
 
 	/**
+	 * @param int $key
+	 *
+	 * @return Json
+	 */
+	public function getIndexJson( int $key = 0 ): JsonInterface;
+
+	/**
 	 * @return mixed
 	 */
 	public function getLast();
@@ -231,6 +238,13 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
 	 * @return mixed|null
 	 */
 	public function get( ?string $path, $default = null );
+
+	/**
+	 * @param string|null $path
+	 *
+	 * @return Json
+	 */
+	public function getJson( ?string $path ): JsonInterface;
 
 	/**
 	 * @param string $path

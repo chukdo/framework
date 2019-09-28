@@ -40,7 +40,7 @@ class Schema implements SchemaInterface
 			->client()
 			->indices()
 			->getMapping( [ 'index' => $name ] ) );
-		$properties       = $info->get( $name . '.mappings', new Json() )
+		$properties       = $info->getJson( $name . '.mappings' )
 								 ->toArray();
 
 

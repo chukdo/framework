@@ -41,7 +41,7 @@ class Schema implements SchemaInterface
 								   'filter'          => [ 'name' => $collection->name() ],
 							   ], $db->name() );
 
-		$this->property = new Property( $json->get( '0.options.validator.$jsonSchema', new Json() )
+		$this->property = new Property( $json->getJson( '0.options.validator.$jsonSchema' )
 											 ->toArray() );
 	}
 

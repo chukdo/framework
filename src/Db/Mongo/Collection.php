@@ -205,7 +205,7 @@ Class Collection implements CollectionInterface
 					  ->server()
 					  ->command( [ 'collStats' => $this->name() ], $this->database()
 																		->name() )
-					  ->getIndex( 0, new Json() )
+					  ->getIndexJson( 0 )
 					  ->filter( function( $k, $v ) {
 						  if ( is_scalar( $v ) ) {
 							  return $v;

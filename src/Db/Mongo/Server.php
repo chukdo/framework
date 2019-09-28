@@ -149,7 +149,7 @@ Class Server implements ServerInterface
 	public function status(): JsonInterface
 	{
 		$status = $this->command( [ 'serverStatus' => 1 ] )
-					   ->getIndex( '0', new Json() )
+					   ->getIndexJson( '0' )
 					   ->filter( function( $k, $v ) {
 						   if ( is_scalar( $v ) ) {
 							   return $v;
@@ -177,7 +177,7 @@ Class Server implements ServerInterface
 	public function ReplicatSetStatus(): JsonInterface
 	{
 		$status = $this->command( [ 'replSetGetStatus' => 1 ] )
-					   ->getIndex( '0', new Json() )
+					   ->getIndexJson( '0' )
 					   ->filter( function( $k, $v ) {
 						   if ( is_scalar( $v ) ) {
 							   return $v;

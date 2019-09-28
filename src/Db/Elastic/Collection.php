@@ -224,7 +224,7 @@ Class Collection implements CollectionInterface
 								->indices()
 								->stats( [ 'index' => $this->name() ] ) );
 
-		return $stats->get( 'indices.' . $this->fullName(), new Json() );
+		return $stats->getJson( 'indices.' . $this->fullName() );
 	}
 
 	/**

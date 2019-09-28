@@ -118,11 +118,9 @@ interface Write
 	public function updateOne(): bool;
 
 	/**
-	 * @param bool $before
-	 *
 	 * @return JsonInterface
 	 */
-	public function updateOneAndGet( bool $before = false ): JsonInterface;
+	public function updateOneAndGet(): JsonInterface;
 
 	/**
 	 * @return string|null

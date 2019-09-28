@@ -325,7 +325,7 @@ Class Write extends Where implements WriteInterface
 		$json   = new Json( $this->collection()
 								 ->client()
 								 ->search( $query ) );
-		$record = $json->get( 'hits.hits.0._source', new Json() )
+		$record = $json->getJson( 'hits.hits.0._source' )
 					   ->filterRecursive( function( $k, $v ) {
 						   return Collection::filterOut( $k, $v );
 					   } );
@@ -365,8 +365,9 @@ Class Write extends Where implements WriteInterface
 	 */
 	public function validatedInsertFields(): array
 	{
-		return (array) $this->fields()
-							->offsetGet( 'set' );
+		return $this->fields()
+					->getJson( 'set' )
+					->toArray();
 	}
 
 	/**
@@ -375,49 +376,31 @@ Class Write extends Where implements WriteInterface
 	public function updateOne(): bool
 	{
 		$query = [
-			'index'     => $this->collection()
-								->fullName(),
-			'body'      => [
-				'query'  => [
-					'bool' => [
-						'must' => [
-							'term' => [
-								'_id' => $this->getOne()
-											  ->offsetGet( '_id' ),
-							],
-						],
-					],
-				],
+			'index'             => $this->collection()
+										->fullName(),
+			'id'                => $this->getOne()
+										->offsetGet( '_id' ),
+			'body'              => [
 				'script' => $this->validatedUpdateFields(),
 			],
-			'conflicts' => 'proceed',
+			'retry_on_conflict' => 3,
 		];
 
 		$command = $this->collection()
 						->client()
-						->updateByQuery( $query );
+						->update( $query );
 
-		return $command[ 'updated' ];
+		return $command[ 'result' ] == 'updated';
 	}
 
 	/**
-	 * @param bool $before
-	 *
 	 * @return JsonInterface
 	 */
-	public function updateOneAndGet( bool $before = false ): JsonInterface
+	public function updateOneAndGet(): JsonInterface
 	{
-		if ( $before ) {
-			$get = $this->getOne();
+		$get = $this->getOne();
 
-			$this->updateOne();
-		} else {
-			$this->updateOne();
-
-			$get = $this->getOne();
-		}
-
-		// ne fonctionne pas !!!!
+		$this->updateOne();
 
 		return $get;
 	}
@@ -427,7 +410,16 @@ Class Write extends Where implements WriteInterface
 	 */
 	public function updateOrInsert(): ?string
 	{
+		$get = $this->getOne();
+		$id  = $get->offsetGet( '_id' );
 
+		if ( $id ) {
+			$this->updateOne();
+		} else {
+			$id = $this->insert();
+		}
+
+		return $id;
 	}
 
 	/**

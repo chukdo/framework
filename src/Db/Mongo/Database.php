@@ -158,7 +158,7 @@ Class Database implements DatabaseInterface
 	{
 		$stats = $this->server()
 					  ->command( [ 'dbStats' => 1 ], $this->name() )
-					  ->getIndex( 0, new Json() )
+					  ->getIndexJson( 0 )
 					  ->filter( function( $k, $v ) {
 						  if ( is_scalar( $v ) ) {
 							  return $v;

@@ -495,6 +495,16 @@ class Json extends ArrayObject implements JsonInterface
 	}
 
 	/**
+	 * @param string|null $path
+	 *
+	 * @return JsonInterface
+	 */
+	public function getJson( ?string $path ): JsonInterface
+	{
+		return $this->get( $path, new Json() );
+	}
+
+	/**
 	 * @param string $path
 	 *
 	 * @return bool
@@ -595,6 +605,16 @@ class Json extends ArrayObject implements JsonInterface
 	public function count(): int
 	{
 		return parent::count();
+	}
+
+	/**
+	 * @param int $key
+	 *
+	 * @return JsonInterface
+	 */
+	public function getIndexJson( int $key = 0 ): JsonInterface
+	{
+		return $this->getIndex( $key, new Json() );
 	}
 
 	/**
