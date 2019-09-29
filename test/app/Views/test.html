@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title><?=$this->j('title')?></title>
+</head>
+<body>
+<h1><?=$this->j('title', 'strtoupper')?></h1>
+<ul>
+    <?php if ($this->j('list')): ?>
+    <?php foreach($this->j('list') as $item): ?>
+    <li>
+        <?=$this->v($item, 'ucfirst')?><?php if ($this->v($this->contain($item, 'd'))): ?>OMINGO<?php endif; ?>
+    </li>
+    <?php endforeach; ?>
+    <?php endif; ?>
+</ul>
+</body>
+</html>
