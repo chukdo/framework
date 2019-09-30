@@ -1,16 +1,13 @@
 <?php
 
-namespace Chukdo\Db\Mongo;
+namespace Chukdo\Db\Elastic;
 
 use Chukdo\Helper\Arr;
 use Chukdo\Json\Json;
-use Chukdo\Db\Mongo\Record\Record;
-use Chukdo\Db\Mongo\Record\RecordList;
 use Chukdo\Contracts\Db\Find as FindInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Contracts\Db\Record as RecordInterface;
 use Chukdo\Contracts\Db\RecordList as RecordListInterface;
-use MongoDB\Driver\ReadPreference;
 
 /**
  * Server Find.
@@ -21,11 +18,6 @@ use MongoDB\Driver\ReadPreference;
  */
 Class Find extends Where implements FindInterface
 {
-	/**
-	 * @var Collection
-	 */
-	protected $collection;
-
 	/**
 	 * @var array
 	 */
@@ -62,43 +54,19 @@ Class Find extends Where implements FindInterface
 	protected $hiddenId = false;
 
 	/**
-	 * Find constructor.
+	 * @param string $field
 	 *
-	 * @param Collection $collection
+	 * @return JsonInterface
 	 */
-	public function __construct( Collection $collection )
+	public function distinct( string $field ): JsonInterface
 	{
-		$this->collection = $collection;
-	}
+		$distinct = new Json( $this->collection()
+								   ->client()
+								   ->search( $this->query( [
+									   'body.aggs.' . $field . 's.terms.field' => $field,
+								   ] ) ) );
 
-	/**
-	 * ReadPreference::RP_PRIMARY = 1,
-	 * RP_SECONDARY = 2,
-	 * RP_PRIMARY_PREFERRED = 5,
-	 * RP_SECONDARY_PREFERRED = 6,
-	 * RP_NEAREST = 10
-	 *
-	 * @param int $readPreference
-	 *
-	 * @return Find
-	 */
-	public function setReadPreference( int $readPreference ): self
-	{
-		$this->collection()
-			 ->database()
-			 ->server()
-			 ->client()
-			 ->selectServer( new ReadPreference( $readPreference ) );
-
-		return $this;
-	}
-
-	/**
-	 * @return Collection
-	 */
-	public function collection(): Collection
-	{
-		return $this->collection;
+		return $distinct->get( 'hits.hits' );
 	}
 
 	/**
@@ -106,9 +74,11 @@ Class Find extends Where implements FindInterface
 	 */
 	public function count(): int
 	{
-		return (int) $this->collection()
-						  ->client()
-						  ->countDocuments( $this->filter() );
+		$count = $this->collection()
+					  ->client()
+					  ->count( $this->query() );
+
+		return (int) $count[ 'count' ];
 	}
 
 	/**
@@ -297,39 +267,5 @@ Class Find extends Where implements FindInterface
 		return $this;
 	}
 
-	/**
-	 * @return JsonInterface
-	 */
-	public function explain(): JsonInterface
-	{
-		$explain = $this->collection()
-						->database()
-						->server()
-						->command( [
-							'explain' => [
-								'find'   => $this->collection()
-												 ->name(),
-								'filter' => $this->filter(),
-							],
-						] );
 
-		$json = new Json();
-
-		$json->offsetSet( 'queryPlanner', $explain->get( '0.queryPlanner' ) );
-		$json->offsetSet( 'executionStats', $explain->get( '0.executionStats' ) );
-
-		return $json;
-	}
-
-	/**
-	 * @param string $field
-	 *
-	 * @return JsonInterface
-	 */
-	public function distinct( string $field ): JsonInterface
-	{
-		return new Json( $this->collection()
-							  ->client()
-							  ->distinct( $field, $this->filter() ) );
-	}
 }

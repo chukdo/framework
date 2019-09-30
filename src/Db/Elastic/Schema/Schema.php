@@ -2,6 +2,7 @@
 
 namespace Chukdo\Db\Elastic\Schema;
 
+use Chukdo\Helper\Is;
 use Throwable;
 use Chukdo\Contracts\Db\Schema as SchemaInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
@@ -48,11 +49,39 @@ class Schema implements SchemaInterface
 	}
 
 	/**
-	 * @return Collection
+	 * @param array $properties
+	 *
+	 * @return $this
 	 */
-	public function collection(): Collection
+	public function setAll( array $properties ): self
 	{
-		return $this->collection;
+		$this->property()
+			 ->setAll( $properties );
+
+		return $this;
+	}
+
+	/**
+	 * @param string $name
+	 * @param null   $type
+	 * @param array  $options
+	 *
+	 * @return $this
+	 */
+	public function set( string $name, $type = null, array $options = [] ): self
+	{
+		$this->property()
+			 ->set( $name, $type, $options );
+
+		return $this;
+	}
+
+	/**
+	 * @return Property
+	 */
+	public function property(): Property
+	{
+		return $this->property;
 	}
 
 	/**
@@ -85,6 +114,14 @@ class Schema implements SchemaInterface
 	}
 
 	/**
+	 * @return Collection
+	 */
+	public function collection(): Collection
+	{
+		return $this->collection;
+	}
+
+	/**
 	 * @param string $name
 	 *
 	 * @return Property|null
@@ -109,29 +146,6 @@ class Schema implements SchemaInterface
 	}
 
 	/**
-	 * @param string      $name
-	 * @param string|null $type
-	 * @param array       $options
-	 *
-	 * @return Schema
-	 */
-	public function set( string $name, string $type = null, array $options = [] ): self
-	{
-		$this->property()
-			 ->set( $name, $type, $options );
-
-		return $this;
-	}
-
-	/**
-	 * @return Property
-	 */
-	public function property(): Property
-	{
-		return $this->property;
-	}
-
-	/**
 	 * @return bool
 	 */
 	public function save(): bool
@@ -141,7 +155,7 @@ class Schema implements SchemaInterface
 							   ->indices()
 							   ->putMapping( [
 								   'index' => $this->collection()
-												   ->name(),
+									   ->name(),
 								   'body'  => $this->toArray(),
 							   ] ) );
 
@@ -154,6 +168,6 @@ class Schema implements SchemaInterface
 	public function toArray(): array
 	{
 		return $this->property()
-					->toArray();
+			->toArray();
 	}
 }

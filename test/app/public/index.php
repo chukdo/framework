@@ -39,139 +39,80 @@ $app->registerServices( [
 
 $elastic = new Server();
 $db      = $elastic->database();
-//$db->collection('test')->schema()->toArray();
-
-/**
- * $db->dropCollection( 'test' );
- * $schema = $db->createCollection( 'test' )
+/**$schema  = $db->dropCollection( 'test' )
+ * ->createCollection( 'test' )
  * ->schema();
- * $schema->set( 'first_name', 'keyword' )
- * ->set( 'last_name', 'keyword' )
- * ->set( 'age', 'integer' )
- * ->set( 'adresse', 'text', [
- * 'fields' => [
- * 'rue'   => [
- * 'type' => 'text',
- * ],
- * 'cp'    => [
- * 'type' => 'text',
- * ],
- * 'ville' => [
- * 'type' => 'text',
- * ],
- * ],
- * ] );
- * $schema->save();
- */
-/**foreach ( $db->collections() as $c ) {
- * echo $c;
- * echo ( new Json( $db->collection( $c )
- * ->schema()
- * ->toArray() ) )->toHtml();
- * }
- * exit;
- * */
-/**
- * $c = $db->collection( 'test2' );
- * $s = $c->schema();
- * $s->get('info')->set('a', 'text');
+ * $schema->set( 'agence', 'text' )
+ * ->set( 'ville', 'keyword' )
+ * ->set( 'cp', 'keyword' )
+ * ->set( 'rcp', 'integer' )
+ * ->set('meta', [
+ * 'siren' => 'keyword',
+ * 'cartepro' => 'keyword',
+ * 'gestion' => [
+ * 'agence' => 'keyword',
+ * 'adresse' => 'keyword',
+ * 'cp' => 'keyword',
+ * 'ville' => 'keyword'
+ * ]
+ * ]);
+ * //dd($schema->toArray());
  *
- * $c->rename('test',null, $s);
- */
+ * $schema->save();
+ * $write = $db->collection( 'test' )
+ * ->write();
+ * $write->setAll( [
+ * 'agence' => 'editions modelo',
+ * 'ville'  => 'bordeaux',
+ * 'cp'     => '33000',
+ * 'rcp'    => 1000,
+ * 'meta'    => [
+ * 'cartepro' => '0123456789',
+ * 'siren' => '1234-12345-1234554321',
+ * 'gestion' => [
+ * 'cp' => '33300'
+ * ]
+ * ]
+ * ] )
+ * ->insert();
+ *
+ * $write->setAll( [
+ * 'agence' => 'immo64',
+ * 'ville'  => 'pau',
+ * 'cp'     => '64000',
+ * 'rcp'    => 10000,
+ * 'meta'    => [
+ * 'cartepro' => '0126523789',
+ * 'siren' => '1234-12345-1234343554321',
+ * 'gestion' => [
+ * 'cp' => '64100'
+ * ]
+ * ]
+ * ] )
+ * ->insert();
+ *
+ * $write->setAll( [
+ * 'agence' => 'toulouse la belle ville que voila que je veux pas y vivre',
+ * 'ville'  => 'toulouse',
+ * 'cp'     => '31000',
+ * 'rcp'    => 100000,
+ * 'meta'    => [
+ * 'cartepro' => '012354749',
+ * 'siren' => '1234-12345-12345542345321',
+ * 'gestion' => [
+ * 'cp' => '31200'
+ * ]
+ * ]
+ * ] )
+ * ->insert();*/
 
-$app->dd( $db->collection( 'test' )
-			 ->write()
-	/**->where( '_id', 'in', [
-	 * 'bbe1d1c2da8480e72758e72467d994af357250b1',
-	 * 'f9a8645e5931690d1eb38562ae3cfdc8e368fd09',
-	 * ] )*/
-	//->where('age', '=', 37)
-			 ->where( 'zz', 'exists' )
-			 ->set( 'age', 3778 )
-			 ->set( 'info.b.h', [
-				 'a',
-				 'b',
-				 'c',
-				 'd',
-				 'e',
-			 ] )
-	//->addToSet( 'info.b.g', 1234569 )
-	//->push( 'info.b.g', 1234567899 )
-	//->unset('z')
-			 ->set( 'zz', 'il est la' )
-			 ->set( 'uf', [
-				 'tutu' => 'vanessa et jp 2019 - 09 14 11h15',
-				 'bubu' => 'bibi22',
-			 ] )
-			 ->updateOrInsert() );
+$find = $db->collection( 'test' )
+		   ->find();
 
+dd( $find->distinct( 'cp' ) );
+
+die( 'ok' );
 exit;
-$app->dd( $db->collection( 'test' )
-			 ->write()
-			 ->set( 'first_name', 'jp' )
-			 ->set( 'last_name', 'domingo' )
-			 ->set( 'age', 44 )
-			 ->set( 'adresse', '124 rue camille godard' )
-			 ->set( 'info', [
-				 'a' => 'toto',
-				 'b' => [ 'c1' => 'd1' ],
-			 ] )
-			 ->insert() );
-
-exit;
-
-/**$app->dd($db->collection('test')->rename('newtest'));*/
-
-/**$elastic->collection('test')
- * ->indices()
- * ->putMapping([
- * 'index' => 'test',
- * 'body'  => [
- * 'properties' => [
- * 'first_name' => [
- * 'type'    => 'keyword',
- * 'copy_to' => 'full_name',
- * ],
- * 'last_name'  => [
- * 'type'    => 'keyword',
- * 'copy_to' => [
- * 'full_name',
- * 'testing',
- * ],
- * ],
- * 'age'        => [
- * 'type' => 'integer',
- * ],
- * 'testing'    => [
- * 'type' => 'text',
- * ],
- * 'full_name'  => [
- * 'type' => 'text',
- * ],
- * 'text'       => [
- * 'type'   => 'text',
- * 'fields' => [
- * 'english' => [
- * 'type' => 'text',
- * ],
- * 'french'  => [
- * 'type' => 'text',
- * ],
- * ],
- * ],
- * ],
- * ],
- * ]);*/
-
-/**
- * $app->dd($elastic->collection('test')
- * ->schema()
- * ->get());
- * $app->dd($elastic->collection('test')
- * ->properties()
- * ->toArray());
- */
-
 $contrat = Mongo::collection( 'contrat' );
 
 $app->dd( $contrat->find()

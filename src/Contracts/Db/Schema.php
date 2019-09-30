@@ -26,13 +26,20 @@ interface Schema
 	public function get( string $name );
 
 	/**
-	 * @param string      $name
-	 * @param string|null $type
-	 * @param array       $options
+	 * @param array $properties
 	 *
 	 * @return mixed
 	 */
-	public function set( string $name, string $type = null, array $options = [] );
+	public function setAll( array $properties );
+
+	/**
+	 * @param string $name
+	 * @param null   $type
+	 * @param array  $options
+	 *
+	 * @return mixed
+	 */
+	public function set( string $name, $type = null, array $options = [] );
 
 	/**
 	 * @param string $name

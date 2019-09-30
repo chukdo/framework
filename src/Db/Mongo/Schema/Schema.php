@@ -106,13 +106,26 @@ class Schema implements SchemaInterface
 	}
 
 	/**
+	 * @param array $properties
+	 *
+	 * @return $this
+	 */
+	public function setAll( array $properties ): self
+	{
+		$this->property()
+			 ->setAll( $properties );
+
+		return $this;
+	}
+
+	/**
 	 * @param string      $name
 	 * @param string|null $type
 	 * @param array       $options
 	 *
 	 * @return Schema
 	 */
-	public function set( string $name, string $type = null, array $options = [] ): self
+	public function set( string $name, $type = null, array $options = [] ): self
 	{
 		$this->property()
 			 ->set( $name, $type, $options );

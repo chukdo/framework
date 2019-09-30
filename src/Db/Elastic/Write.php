@@ -17,11 +17,6 @@ use Chukdo\Json\Json;
 Class Write extends Where implements WriteInterface
 {
 	/**
-	 * @var Collection
-	 */
-	protected $collection;
-
-	/**
 	 * @var Json
 	 */
 	protected $fields;
@@ -33,94 +28,8 @@ Class Write extends Where implements WriteInterface
 	 */
 	public function __construct( Collection $collection )
 	{
-		$this->fields     = new Json();
-		$this->collection = $collection;
-	}
-
-	/**
-	 * @return Collection
-	 */
-	public function collection(): Collection
-	{
-		return $this->collection;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function validatedUpdateFields(): array
-	{
-		$source = '';
-		$params = [];
-
-		foreach ( $this->fields() as $type => $field ) {
-			foreach ( (array) $field as $key => $value ) {
-				if ( $key == '_id' ) {
-					continue;
-				}
-
-				$hydrate = $this->hydrateUpdateFields( $type, $key, $value );
-				$source  .= $hydrate[ 'source' ];
-
-				$params[ $hydrate[ 'param' ] ] = $value instanceof JsonInterface
-					? $value->toArray()
-					: $value;
-			}
-		}
-
-		return [
-			'source' => $source,
-			'params' => $params,
-		];
-	}
-
-	/**
-	 * @return JsonInterface
-	 */
-	public function fields(): JsonInterface
-	{
-		return $this->fields;
-	}
-
-	/**
-	 * @param $type
-	 * @param $key
-	 * @param $value
-	 *
-	 * @return array
-	 */
-	protected function hydrateUpdateFields( $type, $key, $value ): array
-	{
-		$source = '';
-		$param  = str_replace( '.', '_', $key );
-
-		switch ( $type ) {
-			case 'set' :
-				$source = 'ctx._source.' . $key . '=params.' . $param . ';';
-				break;
-			case 'unset' :
-				$source = 'ctx._source.remove(\'' . $key . '\');';
-				break;
-			case 'inc' :
-				$source = 'ctx._source.' . $key . '+=params.' . $param . ';';
-				break;
-			case 'push':
-				$source = 'ctx._source.' . $key . '.add(params.' . $param . ');';
-				break;
-			case 'pull':
-				$source = 'if(ctx._source.' . $key . '.indexOf(params.' . $param . ') >= 0) {ctx._source.' . $key . '.remove(ctx._source.' . $key . '.indexOf(params.' . $param . '))} ';
-				break;
-			case 'addToSet':
-				$source = 'if(ctx._source.' . $key . '.contains(params.' . $param . ')) {ctx.op = \'noop\'} else {ctx._source.' . $key . '.add(params.' . $param . ')} ';
-				break;
-			default:
-				$source = 'ctx.op = \'none\'';
-		}
-
-		return [
-			'source' => $source,
-			'param'  => $param,
-		];
+		parent::__construct( $collection );
+		$this->fields = new Json();
 	}
 
 	/**
@@ -201,6 +110,35 @@ Class Write extends Where implements WriteInterface
 	}
 
 	/**
+	 * @return array
+	 */
+	public function validatedUpdateFields(): array
+	{
+		$source = '';
+		$params = [];
+
+		foreach ( $this->fields() as $type => $field ) {
+			foreach ( (array) $field as $key => $value ) {
+				if ( $key === '_id' ) {
+					continue;
+				}
+
+				$hydrate = $this->hydrateUpdateFields( $type, $key, $value );
+				$source  .= $hydrate[ 'source' ];
+
+				$params[ $hydrate[ 'param' ] ] = $value instanceof JsonInterface
+					? $value->toArray()
+					: $value;
+			}
+		}
+
+		return [
+			'source' => $source,
+			'params' => $params,
+		];
+	}
+
+	/**
 	 * @param string $field
 	 * @param        $value
 	 *
@@ -251,23 +189,64 @@ Class Write extends Where implements WriteInterface
 	}
 
 	/**
+	 * @return JsonInterface
+	 */
+	public function fields(): JsonInterface
+	{
+		return $this->fields;
+	}
+
+	/**
 	 * @return int
 	 */
 	public function delete(): int
 	{
 		$command = $this->collection()
 						->client()
-						->deleteByQuery( [
-							'index' => $this->collection()
-											->fullName(),
-							'body'  => [
-								'query' => [
-									'bool' => $this->filter(),
-								],
-							],
-						] );
+						->deleteByQuery( $this->query() );
 
 		return (int) $command[ 'deleted' ];
+	}
+
+	/**
+	 * @param $type
+	 * @param $key
+	 * @param $value
+	 *
+	 * @return array
+	 */
+	protected function hydrateUpdateFields( $type, $key, $value ): array
+	{
+		$source = '';
+		$param  = str_replace( '.', '_', $key );
+
+		switch ( $type ) {
+			case 'set' :
+				$source = 'ctx._source.' . $key . '=params.' . $param . ';';
+				break;
+			case 'unset' :
+				$source = 'ctx._source.remove(\'' . $key . '\');';
+				break;
+			case 'inc' :
+				$source = 'ctx._source.' . $key . '+=params.' . $param . ';';
+				break;
+			case 'push':
+				$source = 'ctx._source.' . $key . '.add(params.' . $param . ');';
+				break;
+			case 'pull':
+				$source = 'if(ctx._source.' . $key . '.indexOf(params.' . $param . ') >= 0) {ctx._source.' . $key . '.remove(ctx._source.' . $key . '.indexOf(params.' . $param . '))} ';
+				break;
+			case 'addToSet':
+				$source = 'if(ctx._source.' . $key . '.contains(params.' . $param . ')) {ctx.op = \'noop\'} else {ctx._source.' . $key . '.add(params.' . $param . ')} ';
+				break;
+			default:
+				$source = 'ctx.op = \'none\'';
+		}
+
+		return [
+			'source' => $source,
+			'param'  => $param,
+		];
 	}
 
 	/**
@@ -275,22 +254,13 @@ Class Write extends Where implements WriteInterface
 	 */
 	public function deleteOne(): bool
 	{
-		$query = [
-			'index' => $this->collection()
-							->fullName(),
-			'body'  => [
-				'query' => [
-					'bool' => $this->filter(),
-				],
-			],
-			'size'  => 1,
-		];
-
 		$command = $this->collection()
 						->client()
-						->deleteByQuery( $query );
+						->deleteByQuery( $this->query( [
+							'size' => 1,
+						] ) );
 
-		return $command[ 'deleted' ] == 1;
+		return $command[ 'deleted' ] === 1;
 	}
 
 	/**
@@ -312,19 +282,9 @@ Class Write extends Where implements WriteInterface
 	 */
 	protected function getOne(): JsonInterface
 	{
-		$query = [
-			'index' => $this->collection()
-							->fullName(),
-			'body'  => [
-				'query' => [
-					'bool' => $this->filter(),
-				],
-			],
-		];
-
 		$json   = new Json( $this->collection()
 								 ->client()
-								 ->search( $query ) );
+								 ->search( $this->query() ) );
 		$record = $json->getJson( 'hits.hits.0._source' )
 					   ->filterRecursive( function( $k, $v ) {
 						   return Collection::filterOut( $k, $v );
@@ -340,25 +300,15 @@ Class Write extends Where implements WriteInterface
 	 */
 	public function update(): int
 	{
-		$query = [
-			'index'     => $this->collection()
-								->fullName(),
-			'body'      => [
-				'query'  => [
-					'bool' => $this->filter(),
-				],
-				'script' => $this->validatedUpdateFields(),
-			],
-			'conflicts' => 'proceed',
-		];
-
 		$command = $this->collection()
 						->client()
-						->updateByQuery( $query );
+						->updateByQuery( $this->query( [
+							'body.script' => $this->validatedUpdateFields(),
+							'conflicts'   => 'proceed',
+						] ) );
 
 		return $command[ 'updated' ];
 	}
-
 
 	/**
 	 * @return array
@@ -375,22 +325,17 @@ Class Write extends Where implements WriteInterface
 	 */
 	public function updateOne(): bool
 	{
-		$query = [
-			'index'             => $this->collection()
-										->fullName(),
-			'id'                => $this->getOne()
-										->offsetGet( '_id' ),
-			'body'              => [
-				'script' => $this->validatedUpdateFields(),
-			],
-			'retry_on_conflict' => 3,
-		];
-
 		$command = $this->collection()
 						->client()
-						->update( $query );
+						->update( $this->query( [
+							'id'                => $this->getOne()
+														->offsetGet( '_id' ),
+							'body.script'       => $this->validatedUpdateFields(),
+							'conflicts'         => 'proceed',
+							'retry_on_conflict' => 3,
+						], false ) );
 
-		return $command[ 'result' ] == 'updated';
+		return $command[ 'result' ] === 'updated';
 	}
 
 	/**
@@ -431,12 +376,10 @@ Class Write extends Where implements WriteInterface
 				   ->id();
 		$this->collection()
 			 ->client()
-			 ->index( [
-				 'index' => $this->collection()
-								 ->fullName(),
-				 'id'    => $id,
-				 'body'  => $this->validatedInsertFields(),
-			 ] );
+			 ->index( $this->query( [
+				 'id'   => $id,
+				 'body' => $this->validatedInsertFields(),
+			 ], false ) );
 
 		return $id;
 	}

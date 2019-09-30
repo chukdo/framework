@@ -2,6 +2,8 @@
 
 namespace Chukdo\Db\Elastic;
 
+use Chukdo\Json\Json;
+
 /**
  * Server Where.
  * @version      1.0.0
@@ -12,9 +14,32 @@ namespace Chukdo\Db\Elastic;
 Class Where
 {
 	/**
+	 * @var Collection
+	 */
+	protected $collection;
+
+	/**
 	 * @var array
 	 */
 	protected $where = [];
+
+	/**
+	 * Find constructor.
+	 *
+	 * @param Collection $collection
+	 */
+	public function __construct( Collection $collection )
+	{
+		$this->collection = $collection;
+	}
+
+	/**
+	 * @return Collection
+	 */
+	public function collection(): Collection
+	{
+		return $this->collection;
+	}
 
 	/**
 	 * @param string $field
@@ -218,5 +243,31 @@ Class Where
 	public function filter(): array
 	{
 		return $this->where;
+	}
+
+	/**
+	 * @param array $params
+	 * @param bool  $withFilter
+	 *
+	 * @return array
+	 */
+	public function query( array $params = [], bool $withFilter = true ): array
+	{
+		$filter = $this->filter();
+		$query  = new Json( [
+			'index' => $this->collection()
+							->fullName(),
+			'body'  => [],
+		] );
+
+		foreach ( $params as $key => $value ) {
+			$query->set( $key, $value );
+		}
+
+		if ( $withFilter && count( $filter ) > 0 ) {
+			$query->set( 'body.query.bool', $this->filter() );
+		}
+		//dd($query->toArray());
+		return $query->toArray();
 	}
 }
