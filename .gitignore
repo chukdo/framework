@@ -6,6 +6,5 @@
 /vendor
 /composer.lock
 /composer.phar
-*.sh
 *.log
 *.DS_Store
