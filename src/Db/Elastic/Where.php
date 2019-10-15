@@ -267,7 +267,7 @@ Class Where
 		if ( $withFilter && count( $filter ) > 0 ) {
 			$query->set( 'body.query.bool', $this->filter() );
 		}
-		//dd($query->toArray());
+
 		return $query->toArray();
 	}
 }

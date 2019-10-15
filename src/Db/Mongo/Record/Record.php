@@ -27,7 +27,7 @@ Class Record extends Json implements RecordInterface
 	protected $collection;
 
 	/**
-	 * @var string
+	 * @var mixed|null
 	 */
 	protected $id = null;
 
@@ -50,7 +50,7 @@ Class Record extends Json implements RecordInterface
 	public function __construct( Collection $collection, $data = null )
 	{
 		parent::__construct( $data, false );
-		parent::__construct( $this->filterRecursive( function( $k, $v ) {
+		parent::__construct( $this->filterRecursive( static function( $k, $v ) {
 			return Collection::filterOut( $k, $v );
 		} ), false );
 
@@ -125,7 +125,37 @@ Class Record extends Json implements RecordInterface
 			return $this;
 		}
 
-		throw new MongoException( 'No ID to delete Record' );
+		throw new MongoException( 'No ID to move Record' );
+	}
+
+	/**
+	 * @param MongoSession|null $session
+	 *
+	 * @return RecordInterface
+	 * @throws Exception
+	 */
+	public function update( MongoSession $session = null ): RecordInterface
+	{
+		$write = $this->collection()
+					  ->write()
+					  ->setSession( $session )
+					  ->setAll( $this->record() );
+
+		/** Option Auto Date */
+		if ( $this->autoDateRecord ) {
+			$write->set( 'date_modified', new DateTime() );
+		}
+
+		/** Update */
+		$record = $write->where( '_id', '=', $this->id() )
+						->updateOneAndGet( true );
+
+		/** Option Versionning */
+		if ( $this->versioningCollection ) {
+			$this->versioning( $session, $record );
+		}
+
+		return $this;
 	}
 
 	/**
@@ -133,7 +163,7 @@ Class Record extends Json implements RecordInterface
 	 */
 	public function record(): JsonInterface
 	{
-		return $this->filterRecursive( function( $k, $v ) {
+		return $this->filterRecursive( static function( $k, $v ) {
 			return !Is::RecordInterface( $v )
 				? $v
 				: null;
@@ -148,37 +178,42 @@ Class Record extends Json implements RecordInterface
 	 */
 	public function save( MongoSession $session = null ): RecordInterface
 	{
-		$insert = false;
-		$write  = $this->collection()
-					   ->write()
-					   ->setSession( $session )
-					   ->setAll( $this->record() );
+		/** Insert */
+		if ( $this->id() === null ) {
+			$this->insert( $session );
+		} /** Update */
+		else {
+			$this->update( $session );
+		}
+
+		return $this;
+	}
+
+	/**
+	 * @param MongoSession|null $session
+	 *
+	 * @return RecordInterface
+	 * @throws Exception
+	 */
+	public function insert( MongoSession $session = null ): RecordInterface
+	{
+		$write = $this->collection()
+					  ->write()
+					  ->setSession( $session )
+					  ->setAll( $this->record() );
 
 		/** Option Auto Date */
 		if ( $this->autoDateRecord ) {
-			$write->setOnInsert( 'date_created', new DateTime() )
+			$write->set( 'date_created', new DateTime() )
 				  ->set( 'date_modified', new DateTime() );
 		}
 
-		/** Insert */
-		if ( $this->id() === null ) {
-			$insert   = true;
-			$this->id = $write->insert();
-			$this->offsetSet( '_id', $this->id() );
-		} /** Update */
-		else {
-			$write->where( '_id', '=', $this->id() )
-				  ->updateOne();
-		}
+		$this->id = $write->insert();
+		$this->offsetSet( '_id', $this->id() );
 
-		/** Option Versioning */
+		/** Option Versionning */
 		if ( $this->versioningCollection ) {
-			$this->versionning( $session, $insert
-				? $this->record()
-				: $this->collection()
-					   ->find()
-					   ->where( '_id', '=', $this->id() )
-					   ->one() );
+			$this->versioning( $session, $this->record() );
 		}
 
 		return $this;
@@ -191,7 +226,7 @@ Class Record extends Json implements RecordInterface
 	 * @return Record
 	 * @throws Exception
 	 */
-	protected function versionning( ?MongoSession $session, JsonInterface $record ): RecordInterface
+	protected function versioning( ?MongoSession $session, JsonInterface $record ): RecordInterface
 	{
 		$db = $this->collection()
 				   ->database();

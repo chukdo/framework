@@ -29,6 +29,16 @@ interface Record extends JsonInterface
 	public function save(): self;
 
 	/**
+	 * @return Record
+	 */
+	public function insert(): self;
+
+	/**
+	 * @return Record
+	 */
+	public function update(): self;
+
+	/**
 	 * @return JsonInterface
 	 */
 	public function record(): JsonInterface;

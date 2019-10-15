@@ -90,10 +90,7 @@ class Redis implements RedisInterface
 	 */
 	public function __call( string $name, array $args )
 	{
-		array_unshift( $args,
-			str_replace( '_',
-				' ',
-				strtoupper( $name ) ) );
+		array_unshift( $args, str_replace( '_', ' ', strtoupper( $name ) ) );
 
 		$this->write( $this->command( $args ) );
 
@@ -109,10 +106,10 @@ class Redis implements RedisInterface
 	 */
 	public function write( string $c ): void
 	{
-		for ( $written = 0; $written < mb_strlen( $c ); $written += $fwrite ) {
-			$fwrite = fwrite( $this->sock,
-				mb_substr( $c,
-					$written ) );
+		$length = mb_strlen( $c );
+
+		for ( $written = 0; $written < $length; $written += $fwrite ) {
+			$fwrite = fwrite( $this->sock, mb_substr( $c, $written ) );
 
 			if ( $fwrite === false || $fwrite <= 0 ) {
 				throw new RedisException( 'Stream write error' );
@@ -145,19 +142,14 @@ class Redis implements RedisInterface
 	 */
 	public function read()
 	{
-		$get   = stream_get_line( $this->sock,
-			512,
-			"\r\n" );
-		$reply = substr( $get,
-			1 );
+		$get   = stream_get_line( $this->sock, 512, "\r\n" );
+		$reply = substr( $get, 1 );
 
 		if ( $get === 0 ) {
 			throw new RedisException( 'Failed to read type of response from stream' );
 		}
 
-		switch ( substr( $get,
-			0,
-			1 ) ) {
+		switch ( $get[ 0 ] ) {
 			/* Error */
 			case '-':
 				throw new RedisException( $reply );
@@ -174,28 +166,26 @@ class Redis implements RedisInterface
 
 			/* Integer */
 			case ':':
-				$s = intval( $reply );
+				$s = (int) $reply;
 				break;
 
 			/* Bulk */
 			case '$':
 				$s = null;
 
-				if ( $reply == '-1' ) {
+				if ( $reply === '-1' ) {
 					break;
 				}
 
-				$size = intval( $reply );
+				$size = (int) $reply;
 				$read = 0;
 
 				if ( $size > 0 ) {
 					while ( $read < $size ) {
-						$len  = min( 1024,
-							$size - $read );
+						$len  = min( 1024, $size - $read );
 						$read += $len;
 
-						if ( ( $r = stream_get_line( $this->sock,
-								$len ) ) !== 0 ) {
+						if ( ( $r = stream_get_line( $this->sock, $len ) ) !== 0 ) {
 							$s .= $r;
 						} else {
 							throw new RedisException( 'Failed to read response from stream' );
@@ -212,11 +202,11 @@ class Redis implements RedisInterface
 			case '*':
 				$s = null;
 
-				if ( $reply == '*-1' ) {
+				if ( $reply === '*-1' ) {
 					break;
 				}
 
-				$c = intval( $reply );
+				$c = (int) $reply;
 				$s = [];
 
 				for ( $i = 0; $i < $c; ++$i ) {
@@ -267,7 +257,7 @@ class Redis implements RedisInterface
 		/** command SCAN */
 		$scan = $this->getIterator( $this->pointer );
 
-		if ( count( $scan ) == 2 ) {
+		if ( count( $scan ) === 2 ) {
 			$this->pointer = (int) $scan[ 0 ];
 			$this->stack   = (array) $scan[ 1 ];
 		}
@@ -354,9 +344,7 @@ class Redis implements RedisInterface
 	 */
 	public function key()
 	{
-		return isset( $this->stack[ 0 ] )
-			? $this->stack[ 0 ]
-			: '';
+		return $this->stack[ 0 ] ?? '';
 	}
 
 	/**
@@ -371,7 +359,7 @@ class Redis implements RedisInterface
 			/** command SCAN */
 			$scan = $this->getIterator( $this->pointer );
 
-			if ( count( $scan ) == 2 ) {
+			if ( count( $scan ) === 2 ) {
 				$this->pointer = (int) $scan[ 0 ];
 				$this->stack   = (array) $scan[ 1 ];
 			}
@@ -385,9 +373,7 @@ class Redis implements RedisInterface
 	 */
 	public function valid(): bool
 	{
-		return $this->pointer === 0 && empty( $this->stack )
-			? false
-			: true;
+		return !( $this->pointer === 0 && empty( $this->stack ) );
 	}
 
 	/**
@@ -446,9 +432,7 @@ class Redis implements RedisInterface
 		}
 
 		if ( $key ) {
-			return isset( $info[ $key ] )
-				? $info[ $key ]
-				: false;
+			return $info[ $key ] ?? false;
 		}
 
 		return $info;

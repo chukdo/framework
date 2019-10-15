@@ -24,55 +24,55 @@ interface Find
 	 *
 	 * @return Find
 	 */
-	public function link( string $field, array $with = [], array $without = [], string $linked = null );
+	public function link( string $field, array $with = [], array $without = [], string $linked = null ): Find;
 
 	/**
 	 * @param mixed ...$fields
 	 *
-	 * @return mixed
+	 * @return Find
 	 */
-	public function with( ...$fields );
+	public function with( ...$fields ): Find;
 
 	/**
 	 * @param mixed ...$fields
 	 *
-	 * @return mixed
+	 * @return Find
 	 */
-	public function without( ...$fields );
+	public function without( ...$fields ): Find;
 
 	/**
 	 * @param string $field
 	 * @param string $sort
 	 *
-	 * @return mixed
+	 * @return Find
 	 */
-	public function sort( string $field, string $sort = 'ASC' );
+	public function sort( string $field, string $sort = 'ASC' ): Find;
 
 	/**
 	 * @param int $skip
 	 *
-	 * @return mixed
+	 * @return Find
 	 */
-	public function skip( int $skip );
+	public function skip( int $skip ): Find;
 
 	/**
-	 * @return Record
+	 * @return Find
 	 */
-	public function one();
+	public function one(): Find;
 
 	/**
 	 * @param int $limit
 	 *
-	 * @return mixed
+	 * @return Find
 	 */
-	public function limit( int $limit );
+	public function limit( int $limit ): Find;
 
 	/**
 	 * @param bool $idAsKey
 	 *
-	 * @return mixed
+	 * @return Find
 	 */
-	public function all( bool $idAsKey = false );
+	public function all( bool $idAsKey = false ): Find;
 
 	/**
 	 * @return int
@@ -85,9 +85,9 @@ interface Find
 	 * @param        $value
 	 * @param null   $value2
 	 *
-	 * @return $this
+	 * @return Find
 	 */
-	public function where( string $field, string $operator, $value, $value2 = null );
+	public function where( string $field, string $operator, $value, $value2 = null ): Find;
 
 	/**
 	 * @param string $field
@@ -95,7 +95,7 @@ interface Find
 	 * @param        $value
 	 * @param null   $value2
 	 *
-	 * @return $this
+	 * @return Find
 	 */
-	public function orWhere( string $field, string $operator, $value, $value2 = null );
+	public function orWhere( string $field, string $operator, $value, $value2 = null ): Find;
 }

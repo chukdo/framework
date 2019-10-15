@@ -3,6 +3,7 @@
 namespace Chukdo\Routing;
 
 use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
+use Chukdo\Helper\Arr;
 
 /**
  * Gestion des attributs d'une Route.
@@ -120,7 +121,7 @@ class RouteAttributes
 	{
 		$prefix = trim( $prefix, '/' );
 
-		if ( strlen( $prefix ) > 0 ) {
+		if ( $prefix !== '' ) {
 			$this->prefix .= '/' . $prefix;
 		}
 
@@ -147,7 +148,7 @@ class RouteAttributes
 	 */
 	public function add( array $attributes ): self
 	{
-		$attributes = array_merge( [
+		$attributes = Arr::merge( [
 			'middleware'      => [],
 			'validator'       => [],
 			'errorMiddleware' => null,

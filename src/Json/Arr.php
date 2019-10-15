@@ -111,8 +111,15 @@ class Arr implements Iterator
 	 */
 	public function join( string $glue ): string
 	{
-		return implode( $glue,
-			$this->arr );
+		return implode( $glue, $this->arr );
+	}
+
+	/**
+	 * @return array
+	 */
+	public function get(): array
+	{
+		return $this->arr;
 	}
 
 	/**

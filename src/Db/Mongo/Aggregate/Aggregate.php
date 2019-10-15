@@ -7,6 +7,7 @@ use Chukdo\Db\Mongo\Cursor;
 use Chukdo\Db\Mongo\Match;
 use Chukdo\Db\Mongo\Where;
 use Chukdo\Json\Json;
+use Chukdo\Helper\Arr;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
@@ -81,7 +82,7 @@ Class Aggregate
 	 */
 	public function cursor( array $options = [] ): Cursor
 	{
-		$options = array_merge( $this->options, $options );
+		$options = Arr::merge( $this->options, $options );
 
 		return new Cursor( $this->collection, $this->collection->client()
 															   ->aggregate( $this->projection(), $options ) );

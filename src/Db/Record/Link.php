@@ -1,8 +1,11 @@
 <?php
 
-namespace Chukdo\Db\Mongo;
+namespace Chukdo\Db\Record;
 
+use Chukdo\Contracts\Db\Database as DatabaseInterface;
+use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\Db\Mongo\RecordException;
 use Chukdo\Helper\Is;
 use Chukdo\Helper\Arr;
 use Chukdo\Helper\Str;
@@ -17,12 +20,12 @@ use Chukdo\Helper\Str;
 Class Link
 {
 	/**
-	 * @var Database
+	 * @var DatabaseInterface
 	 */
 	protected $database;
 
 	/**
-	 * @var Collection
+	 * @var CollectionInterface
 	 */
 	protected $collection;
 
@@ -49,10 +52,10 @@ Class Link
 	/**
 	 * Link constructor.
 	 *
-	 * @param Database $database
-	 * @param string   $field db._collection ou _collection = _id of collection
+	 * @param DatabaseInterface $database
+	 * @param string            $field
 	 */
-	public function __construct( Database $database, string $field )
+	public function __construct( DatabaseInterface $database, string $field )
 	{
 		$this->database = $database;
 		$dbName         = $database->name();
@@ -63,7 +66,7 @@ Class Link
 		] = array_pad( explode( '.', $field ), -2, $dbName );
 
 		if ( !Str::match( '/^_[a-z0-9]+$/i', $field ) ) {
-			throw new MongoException( sprintf( 'Field [%s] has not a valid format.', $field ) );
+			throw new RecordException( sprintf( 'Field [%s] has not a valid format.', $field ) );
 		}
 
 		if ( $db !== $dbName ) {
@@ -175,7 +178,7 @@ Class Link
 	 */
 	protected function findIds( array $ids ): JsonInterface
 	{
-		$find = new Find( $this->collection );
+		$find = $this->collection->Find();
 
 		return $find->with( $this->with )
 					->without( $this->without )

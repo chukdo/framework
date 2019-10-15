@@ -14,9 +14,9 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
 interface Write
 {
 	/**
-	 * @return mixed
+	 * @return Collection
 	 */
-	public function collection();
+	public function collection(): Collection;
 
 	/**
 	 * @param string $field
@@ -24,9 +24,9 @@ interface Write
 	 * @param null   $value
 	 * @param null   $value2
 	 *
-	 * @return mixed
+	 * @return Write
 	 */
-	public function where( string $field, string $operator, $value = null, $value2 = null );
+	public function where( string $field, string $operator, $value = null, $value2 = null ): Write;
 
 	/**
 	 * @param string $field
@@ -34,63 +34,63 @@ interface Write
 	 * @param null   $value
 	 * @param null   $value2
 	 *
-	 * @return mixed
+	 * @return Write
 	 */
-	public function orWhere( string $field, string $operator, $value = null, $value2 = null );
+	public function orWhere( string $field, string $operator, $value = null, $value2 = null ): Write;
 
 	/**
 	 * @param iterable $values
 	 *
-	 * @return mixed
+	 * @return Write
 	 */
-	public function setAll( iterable $values );
+	public function setAll( iterable $values ): Write;
 
 	/**
 	 * @param string $field
 	 * @param        $value
 	 *
-	 * @return mixed
+	 * @return Write
 	 */
-	public function set( string $field, $value );
+	public function set( string $field, $value ): Write;
 
 	/**
 	 * @param string $field
 	 *
-	 * @return mixed
+	 * @return Write
 	 */
-	public function unset( string $field );
-
-	/**
-	 * @param string $field
-	 * @param        $value
-	 *
-	 * @return mixed
-	 */
-	public function push( string $field, $value );
+	public function unset( string $field ): Write;
 
 	/**
 	 * @param string $field
 	 * @param        $value
 	 *
-	 * @return mixed
+	 * @return Write
 	 */
-	public function pull( string $field, $value );
+	public function push( string $field, $value ): Write;
 
 	/**
 	 * @param string $field
 	 * @param        $value
 	 *
-	 * @return mixed
+	 * @return Write
 	 */
-	public function addToSet( string $field, $value );
+	public function pull( string $field, $value ): Write;
+
+	/**
+	 * @param string $field
+	 * @param        $value
+	 *
+	 * @return Write
+	 */
+	public function addToSet( string $field, $value ): Write;
 
 	/**
 	 * @param string $field
 	 * @param int    $value
 	 *
-	 * @return mixed
+	 * @return Write
 	 */
-	public function inc( string $field, int $value );
+	public function inc( string $field, int $value ): Write;
 
 	/**
 	 * @return int

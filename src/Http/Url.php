@@ -3,6 +3,7 @@
 namespace Chukdo\Http;
 
 use Chukdo\Helper\Str;
+use Chukdo\Helper\Arr;
 
 /**
  * Gestion des URLs.
@@ -65,8 +66,7 @@ class Url
 			'fragment' => '',
 		];
 
-		$url = array_merge( $mergeUrl,
-			(array) parse_url( $url ) );
+		$url = Arr::merge( $mergeUrl, (array) parse_url( $url ) );
 
 		$this->setScheme( $url[ 'scheme' ] )
 			 ->setHost( $url[ 'host' ] )

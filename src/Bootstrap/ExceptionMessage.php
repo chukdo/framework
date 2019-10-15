@@ -2,6 +2,7 @@
 
 namespace Chukdo\Bootstrap;
 
+use Chukdo\Helper\Arr;
 use Chukdo\Helper\Http;
 use Chukdo\Helper\HttpRequest;
 use Chukdo\Helper\To;
@@ -47,7 +48,7 @@ class ExceptionMessage
 		}
 
 		foreach ( $e->getTrace() as $trace ) {
-			$trace = array_merge( [
+			$trace = Arr::merge( [
 				'file'     => null,
 				'line'     => null,
 				'class'    => null,
@@ -142,10 +143,10 @@ class ExceptionMessage
 
 		try {
 			$response->status( 500 )
-					 ->header( 'Content-Type', $contentType . '; charset=utf-8' )
-					 ->content( $content )
-					 ->send()
-					 ->end();
+				->header( 'Content-Type', $contentType . '; charset=utf-8' )
+				->content( $content )
+				->send()
+				->end();
 		} catch ( Throwable $e ) {
 			die( $content );
 		}
@@ -163,18 +164,18 @@ class ExceptionMessage
 		$climate->output->defaultTo( 'buffer' );
 		$climate->border();
 		$climate->red()
-				->out( strtoupper( $message[ 'Call' ]
-					?: 'Exception' ) );
+			->out( strtoupper( $message[ 'Call' ]
+				?: 'Exception' ) );
 		$climate->border();
 		$padding = $climate->padding( 7 );
 		$padding->label( 'Code' )
-				->result( $message[ 'Code' ] );
+			->result( $message[ 'Code' ] );
 		$padding->label( 'Message' )
-				->result( $message[ 'Error' ] );
+			->result( $message[ 'Error' ] );
 		$padding->label( 'File' )
-				->result( $message[ 'File' ] );
+			->result( $message[ 'File' ] );
 		$padding->label( 'Line' )
-				->result( $message[ 'Line' ] );
+			->result( $message[ 'Line' ] );
 
 		$backTrace = $message[ 'Trace' ];
 
@@ -188,7 +189,7 @@ class ExceptionMessage
 		}
 
 		return $climate->output->get( 'buffer' )
-							   ->get();
+			->get();
 	}
 
 	/**
@@ -199,8 +200,8 @@ class ExceptionMessage
 	protected function renderXml( array $message ): string
 	{
 		return ( new Xml() )->import( $message )
-							->toXml()
-							->toXmlString();
+			->toXml()
+			->toXmlString();
 	}
 
 	/**

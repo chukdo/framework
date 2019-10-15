@@ -147,11 +147,12 @@ Class Find extends Where implements FindInterface
 	 */
 	public function cursor(): Cursor
 	{
-		$options = array_merge( $this->projection(), $this->options );
+		$options = Arr::merge( $this->projection(), $this->options );
+		$find    = $this->collection()
+						->client()
+						->find( $this->filter(), $options );
 
-		return new Cursor( $this->collection(), $this->collection()
-													 ->client()
-													 ->find( $this->filter(), $options ) );
+		return new Cursor( $this->collection(), $find );
 	}
 
 	/**
@@ -324,12 +325,24 @@ Class Find extends Where implements FindInterface
 	/**
 	 * @param string $field
 	 *
-	 * @return JsonInterface
+	 * @return RecordListInterface
 	 */
-	public function distinct( string $field ): JsonInterface
+	public function distinct( string $field ): RecordListInterface
 	{
-		return new Json( $this->collection()
-							  ->client()
-							  ->distinct( $field, $this->filter() ) );
+		$recordList = new RecordList( $this->collection(), $this->collection()
+																->client()
+																->distinct( $field, $this->filter() ) );
+		foreach ( $this->link as $link ) {
+			$recordList = $link->hydrate( $recordList );
+		}
+
+		/** Suppression des ID defini par without */
+		if ( $this->hiddenId ) {
+			foreach ( $recordList as $key => $value ) {
+				$value->offsetUnset( '_id' );
+			}
+		}
+
+		return $recordList;
 	}
 }

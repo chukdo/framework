@@ -8,6 +8,7 @@ use Chukdo\Contracts\Db\Find as FindInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Contracts\Db\Record as RecordInterface;
 use Chukdo\Contracts\Db\RecordList as RecordListInterface;
+use Chukdo\Db\Record\RecordList;
 
 /**
  * Server Find.
@@ -90,6 +91,9 @@ Class Find extends Where implements FindInterface
 	{
 		$recordList = new RecordList( $this->collection() );
 
+		$recordList->collection()
+				   ->client();
+
 		foreach ( $this->cursor() as $key => $value ) {
 			if ( $idAsKey ) {
 				$recordList->offsetSet( $value->offsetGet( '_id' ), $value );
@@ -117,7 +121,7 @@ Class Find extends Where implements FindInterface
 	 */
 	public function cursor(): Cursor
 	{
-		$options = array_merge( $this->projection(), $this->options );
+		$options = Arr::merge( $this->projection(), $this->options );
 
 		return new Cursor( $this->collection(), $this->collection()
 													 ->client()

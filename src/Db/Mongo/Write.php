@@ -5,6 +5,7 @@ namespace Chukdo\Db\Mongo;
 use Chukdo\Contracts\Db\Write as WriteInterface;
 use Chukdo\Db\Mongo\Schema\Validator;
 use Chukdo\Helper\Is;
+use Chukdo\Helper\Arr;
 use Chukdo\Json\Json;
 use MongoDB\BSON\Regex;
 use MongoDB\Driver\Session as MongoSession;
@@ -315,7 +316,7 @@ Class Write extends Where implements WriteInterface
 	 */
 	public function updateOrInsert(): ?string
 	{
-		$options = array_merge( [
+		$options = Arr::merge( [
 			'upsert' => true,
 		], $this->options() );
 
@@ -343,7 +344,7 @@ Class Write extends Where implements WriteInterface
 	 */
 	public function updateOneAndGet( bool $before = true ): JsonInterface
 	{
-		$options = array_merge( [
+		$options = Arr::merge( [
 			'projection'     => [],
 			'returnDocument' => $before
 				? FindOneAndUpdate::RETURN_DOCUMENT_BEFORE
@@ -354,7 +355,7 @@ Class Write extends Where implements WriteInterface
 							   ->client()
 							   ->findOneAndUpdate( $this->filter(), $this->validatedUpdateFields(), $options ) );
 
-		return $json->filterRecursive( function( $k, $v ) {
+		return $json->filterRecursive( static function( $k, $v ) {
 			return Collection::filterOut( $k, $v );
 		} );
 	}

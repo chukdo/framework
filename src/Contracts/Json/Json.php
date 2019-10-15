@@ -35,10 +35,8 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
 	/**
 	 * @param mixed $key
 	 * @param mixed $value
-	 *
-	 * @return Json
 	 */
-	public function offsetSet( $key, $value ): JsonInterface;
+	public function offsetSet( $key, $value );
 
 	/**
 	 * @param mixed $key
@@ -371,11 +369,11 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
 	public function __toString(): string;
 
 	/**
-	 * @param bool $prettyfy
+	 * @param bool $prettify
 	 *
 	 * @return string
 	 */
-	public function toJson( bool $prettyfy = false ): string;
+	public function toJson( bool $prettify = false ): string;
 
 	/**
 	 * @param string $key

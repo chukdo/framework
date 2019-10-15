@@ -46,16 +46,16 @@ interface Database
 	/**
 	 * @param string $collection
 	 *
-	 * @return mixed
+	 * @return Collection
 	 */
-	public function collection( string $collection );
+	public function collection( string $collection ): Collection;
 
 	/**
 	 * @param string $collection
 	 *
-	 * @return mixed
+	 * @return Collection
 	 */
-	public function createCollection( string $collection );
+	public function createCollection( string $collection ): Collection;
 
 	/**
 	 * @param string $collection

@@ -29,9 +29,9 @@ interface Collection
 	public function info(): JsonInterface;
 
 	/**
-	 * @return mixed
+	 * @return Database
 	 */
-	public function database();
+	public function database(): Database;
 
 	/**
 	 * @return bool
@@ -47,22 +47,38 @@ interface Collection
 	public function rename( string $collection, string $database = null );
 
 	/**
-	 * @return mixed
+	 * @return Schema
 	 */
-	public function schema();
+	public function schema(): Schema;
 
 	/**
-	 * @return mixed
+	 * @return Write
 	 */
-	public function write();
+	public function write(): Write;
 
 	/**
-	 * @return mixed
+	 * @return Find
 	 */
-	public function find();
+	public function find(): Find;
 
 	/**
 	 * @return mixed
 	 */
 	public function id();
+
+	/**
+	 * @param string|null $field
+	 * @param             $value
+	 *
+	 * @return mixed
+	 */
+	public static function filterOut( ?string $field, $value );
+
+	/**
+	 * @param string|null $field
+	 * @param             $value
+	 *
+	 * @return mixed
+	 */
+	public static function filterIn( ?string $field, $value );
 }
