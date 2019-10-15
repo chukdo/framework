@@ -10,13 +10,16 @@ update-rc.d -f apparmor remove
 apt-get --purge remove apparmor apparmor-utils libapparmor-perl libapparmor1 -y
 
 #mongo key
-apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
-
-#mongo repo
-echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list
+wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
 
 #elastic search
 wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+
+#mongo repo
+echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list
+
+#repo elastic
+echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
 
 # add php repo
 add-apt-repository ppa:ondrej/php
@@ -30,11 +33,7 @@ apt-get update
 apt-get upgrade -y
 
 #APACHE PHP..
-apt-get install -y apt-transport-https mongodb-org certbot python3-pip awscli xfonts-75dpi xfonts-base whois openssl htop zip unzip software-properties-common libimage-exiftool-perl poppler-utils apache2 git-all libapache2-mod-php7.3 php7.3 php7.3-curl php7.3-soap php7.3-json php7.3-gd php-pear php7.3-dev php7.3-zip php7.3-mbstring php7.3-xml php-imagick php7.3-tidy php-mongodb
-
-#repo elastic
-echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
-apt-get update && apt-get install elasticsearch
+apt-get install -y apt-transport-https elasticsearch mongodb-org certbot python3-pip awscli xfonts-75dpi xfonts-base whois openssl htop zip unzip software-properties-common libimage-exiftool-perl poppler-utils apache2 git-all libapache2-mod-php7.3 php7.3 php7.3-curl php7.3-soap php7.3-json php7.3-gd php-pear php7.3-dev php7.3-zip php7.3-mbstring php7.3-xml php-imagick php7.3-tidy php-mongodb
 
 #certbot dns route53
 pip3 install certbot-dns-route53

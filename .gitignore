@@ -2,7 +2,6 @@
 /.vscode
 /.settings
 /.vagrant
-/vagrantfile
 /vendor
 /composer.lock
 /composer.phar
