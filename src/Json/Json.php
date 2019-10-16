@@ -380,8 +380,7 @@ class Json extends ArrayObject implements JsonInterface
 		$mixed = new Json();
 
 		foreach ( $this as $k => $v ) {
-			$k = trim( $prefix . '.' . $k,
-				'.' );
+			$k = trim( $prefix . '.' . $k, '.' );
 
 			if ( $v instanceof JsonInterface ) {
 				$mixed->merge( $v->to2d( $k ) );
@@ -404,6 +403,27 @@ class Json extends ArrayObject implements JsonInterface
 		if ( $merge ) {
 			foreach ( $merge as $k => $v ) {
 				if ( $overwrite || !$this->offsetExists( $k ) ) {
+					$this->offsetSet( $k, $v );
+				}
+			}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * @param iterable|null $push
+	 * @param bool|null     $overwrite
+	 *
+	 * @return JsonInterface
+	 */
+	public function push( iterable $push = null, bool $overwrite = null ): JsonInterface
+	{
+		if ( $push ) {
+			foreach ( $push as $k => $v ) {
+				if ( is_int( $k ) ) {
+					$this->append( $v );
+				} else if ( $overwrite || !$this->offsetExists( $k ) ) {
 					$this->offsetSet( $k, $v );
 				}
 			}
@@ -708,7 +728,7 @@ class Json extends ArrayObject implements JsonInterface
 		$param[ 0 ] = $this->get( $param[ 0 ] );
 
 		return call_user_func_array( [
-			'\Chukdo\Helper\Is',
+			Is::class,
 			$function,
 		],
 			$param );
@@ -719,9 +739,7 @@ class Json extends ArrayObject implements JsonInterface
 	 */
 	public function isEmpty(): bool
 	{
-		return $this->count() == 0
-			? true
-			: false;
+		return $this->count() === 0;
 	}
 
 	/**
@@ -753,7 +771,8 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		if ( $merge ) {
 			foreach ( $merge as $k => $v ) {
-				/* Les deux sont iterables on boucle en recursif */
+
+				/** Les deux sont iterables on boucle en recursif */
 				if ( is_iterable( $v )
 					&& $this->offsetGet( $k ) instanceof JsonInterface ) {
 					$this->offsetGet( $k )
@@ -838,10 +857,9 @@ class Json extends ArrayObject implements JsonInterface
 		$param[ 0 ] = $this->get( $param[ 0 ] );
 
 		return call_user_func_array( [
-			\Chukdo\Helper\To::class,
+			To::class,
 			$function,
-		],
-			$param );
+		], $param );
 	}
 
 	/**
@@ -862,9 +880,9 @@ class Json extends ArrayObject implements JsonInterface
 		if ( $title ) {
 			$climate->border();
 			$climate->style->addCommand( 'colored', $color
-				?: 'green' );
+				?? 'green' );
 			$climate->colored( ucfirst( $title
-				?: $this->name ) );
+				?? $this->name ) );
 			$climate->border();
 		}
 
@@ -984,7 +1002,7 @@ class Json extends ArrayObject implements JsonInterface
 	 *
 	 * @return JsonInterface
 	 */
-	public function wildcard( string $path, $scalarResultOnly = false ): JsonInterface
+	public function wildcard( string $path, bool $scalarResultOnly = false ): JsonInterface
 	{
 		$path      = rtrim( $path, '.*' );
 		$arr       = new Arr( Str::split( $path, '.' ) );
@@ -996,21 +1014,15 @@ class Json extends ArrayObject implements JsonInterface
 
 		if ( $firstPath === '*' ) {
 			foreach ( $this as $key => $value ) {
-				if ( $value instanceof JsonInterface ) {
-					if ( ( $get = $value->wildcard( $endPath,
-						$scalarResultOnly ) )->count() ) {
-						$json->offsetSet( $key,
-							$get );
-					}
+				if ( ( $value instanceof JsonInterface ) && ( $get = $value->wildcard( $endPath, $scalarResultOnly ) )->count() ) {
+					$json->push( $get );
 				}
 			}
 		} else if ( $get instanceof JsonInterface && !$emptyPath ) {
-			$json->offsetSet( $firstPath,
-				$get->wildcard( $endPath,
-					$scalarResultOnly ) );
+			$json->merge( $get->wildcard( $endPath, $scalarResultOnly ) );
+
 		} else if ( $get && $emptyPath && ( ( is_scalar( $get ) && $scalarResultOnly ) || !$scalarResultOnly ) ) {
-			$json->offsetSet( $firstPath,
-				$get );
+			$json->append( $get );
 		}
 
 		return $json;

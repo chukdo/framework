@@ -3,17 +3,23 @@
 Namespace Chukdo\DB\Elastic;
 
 use Chukdo\Db\Elastic\Schema\Schema;
-use Chukdo\Facades\App;
 use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
 use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\Contracts\Db\Database as DatabaseInterface;
 use Chukdo\Contracts\Db\Collection as CollectionInterface;
+use Chukdo\Contracts\Db\Schema as SchemaInterface;
+use Chukdo\Contracts\Db\Find as FindInterface;
+use Chukdo\Contracts\Db\Write as WriteInterface;
+use Chukdo\Db\Record\Record;
 use DateTime;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Exception;
+use ReflectionException;
 use Throwable;
+use ReflectionClass;
 
 /**
  * Server Server Collect.
@@ -50,7 +56,7 @@ Class Collection implements CollectionInterface
 	 * @param string|null $field
 	 * @param             $value
 	 *
-	 * @return DateTime
+	 * @return DateTime|mixed
 	 * @throws Exception
 	 */
 	public static function filterOut( ?string $field, $value )
@@ -88,23 +94,28 @@ Class Collection implements CollectionInterface
 	}
 
 	/**
-	 * @param $data
+	 * @param      $data
+	 * @param bool $hiddenId
 	 *
-	 * @return RecordInterface
+	 * @return Record|object
 	 */
-	public function record( $data ): RecordInterface
+	public function record( $data, bool $hiddenId = false ): Record
 	{
 		try {
-			$reflector = new ReflectionClass( '\App\Model\\' . $this->name() );
+			$reflector = new ReflectionClass( '\App\Model\\' . $this->database()
+																	->server()
+																	->name() . '\Record\\' . $this->name() );
 
-			return $reflector->newInstanceArgs( [
-				$this,
-				$data,
-			] );
-
+			if ( $reflector->implementsInterface( Record::class ) ) {
+				return $reflector->newInstanceArgs( [
+					$this,
+					$data,
+				] );
+			}
 		} catch ( ReflectionException $e ) {
-			return new Record( $this, $data );
 		}
+
+		return new Record( $this, $data, $hiddenId );
 	}
 
 	/**
@@ -120,12 +131,12 @@ Class Collection implements CollectionInterface
 	 * @param string|null $database
 	 * @param Schema|null $schema
 	 *
-	 * @return Collection
+	 * @return CollectionInterface
 	 */
-	public function rename( string $collection, string $database = null, Schema $schema = null ): Collection
+	public function rename( string $collection, string $database = null, Schema $schema = null ): CollectionInterface
 	{
 		$database = $database
-			?: $this->database()
+			?? $this->database()
 					->name();
 
 		$newCollection = $this->database()
@@ -156,9 +167,9 @@ Class Collection implements CollectionInterface
 	}
 
 	/**
-	 * @return Database
+	 * @return DatabaseInterface
 	 */
-	public function database(): Database
+	public function database(): DatabaseInterface
 	{
 		return $this->database;
 	}
@@ -184,7 +195,7 @@ Class Collection implements CollectionInterface
 	/**
 	 * @return Schema
 	 */
-	public function schema(): Schema
+	public function schema(): SchemaInterface
 	{
 		return new Schema( $this );
 	}
@@ -210,7 +221,7 @@ Class Collection implements CollectionInterface
 	/**
 	 * @return Find
 	 */
-	public function find(): Find
+	public function find(): FindInterface
 	{
 		return new Find( $this );
 	}
@@ -230,7 +241,7 @@ Class Collection implements CollectionInterface
 	/**
 	 * @return Write
 	 */
-	public function write(): Write
+	public function write(): WriteInterface
 	{
 		return new Write( $this );
 	}

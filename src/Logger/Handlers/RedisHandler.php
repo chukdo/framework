@@ -34,7 +34,7 @@ class RedisHandler extends AbstractHandler
 	{
 		$this->redis = $redis;
 		$this->key   = $key
-			?: 'log';
+			?? 'log';
 
 		parent::__construct();
 	}

@@ -19,9 +19,9 @@ interface Database
 	public function client();
 
 	/**
-	 * @return mixed
+	 * @return Server
 	 */
-	public function server();
+	public function server(): Server;
 
 	/**
 	 * @return string|null
@@ -67,7 +67,7 @@ interface Database
 	/**
 	 * @param string $collection
 	 *
-	 * @return mixed
+	 * @return Database
 	 */
-	public function dropCollection( string $collection );
+	public function dropCollection( string $collection ): Database;
 }

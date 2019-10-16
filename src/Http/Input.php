@@ -25,7 +25,7 @@ class Input extends Json implements InputInterface
 	public function __construct( $data = null )
 	{
 		$data = $data
-			?: ( Cli::runningInConsole()
+			?? ( Cli::runningInConsole()
 				? Cli::inputs()
 				: $_REQUEST );
 

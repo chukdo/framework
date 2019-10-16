@@ -3,6 +3,7 @@
 namespace Chukdo\Db\Elastic;
 
 use Chukdo\Contracts\Db\Write as WriteInterface;
+use Chukdo\Contracts\Db\Record as RecordInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
@@ -35,9 +36,9 @@ Class Write extends Where implements WriteInterface
 	/**
 	 * @param iterable $values
 	 *
-	 * @return Write
+	 * @return WriteInterface
 	 */
-	public function setAll( iterable $values )
+	public function setAll( iterable $values ): WriteInterface
 	{
 		foreach ( $values as $field => $value ) {
 			$this->set( $field, $value );
@@ -50,9 +51,9 @@ Class Write extends Where implements WriteInterface
 	 * @param string $field
 	 * @param        $value
 	 *
-	 * @return Write
+	 * @return WriteInterface
 	 */
-	public function set( string $field, $value )
+	public function set( string $field, $value ): WriteInterface
 	{
 		$this->field( 'set', $field, $value );
 
@@ -64,9 +65,9 @@ Class Write extends Where implements WriteInterface
 	 * @param string $field
 	 * @param        $value
 	 *
-	 * @return Write
+	 * @return WriteInterface
 	 */
-	protected function field( string $keyword, string $field, $value ): self
+	protected function field( string $keyword, string $field, $value ): WriteInterface
 	{
 		$this->fields->offsetGetOrSet( $keyword )
 					 ->offsetSet( $field, $this->filterValues( $field, $value ) );
@@ -100,9 +101,9 @@ Class Write extends Where implements WriteInterface
 	/**
 	 * @param string $field
 	 *
-	 * @return $this|mixed
+	 * @return WriteInterface
 	 */
-	public function unset( string $field )
+	public function unset( string $field ): WriteInterface
 	{
 		$this->field( 'unset', $field, '' );
 
@@ -142,9 +143,9 @@ Class Write extends Where implements WriteInterface
 	 * @param string $field
 	 * @param        $value
 	 *
-	 * @return Write
+	 * @return WriteInterface
 	 */
-	public function push( string $field, $value )
+	public function push( string $field, $value ): WriteInterface
 	{
 		$this->field( 'push', $field, $value );
 
@@ -155,9 +156,9 @@ Class Write extends Where implements WriteInterface
 	 * @param string $field
 	 * @param        $value
 	 *
-	 * @return Write
+	 * @return WriteInterface
 	 */
-	public function addToSet( string $field, $value ): self
+	public function addToSet( string $field, $value ): WriteInterface
 	{
 		return $this->field( 'addToSet', $field, $value );
 	}
@@ -166,9 +167,9 @@ Class Write extends Where implements WriteInterface
 	 * @param string $field
 	 * @param        $value
 	 *
-	 * @return Write
+	 * @return WriteInterface
 	 */
-	public function pull( string $field, $value )
+	public function pull( string $field, $value ): WriteInterface
 	{
 		$this->field( 'pull', $field, $value );
 
@@ -179,9 +180,9 @@ Class Write extends Where implements WriteInterface
 	 * @param string $field
 	 * @param int    $value
 	 *
-	 * @return $this|mixed
+	 * @return WriteInterface
 	 */
-	public function inc( string $field, int $value )
+	public function inc( string $field, int $value ): WriteInterface
 	{
 		$this->field( 'inc', $field, $value );
 
@@ -264,9 +265,9 @@ Class Write extends Where implements WriteInterface
 	}
 
 	/**
-	 * @return JsonInterface
+	 * @return RecordInterface
 	 */
-	public function deleteOneAndGet(): JsonInterface
+	public function deleteOneAndGet(): RecordInterface
 	{
 		$get = $this->getOne();
 
@@ -278,9 +279,9 @@ Class Write extends Where implements WriteInterface
 	}
 
 	/**
-	 * @return JsonInterface
+	 * @return RecordInterface
 	 */
-	protected function getOne(): JsonInterface
+	protected function getOne(): RecordInterface
 	{
 		$json   = new Json( $this->collection()
 								 ->client()
@@ -339,9 +340,9 @@ Class Write extends Where implements WriteInterface
 	}
 
 	/**
-	 * @return JsonInterface
+	 * @return RecordInterface
 	 */
-	public function updateOneAndGet(): JsonInterface
+	public function updateOneAndGet(): RecordInterface
 	{
 		$get = $this->getOne();
 

@@ -140,6 +140,14 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
 	public function merge( iterable $merge = null, bool $overwrite = null ): JsonInterface;
 
 	/**
+	 * @param iterable|null $push
+	 * @param bool|null     $overwrite
+	 *
+	 * @return JsonInterface
+	 */
+	public function push( iterable $push = null, bool $overwrite = null ): JsonInterface;
+
+	/**
 	 * @param mixed ...$names
 	 *
 	 * @return Json
@@ -314,7 +322,7 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
 	 *
 	 * @return Json
 	 */
-	public function wildcard( string $path, $scalarResultOnly = false ): JsonInterface;
+	public function wildcard( string $path, bool $scalarResultOnly = false ): JsonInterface;
 
 	/**
 	 * @param string|null $prefix

@@ -48,6 +48,14 @@ Class Server implements ServerInterface
 	}
 
 	/**
+	 * @return string
+	 */
+	public function name(): string
+	{
+		return 'Mongo';
+	}
+
+	/**
 	 * @param string $name
 	 * @param array  $hosts array of hosts
 	 *

@@ -22,9 +22,14 @@ interface Server
 	public function __construct( string $dsn = null, string $database = null );
 
 	/**
-	 * @return mixed
+	 * @return object
 	 */
 	public function client();
+
+	/**
+	 * @return string
+	 */
+	public function name(): string;
 
 	/**
 	 * @return bool
@@ -50,14 +55,14 @@ interface Server
 	 * @param string      $collection
 	 * @param string|null $database
 	 *
-	 * @return mixed
+	 * @return Collection
 	 */
-	public function collection( string $collection, string $database = null );
+	public function collection( string $collection, string $database = null ): Collection;
 
 	/**
 	 * @param string|null $database
 	 *
-	 * @return mixed
+	 * @return Database
 	 */
-	public function database( string $database = null );
+	public function database( string $database = null ): Database;
 }

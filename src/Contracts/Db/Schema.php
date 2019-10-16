@@ -16,42 +16,42 @@ interface Schema
 	/**
 	 * @return Collection
 	 */
-	public function collection();
+	public function collection(): Collection;
 
 	/**
 	 * @param string $name
 	 *
 	 * @return mixed
 	 */
-	public function get( string $name );
+	public function get( string $name ): ?Property;
 
 	/**
 	 * @param array $properties
 	 *
-	 * @return mixed
+	 * @return Schema
 	 */
-	public function setAll( array $properties );
+	public function setAll( array $properties ): Schema;
 
 	/**
 	 * @param string $name
 	 * @param null   $type
 	 * @param array  $options
 	 *
-	 * @return mixed
+	 * @return Schema
 	 */
-	public function set( string $name, $type = null, array $options = [] );
+	public function set( string $name, $type = null, array $options = [] ): Schema;
 
 	/**
 	 * @param string $name
 	 *
-	 * @return mixed
+	 * @return Schema
 	 */
-	public function unset( string $name );
+	public function unset( string $name ): Schema;
 
 	/**
-	 * @return mixed
+	 * @return Property
 	 */
-	public function property();
+	public function property(): Property;
 
 	/**
 	 * @return JsonInterface

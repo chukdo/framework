@@ -6,7 +6,6 @@ use Chukdo\Bootstrap\ServiceException;
 use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
 use Chukdo\Contracts\Middleware\Middleware as MiddlewareInterface;
 use Chukdo\Http\Response;
-use Closure;
 use ReflectionException;
 
 class ValidatorMiddleware implements MiddlewareInterface
@@ -31,8 +30,6 @@ class ValidatorMiddleware implements MiddlewareInterface
 	{
 		$this->validators      = $validators;
 		$this->errorMiddleware = $errorMiddleware;
-
-		return $this;
 	}
 
 	/**
@@ -49,7 +46,7 @@ class ValidatorMiddleware implements MiddlewareInterface
 
 		if ( $validate->fails() ) {
 			return ( $this->errorMiddleware
-				?: new ErrorMiddleware() )->errorMessage( $validate->errors() )
+				?? new ErrorMiddleware() )->errorMessage( $validate->errors() )
 										  ->process( $dispatcher );
 		}
 

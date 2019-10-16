@@ -38,9 +38,7 @@ class FloatValidate implements ValidateInterface
 	 */
 	public function attributes( array $attributes ): ValidateInterface
 	{
-		$attributes = array_pad( $attributes,
-			2,
-			0 );
+		$attributes = array_pad( $attributes, 2, 0 );
 		$this->min  = $attributes[ 0 ];
 		$this->max  = $attributes[ 1 ]
 			?: $attributes[ 0 ]
@@ -56,12 +54,6 @@ class FloatValidate implements ValidateInterface
 	 */
 	public function validate( $input ): bool
 	{
-		if ( is_float( $input ) ) {
-			if ( $input >= $this->min && $input <= $this->max ) {
-				return true;
-			}
-		}
-
-		return false;
+		return is_float( $input ) && $input >= $this->min && $input <= $this->max;
 	}
 }

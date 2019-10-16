@@ -122,7 +122,7 @@ final class Image
 				$r = self::getImage( $dst,
 					$format,
 					$quality
-						?: 92 );
+					?? 92 );
 				imagedestroy( $src );
 				imagedestroy( $dst );
 
@@ -154,11 +154,11 @@ final class Image
 				imagejpeg( $image,
 					null,
 					$quality
-						?: 85 );
+					?? 85 );
 				break;
 			case 'image/png':
 				$quality = 9 - abs( floor( ( ( $quality
-								?: 85 ) - 1 ) / 10 ) );
+								?? 85 ) - 1 ) / 10 ) );
 				imagealphablending( $image,
 					false );
 				imagesavealpha( $image,
@@ -166,7 +166,7 @@ final class Image
 				imagepng( $image,
 					null,
 					$quality
-						?: 85 );
+					?? 85 );
 				break;
 		}
 

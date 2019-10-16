@@ -51,12 +51,8 @@ class Collect
 		$closure = $this->whereClosure( $operator );
 
 		foreach ( $this->collection as $k => $row ) {
-			if ( $row instanceof JsonInterface ) {
-				if ( $get = $row->get( $field ) ) {
-					if ( $closure( $get, $row->get( $fieldValue ), $row->get( $fieldValue2 ) ) ) {
-						$json->offsetSet( $k, $row );
-					}
-				}
+			if ( ( $row instanceof JsonInterface ) && ( $get = $row->get( $field ) ) && $closure( $get, $row->get( $fieldValue ), $row->get( $fieldValue2 ) ) ) {
+				$json->offsetSet( $k, $row );
 			}
 		}
 
@@ -147,21 +143,21 @@ class Collect
 				break;
 			case 'type':
 				$closure = function( $v, $value ) {
-					return Str::type( $v ) == $value
+					return Str::type( $v ) === $value
 						? $v
 						: null;
 				};
 				break;
 			case '%':
 				$closure = function( $v, $value, $value2 ) {
-					return $v % $value == $value2
+					return $v % $value === $value2
 						? $v
 						: null;
 				};
 				break;
 			case 'size':
 				$closure = function( $v, $value ) {
-					return count( (array) $v ) == $value
+					return count( (array) $v ) === $value
 						? $v
 						: null;
 				};
@@ -176,7 +172,7 @@ class Collect
 			case 'regex':
 				$closure = function( $v, $value, $value2 ) {
 					return Str::match( '/' . $value . '/' . ( $value2
-							?: 'i' ), $v )
+							?? 'i' ), $v )
 						? $v
 						: null;
 				};
@@ -411,8 +407,8 @@ class Collect
 			$get = $v->get( $path );
 
 			if ( !Is::scalar( $get ) || Is::null( $get ) ) {
-				$get = uniqid( '' );
-			};
+				$get = uniqid( '', true );
+			}
 
 			$toSort[ $get ] = [
 				'k' => $k,
@@ -420,7 +416,7 @@ class Collect
 			];
 		}
 
-		if ( $sort == 'ASC' || $sort == 'asc' ) {
+		if ( $sort === 'ASC' || $sort === 'asc' ) {
 			ksort( $toSort );
 		} else {
 			krsort( $toSort );

@@ -23,13 +23,10 @@ final class Str
 	public static function extension( string $name ): string
 	{
 		$name = strtolower( $name );
-		$pos  = strrpos( $name,
-			'.' );
+		$pos  = strrpos( $name, '.' );
 
 		if ( $pos !== false ) {
-			return substr( $name,
-				strrpos( $name,
-					'.' ) + 1 );
+			return substr( $name, strrpos( $name, '.' ) + 1 );
 		}
 
 		return $name;
@@ -44,7 +41,7 @@ final class Str
 	{
 		$type = gettype( $value );
 
-		if ( $type == 'object' ) {
+		if ( $type === 'object' ) {
 			return get_class( $value );
 		}
 
@@ -61,8 +58,7 @@ final class Str
 	 */
 	public static function notContain( ?string $haystack, ?string $needle ): bool
 	{
-		return !self::contain( $haystack,
-			$needle );
+		return !self::contain( $haystack, $needle );
 	}
 
 	/**
@@ -75,10 +71,7 @@ final class Str
 	 */
 	public static function contain( ?string $haystack, ?string $needle ): bool
 	{
-		return strpos( $haystack,
-			$needle ) === false
-			? false
-			: true;
+		return strpos( $haystack, $needle ) !== false;
 	}
 
 	/**
@@ -89,7 +82,7 @@ final class Str
 	 */
 	public static function startWith( ?string $haystack, ?string $needle ): bool
 	{
-		return substr( $haystack, 0, strlen( $needle ) ) == $needle;
+		return strpos( $haystack, $needle ) === 0;
 	}
 
 	/**
@@ -100,7 +93,7 @@ final class Str
 	 */
 	public static function endWith( ?string $haystack, ?string $needle ): bool
 	{
-		return substr( $haystack, strlen( $needle ) ) == $needle;
+		return substr( $haystack, strlen( $needle ) ) === $needle;
 	}
 
 	/**
@@ -114,12 +107,8 @@ final class Str
 	{
 		$explode = explode( $delimiter, $string );
 
-		if ( $explode !== false ) {
-			if ( count( $explode ) == 1 ) {
-				if ( $explode[ 0 ] === "" ) {
-					$explode = [];
-				}
-			}
+		if ( ( $explode !== false ) && count( $explode ) === 1 && $explode[ 0 ] === '' ) {
+			$explode = [];
 		}
 
 		if ( $length ) {
@@ -140,12 +129,10 @@ final class Str
 	public static function charAt( string $string, int $index ): string
 	{
 		if ( $index < strlen( $string ) ) {
-			return substr( $string,
-				$index,
-				1 );
-		} else {
-			return -1;
+			return $string[ $index ];
 		}
+
+		return -1;
 	}
 
 	/**
@@ -158,10 +145,7 @@ final class Str
 	{
 		$match   = new Json();
 		$matches = [];
-		preg_match_all( $pattern,
-			$value,
-			$matches,
-			PREG_SET_ORDER );
+		preg_match_all( $pattern, $value, $matches, PREG_SET_ORDER );
 
 		foreach ( $matches as $k => $array ) {
 			switch ( count( $array ) ) {
@@ -191,9 +175,7 @@ final class Str
 	public static function match( string $pattern, string $value )
 	{
 		$match = [];
-		preg_match( $pattern,
-			$value,
-			$match );
+		preg_match( $pattern, $value, $match );
 
 		switch ( count( $match ) ) {
 			case 0:
@@ -222,9 +204,7 @@ final class Str
 		$split = explode( $delimiter, $value );
 
 		if ( $pad ) {
-			$split = array_pad( $split,
-				$pad,
-				$padValue );
+			$split = array_pad( $split, $pad, $padValue );
 		}
 
 		return $split;
@@ -250,13 +230,17 @@ final class Str
 	{
 		if ( $time < 0.1 ) {
 			return round( $time * 1000, 3 ) . ' Micro-secondes';
-		} else if ( $time < 1 ) {
-			return round( $time * 1000, 3 ) . ' Milli-secondes';
-		} else if ( $time ) {
-			return round( $time, 3 ) . ' Secondes';
-		} else {
-			return '0';
 		}
+
+		if ( $time < 1 ) {
+			return round( $time * 1000, 3 ) . ' Milli-secondes';
+		}
+
+		if ( $time ) {
+			return round( $time, 3 ) . ' Secondes';
+		}
+
+		return '0';
 	}
 
 	/**
@@ -268,13 +252,17 @@ final class Str
 	{
 		if ( $mem < 1024 ) {
 			return $mem . ' Octets';
-		} else if ( $mem < 1048576 ) {
-			return round( $mem / 1024, 2 ) . ' Kilo-octets';
-		} else if ( $mem ) {
-			return round( $mem / 1048576, 2 ) . ' Mega-octets';
-		} else {
-			return '0';
 		}
+
+		if ( $mem < 1048576 ) {
+			return round( $mem / 1024, 2 ) . ' Kilo-octets';
+		}
+
+		if ( $mem ) {
+			return round( $mem / 1048576, 2 ) . ' Mega-octets';
+		}
+
+		return '0';
 	}
 
 	/**
@@ -284,7 +272,7 @@ final class Str
 	 */
 	public static function uid( string $prefix = null ): string
 	{
-		return $prefix . md5( uniqid( rand(), true ) );
+		return $prefix . md5( uniqid( mt_rand(), true ) );
 	}
 
 	/**
@@ -354,9 +342,7 @@ final class Str
 	 */
 	public static function allText( string $value ): string
 	{
-		$text = trim( strtolower( self::replace( '/[^[:alnum:]]/u',
-			' ',
-			self::removeSpecialChars( self::stripTag( $value ) ) ) ) );
+		$text = strtolower( trim( self::replace( '/[^[:alnum:]]/u', ' ', self::removeSpecialChars( self::stripTag( $value ) ) ) ) );
 
 		return $text;
 	}
@@ -404,7 +390,7 @@ final class Str
 	{
 		return self::replace( '/<\/?\s*' . $tag . '[^>]*>/',
 			$replacement
-				?: ' ',
+			?? ' ',
 			$value );
 	}
 
@@ -415,9 +401,7 @@ final class Str
 	 */
 	public static function allSentence( string $value ): string
 	{
-		$text = trim( strtolower( self::replace( '/[^[:alnum:]_;:\., ]/u',
-			' ',
-			self::removeSpecialChars( self::stripTag( $value ) ) ) ) );
+		$text = strtolower( trim( self::replace( '/[^[:alnum:]_;:\., ]/u', ' ', self::removeSpecialChars( self::stripTag( $value ) ) ) ) );
 
 		return $text;
 	}

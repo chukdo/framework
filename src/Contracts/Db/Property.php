@@ -24,32 +24,46 @@ interface Property
 	/**
 	 * @param string $name
 	 *
-	 * @return mixed
+	 * @return Property|null
 	 */
-	public function get( string $name );
+	public function get( string $name ): ?Property;
 
 	/**
 	 * @param array $properties
 	 *
-	 * @return mixed
+	 * @return Property
 	 */
-	public function setAll( array $properties );
+	public function setAll( array $properties ): Property;
 
 	/**
 	 * @param string $name
 	 * @param null   $type
 	 * @param array  $options
 	 *
-	 * @return mixed
+	 * @return Property
 	 */
-	public function set( string $name, $type = null, array $options = [] );
+	public function set( string $name, $type = null, array $options = [] ): Property;
+
+	/**
+	 * @param array $value
+	 *
+	 * @return Property
+	 */
+	public function setProperties( array $value ): Property;
+
+	/**
+	 * @param $value
+	 *
+	 * @return Property
+	 */
+	public function setType( $value ): Property;
 
 	/**
 	 * @param string $name
 	 *
-	 * @return mixed
+	 * @return Property
 	 */
-	public function unset( string $name );
+	public function unset( string $name ): Property;
 
 	/**
 	 * @return JsonInterface
@@ -57,9 +71,9 @@ interface Property
 	public function properties(): JsonInterface;
 
 	/**
-	 * @return mixed
+	 * @return string|null
 	 */
-	public function type();
+	public function type(): ?string;
 
 	/**
 	 * @return string|null

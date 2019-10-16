@@ -53,14 +53,11 @@ final class To
 	 */
 	public static function qualifiedName( string $name, $prefix = null ): string
 	{
-		$qname = str_replace( ' ',
-			'_',
-			Str::allText( $name ) );
+		$qname = str_replace( ' ', '_', Str::allText( $name ) );
 
-		if ( !preg_match( '/^[a-z]/',
-			$qname ) ) {
+		if ( !preg_match( '/^[a-z]/', $qname ) ) {
 			$qname = $prefix
-				?: 'error';
+				?? 'error';
 		}
 
 		return $qname;
@@ -75,12 +72,8 @@ final class To
 	 */
 	public static function fileName( string $name, string $prefix = null, string $suffix = null ): string
 	{
-		if ( strlen( $name ) > 0 ) {
-			return preg_replace( '/_{2,}/',
-				'_',
-				$prefix . str_replace( ' ',
-					'_',
-					Str::allText( $name ) ) . $suffix );
+		if ( $name !== '' ) {
+			return preg_replace( '/_{2,}/', '_', $prefix . str_replace( ' ', '_', Str::allText( $name ) ) . $suffix );
 		}
 
 		return '';
@@ -95,12 +88,8 @@ final class To
 	{
 		$value = (string) $value;
 
-		if ( $value !== false ) {
-			if ( !mb_check_encoding( $value,
-				'UTF-8' ) ) {
-				$value = mb_convert_encoding( $value,
-					'UTF-8' );
-			}
+		if ( ( $value !== false ) && !mb_check_encoding( $value, 'UTF-8' ) ) {
+			$value = mb_convert_encoding( $value, 'UTF-8' );
 		}
 
 		return $value;
@@ -166,7 +155,7 @@ final class To
 	public static function date( string $value, string $format = null ): DateTime
 	{
 		$date = DateTime::createFromFormat( $format
-			?: 'd/m/Y',
+			?? 'd/m/Y',
 			$value );
 
 		if ( $date instanceof DateTime ) {
@@ -185,11 +174,13 @@ final class To
 	{
 		if ( is_scalar( $value ) ) {
 			return $value;
-		} else if ( Is::object( $value, 'toJson' ) ) {
-			return $value->toJson();
-		} else {
-			return json_encode( self::arr( $value ), JSON_PRETTY_PRINT );
 		}
+
+		if ( Is::object( $value, 'toJson' ) ) {
+			return $value->toJson();
+		}
+
+		return json_encode( self::arr( $value ), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT, 512 );
 	}
 
 	/**
@@ -204,20 +195,20 @@ final class To
 		if ( is_array( $value ) ) {
 			$array = $value;
 
-			/* La valeur est TRUE | FALSE | NULL | '' */
+			/** La valeur est TRUE | FALSE | NULL | '' */
 		} else if ( $value === true || $value === false || $value === null || $value === '' || $value === 0 ) {
 			$array = [];
 
-			/* La valeur est un entier ou une chaine de caractere */
+			/** La valeur est un entier ou une chaine de caractere */
 		} else if ( Is::scalar( $value ) ) {
 			$array = [ $value ];
 
-			/* La valeur est un object avec une fonction de transformation */
+			/** La valeur est un object avec une fonction de transformation */
 		} else if ( Is::object( $value,
 			'toArray' ) ) {
 			$array = $value->toArray();
 
-			/* La valeur est un tableau ou est travsersable */
+			/** La valeur est un tableau ou est travsersable */
 		} else if ( Is::traversable( $value ) ) {
 			foreach ( $value as $k => $v ) {
 				$array[ $k ] = is_scalar( $v )
@@ -225,7 +216,7 @@ final class To
 					: self::arr( $v );
 			}
 
-			/* retourne un tableau vide */
+			/** retourne un tableau vide */
 		} else {
 			$array = [];
 		}
@@ -242,14 +233,16 @@ final class To
 	{
 		if ( $value instanceof Xml ) {
 			return $value;
-		} else if ( Is::object( $value, 'toXml' ) ) {
-			return $value->toXml();
-		} else {
-			$xml = new Xml();
-			$xml->import( $value );
-
-			return $xml;
 		}
+
+		if ( Is::object( $value, 'toXml' ) ) {
+			return $value->toXml();
+		}
+
+		$xml = new Xml();
+		$xml->import( $value );
+
+		return $xml;
 	}
 
 	/**
@@ -266,14 +259,14 @@ final class To
 			$text .= "Number: $value";
 		} else if ( is_string( $value ) ) {
 			$text .= "String: '$value'";
-		} else if ( is_null( $value ) ) {
-			$text .= "Null";
+		} else if ( $value === null ) {
+			$text .= 'Null';
 		} else if ( $value === true ) {
-			$text .= "True";
+			$text .= 'True';
 		} else if ( $value === false ) {
-			$text .= "False";
+			$text .= 'False';
 		} else if ( is_array( $value ) ) {
-			$text .= "Array (" . count( $value ) . ')';
+			$text .= 'Array (' . count( $value ) . ')';
 			$indent++;
 
 			foreach ( $value AS $k => $v ) {
@@ -281,7 +274,7 @@ final class To
 				$text .= self::text( $v, $indent );
 			}
 		} else if ( is_object( $value ) ) {
-			$text .= "Object (" . get_class( $value ) . ")";
+			$text .= 'Object (' . get_class( $value ) . ')';
 			$indent++;
 
 			foreach ( $value AS $k => $v ) {
@@ -306,7 +299,7 @@ final class To
 		$html  = '';
 		$style = 'border-spacing:0;border-collapse:collapse;font-family:Arial;width:100%;word-break:break-word;';
 		$title = $title
-			?: ( $type
+			?? ( $type
 				? Str::type( $value )
 				: null );
 
@@ -315,7 +308,7 @@ final class To
 				?: '#777';
 			$html  .= '<thead style="color: #fff;background: ' . $color
 				. ';"><tr><th colspan="2" style="padding:5px;font-size:18px;font-weight: normal;">' . ucfirst( $title )
-				. "</th></tr></thead>";
+				. '</th></tr></thead>';
 		}
 
 		if ( is_scalar( $value ) ) {

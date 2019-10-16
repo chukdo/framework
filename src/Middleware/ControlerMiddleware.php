@@ -24,7 +24,10 @@ class ControlerMiddleware implements MiddlewareInterface
 	 */
 	public function __construct( String $uri )
 	{
-		list( $this->controler, $this->action ) = explode( '@', $uri );
+		[
+			$this->controler,
+			$this->action,
+		] = explode( '@', $uri );
 	}
 
 	/**

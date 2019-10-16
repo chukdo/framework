@@ -63,9 +63,9 @@ class Property implements PropertyInterface
 	/**
 	 * @param array $value
 	 *
-	 * @return $this
+	 * @return PropertyInterface
 	 */
-	public function setProperties( array $value ): self
+	public function setProperties( array $value ): PropertyInterface
 	{
 		$properties = $this->property->offsetGetOrSet( 'properties', [] );
 
@@ -82,9 +82,9 @@ class Property implements PropertyInterface
 	 *
 	 * @param string $value
 	 *
-	 * @return Property
+	 * @return PropertyInterface
 	 */
-	public function setType( string $value ): self
+	public function setType( $value ): PropertyInterface
 	{
 		$this->property->offsetSet( 'type', $value );
 
@@ -95,9 +95,9 @@ class Property implements PropertyInterface
 	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/copy-to.html
 	 * @param string $value
 	 *
-	 * @return $this
+	 * @return PropertyInterface
 	 */
-	public function setCopyTo( $value ): self
+	public function setCopyTo( $value ): PropertyInterface
 	{
 		$this->property->offsetSet( 'copy_to', (array) $value );
 
@@ -108,9 +108,9 @@ class Property implements PropertyInterface
 	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer.html
 	 * @param string $value
 	 *
-	 * @return $this
+	 * @return PropertyInterface
 	 */
-	public function setAnalyser( string $value ): self
+	public function setAnalyser( string $value ): PropertyInterface
 	{
 		$this->property->offsetSet( 'analyser', $value );
 
@@ -121,9 +121,9 @@ class Property implements PropertyInterface
 	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/multi-fields.html
 	 * @param array $value
 	 *
-	 * @return $this
+	 * @return PropertyInterface
 	 */
-	public function setFields( array $value ): self
+	public function setFields( array $value ): PropertyInterface
 	{
 		$properties = $this->property->offsetGetOrSet( 'fields', [] );
 
@@ -135,27 +135,11 @@ class Property implements PropertyInterface
 	}
 
 	/**
-	 * @return int
-	 */
-	public function count(): int
-	{
-		return $this->property->count();
-	}
-
-	/**
-	 * @return $this|null
-	 */
-	public function fields(): ?Property
-	{
-		return $this->property->offsetGet( 'fields' );
-	}
-
-	/**
 	 * @param string $name
 	 *
-	 * @return $this|null
+	 * @return PropertyInterface|null
 	 */
-	public function get( string $name ): ?Property
+	public function get( string $name ): ?PropertyInterface
 	{
 		if ( Str::notContain( $name, '.' ) ) {
 			return $this->properties()
@@ -168,7 +152,7 @@ class Property implements PropertyInterface
 		$get       = $this->properties()
 						  ->offsetGet( $firstPath );
 
-		if ( $get instanceof Property ) {
+		if ( $get instanceof PropertyInterface ) {
 			return $get->get( $endPath );
 		}
 
@@ -186,9 +170,9 @@ class Property implements PropertyInterface
 	/**
 	 * @param array $properties
 	 *
-	 * @return $this
+	 * @return PropertyInterface
 	 */
-	public function setAll( array $properties ): self
+	public function setAll( array $properties ): PropertyInterface
 	{
 		foreach ( $properties as $name => $type ) {
 			$this->set( $name, $type );
@@ -202,9 +186,9 @@ class Property implements PropertyInterface
 	 * @param null   $type
 	 * @param array  $options
 	 *
-	 * @return Property
+	 * @return PropertyInterface
 	 */
-	public function set( string $name, $type = null, array $options = [] ): Property
+	public function set( string $name, $type = null, array $options = [] ): PropertyInterface
 	{
 		$property = new Property( $options, $name );
 
@@ -227,7 +211,7 @@ class Property implements PropertyInterface
 	 */
 	public function toArray(): array
 	{
-		return $this->property->filterRecursive( function( $k, $v ) {
+		return $this->property->filterRecursive( static function( $k, $v ) {
 			return $v instanceof Property
 				? $v->toArray()
 				: $v;
@@ -254,14 +238,30 @@ class Property implements PropertyInterface
 	/**
 	 * @param string $name
 	 *
-	 * @return $this
+	 * @return PropertyInterface
 	 */
-	public function unset( string $name ): self
+	public function unset( string $name ): PropertyInterface
 	{
 		$this->properties()
 			 ->offsetUnset( $name );
 
 		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function count(): int
+	{
+		return $this->property->count();
+	}
+
+	/**
+	 * @return PropertyInterface|null
+	 */
+	public function fields(): ?PropertyInterface
+	{
+		return $this->property->offsetGet( 'fields' );
 	}
 
 	/**

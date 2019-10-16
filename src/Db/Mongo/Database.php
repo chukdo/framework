@@ -36,7 +36,7 @@ Class Database implements DatabaseInterface
 	{
 		$this->server = $server;
 		$this->client = new MongoDbDatabase( $server->client(), $database
-			?: 'main' );
+			?? 'main' );
 	}
 
 	/**
@@ -45,10 +45,8 @@ Class Database implements DatabaseInterface
 	public function repair(): bool
 	{
 		return $this->server()
-					->command( [
-						'repairDatabase' => 1,
-					], $this->name() )
-					->get( '0.ok' ) == 1;
+					->command( [ 'repairDatabase' => 1, ], $this->name() )
+					->get( '0.ok' ) === 1;
 	}
 
 	/**
@@ -148,7 +146,7 @@ Class Database implements DatabaseInterface
 		$drop = $this->client()
 					 ->drop();
 
-		return $drop[ 'ok' ] == 1;
+		return $drop[ 'ok' ] === 1;
 	}
 
 	/**

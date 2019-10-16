@@ -78,7 +78,7 @@ class View
 	public function setResponseHandler( Response $response = null ): self
 	{
 		$this->response = $response
-			?: new Response();
+			?? new Response();
 
 		return $this;
 	}
@@ -129,7 +129,10 @@ class View
 	 */
 	public function path( string $template ): ?array
 	{
-		list( $folder, $name ) = Str::split( $template,
+		[
+			$folder,
+			$name,
+		] = Str::split( $template,
 			'::',
 			2 );
 
@@ -168,7 +171,7 @@ class View
 	 */
 	public function addData( Iterable $data, $templates = null ): self
 	{
-		if ( $templates == null ) {
+		if ( $templates === null ) {
 			$this->sharedData = $data;
 		} else {
 			foreach ( (array) $templates as $template ) {
@@ -186,13 +189,11 @@ class View
 	 */
 	public function getData( string $template = null ): ?iterable
 	{
-		if ( $template == null ) {
+		if ( $template === null ) {
 			return $this->sharedData;
-		} else if ( isset( $this->sharedTemplateData[ $template ] ) ) {
-			return $this->sharedTemplateData[ $template ];
-		} else {
-			return null;
 		}
+
+		return $this->sharedTemplateData[ $template ] ?? null;
 	}
 
 	/**

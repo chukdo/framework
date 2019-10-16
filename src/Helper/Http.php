@@ -67,9 +67,9 @@ final class Http
 		if ( array_key_exists( $ext,
 			$mimeTypes ) ) {
 			return $mimeTypes[ $ext ];
-		} else {
-			return 'application/octet-stream';
 		}
+
+		return 'application/octet-stream';
 	}
 
 	/**
@@ -104,18 +104,14 @@ final class Http
 			return false;
 		};
 
-		/* Browser & Version */
+		/** Browser & Version */
 		if ( !$is( 'firefox' ) ) {
-			if ( !$is( 'edge',
-				'msie' ) ) {
+			if ( !$is( 'edge', 'msie' ) ) {
 				if ( !$is( 'msie' ) ) {
-					if ( !$is( 'trident',
-						'msie' ) ) {
+					if ( !$is( 'trident', 'msie' ) ) {
 						if ( !$is( 'opera' ) ) {
-							if ( !$is( 'opr',
-								'opera' ) ) {
-								if ( !$is( 'chromium',
-									'chrome' ) ) {
+							if ( !$is( 'opr', 'opera' ) ) {
+								if ( !$is( 'chromium', 'chrome' ) ) {
 									if ( !$is( 'chrome' ) ) {
 										$is( 'safari' );
 									}
@@ -127,26 +123,19 @@ final class Http
 			}
 		}
 
-		/* Platform */
-		if ( Str::contain( $ua,
-			'windows' ) ) {
+		/** Platform */
+		if ( Str::contain( $ua, 'windows' ) ) {
 			$browser[ 'platform' ] = 'windows';
-		} else if ( Str::contain( $ua,
-			'linux' ) ) {
+		} else if ( Str::contain( $ua, 'linux' ) ) {
 			$browser[ 'platform' ] = 'linux';
-		} else if ( Str::contain( $ua,
-			'mac' ) ) {
+		} else if ( Str::contain( $ua, 'mac' ) ) {
 			$browser[ 'platform' ] = 'osx';
 		}
 
-		/* Mobile */
-		if ( Str::contain( $ua,
-				'ipad' )
-			|| Str::contain( $ua,
-				'iphone' ) ) {
+		/** Mobile */
+		if ( Str::contain( $ua, 'ipad' ) || Str::contain( $ua, 'iphone' ) ) {
 			$browser[ 'mobile' ] = 'ios';
-		} else if ( Str::contain( $ua,
-			'android' ) ) {
+		} else if ( Str::contain( $ua, 'android' ) ) {
 			$browser[ 'mobile' ] = 'android';
 		}
 

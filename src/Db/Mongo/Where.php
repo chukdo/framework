@@ -3,6 +3,8 @@
 namespace Chukdo\Db\Mongo;
 
 use MongoDB\BSON\Regex;
+use Chukdo\Contracts\Db\Find as FindInterface;
+use Chukdo\Contracts\Db\Write as WriteInterface;
 
 /**
  * Server Where.
@@ -11,7 +13,7 @@ use MongoDB\BSON\Regex;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Where
+Abstract Class Where
 {
 	/**
 	 * @var array
@@ -29,9 +31,9 @@ Class Where
 	 * @param null   $value
 	 * @param null   $value2
 	 *
-	 * @return $this
+	 * @return FindInterface|WriteInterface|object
 	 */
-	public function where( string $field, string $operator, $value = null, $value2 = null ): self
+	public function where( string $field, string $operator, $value = null, $value2 = null )
 	{
 		$this->where[ $field ] = $this->subQuery( $field, $operator, $value, $value2 );
 
@@ -120,7 +122,7 @@ Class Where
 			case 'regex':
 				return [
 					'$regex' => new Regex( $value, $value2
-						?: 'i' ),
+						?? 'i' ),
 				];
 				break;
 			case 'match':
@@ -130,7 +132,7 @@ Class Where
 				return [ '$all' => $value ];
 				break;
 			default :
-				throw new MongoException( sprintf( "Unknown operator [%s]", $operator ) );
+				throw new MongoException( sprintf( 'Unknown operator [%s]', $operator ) );
 
 		}
 	}
@@ -141,9 +143,9 @@ Class Where
 	 * @param null   $value
 	 * @param null   $value2
 	 *
-	 * @return $this
+	 * @return FindInterface|WriteInterface|object
 	 */
-	public function orWhere( string $field, string $operator, $value = null, $value2 = null ): self
+	public function orWhere( string $field, string $operator, $value = null, $value2 = null )
 	{
 		$this->orWhere[ $field ] = $this->subQuery( $field, $operator, $value, $value2 );
 

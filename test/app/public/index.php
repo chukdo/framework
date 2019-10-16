@@ -17,7 +17,7 @@ use \App\Providers;
 use Chukdo\Json\Json;
 use Chukdo\View\Functions\Basic;
 
-$app = require_once __DIR__ . '/../Bootstrap/App.php';
+$app = require __DIR__ . '/../Bootstrap/App.php';
 
 $app->channel( \Chukdo\Helper\HttpRequest::subDomain() );
 
@@ -109,7 +109,8 @@ $db      = $elastic->database();
 $find = $db->collection( 'test' )
 		   ->find();
 
-dd( $find->distinct( 'cp' ) );
+print_r( $find->distinct( 'cp' )
+			  ->toHtml() );
 
 die( 'ok' );
 exit;

@@ -400,26 +400,24 @@ class Header
 	public function setAllowAllOrigin( string $origin = null, string $method = null, string $allow = null ): self
 	{
 		if ( isset( $_SERVER[ 'HTTP_ORIGIN' ] ) ) {
+			$isAllow = false;
 			$uri     = trim( $_SERVER[ 'HTTP_ORIGIN' ],
 				'/' );
-			$origins = explode( ' ',
-				$origin );
+			$origins = explode( ' ', $origin );
 			$method  = $method
-				?: 'GET, POST, PUT, DELETE, OPTIONS';
+				?? 'GET, POST, PUT, DELETE, OPTIONS';
 			$allow   = $allow
-				?: 'Content-Type, Content-Range, Content-Disposition, Content-Description, '
+				?? 'Content-Type, Content-Range, Content-Disposition, Content-Description, '
 				. 'Accept, Access-Control-Allow-Headers, Authorization, X-Requested-With';
 
-			foreach ( $origins as $origin ) {
-				if ( $origin
-					&& substr( $uri,
-						-strlen( $origin ) ) == $origin ) {
-					$allow = true;
+			foreach ( $origins as $item ) {
+				if ( $item && substr( $uri, -strlen( $item ) ) === $item ) {
+					$isAllow = true;
 					break;
 				}
 			}
 
-			if ( $allow || $origin == '*' ) {
+			if ( $isAllow || $origin === '*' ) {
 				$this->setHeader( 'Access-Control-Allow-Origin',
 					$_SERVER[ 'HTTP_ORIGIN' ] )
 					 ->setHeader( 'X-Origin',

@@ -67,9 +67,9 @@ class Message extends Json
 		$climate->output->defaultTo( 'buffer' );
 		$climate->border();
 		$climate->style->addCommand( 'colored', $color
-			?: 'green' );
+			?? 'green' );
 		$climate->colored( ucfirst( $title
-			?: $this->name ) );
+			?? $this->name ) );
 		$climate->border();
 
 		$padding = $climate->padding( 15 );

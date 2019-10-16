@@ -4,12 +4,11 @@ namespace Chukdo\Db\Mongo;
 
 use Chukdo\Helper\Arr;
 use Chukdo\Json\Json;
-use Chukdo\Db\Mongo\Record\Record;
-use Chukdo\Db\Mongo\Record\RecordList;
 use Chukdo\Contracts\Db\Find as FindInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
-use Chukdo\Contracts\Db\Record as RecordInterface;
-use Chukdo\Contracts\Db\RecordList as RecordListInterface;
+use Chukdo\Contracts\Db\Collection as CollectionInterface;
+use Chukdo\Db\Record\Record;
+use Chukdo\Db\Record\RecordList;
 use MongoDB\Driver\ReadPreference;
 
 /**
@@ -96,7 +95,7 @@ Class Find extends Where implements FindInterface
 	/**
 	 * @return Collection
 	 */
-	public function collection(): Collection
+	public function collection(): CollectionInterface
 	{
 		return $this->collection;
 	}
@@ -114,45 +113,21 @@ Class Find extends Where implements FindInterface
 	/**
 	 * @param bool $idAsKey
 	 *
-	 * @return RecordListInterface
+	 * @return RecordList
 	 */
-	public function all( bool $idAsKey = false ): RecordListInterface
+	public function all( bool $idAsKey = false ): RecordList
 	{
-		$recordList = new RecordList( $this->collection() );
-
-		foreach ( $this->cursor() as $key => $value ) {
-			if ( $idAsKey ) {
-				$recordList->offsetSet( $value->offsetGet( '_id' ), $value );
-			} else {
-				$recordList->offsetSet( $key, $value );
-			}
-		}
+		$options    = Arr::merge( $this->projection(), $this->options );
+		$find       = $this->collection()
+						   ->client()
+						   ->find( $this->filter(), $options );
+		$recordList = new RecordList( $this->collection(), new Json( $find ), $idAsKey, $this->hiddenId );
 
 		foreach ( $this->link as $link ) {
 			$recordList = $link->hydrate( $recordList );
 		}
 
-		/** Suppression des ID defini par without */
-		if ( $this->hiddenId ) {
-			foreach ( $recordList as $key => $value ) {
-				$value->offsetUnset( '_id' );
-			}
-		}
-
 		return $recordList;
-	}
-
-	/**
-	 * @return Cursor
-	 */
-	public function cursor(): Cursor
-	{
-		$options = Arr::merge( $this->projection(), $this->options );
-		$find    = $this->collection()
-						->client()
-						->find( $this->filter(), $options );
-
-		return new Cursor( $this->collection(), $find );
 	}
 
 	/**
@@ -186,9 +161,9 @@ Class Find extends Where implements FindInterface
 	 * @param array       $without
 	 * @param string|null $linked
 	 *
-	 * @return Find
+	 * @return FindInterface
 	 */
-	public function link( string $field, array $with = [], array $without = [], string $linked = null ): self
+	public function link( string $field, array $with = [], array $without = [], string $linked = null ): FindInterface
 	{
 		$link = new Link( $this->collection()
 							   ->database(), $field );
@@ -203,9 +178,9 @@ Class Find extends Where implements FindInterface
 	/**
 	 * @param mixed ...$fields
 	 *
-	 * @return Find
+	 * @return FindInterface
 	 */
-	public function with( ...$fields ): self
+	public function with( ...$fields ): FindInterface
 	{
 		$fields = Arr::spreadArgs( $fields );
 
@@ -219,9 +194,9 @@ Class Find extends Where implements FindInterface
 	/**
 	 * @param mixed ...$fields
 	 *
-	 * @return Find
+	 * @return FindInterface
 	 */
-	public function without( ...$fields ): self
+	public function without( ...$fields ): FindInterface
 	{
 		$fields = Arr::spreadArgs( $fields );
 
@@ -240,9 +215,9 @@ Class Find extends Where implements FindInterface
 	 * @param string $field
 	 * @param string $sort
 	 *
-	 * @return Find
+	 * @return FindInterface
 	 */
-	public function sort( string $field, string $sort = 'ASC' ): self
+	public function sort( string $field, string $sort = 'ASC' ): FindInterface
 	{
 		$this->sort[ $field ] = $sort === 'asc' || $sort === 'ASC'
 			? 1
@@ -254,9 +229,9 @@ Class Find extends Where implements FindInterface
 	/**
 	 * @param int $skip
 	 *
-	 * @return Find
+	 * @return FindInterface
 	 */
-	public function skip( int $skip ): self
+	public function skip( int $skip ): FindInterface
 	{
 		$this->skip = $skip;
 
@@ -264,38 +239,55 @@ Class Find extends Where implements FindInterface
 	}
 
 	/**
-	 * @return RecordInterface
+	 * @return Record
 	 */
-	public function one(): RecordInterface
+	public function one(): Record
 	{
-		foreach ( $this->limit( 1 )
-					   ->cursor() as $key => $record ) {
+		$options = Arr::merge( $this->projection(), $this->options );
+		$find    = $this->collection()
+						->client()
+						->findOne( $this->filter(), $options );
 
-			/** Suppression des ID defini par without */
-			if ( $this->hiddenId ) {
-				$record->offsetUnset( '_id' );
-			}
+		$record = $this->collection()
+					   ->record( $find, $this->hiddenId );
 
-			foreach ( $this->link as $link ) {
-				$record = $link->hydrate( $record );
-			}
-
-			return $record;
+		foreach ( $this->link as $link ) {
+			$record = $link->hydrate( $record );
 		}
 
-		return new Record( $this->collection() );
+		return $record;
 	}
 
 	/**
 	 * @param int $limit
 	 *
-	 * @return Find
+	 * @return FindInterface
 	 */
-	public function limit( int $limit ): self
+	public function limit( int $limit ): FindInterface
 	{
 		$this->limit = $limit;
 
 		return $this;
+	}
+
+	/**
+	 * @param string $field
+	 * @param bool   $idAsKey
+	 *
+	 * @return RecordList
+	 */
+	public function distinct( string $field, bool $idAsKey = false ): RecordList
+	{
+		$find       = $this->collection()
+						   ->client()
+						   ->distinct( $field, $this->filter() );
+		$recordList = new RecordList( $this->collection(), new Json( $find ), $idAsKey, $this->hiddenId );
+
+		foreach ( $this->link as $link ) {
+			$recordList = $link->hydrate( $recordList );
+		}
+
+		return $recordList;
 	}
 
 	/**
@@ -320,29 +312,5 @@ Class Find extends Where implements FindInterface
 		$json->offsetSet( 'executionStats', $explain->get( '0.executionStats' ) );
 
 		return $json;
-	}
-
-	/**
-	 * @param string $field
-	 *
-	 * @return RecordListInterface
-	 */
-	public function distinct( string $field ): RecordListInterface
-	{
-		$recordList = new RecordList( $this->collection(), $this->collection()
-																->client()
-																->distinct( $field, $this->filter() ) );
-		foreach ( $this->link as $link ) {
-			$recordList = $link->hydrate( $recordList );
-		}
-
-		/** Suppression des ID defini par without */
-		if ( $this->hiddenId ) {
-			foreach ( $recordList as $key => $value ) {
-				$value->offsetUnset( '_id' );
-			}
-		}
-
-		return $recordList;
 	}
 }

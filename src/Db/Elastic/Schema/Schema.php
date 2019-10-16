@@ -2,9 +2,10 @@
 
 namespace Chukdo\Db\Elastic\Schema;
 
-use Chukdo\Helper\Is;
 use Throwable;
 use Chukdo\Contracts\Db\Schema as SchemaInterface;
+use Chukdo\Contracts\Db\Collection as CollectionInterface;
+use Chukdo\Contracts\Db\Property as PropertyInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\DB\Elastic\Collection;
 use Chukdo\Json\Json;
@@ -51,9 +52,9 @@ class Schema implements SchemaInterface
 	/**
 	 * @param array $properties
 	 *
-	 * @return $this
+	 * @return SchemaInterface
 	 */
-	public function setAll( array $properties ): self
+	public function setAll( array $properties ): SchemaInterface
 	{
 		$this->property()
 			 ->setAll( $properties );
@@ -66,9 +67,9 @@ class Schema implements SchemaInterface
 	 * @param null   $type
 	 * @param array  $options
 	 *
-	 * @return $this
+	 * @return SchemaInterface
 	 */
-	public function set( string $name, $type = null, array $options = [] ): self
+	public function set( string $name, $type = null, array $options = [] ): SchemaInterface
 	{
 		$this->property()
 			 ->set( $name, $type, $options );
@@ -79,7 +80,7 @@ class Schema implements SchemaInterface
 	/**
 	 * @return Property
 	 */
-	public function property(): Property
+	public function property(): PropertyInterface
 	{
 		return $this->property;
 	}
@@ -114,9 +115,9 @@ class Schema implements SchemaInterface
 	}
 
 	/**
-	 * @return Collection
+	 * @return CollectionInterface
 	 */
-	public function collection(): Collection
+	public function collection(): CollectionInterface
 	{
 		return $this->collection;
 	}
@@ -126,7 +127,7 @@ class Schema implements SchemaInterface
 	 *
 	 * @return Property|null
 	 */
-	public function get( string $name ): ?Property
+	public function get( string $name ): ?PropertyInterface
 	{
 		return $this->property()
 					->get( $name );
@@ -135,9 +136,9 @@ class Schema implements SchemaInterface
 	/**
 	 * @param string $name
 	 *
-	 * @return $this
+	 * @return SchemaInterface
 	 */
-	public function unset( string $name ): self
+	public function unset( string $name ): SchemaInterface
 	{
 		$this->property()
 			 ->unset( $name );
@@ -159,7 +160,7 @@ class Schema implements SchemaInterface
 								   'body'  => $this->toArray(),
 							   ] ) );
 
-		return $save->offsetGet( 'acknowledged' ) == 1;
+		return $save->offsetGet( 'acknowledged' ) === 1;
 	}
 
 	/**

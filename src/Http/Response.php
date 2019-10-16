@@ -169,9 +169,9 @@ class Response
 	public function download( string $file, string $name = null, string $type = null ): self
 	{
 		$name = $name
-			?: basename( $file );
+			?? basename( $file );
 		$type = $type
-			?: Http::mimeContentType( $name );
+			?? Http::mimeContentType( $name );
 
 		$this->file = $file;
 		$this->header->setHeader( 'Content-Disposition',
@@ -192,9 +192,9 @@ class Response
 	public function file( string $file, string $name = null, string $type = null ): self
 	{
 		$name = $name
-			?: basename( $file );
+			?? basename( $file );
 		$type = $type
-			?: Http::mimeContentType( $name );
+			?? Http::mimeContentType( $name );
 
 		$this->file = $file;
 		$this->header->setHeader( 'Content-Disposition',

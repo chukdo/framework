@@ -185,8 +185,7 @@ class Rule
 		$input = Str::contain( $this->path,
 			'*' )
 			? $this->validator->inputs()
-							  ->wildcard( $this->path,
-								  true )
+							  ->wildcard( $this->path, true )
 			: $this->validator->inputs()
 							  ->get( $this->path );
 

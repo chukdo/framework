@@ -2,6 +2,9 @@
 
 namespace Chukdo\Db\Elastic;
 
+use Chukdo\Contracts\Db\Collection as CollectionInterface;
+use Chukdo\Contracts\Db\Find as FindInterface;
+use Chukdo\Contracts\Db\Write as WriteInterface;
 use Chukdo\Json\Json;
 
 /**
@@ -11,7 +14,7 @@ use Chukdo\Json\Json;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Where
+Abstract Class Where
 {
 	/**
 	 * @var Collection
@@ -34,9 +37,9 @@ Class Where
 	}
 
 	/**
-	 * @return Collection
+	 * @return CollectionInterface
 	 */
-	public function collection(): Collection
+	public function collection(): CollectionInterface
 	{
 		return $this->collection;
 	}
@@ -47,9 +50,9 @@ Class Where
 	 * @param null   $value
 	 * @param null   $value2
 	 *
-	 * @return $this
+	 * @return FindInterface|WriteInterface|object
 	 */
-	public function where( string $field, string $operator, $value = null, $value2 = null ): self
+	public function where( string $field, string $operator, $value = null, $value2 = null )
 	{
 		$keyword = 'must';
 
@@ -187,7 +190,7 @@ Class Where
 						$field => [
 							'value' => $value,
 							'flags' => $value2
-								?: 'ALL',
+								?? 'ALL',
 						],
 					],
 				];
@@ -210,9 +213,9 @@ Class Where
 	 * @param null   $value
 	 * @param null   $value2
 	 *
-	 * @return $this
+	 * @return FindInterface|WriteInterface|object
 	 */
-	public function orWhere( string $field, string $operator, $value = null, $value2 = null ): self
+	public function orWhere( string $field, string $operator, $value = null, $value2 = null )
 	{
 		$keyword = 'should';
 
@@ -256,7 +259,7 @@ Class Where
 		$filter = $this->filter();
 		$query  = new Json( [
 			'index' => $this->collection()
-							->fullName(),
+				->fullName(),
 			'body'  => [],
 		] );
 

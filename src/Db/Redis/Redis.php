@@ -54,26 +54,19 @@ class Redis implements RedisInterface
 	public function __construct( string $dsn = null, int $timeout = null )
 	{
 		$dsn  = parse_url( $dsn
-			?: 'redis://127.0.0.1:6379' );
+			?? 'redis://127.0.0.1:6379' );
 		$host = $dsn[ 'host' ];
 		$port = $dsn[ 'port' ];
 
-		$this->sock = fsockopen( $host,
-			$port,
-			$errno,
-			$errstr,
-			$timeout
-				?: 5 );
+		$this->sock = fsockopen( $host, $port, $errno, $errstr, $timeout
+			?? 5 );
 
 		if ( $this->sock === null ) {
 			throw new RedisException( "[$errno $errstr]" );
 		}
 
-		if ( isset( $dsn[ 'pass' ] ) ) {
-			if ( !$this->__call( 'AUTH',
-				[ $dsn[ 'pass' ] ] ) ) {
-				throw new RedisException( 'Wrong password' );
-			}
+		if ( isset( $dsn[ 'pass' ] ) && !$this->__call( 'AUTH', [ $dsn[ 'pass' ] ] ) ) {
+			throw new RedisException( 'Wrong password' );
 		}
 
 		$this->setTypeIterator( 'scan' );
@@ -150,26 +143,26 @@ class Redis implements RedisInterface
 		}
 
 		switch ( $get[ 0 ] ) {
-			/* Error */
+			/** Error */
 			case '-':
 				throw new RedisException( $reply );
 				break;
 
-			/* Inline */
+			/** Inline */
 			case '+':
 				$s = $reply;
 
-				if ( $s == 'OK' ) {
+				if ( $s === 'OK' ) {
 					$s = true;
 				}
 				break;
 
-			/* Integer */
+			/** Integer */
 			case ':':
 				$s = (int) $reply;
 				break;
 
-			/* Bulk */
+			/** Bulk */
 			case '$':
 				$s = null;
 
@@ -193,12 +186,12 @@ class Redis implements RedisInterface
 					}
 				}
 
-				/* \r\n */
+				/** \r\n */
 				stream_get_line( $this->sock,
 					2 );
 				break;
 
-			/* Multi Bulk */
+			/** Multi Bulk */
 			case '*':
 				$s = null;
 
@@ -248,9 +241,9 @@ class Redis implements RedisInterface
 	 * Initialise l'iteration.
 	 * @throws RedisException
 	 */
-	public function rewind()
+	public function rewind(): void
 	{
-		/* Reset */
+		/** Reset */
 		$this->stack   = [];
 		$this->pointer = 0;
 
@@ -317,8 +310,7 @@ class Redis implements RedisInterface
 						] );
 					break;
 				case 'hash':
-					$current = $this->__call( 'HGETALL',
-						[ $key ] );
+					$current = $this->__call( 'HGETALL', [ $key ] );
 					break;
 			}
 		}
@@ -334,8 +326,7 @@ class Redis implements RedisInterface
 	 */
 	public function get( string $key )
 	{
-		return $this->__call( 'GET',
-			[ $key ] );
+		return $this->__call( 'GET', [ $key ] );
 	}
 
 	/**
@@ -391,9 +382,7 @@ class Redis implements RedisInterface
 		$i = 0;
 
 		foreach ( $commands as $command ) {
-			$args = str_getcsv( $command,
-				' ',
-				'"' );
+			$args = str_getcsv( $command, ' ', '"' );
 			$c    .= $this->command( $args );
 			++$i;
 		}
@@ -419,12 +408,10 @@ class Redis implements RedisInterface
 	{
 		$info  = [];
 		$items = explode( "\r\n",
-			$this->__call( 'info',
-				[] ) );
+			$this->__call( 'info', [] ) );
 
 		foreach ( $items as $item ) {
-			$item = explode( ':',
-				$item );
+			$item = explode( ':', $item );
 
 			if ( isset( $item[ 1 ] ) ) {
 				$info[ $item[ 0 ] ] = $item[ 1 ];
@@ -465,8 +452,7 @@ class Redis implements RedisInterface
 	 */
 	public function exists( string $key )
 	{
-		return $this->__call( 'EXISTS',
-			[ $key ] );
+		return $this->__call( 'EXISTS', [ $key ] );
 	}
 
 	/**
@@ -491,10 +477,9 @@ class Redis implements RedisInterface
 	 * @return bool
 	 * @throws RedisException
 	 */
-	public function del( string $key )
+	public function del( string $key ): bool
 	{
-		return (bool) $this->__call( 'DEL',
-			[ $key ] );
+		return (bool) $this->__call( 'DEL', [ $key ] );
 	}
 
 	/**
@@ -517,8 +502,7 @@ class Redis implements RedisInterface
 	 */
 	public function __get( string $key )
 	{
-		return $this->__call( 'GET',
-			[ $key ] );
+		return $this->__call( 'GET', [ $key ] );
 	}
 
 	/**
@@ -545,7 +529,6 @@ class Redis implements RedisInterface
 	 */
 	public function __unset( string $key )
 	{
-		return $this->__call( 'DEL',
-			[ $key ] );
+		return $this->__call( 'DEL', [ $key ] );
 	}
 }

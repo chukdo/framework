@@ -24,10 +24,9 @@ final class Crypto
 	{
 		return self::encrypt( json_encode( [
 			'time'     => time(),
-			'duration' => (int) $duration
-				?: 60,
-		] ),
-			$salt );
+			'duration' => $duration
+				?? 60,
+		], JSON_THROW_ON_ERROR, 512 ), $salt );
 	}
 
 	/**
@@ -39,9 +38,8 @@ final class Crypto
 	public static function encrypt( string $data, string $salt ): string
 	{
 		$encrypted = openssl_encrypt( $data, 'aes-256-ecb', $salt, true );
-		$result    = base64_encode( $encrypted );
 
-		return $result;
+		return base64_encode( $encrypted );
 	}
 
 	/**
@@ -52,24 +50,16 @@ final class Crypto
 	 */
 	public static function decodeCsrf( string $token, string $salt ): bool
 	{
-		/* URI Decode */
+		/** URI Decode */
 		if ( Str::contain( $token, '%' ) ) {
 			$token = rawurldecode( $token );
 		}
 
 		/** Hack decoding link ex. Outlook */
-		$token = str_replace( ' ',
-			'+',
-			$token );
-		$json  = json_decode( self::decrypt( $token, $salt ) );
+		$token = str_replace( ' ', '+', $token );
+		$json  = json_decode( self::decrypt( $token, $salt ), false, 512, JSON_THROW_ON_ERROR );
 
-		if ( $json ) {
-			if ( $json->time + $json->duration >= time() ) {
-				return true;
-			}
-		}
-
-		return false;
+		return $json && ( $json->time + $json->duration >= time() );
 	}
 
 	/**
@@ -80,10 +70,9 @@ final class Crypto
 	 */
 	public static function decrypt( string $data, string $salt ): string
 	{
-		$data      = base64_decode( $data );
-		$decrypted = openssl_decrypt( $data, 'aes-256-ecb', $salt, true );
+		$data = base64_decode( $data );
 
-		return $decrypted;
+		return openssl_decrypt( $data, 'aes-256-ecb', $salt, true );
 	}
 
 	/**
@@ -93,13 +82,10 @@ final class Crypto
 	 */
 	public static function password( int $length = null ): string
 	{
-		$chars    = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?';
-		$password = substr( str_shuffle( $chars ),
-			0,
-			$length
-				?: 8 );
+		$chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?';
 
-		return $password;
+		return substr( str_shuffle( $chars ), 0, $length
+			?? 8 );
 	}
 
 	/**
@@ -118,8 +104,7 @@ final class Crypto
 		$max          = strlen( $codeAlphabet );
 
 		for ( $i = 0; $i < $length; ++$i ) {
-			$token .= $codeAlphabet[ random_int( 0,
-				$max - 1 ) ];
+			$token .= $codeAlphabet[ random_int( 0, $max - 1 ) ];
 		}
 
 		return $token;
@@ -137,11 +122,9 @@ final class Crypto
 	{
 		$file = crc32( $name );
 		$path = '';
-		$hash = str_split( hash( 'crc32',
-			$file ),
-			2 );
+		$hash = str_split( hash( 'crc32', $file ), 2 );
 
-		/* Hashlevel */
+		/** Hashlevel */
 		for ( $i = 0; $i < $hashlevel; ++$i ) {
 			$path .= $hash[ $i ] . '/';
 		}

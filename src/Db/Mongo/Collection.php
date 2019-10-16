@@ -2,14 +2,16 @@
 
 Namespace Chukdo\DB\Mongo;
 
+use Chukdo\Contracts\Db\Schema as SchemaInterface;
+use Chukdo\Contracts\Db\Write as WriteInterface;
+use Chukdo\Contracts\Db\Find as FindInterface;
+use Chukdo\Contracts\Db\Database as DatabaseInterface;
 use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
-use Chukdo\Contracts\Db\Record as RecordInterface;
-use Chukdo\Db\Mongo\Record\Record;
+use Chukdo\Db\Record\Record;
 use Chukdo\Db\Mongo\Aggregate\Aggregate;
 use Chukdo\Db\Mongo\Schema\Schema;
 use Chukdo\Helper\Str;
-use Chukdo\Json\Json;
 use Chukdo\Helper\Is;
 use MongoDB\Collection as MongoDbCollection;
 use DateTime;
@@ -48,8 +50,9 @@ Class Collection implements CollectionInterface
 	public function __construct( Database $database, string $collection )
 	{
 		$this->database = $database;
-		$this->client   = new MongoDbCollection( $database->server()
-														  ->client(), $database->name(), $collection );
+		$client         = $database->server()
+								   ->client();
+		$this->client   = new MongoDbCollection( $client, $database->name(), $collection );
 	}
 
 	/**
@@ -62,10 +65,14 @@ Class Collection implements CollectionInterface
 	public static function filterOut( ?string $field, $value )
 	{
 		if ( $value instanceof ObjectId ) {
-			return $value->__toString();
-		} else if ( $value instanceof Timestamp ) {
+			return (string) $value;
+		}
+
+		if ( $value instanceof Timestamp ) {
 			return ( new DateTime() )->setTimestamp( (int) (string) $value );
-		} else if ( $value instanceof UTCDateTime ) {
+		}
+
+		if ( $value instanceof UTCDateTime ) {
 			return $value->toDateTime();
 		}
 
@@ -100,11 +107,12 @@ Class Collection implements CollectionInterface
 	}
 
 	/**
-	 * @param $data
+	 * @param      $data
+	 * @param bool $hiddenId
 	 *
-	 * @return RecordInterface
+	 * @return Record|object
 	 */
-	public function record( $data ): RecordInterface
+	public function record( $data, bool $hiddenId = false ): Record
 	{
 		try {
 			$reflector = new ReflectionClass( '\App\Model\\' . $this->name() );
@@ -115,7 +123,7 @@ Class Collection implements CollectionInterface
 			] );
 
 		} catch ( ReflectionException $e ) {
-			return new Record( $this, $data );
+			return new Record( $this, $data, $hiddenId );
 		}
 	}
 
@@ -140,16 +148,16 @@ Class Collection implements CollectionInterface
 	 * @param string      $collection
 	 * @param string|null $database
 	 *
-	 * @return $this
+	 * @return CollectionInterface
 	 */
-	public function rename( string $collection, string $database = null ): self
+	public function rename( string $collection, string $database = null ): CollectionInterface
 	{
 		$oldDatabase   = $this->database()
 							  ->name();
 		$oldCollection = $this->name();
 		$old           = $oldDatabase . '.' . $oldCollection;
 		$newDatabase   = $database
-			?: $oldDatabase;
+			?? $oldDatabase;
 		$newCollection = $collection;
 		$new           = $newDatabase . '.' . $newCollection;
 		$command       = $this->database()
@@ -159,7 +167,7 @@ Class Collection implements CollectionInterface
 								  'to'               => $new,
 							  ] );
 
-		if ( $command->offsetGet( 'ok' ) == 1 ) {
+		if ( $command->offsetGet( 'ok' ) === 1 ) {
 			return $this->database()
 						->server()
 						->database( $newDatabase )
@@ -172,7 +180,7 @@ Class Collection implements CollectionInterface
 	/**
 	 * @return Database
 	 */
-	public function database(): Database
+	public function database(): DatabaseInterface
 	{
 		return $this->database;
 	}
@@ -185,13 +193,13 @@ Class Collection implements CollectionInterface
 		$drop = $this->client()
 					 ->drop();
 
-		return $drop[ 'ok' ] == 1;
+		return $drop[ 'ok' ] === 1;
 	}
 
 	/**
 	 * @return Find
 	 */
-	public function find(): Find
+	public function find(): FindInterface
 	{
 		return new Find( $this );
 	}
@@ -201,19 +209,21 @@ Class Collection implements CollectionInterface
 	 */
 	public function info(): JsonInterface
 	{
-		$stats = $this->database()
-					  ->server()
-					  ->command( [ 'collStats' => $this->name() ], $this->database()
-																		->name() )
-					  ->getIndexJson( 0 )
-					  ->filter( function( $k, $v ) {
-						  if ( is_scalar( $v ) ) {
-							  return $v;
-						  }
+		$name   = $this->name();
+		$dbName = $this->database()
+					   ->name();
+		$stats  = $this->database()
+					   ->server()
+					   ->command( [ 'collStats' => $name ], $dbName )
+					   ->getIndexJson( 0 )
+					   ->filter( static function( $k, $v ) {
+						   if ( is_scalar( $v ) ) {
+							   return $v;
+						   }
 
-						  return false;
-					  } )
-					  ->clean();
+						   return false;
+					   } )
+					   ->clean();
 
 		return $stats;
 	}
@@ -221,7 +231,7 @@ Class Collection implements CollectionInterface
 	/**
 	 * @return Schema
 	 */
-	public function schema(): Schema
+	public function schema(): SchemaInterface
 	{
 		return new Schema( $this );
 	}
@@ -229,7 +239,7 @@ Class Collection implements CollectionInterface
 	/**
 	 * @return Write
 	 */
-	public function write(): Write
+	public function write(): WriteInterface
 	{
 		return new Write( $this );
 	}

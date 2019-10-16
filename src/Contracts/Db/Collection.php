@@ -3,6 +3,7 @@
 namespace Chukdo\Contracts\Db;
 
 use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\Db\Record\Record;
 
 /**
  * Interface database de donnée.
@@ -14,7 +15,7 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
 interface Collection
 {
 	/**
-	 * @return mixed
+	 * @return object
 	 */
 	public function client();
 
@@ -42,9 +43,9 @@ interface Collection
 	 * @param string      $collection
 	 * @param string|null $database
 	 *
-	 * @return mixed
+	 * @return Collection
 	 */
-	public function rename( string $collection, string $database = null );
+	public function rename( string $collection, string $database = null ): Collection;
 
 	/**
 	 * @return Schema
@@ -65,6 +66,14 @@ interface Collection
 	 * @return mixed
 	 */
 	public function id();
+
+	/**
+	 * @param      $data
+	 * @param bool $hiddenId
+	 *
+	 * @return Record
+	 */
+	public function record( $data, bool $hiddenId = false ): Record;
 
 	/**
 	 * @param string|null $field

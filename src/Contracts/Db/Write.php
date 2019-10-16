@@ -2,7 +2,7 @@
 
 namespace Chukdo\Contracts\Db;
 
-use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\Db\Record\Record;
 
 /**
  * Interface d'ecriture de données.
@@ -24,9 +24,9 @@ interface Write
 	 * @param null   $value
 	 * @param null   $value2
 	 *
-	 * @return Write
+	 * @return Write|Find
 	 */
-	public function where( string $field, string $operator, $value = null, $value2 = null ): Write;
+	public function where( string $field, string $operator, $value = null, $value2 = null );
 
 	/**
 	 * @param string $field
@@ -34,9 +34,9 @@ interface Write
 	 * @param null   $value
 	 * @param null   $value2
 	 *
-	 * @return Write
+	 * @return Write|Find
 	 */
-	public function orWhere( string $field, string $operator, $value = null, $value2 = null ): Write;
+	public function orWhere( string $field, string $operator, $value = null, $value2 = null );
 
 	/**
 	 * @param iterable $values
@@ -103,9 +103,9 @@ interface Write
 	public function deleteOne(): bool;
 
 	/**
-	 * @return JsonInterface
+	 * @return Record
 	 */
-	public function deleteOneAndGet(): JsonInterface;
+	public function deleteOneAndGet(): Record;
 
 	/**
 	 * @return int
@@ -118,9 +118,9 @@ interface Write
 	public function updateOne(): bool;
 
 	/**
-	 * @return JsonInterface
+	 * @return Record
 	 */
-	public function updateOneAndGet(): JsonInterface;
+	public function updateOneAndGet(): Record;
 
 	/**
 	 * @return string|null

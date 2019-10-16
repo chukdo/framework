@@ -29,13 +29,15 @@ final class Is
 	{
 		if ( !self::scalar( $value ) ) {
 			return false;
-		} else if ( substr( $value, 0, 1 ) !== '{' ) {
+		}
+
+		if ( strpos( $value, '{' ) !== 0 ) {
 			return false;
 		}
 
-		$json = json_decode( $value );
+		$json = json_decode( $value, true, 512, JSON_THROW_ON_ERROR );
 
-		return $json && $value != $json;
+		return $json && $value !== $json;
 	}
 
 	/**
@@ -55,7 +57,7 @@ final class Is
 	 */
 	public static function null( $value ): bool
 	{
-		return is_null( $value );
+		return $value === null;
 	}
 
 	/**
@@ -79,21 +81,21 @@ final class Is
 	}
 
 	/**
-	 * @param        $value
-	 * @param string $method
-	 * @param string $property
+	 * @param             $value
+	 * @param string|null $method
+	 * @param string|null $property
 	 *
 	 * @return bool
 	 */
-	public static function object( $value, string $method = '', string $property = '' ): bool
+	public static function object( $value, string $method = null, string $property = null ): bool
 	{
 		if ( is_object( $value ) ) {
-			if ( $method != false ) {
-				return method_exists( $value,
-					$method );
-			} else if ( $property != false ) {
-				return property_exists( $value,
-					$property );
+			if ( $method ) {
+				return method_exists( $value, $method );
+			}
+
+			if ( $property ) {
+				return property_exists( $value, $property );
 			}
 
 			return true;
@@ -131,16 +133,12 @@ final class Is
 		$min = (int) $min;
 		$max = (int) $max;
 
-		if ( $min > 0 ) {
-			if ( $value < $min ) {
-				return false;
-			}
+		if ( ( $min > 0 ) && $value < $min ) {
+			return false;
 		}
 
-		if ( $max > 0 ) {
-			if ( $value > $max ) {
-				return false;
-			}
+		if ( ( $max > 0 ) && $value > $max ) {
+			return false;
 		}
 
 		return true;
@@ -153,8 +151,7 @@ final class Is
 	 */
 	public static function int( $value ): bool
 	{
-		return filter_var( $value,
-				FILTER_VALIDATE_INT ) !== false;
+		return filter_var( $value, FILTER_VALIDATE_INT ) !== false;
 	}
 
 	/**
@@ -164,8 +161,7 @@ final class Is
 	 */
 	public static function float( $value ): bool
 	{
-		return filter_var( $value,
-				FILTER_VALIDATE_FLOAT ) !== false;
+		return filter_var( $value, FILTER_VALIDATE_FLOAT ) !== false;
 	}
 
 	/**
@@ -175,8 +171,7 @@ final class Is
 	 */
 	public static function alpha( string $value ): bool
 	{
-		return filter_var( $value,
-				FILTER_VALIDATE_REGEXP,
+		return filter_var( $value, FILTER_VALIDATE_REGEXP,
 				[
 					'options' => [
 						'regexp' => '/^[a-z]+$/iu',
@@ -191,8 +186,7 @@ final class Is
 	 */
 	public static function alnum( string $value ): bool
 	{
-		return filter_var( $value,
-				FILTER_VALIDATE_REGEXP,
+		return filter_var( $value, FILTER_VALIDATE_REGEXP,
 				[
 					'options' => [
 						'regexp' => '/^[a-z0-9]+$/iu',
@@ -209,11 +203,10 @@ final class Is
 	public static function date( $value, string $format = null ): bool
 	{
 		$format    = $format
-			?: 'd/m/Y';
-		$checkDate = DateTime::createFromFormat( $format,
-			$value );
+			?? 'd/m/Y';
+		$checkDate = DateTime::createFromFormat( $format, $value );
 
-		return $value == $checkDate->format( $format );
+		return $value === $checkDate->format( $format );
 	}
 
 	/**
@@ -233,7 +226,7 @@ final class Is
 	 */
 	public static function html( string $value ): bool
 	{
-		return strlen( strip_tags( $value ) ) != strlen( $value );
+		return strlen( strip_tags( $value ) ) !== strlen( $value );
 	}
 
 	/**
@@ -243,8 +236,7 @@ final class Is
 	 */
 	public static function url( string $value ): bool
 	{
-		return filter_var( $value,
-				FILTER_VALIDATE_URL ) !== false;
+		return filter_var( $value, FILTER_VALIDATE_URL ) !== false;
 	}
 
 	/**
@@ -254,8 +246,7 @@ final class Is
 	 */
 	public static function email( string $value ): bool
 	{
-		return filter_var( $value,
-				FILTER_VALIDATE_EMAIL ) !== false;
+		return filter_var( $value, FILTER_VALIDATE_EMAIL ) !== false;
 	}
 
 	/**
@@ -265,8 +256,7 @@ final class Is
 	 */
 	public static function zipcode( $value ): bool
 	{
-		return filter_var( $value,
-				FILTER_VALIDATE_REGEXP,
+		return filter_var( $value, FILTER_VALIDATE_REGEXP,
 				[
 					'options' => [
 						'regexp' => '/^[0-9]{5}$/u',
@@ -281,8 +271,7 @@ final class Is
 	 */
 	public static function name( $value ): bool
 	{
-		return filter_var( $value,
-				FILTER_VALIDATE_REGEXP,
+		return filter_var( $value, FILTER_VALIDATE_REGEXP,
 				[
 					'options' => [
 						'regexp' => '/^[a-zéèêëàäâùüûôöçîï\-\' ]+$/iu',
@@ -297,8 +286,7 @@ final class Is
 	 */
 	public static function fileName( string $value ): bool
 	{
-		return filter_var( $value,
-				FILTER_VALIDATE_REGEXP,
+		return filter_var( $value, FILTER_VALIDATE_REGEXP,
 				[
 					'options' => [
 						'regexp' => '/^[0-9a-z_\. ]+$/iu',
@@ -313,8 +301,7 @@ final class Is
 	 */
 	public static function phone( string $value ): bool
 	{
-		return filter_var( $value,
-				FILTER_VALIDATE_REGEXP,
+		return filter_var( $value, FILTER_VALIDATE_REGEXP,
 				[
 					'options' => [
 						'regexp' => '/^(?:\+[1-9]|0)?\d{8,}$/iu',
@@ -329,8 +316,7 @@ final class Is
 	 */
 	public static function mongoId( string $value ): bool
 	{
-		return filter_var( $value,
-				FILTER_VALIDATE_REGEXP,
+		return filter_var( $value, FILTER_VALIDATE_REGEXP,
 				[
 					'options' => [
 						'regexp' => '/^[0-9abcdef]{22,26}$/iu',
@@ -346,16 +332,6 @@ final class Is
 	public static function jsonInterface( $value ): bool
 	{
 		return $value instanceof JsonInterface;
-	}
-
-	/**
-	 * @param $value
-	 *
-	 * @return bool
-	 */
-	public static function RecordInterface( $value ): bool
-	{
-		return $value instanceof RecordInterface;
 	}
 
 	/**

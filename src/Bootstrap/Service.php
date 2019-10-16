@@ -233,9 +233,7 @@ class Service implements ArrayAccess
 	{
 		$name = $this->formatNameSpace( $name );
 
-		return isset( $this->bindings[ $name ] )
-			? $this->bindings[ $name ]
-			: null;
+		return $this->bindings[ $name ] ?? null;
 	}
 
 	/**

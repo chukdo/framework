@@ -6,7 +6,9 @@ use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
 use Elasticsearch\Client;
 use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\Contracts\Db\Server as ServerInterface;
 use Chukdo\Contracts\Db\Database as DatabaseInterface;
+use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Throwable;
 
 /**
@@ -65,9 +67,9 @@ Class Database implements DatabaseInterface
 	}
 
 	/**
-	 * @return Server
+	 * @return ServerInterface
 	 */
-	public function server(): Server
+	public function server(): ServerInterface
 	{
 		return $this->server;
 	}
@@ -98,9 +100,9 @@ Class Database implements DatabaseInterface
 	/**
 	 * @param string $collection
 	 *
-	 * @return Collection
+	 * @return CollectionInterface
 	 */
-	public function collection( string $collection ): Collection
+	public function collection( string $collection ): CollectionInterface
 	{
 		return new Collection( $this, $collection );
 	}
@@ -108,9 +110,9 @@ Class Database implements DatabaseInterface
 	/**
 	 * @param string $collection
 	 *
-	 * @return Collection
+	 * @return CollectionInterface
 	 */
-	public function createCollection( string $collection ): Collection
+	public function createCollection( string $collection ): CollectionInterface
 	{
 		if ( !$this->collectionExist( $collection ) ) {
 			$this->client()
@@ -129,7 +131,7 @@ Class Database implements DatabaseInterface
 	public function collectionExist( string $collection ): bool
 	{
 		foreach ( $this->collections() as $coll ) {
-			if ( $coll == $collection ) {
+			if ( $coll === $collection ) {
 				return true;
 			}
 		}
@@ -163,9 +165,9 @@ Class Database implements DatabaseInterface
 	/**
 	 * @param string $collection
 	 *
-	 * @return $this
+	 * @return DatabaseInterface
 	 */
-	public function dropCollection( string $collection ): self
+	public function dropCollection( string $collection ): DatabaseInterface
 	{
 		try {
 			$this->client()
@@ -182,14 +184,13 @@ Class Database implements DatabaseInterface
 	 */
 	public function info(): JsonInterface
 	{
+		$info  = new Json();
 		$stats = new Json( $this->client()
 								->indices()
 								->stats( [ 'index' => '*' ] ) );
 
-		$info = new Json();
-
 		foreach ( $stats->offsetGet( 'indices' ) as $key => $indice ) {
-			if ( Str::startWith( $key, $this->name() ) ) {
+			if ( $indice instanceof JsonInterface && Str::startWith( $key, $this->name() ) ) {
 				$info->offsetSet( $key, $indice->offsetGet( 'total' ) );
 			}
 		}

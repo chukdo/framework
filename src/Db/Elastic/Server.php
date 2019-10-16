@@ -7,6 +7,8 @@ use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Contracts\Db\Server as ServerInterface;
+use Chukdo\Contracts\Db\Database as DatabaseInterface;
+use Chukdo\Contracts\Db\Collection as CollectionInterface;
 
 /**
  * Server Server.
@@ -42,15 +44,22 @@ Class Server implements ServerInterface
 	public function __construct( string $dsn = null, string $database = null, bool $synchronous = true )
 	{
 		$this->dsn      = $dsn
-			?: 'localhost:9200';
+			?? 'localhost:9200';
 		$this->database = $database;
 		$this->client   = ClientBuilder::create()
-									   ->setHosts( explode( ',',
-										   $this->dsn ) )
+									   ->setHosts( explode( ',', $this->dsn ) )
 									   ->setHandler( $synchronous
 										   ? ClientBuilder::singleHandler()
 										   : ClientBuilder::multiHandler() )
 									   ->build();
+	}
+
+	/**
+	 * @return string
+	 */
+	public function name(): string
+	{
+		return 'Elastic';
 	}
 
 	/**
@@ -110,7 +119,7 @@ Class Server implements ServerInterface
 	 *
 	 * @return Collection
 	 */
-	public function collection( string $collection, string $database = null ): Collection
+	public function collection( string $collection, string $database = null ): CollectionInterface
 	{
 		return $this->database( $database )
 					->collection( $collection );
@@ -121,10 +130,10 @@ Class Server implements ServerInterface
 	 *
 	 * @return Database
 	 */
-	public function database( string $database = null ): Database
+	public function database( string $database = null ): DatabaseInterface
 	{
 		return new Database( $this, $database
-			?: $this->database );
+			?? $this->database );
 	}
 
 

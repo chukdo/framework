@@ -5,10 +5,8 @@ namespace Chukdo\Db\Record;
 use Chukdo\Db\Elastic\ElasticException;
 use Exception;
 use DateTime;
-use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
 use Chukdo\Contracts\Db\Collection as CollectionInterface;
-use Chukdo\Contracts\Db\Record as RecordInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
@@ -18,7 +16,7 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Record extends Json implements RecordInterface
+Class Record extends Json
 {
 	/**
 	 * @var CollectionInterface
@@ -35,8 +33,9 @@ Class Record extends Json implements RecordInterface
 	 *
 	 * @param CollectionInterface $collection
 	 * @param null                $data
+	 * @param bool                $hiddenId
 	 */
-	public function __construct( CollectionInterface $collection, $data = null )
+	public function __construct( CollectionInterface $collection, $data = null, bool $hiddenId = false )
 	{
 		$json     = new Json( $data );
 		$filtered = $json->filterRecursive( static function( $k, $v ) use ( $collection ) {
@@ -46,13 +45,15 @@ Class Record extends Json implements RecordInterface
 		parent::__construct( $filtered, false );
 
 		$this->collection = $collection;
-		$this->id         = $this->offsetGet( '_id' );
+		$this->id         = $hiddenId
+			? $this->offsetUnset( '_id' )
+			: $this->offsetGet( '_id' );
 	}
 
 	/**
-	 * @return RecordInterface
+	 * @return Record
 	 */
-	public function delete(): RecordInterface
+	public function delete(): Record
 	{
 		$write = $this->collection()
 					  ->write();
@@ -87,10 +88,10 @@ Class Record extends Json implements RecordInterface
 	/**
 	 * @param string $collection
 	 *
-	 * @return RecordInterface
+	 * @return Record
 	 * @throws Exception
 	 */
-	public function moveTo( string $collection ): RecordInterface
+	public function moveTo( string $collection ): Record
 	{
 		$write = $this->collection()
 					  ->write();
@@ -113,22 +114,9 @@ Class Record extends Json implements RecordInterface
 	}
 
 	/**
-	 * @return JsonInterface
+	 * @return Record
 	 */
-	public function record(): JsonInterface
-	{
-		return $this->filterRecursive( static function( $k, $v ) {
-			return !Is::RecordInterface( $v )
-				? $v
-				: null;
-		} );
-	}
-
-	/**
-	 * @return RecordInterface
-	 * @throws Exception
-	 */
-	public function save(): RecordInterface
+	public function save(): Record
 	{
 		/** Insert */
 		if ( $this->id() === null ) {
@@ -143,9 +131,9 @@ Class Record extends Json implements RecordInterface
 	}
 
 	/**
-	 * @return RecordInterface
+	 * @return Record
 	 */
-	public function insert(): RecordInterface
+	public function insert(): Record
 	{
 		$write = $this->collection()
 					  ->write()
@@ -159,9 +147,21 @@ Class Record extends Json implements RecordInterface
 	}
 
 	/**
-	 * @return RecordInterface
+	 * @return JsonInterface
 	 */
-	public function update(): RecordInterface
+	public function record(): JsonInterface
+	{
+		return $this->filterRecursive( static function( $k, $v ) {
+			return $v instanceof Record
+				? $v
+				: null;
+		} );
+	}
+
+	/**
+	 * @return Record
+	 */
+	public function update(): Record
 	{
 		$write = $this->collection()
 					  ->write()
