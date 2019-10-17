@@ -3,8 +3,8 @@
 namespace Chukdo\Db\Elastic;
 
 use Chukdo\Contracts\Db\Write as WriteInterface;
-use Chukdo\Contracts\Db\Record as RecordInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\DB\Record\Record;
 use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
 
@@ -204,7 +204,7 @@ Class Write extends Where implements WriteInterface
 	{
 		$command = $this->collection()
 						->client()
-						->deleteByQuery( $this->query() );
+						->deleteByQuery( $this->filter() );
 
 		return (int) $command[ 'deleted' ];
 	}
@@ -257,7 +257,7 @@ Class Write extends Where implements WriteInterface
 	{
 		$command = $this->collection()
 						->client()
-						->deleteByQuery( $this->query( [
+						->deleteByQuery( $this->filter( [
 							'size' => 1,
 						] ) );
 
@@ -265,9 +265,9 @@ Class Write extends Where implements WriteInterface
 	}
 
 	/**
-	 * @return RecordInterface
+	 * @return Record
 	 */
-	public function deleteOneAndGet(): RecordInterface
+	public function deleteOneAndGet(): Record
 	{
 		$get = $this->getOne();
 
@@ -279,13 +279,13 @@ Class Write extends Where implements WriteInterface
 	}
 
 	/**
-	 * @return RecordInterface
+	 * @return Record
 	 */
-	protected function getOne(): RecordInterface
+	protected function getOne(): Record
 	{
 		$json   = new Json( $this->collection()
 								 ->client()
-								 ->search( $this->query() ) );
+								 ->search( $this->filter() ) );
 		$record = $json->getJson( 'hits.hits.0._source' )
 					   ->filterRecursive( function( $k, $v ) {
 						   return Collection::filterOut( $k, $v );
@@ -303,7 +303,7 @@ Class Write extends Where implements WriteInterface
 	{
 		$command = $this->collection()
 						->client()
-						->updateByQuery( $this->query( [
+						->updateByQuery( $this->filter( [
 							'body.script' => $this->validatedUpdateFields(),
 							'conflicts'   => 'proceed',
 						] ) );
@@ -328,7 +328,7 @@ Class Write extends Where implements WriteInterface
 	{
 		$command = $this->collection()
 						->client()
-						->update( $this->query( [
+						->update( $this->filter( [
 							'id'                => $this->getOne()
 														->offsetGet( '_id' ),
 							'body.script'       => $this->validatedUpdateFields(),
@@ -340,9 +340,9 @@ Class Write extends Where implements WriteInterface
 	}
 
 	/**
-	 * @return RecordInterface
+	 * @return Record
 	 */
-	public function updateOneAndGet(): RecordInterface
+	public function updateOneAndGet(): Record
 	{
 		$get = $this->getOne();
 
@@ -377,7 +377,7 @@ Class Write extends Where implements WriteInterface
 				   ->id();
 		$this->collection()
 			 ->client()
-			 ->index( $this->query( [
+			 ->index( $this->filter( [
 				 'id'   => $id,
 				 'body' => $this->validatedInsertFields(),
 			 ], false ) );

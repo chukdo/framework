@@ -2,6 +2,7 @@
 
 namespace Chukdo\Http;
 
+use Chukdo\Helper\Arr;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
 use Chukdo\Contracts\Json\Json as JsonInterface;
@@ -229,7 +230,7 @@ class Header
 
 		foreach ( explode( ', ',
 			$this->getHeader( 'Cache-Control' ) ) as $value ) {
-			if ( $value == 'must-revalidate' ) {
+			if ( $value === 'must-revalidate' ) {
 				$cache->offsetSet( 'revalidate',
 					true );
 			} else if ( ( $age = Str::match( '/max-age=([0-9]+)/',
@@ -276,14 +277,10 @@ class Header
 	 */
 	public function normalize( string $name ): string
 	{
-		return str_replace( ' ',
+		return str_replace( ' ', '-', ucwords( str_replace( [
 			'-',
-			ucwords( str_replace( [
-				'-',
-				'_',
-			],
-				' ',
-				strtolower( $name ) ) ) );
+			'_',
+		], ' ', strtolower( $name ) ) ) );
 	}
 
 	/**
@@ -355,21 +352,18 @@ class Header
 	 */
 	public function setXFrameOptions( string $origin = null ): self
 	{
-		if ( $origin == '*' ) {
+		if ( $origin === '*' ) {
 			return $this;
 		}
 
 		if ( isset( $_SERVER[ 'HTTP_REFERER' ] ) ) {
 			$allow   = false;
 			$uri     = new Url( $_SERVER[ 'HTTP_REFERER' ] );
-			$origins = explode( ' ',
-				$origin );
+			$origins = explode( ' ', $origin );
 
-			foreach ( $origins as $origin ) {
-				if ( $origin
-					&& substr( $uri->getHost(),
-						-strlen( $origin ) ) == $origin ) {
-					$allow = true;
+			foreach ( $origins as $item ) {
+				if ( $item && substr( $uri->getHost(), -strlen( $item ) ) === $item ) {
+					$isAllow = true;
 					break;
 				}
 			}
@@ -510,7 +504,7 @@ class Header
 	 * @param string $value   valeur associée
 	 * @param string $expires date d'expiration en timestamp
 	 * @param string $path    le chemin auquel s'applique le cookie '/' all par defaut
-	 * @param string $domain  le domaine auquel s'applique le cookie '.google.com' pour tout google
+	 * @param string $domain le domaine auquel s'applique le cookie '.google.com' pour tout google
 	 *
 	 * @return Header
 	 */
@@ -532,8 +526,7 @@ class Header
 			$cookie .= '; domain=' . $domain;
 		}
 
-		$this->cookie->offsetSet( $name,
-			$cookie );
+		$this->cookie->offsetSet( $name, $cookie );
 
 		return $this;
 	}
@@ -589,8 +582,7 @@ class Header
 	public function __call( $name, $params = [] )
 	{
 		$value  = array_shift( $params );
-		$match  = new Json( Str::match( '/^(set|get|unset)([a-z]+)/i',
-			strtolower( $name ) ) );
+		$match  = new Json( Str::match( '/^(set|get|unset)([a-z]+)/i', strtolower( $name ) ) );
 		$action = $match->get( 0 );
 		$header = $match->get( 1 );
 
@@ -657,13 +649,10 @@ class Header
 			$key = $method[ $header ];
 
 			/* Gestion des timestamp */
-			if ( in_array( $header,
-				$date ) ) {
+			if ( Arr::in( $header, $date ) ) {
 				switch ( $action ) {
 					case 'set':
-						return $this->setHeader( $key,
-							gmdate( DATE_RFC850,
-								$value ) );
+						return $this->setHeader( $key, gmdate( DATE_RFC850, $value ) );
 					case 'get':
 						$d = date_parse( $this->getHeader( $key ) );
 

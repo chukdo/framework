@@ -5,6 +5,7 @@ namespace Chukdo\Db\Elastic;
 use Chukdo\Helper\Arr;
 use Chukdo\Json\Json;
 use Chukdo\Contracts\Db\Find as FindInterface;
+use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Db\Record\RecordList;
 use Chukdo\Db\Record\Record;
 
@@ -20,7 +21,12 @@ Class Find extends Where implements FindInterface
 	/**
 	 * @var array
 	 */
-	protected $projection = [];
+	protected $with = [];
+
+	/**
+	 * @var array
+	 */
+	protected $without = [];
 
 	/**
 	 * @var array
@@ -48,9 +54,120 @@ Class Find extends Where implements FindInterface
 	protected $limit = 0;
 
 	/**
-	 * @var bool
+	 * @return int
 	 */
-	protected $hiddenId = false;
+	public function count(): int
+	{
+		$count = $this->collection()
+					  ->client()
+					  ->count( $this->projection() );
+
+		return (int) $count[ 'count' ];
+	}
+
+	/**
+	 * @param array $params
+	 *
+	 * @return array
+	 */
+	public function projection( array $params = [] ): array
+	{
+		$projection = [];
+
+		if ( $this->skip ) {
+			$projection[ 'from' ] = $this->skip;
+		}
+
+		if ( $this->limit ) {
+			$projection[ 'size' ] = $this->limit;
+		}
+
+		if ( $this->sort ) {
+			$projection[ 'sort' ] = $this->sort;
+		}
+
+		return array_merge( $projection, $this->filter( $params ) );
+	}
+
+	/**
+	 * @return Record
+	 */
+	public function one(): Record
+	{
+		$find = $this->collection()
+					 ->client()
+					 ->search( $this->projection( [ 'size' => 1 ] ) );
+
+		return $this->collection()
+					->record( $this->hit( $find[ 'hits' ][ 'hits' ][ 0 ] ?? [] ) );
+	}
+
+	/**
+	 * @param array $hit
+	 *
+	 * @return array
+	 */
+	protected function hit( array $hit ): array
+	{
+		$source = [];
+
+		if ( isset( $hit[ '_id' ], $hit[ '_source' ] ) ) {
+			$source          = $hit[ '_source' ];
+			$source[ '_id' ] = $hit[ '_id' ];
+		}
+
+		foreach ( $this->without as $without ) {
+			if ( $without !== '_id' && isset( $source[ $without ] ) ) {
+				unset( $source[ $without ] );
+			}
+		}
+
+		foreach ( $source as $key => $value ) {
+			if ( !Arr::in( $key, $this->with ) ) {
+				unset( $source[ $key ] );
+			}
+		}
+
+		return $source;
+	}
+
+	/**
+	 * @param bool $idAsKey
+	 *
+	 * @return RecordList
+	 */
+	public function all( bool $idAsKey = false ): RecordList
+	{
+		$find = $this->collection()
+					 ->client()
+					 ->search( $this->projection() );
+
+		$recordList = new RecordList( $this->collection(), $this->hits( $find ), $idAsKey );
+
+		foreach ( $this->link as $link ) {
+			$recordList = $link->hydrate( $recordList );
+		}
+
+		return $recordList;
+	}
+
+	/**
+	 * @param array $find
+	 *
+	 * @return JsonInterface
+	 */
+	protected function hits( array $find ): JsonInterface
+	{
+		$hits = new Json();
+
+		if ( isset( $find[ 'hits' ][ 'hits' ] ) ) {
+			foreach ( $find[ 'hits' ][ 'hits' ] as $hit ) {
+				$hits->append( $this->hit( $hit ) );
+			}
+		}
+
+		return $hits;
+	}
 
 	/**
 	 * @param string $field
@@ -62,62 +179,14 @@ Class Find extends Where implements FindInterface
 	{
 		$find = $this->collection()
 					 ->client()
-					 ->search( $this->query( [
+					 ->search( $this->projection( [
 						 'body.aggs.' . $field . 's.terms.field' => $field,
 					 ] ) );
 
-		$json = ( new Json( $find ) )->wildcard( 'hits.hits.*._source' );
-
-		$recordList = new RecordList( $this->collection(), $json, $idAsKey, $this->hiddenId );
+		$recordList = new RecordList( $this->collection(), $this->hits( $find ), $idAsKey );
 
 		foreach ( $this->link as $link ) {
 			$recordList = $link->hydrate( $recordList );
-		}
-
-		return $recordList;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function count(): int
-	{
-		$count = $this->collection()
-					  ->client()
-					  ->count( $this->query() );
-
-		return (int) $count[ 'count' ];
-	}
-
-	/**
-	 * @param bool $idAsKey
-	 *
-	 * @return RecordList
-	 */
-	public function all( bool $idAsKey = false ): RecordList
-	{
-		$recordList = new RecordList( $this->collection() );
-
-		$recordList->collection()
-				   ->client();
-
-		foreach ( $this->cursor() as $key => $value ) {
-			if ( $idAsKey ) {
-				$recordList->offsetSet( $value->offsetGet( '_id' ), $value );
-			} else {
-				$recordList->offsetSet( $key, $value );
-			}
-		}
-
-		foreach ( $this->link as $link ) {
-			$recordList = $link->hydrate( $recordList );
-		}
-
-		/** Suppression des ID defini par without */
-		if ( $this->hiddenId ) {
-			foreach ( $recordList as $key => $value ) {
-				$value->offsetUnset( '_id' );
-			}
 		}
 
 		return $recordList;
@@ -153,7 +222,7 @@ Class Find extends Where implements FindInterface
 		$fields = Arr::spreadArgs( $fields );
 
 		foreach ( $fields as $field ) {
-			$this->projection[ $field ] = 1;
+			$this->with[] = $field;
 		}
 
 		return $this;
@@ -169,11 +238,7 @@ Class Find extends Where implements FindInterface
 		$fields = Arr::spreadArgs( $fields );
 
 		foreach ( $fields as $field ) {
-			if ( $field === '_id' ) {
-				$this->hiddenId = true;
-			} else {
-				$this->projection[ $field ] = 0;
-			}
+			$this->without[] = $field;
 		}
 
 		return $this;
@@ -187,9 +252,7 @@ Class Find extends Where implements FindInterface
 	 */
 	public function sort( string $field, string $sort = 'ASC' ): FindInterface
 	{
-		$this->sort[ $field ] = $sort === 'asc' || $sort === 'ASC'
-			? 1
-			: -1;
+		$this->sort[] = $field . ':' . strtolower( $sort );
 
 		return $this;
 	}
@@ -207,29 +270,6 @@ Class Find extends Where implements FindInterface
 	}
 
 	/**
-	 * @return Record
-	 */
-	public function one(): Record
-	{
-		foreach ( $this->limit( 1 )
-					   ->cursor() as $key => $record ) {
-
-			/** Suppression des ID defini par without */
-			if ( $this->hiddenId ) {
-				$record->offsetUnset( '_id' );
-			}
-
-			foreach ( $this->link as $link ) {
-				$record = $link->hydrate( $record );
-			}
-
-			return $record;
-		}
-
-		return new Record( $this->collection() );
-	}
-
-	/**
 	 * @param int $limit
 	 *
 	 * @return Find
@@ -239,31 +279,6 @@ Class Find extends Where implements FindInterface
 		$this->limit = $limit;
 
 		return $this;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function projection(): array
-	{
-		/**$projection = [
-		 * 'projection'      => $this->projection,
-		 * 'noCursorTimeout' => false,
-		 * ];
-		 *
-		 * if ( !empty( $this->sort ) ) {
-		 * $projection[ 'sort' ] = $this->sort;
-		 * }
-		 *
-		 * if ( $this->skip > 0 ) {
-		 * $projection[ 'skip' ] = $this->skip;
-		 * }
-		 *
-		 * if ( $this->limit > 0 ) {
-		 * $projection[ 'limit' ] = $this->limit;
-		 * }
-		 *
-		 * return $projection;*/
 	}
 
 

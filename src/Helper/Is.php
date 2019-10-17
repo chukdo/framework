@@ -3,7 +3,6 @@
 namespace Chukdo\Helper;
 
 use Chukdo\Contracts\Json\Json as JsonInterface;
-use Chukdo\Contracts\Db\Record as RecordInterface;
 use Chukdo\Json\Arr;
 use DateTime;
 use stdClass;

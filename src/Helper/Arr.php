@@ -42,6 +42,17 @@ final class Arr
 	}
 
 	/**
+	 * @param       $value
+	 * @param array $array
+	 *
+	 * @return bool
+	 */
+	public static function in( $value, array $array ): bool
+	{
+		return in_array( $value, $array, true );
+	}
+
+	/**
 	 * @param array $pushTo
 	 * @param array $toPush
 	 *

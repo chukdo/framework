@@ -24,11 +24,6 @@ Class RecordList extends Json
 	/**
 	 * @var bool
 	 */
-	protected $hiddenId = false;
-
-	/**
-	 * @var bool
-	 */
 	protected $idAsKey = false;
 
 	/**
@@ -37,30 +32,27 @@ Class RecordList extends Json
 	 * @param CollectionInterface $collection
 	 * @param JsonInterface       $json
 	 * @param bool                $idAsKey
-	 * @param bool                $hiddenId
 	 */
-	public function __construct( CollectionInterface $collection, JsonInterface $json, bool $idAsKey = false, bool $hiddenId = false )
+	public function __construct( CollectionInterface $collection, JsonInterface $json, bool $idAsKey = false )
 	{
 		$this->collection = $collection;
-		$this->hiddenId   = $hiddenId;
 		$this->idAsKey    = $idAsKey;
 
 		parent::__construct( [], false );
 
 		foreach ( $json as $k => $v ) {
-			$this->append( $v );
+			if ( $idAsKey ) {
+				$this->offsetSet( $v->offsetGet( '_id' ), $v );
+			} else {
+				$this->append( $v );
+			}
 		}
 	}
 
-	/**
-	 * @param mixed $value
-	 *
-	 * @return JsonInterface
-	 */
-	public function append( $value ): JsonInterface
+	public function offsetSet( $key, $value ): JsonInterface
 	{
-		parent::append( $this->collection()
-							 ->record( $value, $this->hiddenId ) );
+		parent::offsetSet( $key, $this->collection()
+									  ->record( $value ) );
 
 		return $this;
 	}

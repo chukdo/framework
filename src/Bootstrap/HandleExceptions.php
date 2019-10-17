@@ -43,8 +43,7 @@ class HandleExceptions
 			$this,
 			'handleShutdown',
 		] );
-		ini_set( 'display_errors',
-			'Off' );
+		ini_set( 'display_errors', 'Off' );
 	}
 
 	/**
@@ -68,7 +67,7 @@ class HandleExceptions
 	 */
 	public function handleShutdown(): void
 	{
-		if ( !is_null( $error = error_get_last() ) && $this->isFatal( $error[ 'type' ] ) ) {
+		if ( ( $error = error_get_last() ) !== null && $this->isFatal( $error[ 'type' ] ) ) {
 			$this->handleException( $this->fatalExceptionFromError( $error ) );
 		}
 	}
@@ -86,7 +85,7 @@ class HandleExceptions
 				E_CORE_ERROR,
 				E_ERROR,
 				E_PARSE,
-			] );
+			], true );
 	}
 
 	/**
@@ -95,7 +94,7 @@ class HandleExceptions
 	 * @throws ServiceException
 	 * @throws ReflectionException
 	 */
-	public function handleException( Throwable $e )
+	public function handleException( Throwable $e ): void
 	{
 		if ( !$e instanceof Exception ) {
 			$e = new AppException( $e->getMessage(), $e->getCode(), $e );

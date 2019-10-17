@@ -2,6 +2,7 @@
 
 Namespace Chukdo\DB\Elastic;
 
+use MongoDB\BSON\ObjectId;
 use Chukdo\Db\Elastic\Schema\Schema;
 use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
@@ -90,21 +91,18 @@ Class Collection implements CollectionInterface
 	 */
 	public function id(): string
 	{
-		return sha1( uniqid( '', true ) );
+		return (string) new ObjectId();
 	}
 
 	/**
-	 * @param      $data
-	 * @param bool $hiddenId
+	 * @param $data
 	 *
 	 * @return Record|object
 	 */
-	public function record( $data, bool $hiddenId = false ): Record
+	public function record( $data ): Record
 	{
 		try {
-			$reflector = new ReflectionClass( '\App\Model\\' . $this->database()
-																	->server()
-																	->name() . '\Record\\' . $this->name() );
+			$reflector = new ReflectionClass( '\App\Model\Elastic\Record\\' . $this->name() );
 
 			if ( $reflector->implementsInterface( Record::class ) ) {
 				return $reflector->newInstanceArgs( [
@@ -115,7 +113,7 @@ Class Collection implements CollectionInterface
 		} catch ( ReflectionException $e ) {
 		}
 
-		return new Record( $this, $data, $hiddenId );
+		return new Record( $this, $data );
 	}
 
 	/**
@@ -146,21 +144,21 @@ Class Collection implements CollectionInterface
 							  ->createCollection( $collection );
 
 		$newCollection->client()
-					  ->indices()
-					  ->putMapping( [
-						  'index' => $newCollection->fullName(),
-						  'body'  => $schema
-							  ? $schema->toArray()
-							  : $this->schema()
-									 ->toArray(),
-					  ] );
+			->indices()
+			->putMapping( [
+				'index' => $newCollection->fullName(),
+				'body'  => $schema
+					? $schema->toArray()
+					: $this->schema()
+						->toArray(),
+			] );
 		$this->client()
-			 ->reindex( [
-				 'body' => [
-					 'source' => [ 'index' => $this->fullName() ],
-					 'dest'   => [ 'index' => $newCollection->fullName() ],
-				 ],
-			 ] );
+			->reindex( [
+				'body' => [
+					'source' => [ 'index' => $this->fullName() ],
+					'dest'   => [ 'index' => $newCollection->fullName() ],
+				],
+			] );
 		$this->drop();
 
 		return $newCollection;
@@ -180,7 +178,7 @@ Class Collection implements CollectionInterface
 	public function client(): Client
 	{
 		return $this->database()
-					->client();
+			->client();
 	}
 
 	/**
@@ -189,7 +187,7 @@ Class Collection implements CollectionInterface
 	public function fullName(): string
 	{
 		return $this->database()
-					->prefixName() . $this->name();
+				->prefixName() . $this->name();
 	}
 
 	/**
@@ -207,8 +205,8 @@ Class Collection implements CollectionInterface
 	{
 		try {
 			$this->client()
-				 ->indices()
-				 ->delete( [ 'index' => $this->fullName() ] );
+				->indices()
+				->delete( [ 'index' => $this->fullName() ] );
 
 			return true;
 		} catch ( Missing404Exception $e ) {
@@ -232,8 +230,8 @@ Class Collection implements CollectionInterface
 	public function info(): JsonInterface
 	{
 		$stats = new Json( $this->client()
-								->indices()
-								->stats( [ 'index' => $this->name() ] ) );
+			->indices()
+			->stats( [ 'index' => $this->name() ] ) );
 
 		return $stats->getJson( 'indices.' . $this->fullName() );
 	}

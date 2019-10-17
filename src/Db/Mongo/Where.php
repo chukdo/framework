@@ -3,6 +3,7 @@
 namespace Chukdo\Db\Mongo;
 
 use MongoDB\BSON\Regex;
+use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\Contracts\Db\Find as FindInterface;
 use Chukdo\Contracts\Db\Write as WriteInterface;
 
@@ -16,6 +17,11 @@ use Chukdo\Contracts\Db\Write as WriteInterface;
 Abstract Class Where
 {
 	/**
+	 * @var Collection
+	 */
+	protected $collection;
+
+	/**
 	 * @var array
 	 */
 	protected $where = [];
@@ -24,6 +30,24 @@ Abstract Class Where
 	 * @var array
 	 */
 	protected $orWhere = [];
+
+	/**
+	 * Find constructor.
+	 *
+	 * @param Collection $collection
+	 */
+	public function __construct( Collection $collection )
+	{
+		$this->collection = $collection;
+	}
+
+	/**
+	 * @return CollectionInterface|Collection
+	 */
+	public function collection(): CollectionInterface
+	{
+		return $this->collection;
+	}
 
 	/**
 	 * @param string $field

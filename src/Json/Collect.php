@@ -72,105 +72,105 @@ class Collect
 
 		switch ( $operator ) {
 			case '=' :
-				$closure = function( $v, $value ) {
-					return $v == $value
+				$closure = static function( $v, $value ) {
+					return $v === $value
 						? $v
 						: null;
 				};
 				break;
 			case '!=' :
-				$closure = function( $v, $value ) {
+				$closure = static function( $v, $value ) {
 					return $v !== $value
 						? $v
 						: null;
 				};
 				break;
 			case '>' :
-				$closure = function( $v, $value ) {
+				$closure = static function( $v, $value ) {
 					return $v > $value
 						? $v
 						: null;
 				};
 				break;
 			case '>=':
-				$closure = function( $v, $value ) {
+				$closure = static function( $v, $value ) {
 					return $v >= $value
 						? $v
 						: null;
 				};
 				break;
 			case '<':
-				$closure = function( $v, $value ) {
+				$closure = static function( $v, $value ) {
 					return $v < $value
 						? $v
 						: null;
 				};
 				break;
 			case '<=':
-				$closure = function( $v, $value ) {
+				$closure = static function( $v, $value ) {
 					return $v <= $value
 						? $v
 						: null;
 				};
 				break;
 			case '<>' :
-				$closure = function( $v, $value, $value2 ) {
+				$closure = static function( $v, $value, $value2 ) {
 					return $v < $value && $v > $value2
 						? $v
 						: null;
 				};
 				break;
 			case '<=>' :
-				$closure = function( $v, $value, $value2 ) {
+				$closure = static function( $v, $value, $value2 ) {
 					return $v <= $value && $v >= $value2
 						? $v
 						: null;
 				};
 				break;
 			case 'in':
-				$closure = function( $v, $value ) {
-					return in_array( $v, (array) $value )
+				$closure = static function( $v, $value ) {
+					return Arr::in( $v, (array) $value )
 						? $v
 						: null;
 				};
 				break;
 			case '!in':
-				$closure = function( $v, $value ) {
-					return !in_array( $v, (array) $value )
+				$closure = static function( $v, $value ) {
+					return !Arr::in( $v, (array) $value )
 						? $v
 						: null;
 				};
 				break;
 			case 'type':
-				$closure = function( $v, $value ) {
+				$closure = static function( $v, $value ) {
 					return Str::type( $v ) === $value
 						? $v
 						: null;
 				};
 				break;
 			case '%':
-				$closure = function( $v, $value, $value2 ) {
+				$closure = static function( $v, $value, $value2 ) {
 					return $v % $value === $value2
 						? $v
 						: null;
 				};
 				break;
 			case 'size':
-				$closure = function( $v, $value ) {
+				$closure = static function( $v, $value ) {
 					return count( (array) $v ) === $value
 						? $v
 						: null;
 				};
 				break;
 			case 'exist':
-				$closure = function( $v ) {
+				$closure = static function( $v ) {
 					return $v
 						? $v
 						: null;
 				};
 				break;
 			case 'regex':
-				$closure = function( $v, $value, $value2 ) {
+				$closure = static function( $v, $value, $value2 ) {
 					return Str::match( '/' . $value . '/' . ( $value2
 							?? 'i' ), $v )
 						? $v
@@ -178,11 +178,11 @@ class Collect
 				};
 				break;
 			case 'match':
-				$closure = function( $v, $value ) {
+				$closure = static function( $v, $value ) {
 					$valid = false;
 
 					foreach ( (array) $value as $valueItem ) {
-						if ( in_array( $valueItem, (array) $v ) ) {
+						if ( Arr::in( $valueItem, (array) $v ) ) {
 							$valid = true;
 							break;
 						}
@@ -194,9 +194,9 @@ class Collect
 				};
 				break;
 			case 'all':
-				$closure = function( $v, $value ) {
+				$closure = static function( $v, $value ) {
 					foreach ( (array) $value as $valueItem ) {
-						if ( !in_array( $valueItem, (array) $v ) ) {
+						if ( !Arr::in( $valueItem, (array) $v ) ) {
 							return null;
 						}
 					}
@@ -274,10 +274,8 @@ class Collect
 		$json = new Json();
 
 		foreach ( $this->collection as $k => $row ) {
-			if ( $row instanceof JsonInterface ) {
-				if ( $unsetId = $row->unset( $id ) ) {
-					$json->set( $unsetId, $row );
-				}
+			if ( ( $row instanceof JsonInterface ) && $unsetId = $row->unset( $id ) ) {
+				$json->set( $unsetId, $row );
 			}
 		}
 

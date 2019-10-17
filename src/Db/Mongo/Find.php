@@ -6,7 +6,6 @@ use Chukdo\Helper\Arr;
 use Chukdo\Json\Json;
 use Chukdo\Contracts\Db\Find as FindInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
-use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\Db\Record\Record;
 use Chukdo\Db\Record\RecordList;
 use MongoDB\Driver\ReadPreference;
@@ -20,11 +19,6 @@ use MongoDB\Driver\ReadPreference;
  */
 Class Find extends Where implements FindInterface
 {
-	/**
-	 * @var Collection
-	 */
-	protected $collection;
-
 	/**
 	 * @var array
 	 */
@@ -61,16 +55,6 @@ Class Find extends Where implements FindInterface
 	protected $hiddenId = false;
 
 	/**
-	 * Find constructor.
-	 *
-	 * @param Collection $collection
-	 */
-	public function __construct( Collection $collection )
-	{
-		$this->collection = $collection;
-	}
-
-	/**
 	 * ReadPreference::RP_PRIMARY = 1,
 	 * RP_SECONDARY = 2,
 	 * RP_PRIMARY_PREFERRED = 5,
@@ -90,14 +74,6 @@ Class Find extends Where implements FindInterface
 			 ->selectServer( new ReadPreference( $readPreference ) );
 
 		return $this;
-	}
-
-	/**
-	 * @return Collection
-	 */
-	public function collection(): CollectionInterface
-	{
-		return $this->collection;
 	}
 
 	/**
@@ -121,7 +97,7 @@ Class Find extends Where implements FindInterface
 		$find       = $this->collection()
 						   ->client()
 						   ->find( $this->filter(), $options );
-		$recordList = new RecordList( $this->collection(), new Json( $find ), $idAsKey, $this->hiddenId );
+		$recordList = new RecordList( $this->collection(), new Json( $find ), $idAsKey );
 
 		foreach ( $this->link as $link ) {
 			$recordList = $link->hydrate( $recordList );

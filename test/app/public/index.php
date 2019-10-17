@@ -106,10 +106,11 @@ $db      = $elastic->database();
  * ] )
  * ->insert();*/
 
+
 $find = $db->collection( 'test' )
 		   ->find();
 
-print_r( $find->distinct( 'cp' )
+print_r( $find->one()
 			  ->toHtml() );
 
 die( 'ok' );

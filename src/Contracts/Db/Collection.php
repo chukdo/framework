@@ -68,12 +68,11 @@ interface Collection
 	public function id();
 
 	/**
-	 * @param      $data
-	 * @param bool $hiddenId
+	 * @param $data
 	 *
 	 * @return Record
 	 */
-	public function record( $data, bool $hiddenId = false ): Record;
+	public function record( $data ): Record;
 
 	/**
 	 * @param string|null $field

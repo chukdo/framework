@@ -38,7 +38,6 @@ final class Stream
 	 */
 	public static function exists( string $name ): bool
 	{
-		return (bool) in_array( $name,
-			stream_get_wrappers() );
+		return Arr::in( $name, stream_get_wrappers() );
 	}
 }

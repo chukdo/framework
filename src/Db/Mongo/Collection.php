@@ -107,24 +107,25 @@ Class Collection implements CollectionInterface
 	}
 
 	/**
-	 * @param      $data
-	 * @param bool $hiddenId
+	 * @param $data
 	 *
 	 * @return Record|object
 	 */
-	public function record( $data, bool $hiddenId = false ): Record
+	public function record( $data ): Record
 	{
 		try {
-			$reflector = new ReflectionClass( '\App\Model\\' . $this->name() );
+			$reflector = new ReflectionClass( '\App\Model\Mongo\Record\\' . $this->name() );
 
-			return $reflector->newInstanceArgs( [
-				$this,
-				$data,
-			] );
-
+			if ( $reflector->implementsInterface( Record::class ) ) {
+				return $reflector->newInstanceArgs( [
+					$this,
+					$data,
+				] );
+			}
 		} catch ( ReflectionException $e ) {
-			return new Record( $this, $data, $hiddenId );
 		}
+
+		return new Record( $this, $data );
 	}
 
 	/**

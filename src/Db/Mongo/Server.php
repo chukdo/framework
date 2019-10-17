@@ -8,6 +8,8 @@ use MongoDB\Driver\Command;
 use MongoDB\Driver\Exception\Exception;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Contracts\Db\Server as ServerInterface;
+use Chukdo\Contracts\Db\Database as DatabaseInterface;
+use Chukdo\Contracts\Db\Collection as CollectionInterface;
 
 /**
  * Server Server.
@@ -78,7 +80,7 @@ Class Server implements ServerInterface
 					'members' => $members,
 				],
 			] )
-					->get( 'ok' ) == 1;
+					->get( 'ok' ) === 1;
 	}
 
 	/**
@@ -90,11 +92,8 @@ Class Server implements ServerInterface
 	public function command( array $args, string $db = 'admin' ): JsonInterface
 	{
 		try {
-			$args = new Command( $args );
-			$json = new Json( $this->client()
-								   ->executeCommand( $db, $args ) );
-
-			return $json;
+			return new Json( $this->client()
+								  ->executeCommand( $db, new Command( $args ) ) );
 		} catch ( Exception $e ) {
 		}
 
@@ -113,9 +112,9 @@ Class Server implements ServerInterface
 	 * @param string      $collection
 	 * @param string|null $database
 	 *
-	 * @return Collection
+	 * @return CollectionInterface
 	 */
-	public function collection( string $collection, string $database = null ): Collection
+	public function collection( string $collection, string $database = null ): CollectionInterface
 	{
 		return $this->database( $database )
 					->collection( $collection );
@@ -124,9 +123,9 @@ Class Server implements ServerInterface
 	/**
 	 * @param string|null $database
 	 *
-	 * @return Database
+	 * @return DatabaseInterface
 	 */
-	public function database( string $database = null ): Database
+	public function database( string $database = null ): DatabaseInterface
 	{
 		return new Database( $this, $database
 			?: $this->database );
@@ -138,8 +137,7 @@ Class Server implements ServerInterface
 	public function databases(): JsonInterface
 	{
 		return $this->command( [ 'listDatabases' => 1 ] )
-					->get( '0.databases' )
-					->coll( 'name' );
+					->wildcard( '0.databases.*.name' );
 	}
 
 	/**
@@ -148,7 +146,7 @@ Class Server implements ServerInterface
 	public function ping(): bool
 	{
 		return $this->command( [ 'ping' => 1 ] )
-					->get( '0.ok' ) == 1;
+					->get( '0.ok' ) === 1;
 	}
 
 	/**
@@ -158,7 +156,7 @@ Class Server implements ServerInterface
 	{
 		$status = $this->command( [ 'serverStatus' => 1 ] )
 					   ->getIndexJson( '0' )
-					   ->filter( function( $k, $v ) {
+					   ->filter( static function( $k, $v ) {
 						   if ( is_scalar( $v ) ) {
 							   return $v;
 						   }
@@ -186,7 +184,7 @@ Class Server implements ServerInterface
 	{
 		$status = $this->command( [ 'replSetGetStatus' => 1 ] )
 					   ->getIndexJson( '0' )
-					   ->filter( function( $k, $v ) {
+					   ->filter( static function( $k, $v ) {
 						   if ( is_scalar( $v ) ) {
 							   return $v;
 						   }
@@ -209,6 +207,6 @@ Class Server implements ServerInterface
 				'killOp' => 1,
 				'op'     => $op,
 			] )
-					->get( 'ok' ) == 1;
+					->get( 'ok' ) === 1;
 	}
 }

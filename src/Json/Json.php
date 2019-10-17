@@ -168,6 +168,14 @@ class Json extends ArrayObject implements JsonInterface
 	}
 
 	/**
+	 * @return array
+	 */
+	public function __debugInfo(): array
+	{
+		return $this->getArrayCopy();
+	}
+
+	/**
 	 * @param bool $prettify
 	 *
 	 * @return string
@@ -753,7 +761,7 @@ class Json extends ArrayObject implements JsonInterface
 		$names = ArrHelper::spreadArgs( $names );
 
 		foreach ( $this as $k => $v ) {
-			if ( in_array( $k, $names ) ) {
+			if ( ArrHelper::in( $k, $names ) ) {
 				$json->offsetSet( $k, $v );
 			}
 		}

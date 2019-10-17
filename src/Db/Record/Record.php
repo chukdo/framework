@@ -33,9 +33,8 @@ Class Record extends Json
 	 *
 	 * @param CollectionInterface $collection
 	 * @param null                $data
-	 * @param bool                $hiddenId
 	 */
-	public function __construct( CollectionInterface $collection, $data = null, bool $hiddenId = false )
+	public function __construct( CollectionInterface $collection, $data = null )
 	{
 		$json     = new Json( $data );
 		$filtered = $json->filterRecursive( static function( $k, $v ) use ( $collection ) {
@@ -45,9 +44,7 @@ Class Record extends Json
 		parent::__construct( $filtered, false );
 
 		$this->collection = $collection;
-		$this->id         = $hiddenId
-			? $this->offsetUnset( '_id' )
-			: $this->offsetGet( '_id' );
+		$this->id         = $this->offsetUnset( '_id' );
 	}
 
 	/**
@@ -141,7 +138,6 @@ Class Record extends Json
 
 		/** Insert */
 		$this->id = $write->insert();
-		$this->offsetSet( '_id', $this->id() );
 
 		return $this;
 	}

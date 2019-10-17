@@ -297,7 +297,7 @@ final class To
 	public static function html( $value, string $title = null, string $color = null, bool $type = false ): string
 	{
 		$html  = '';
-		$style = 'border-spacing:0;border-collapse:collapse;font-family:Arial;width:100%;word-break:break-word;';
+		$style = 'border-spacing:0;border-collapse:collapse;font-family:Arial;width:100%;word-break:break-word;border-radius:3px;overflow:hidden;';
 		$title = $title
 			?? ( $type
 				? Str::type( $value )
@@ -305,9 +305,9 @@ final class To
 
 		if ( $title ) {
 			$color = $color
-				?: '#777';
-			$html  .= '<thead style="color: #fff;background: ' . $color
-				. ';"><tr><th colspan="2" style="padding:5px;font-size:18px;font-weight: normal;">' . ucfirst( $title )
+				?: '#333';
+			$html  .= '<thead style="background: #ddd;color: ' . $color
+				. ';"><tr><th colspan="2" style="padding:8px;font-size:14px;font-weight: normal;">' . ucfirst( $title )
 				. '</th></tr></thead>';
 		}
 
@@ -324,8 +324,9 @@ final class To
 				$v = $v->format( 'd-m-Y H:i:s' );
 			}
 
-			$html .= '<tr><td style="background:#eee;padding:5px;border:1px solid #ddd;width:' . strlen( $k ) * 9 . 'px;">'
-				. $k . '</td><td  style="padding:5px;border:1px solid #ddd;">' . $v . '</td></tr>';
+			$html .= '<tr style="font-size:12px;font-weight: normal;">'
+				. '<td style="background:#eee;padding:8px;border:1px solid #ddd;width:' . strlen( $k ) * 9 . 'px;">'
+				. $k . '</td><td  style="padding:8px;border:1px solid #ddd;">' . $v . '</td></tr>';
 		}
 
 		return '<table id="ToHtml" style="' . $style . '">' . $html . '</table>';

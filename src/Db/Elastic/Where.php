@@ -37,7 +37,7 @@ Abstract Class Where
 	}
 
 	/**
-	 * @return CollectionInterface
+	 * @return CollectionInterface|Collection
 	 */
 	public function collection(): CollectionInterface
 	{
@@ -241,22 +241,13 @@ Abstract Class Where
 	}
 
 	/**
-	 * @return array
-	 */
-	public function filter(): array
-	{
-		return $this->where;
-	}
-
-	/**
 	 * @param array $params
 	 * @param bool  $withFilter
 	 *
 	 * @return array
 	 */
-	public function query( array $params = [], bool $withFilter = true ): array
+	public function filter( array $params = [], bool $withFilter = true ): array
 	{
-		$filter = $this->filter();
 		$query  = new Json( [
 			'index' => $this->collection()
 				->fullName(),
@@ -267,8 +258,8 @@ Abstract Class Where
 			$query->set( $key, $value );
 		}
 
-		if ( $withFilter && count( $filter ) > 0 ) {
-			$query->set( 'body.query.bool', $this->filter() );
+		if ( $withFilter && count( $this->where ) > 0 ) {
+			$query->set( 'body.query.bool', $this->where );
 		}
 
 		return $query->toArray();
