@@ -53,15 +53,35 @@ final class Arr
 	}
 
 	/**
-	 * @param array $pushTo
-	 * @param array $toPush
+	 * @param       $value
+	 * @param array $array
+	 * @param bool  $unique
 	 *
 	 * @return array
 	 */
-	public static function push( array $pushTo, array $toPush ): array
+	public static function append( $value, array $array, bool $unique = true ): array
+	{
+		if ( $unique === false || ( $unique === true && !self::in( $value, $array ) ) ) {
+			$array[] = $value;
+		}
+
+		return $array;
+	}
+
+	/**
+	 * @param array $pushTo
+	 * @param array $toPush
+	 *
+	 * @param bool  $unique
+	 *
+	 * @return array
+	 */
+	public static function push( array $pushTo, array $toPush, bool $unique = true ): array
 	{
 		foreach ( $toPush as $push ) {
-			$pushTo[] = $push;
+			if ( $unique === false || ( $unique === true && !self::in( $push, $pushTo ) ) ) {
+				$pushTo[] = $push;
+			}
 		}
 
 		return $pushTo;

@@ -197,9 +197,9 @@ Class Link
 
 		foreach ( $json as $key => $value ) {
 			if ( $key === $this->field ) {
-				$extractIds = Arr::push( $extractIds, (array) $value );
+				$extractIds = Arr::append( $value, $extractIds, true );
 			} else if ( Is::JsonInterface( $value ) ) {
-				$extractIds = Arr::push( $extractIds, $this->extractIds( $value ) );
+				$extractIds = Arr::push( $extractIds, $this->extractIds( $value ), true );
 			}
 		}
 

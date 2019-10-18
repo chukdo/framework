@@ -84,16 +84,16 @@ Class Server implements ServerInterface
 	}
 
 	/**
-	 * @param array  $args
-	 * @param string $db
+	 * @param array       $args
+	 * @param string|null $db
 	 *
 	 * @return JsonInterface
 	 */
-	public function command( array $args, string $db = 'admin' ): JsonInterface
+	public function command( array $args, string $db = null ): JsonInterface
 	{
 		try {
 			return new Json( $this->client()
-								  ->executeCommand( $db, new Command( $args ) ) );
+								  ->executeCommand( $db ?? 'admin', new Command( $args ) ) );
 		} catch ( Exception $e ) {
 		}
 

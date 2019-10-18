@@ -150,11 +150,7 @@ Class Database implements DatabaseInterface
 						->indices();
 
 		foreach ( $indices as $indice ) {
-			if ( $this->name() !== null ) {
-				if ( Str::startWith( $indice[ 'index' ], $this->name() . '_' ) ) {
-					$list->append( $indice[ 'index' ] );
-				}
-			} else {
+			if ( $this->name() === null || ( $this->name() !== null && Str::startWith( $indice[ 'index' ], $this->name() . '_' ) ) ) {
 				$list->append( $indice[ 'index' ] );
 			}
 		}

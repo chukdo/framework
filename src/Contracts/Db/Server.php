@@ -22,6 +22,14 @@ interface Server
 	public function __construct( string $dsn = null, string $database = null );
 
 	/**
+	 * @param array  $args
+	 * @param string $db
+	 *
+	 * @return JsonInterface
+	 */
+	public function command( array $args, string $db = null ): JsonInterface;
+
+	/**
 	 * @return object
 	 */
 	public function client();

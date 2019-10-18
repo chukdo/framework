@@ -37,8 +37,6 @@ $app->registerServices( [
 	Providers\MongoServiceProvider::class,
 ] );
 
-$elastic = new Server();
-$db      = $elastic->database();
 /**$schema  = $db->dropCollection( 'test' )
  * ->createCollection( 'test' )
  * ->schema();
@@ -106,19 +104,105 @@ $db      = $elastic->database();
  * ] )
  * ->insert();*/
 
-$find = $db->collection( 'test' )
-		   ->find();
-$r    = $find->all( true );
+
+$elastic = new Server();
+$db      = $elastic->database();
 /*
-$record = $r->offsetGet('5da9c3bbe45e32097263e991');
-$record->set('agence', 'bibiNew ');
-$record->set('meta.gestion.cp', 65010);
-$record->save();*/
+$schemaAgence = $db->dropCollection( 'agence' )
+				   ->createCollection( 'agence' )
+				   ->schema();
+$schemaAgence->set( 'agence', 'text' )
+			 ->set( 'ville', 'keyword' )
+			 ->set( 'cp', 'keyword' );
+$schemaAgence->save();
 
-print_r( $r
-			  ->toHtml() );
+$writeAgence = $db->collection( 'agence' )
+				  ->write();
+$writeAgence->set( 'agence', 'demo immo 33' )
+			->set( 'ville', 'bordeaux' )
+			->set( 'cp', '33000' )
+			->insert();
+$writeAgence->set( 'agence', 'demo immo 64' )
+			->set( 'ville', 'pau' )
+			->set( 'cp', '64000' )
+			->insert();
+$writeAgence->set( 'agence', 'demo immo 16' )
+			->set( 'ville', 'chassors' )
+			->set( 'cp', '16200' )
+			->insert();
+$writeAgence->set( 'agence', 'demo immo 75' )
+			->set( 'ville', 'paris' )
+			->set( 'cp', '75012' )
+			->insert();
 
+$schemaContrat = $db->dropCollection( 'contrat' )
+					->createCollection( 'contrat' )
+					->schema();
+$schemaContrat->set( 'contrat', 'text' )
+			  ->set( '_agence', 'keyword' )
+			  ->set( 'completion', 'keyword' )
+			  ->set( 'reference', 'keyword' );
+$schemaContrat->save();
+
+$writeContrat = $db->collection( 'contrat' )
+				   ->write();
+$writeContrat->set( 'contrat', 'compromis de vente' )
+			 ->set( '_agence', '5da9e1ebe45e3209711d6533' )
+			 ->set( 'completion', '90%' )
+			 ->set( 'reference', '324324324' )
+			 ->insert();
+$writeContrat->set( 'contrat', 'mandat' )
+			 ->set( '_agence', '5da9e1ebe45e3209711d6533' )
+			 ->set( 'completion', '40%' )
+			 ->set( 'reference', '567567567657' )
+			 ->insert();
+$writeContrat->set( 'contrat', 'offre' )
+			 ->set( '_agence', '5da9e1ebe45e3209711d6533' )
+			 ->set( 'completion', '20%' )
+			 ->set( 'reference', '324324324324' )
+			 ->insert();
+$writeContrat->set( 'contrat', 'compromis de vente' )
+			 ->set( '_agence', '5da9e1ebe45e3209711d6533' )
+			 ->set( 'completion', '10%' )
+			 ->set( 'reference', '111111111324' )
+			 ->insert();
+$writeContrat->set( 'contrat', 'compromis de vente' )
+			 ->set( '_agence', '5da9e1ebe45e3209711d6534' )
+			 ->set( 'completion', '10%' )
+			 ->set( 'reference', '32432342324324' )
+			 ->insert();
+$writeContrat->set( 'contrat', 'compromis de vente' )
+			 ->set( '_agence', '5da9e1ebe45e3209711d6534' )
+			 ->set( 'completion', '30%' )
+			 ->set( 'reference', '3ZREREZ24324324' )
+			 ->insert();
+$writeContrat->set( 'contrat', 'compromis de vente' )
+			 ->set( '_agence', '5da9e1ebe45e3209711d6534' )
+			 ->set( 'completion', '80%' )
+			 ->set( 'reference', '3243TREZER24324' )
+			 ->insert();
+$writeContrat->set( 'contrat', 'compromis de vente' )
+			 ->set( '_agence', '5da9e1ece45e3209711d6535' )
+			 ->set( 'completion', '16%' )
+			 ->set( 'reference', '324324324' )
+			 ->insert();
+$writeContrat->set( 'contrat', 'mandat' )
+			 ->set( '_agence', '5da9e1ece45e3209711d6535' )
+			 ->set( 'completion', '100%' )
+			 ->set( 'reference', '3243243SDFDSF24' )
+			 ->insert();
+*/
+
+$findContrat = $db->collection( 'contrat' )
+				  ->find()
+				  ->link( '_agence' );
+
+$contrats = $findContrat->all( true );
+
+print_r( $contrats->toHtml() );
 die( 'ok' );
+
+
 exit;
 $contrat = Mongo::collection( 'contrat' );
 

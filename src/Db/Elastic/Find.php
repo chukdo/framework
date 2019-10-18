@@ -2,6 +2,7 @@
 
 namespace Chukdo\Db\Elastic;
 
+use Chukdo\Db\Record\Link;
 use Chukdo\Helper\Arr;
 use Chukdo\Json\Json;
 use Chukdo\Contracts\Db\Find as FindInterface;
@@ -59,8 +60,8 @@ Class Find extends Where implements FindInterface
 	public function count(): int
 	{
 		$count = $this->collection()
-					  ->client()
-					  ->count( $this->projection() );
+			->client()
+			->count( $this->projection() );
 
 		return (int) $count[ 'count' ];
 	}
@@ -97,7 +98,7 @@ Class Find extends Where implements FindInterface
 		$find = $this->search( $this->filter( [ 'size' => 1 ] ) );
 
 		return $this->collection()
-					->record( $this->hit( $find[ 0 ] ?? [] ) );
+			->record( $this->hit( $find[ 0 ] ?? [] ) );
 	}
 
 	/**
@@ -108,8 +109,8 @@ Class Find extends Where implements FindInterface
 	protected function search( array $filter ): array
 	{
 		$find = $this->collection()
-					 ->client()
-					 ->search( $filter );
+			->client()
+			->search( $filter );
 
 		return $find[ 'hits' ][ 'hits' ] ?? [];
 	}
@@ -143,11 +144,11 @@ Class Find extends Where implements FindInterface
 			}
 
 			return $filterHit->offsetSet( '_id', $id )
-							 ->toArray();
+				->toArray();
 		}
 
 		return $hit->offsetSet( '_id', $id )
-				   ->toArray();
+			->toArray();
 	}
 
 	/**
@@ -212,11 +213,11 @@ Class Find extends Where implements FindInterface
 	public function link( string $field, array $with = [], array $without = [], string $linked = null ): FindInterface
 	{
 		$link = new Link( $this->collection()
-							   ->database(), $field );
+			->database(), $field );
 
 		$this->link[] = $link->with( $with )
-							 ->without( $without )
-							 ->setLinkedName( $linked );
+			->without( $without )
+			->setLinkedName( $linked );
 
 		return $this;
 	}

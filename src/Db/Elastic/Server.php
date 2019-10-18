@@ -55,6 +55,17 @@ Class Server implements ServerInterface
 	}
 
 	/**
+	 * @param array  $args
+	 * @param string $db
+	 *
+	 * @return JsonInterface
+	 */
+	public function command( array $args, string $db ): JsonInterface
+	{
+		return $this->status();
+	}
+
+	/**
 	 * @return string
 	 */
 	public function name(): string

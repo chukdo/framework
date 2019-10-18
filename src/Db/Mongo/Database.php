@@ -5,7 +5,9 @@ Namespace Chukdo\DB\Mongo;
 use Chukdo\Json\Json;
 use MongoDB\Database as MongoDbDatabase;
 use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\Contracts\Db\Server as ServerInterface;
 use Chukdo\Contracts\Db\Database as DatabaseInterface;
+use Chukdo\Contracts\Db\Collection as CollectionInterface;
 
 /**
  * Server Server Database.
@@ -50,9 +52,9 @@ Class Database implements DatabaseInterface
 	}
 
 	/**
-	 * @return Server
+	 * @return ServerInterface
 	 */
-	public function server(): Server
+	public function server(): ServerInterface
 	{
 		return $this->server;
 	}
@@ -77,9 +79,9 @@ Class Database implements DatabaseInterface
 	/**
 	 * @param string $collection
 	 *
-	 * @return Collection
+	 * @return CollectionInterface
 	 */
-	public function collection( string $collection ): Collection
+	public function collection( string $collection ): CollectionInterface
 	{
 		return new Collection( $this, $collection );
 	}
@@ -87,9 +89,9 @@ Class Database implements DatabaseInterface
 	/**
 	 * @param string $collection
 	 *
-	 * @return $this
+	 * @return DatabaseInterface
 	 */
-	public function dropCollection( string $collection ): self
+	public function dropCollection( string $collection ): DatabaseInterface
 	{
 		$this->client()
 			 ->dropCollection( $collection );
@@ -100,9 +102,9 @@ Class Database implements DatabaseInterface
 	/**
 	 * @param string $collection
 	 *
-	 * @return Collection
+	 * @return CollectionInterface
 	 */
-	public function createCollection( string $collection ): Collection
+	public function createCollection( string $collection ): CollectionInterface
 	{
 		if ( !$this->collectionExist( $collection ) ) {
 			$this->client()
