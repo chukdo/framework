@@ -111,6 +111,30 @@ Class Write extends Where implements WriteInterface
 	}
 
 	/**
+	 * @param string $field
+	 * @param        $value
+	 *
+	 * @return WriteInterface
+	 */
+	public function push( string $field, $value ): WriteInterface
+	{
+		$this->field( 'push', $field, $value );
+
+		return $this;
+	}
+
+	/**
+	 * @param string $field
+	 * @param        $value
+	 *
+	 * @return WriteInterface
+	 */
+	public function addToSet( string $field, $value ): WriteInterface
+	{
+		return $this->field( 'addToSet', $field, $value );
+	}
+
+	/**
 	 * @return array
 	 */
 	public function validatedUpdateFields(): array
@@ -145,30 +169,6 @@ Class Write extends Where implements WriteInterface
 	 *
 	 * @return WriteInterface
 	 */
-	public function push( string $field, $value ): WriteInterface
-	{
-		$this->field( 'push', $field, $value );
-
-		return $this;
-	}
-
-	/**
-	 * @param string $field
-	 * @param        $value
-	 *
-	 * @return WriteInterface
-	 */
-	public function addToSet( string $field, $value ): WriteInterface
-	{
-		return $this->field( 'addToSet', $field, $value );
-	}
-
-	/**
-	 * @param string $field
-	 * @param        $value
-	 *
-	 * @return WriteInterface
-	 */
 	public function pull( string $field, $value ): WriteInterface
 	{
 		$this->field( 'pull', $field, $value );
@@ -190,14 +190,6 @@ Class Write extends Where implements WriteInterface
 	}
 
 	/**
-	 * @return JsonInterface
-	 */
-	public function fields(): JsonInterface
-	{
-		return $this->fields;
-	}
-
-	/**
 	 * @return int
 	 */
 	public function delete(): int
@@ -208,6 +200,16 @@ Class Write extends Where implements WriteInterface
 
 		return (int) $command[ 'deleted' ];
 	}
+
+
+	/**
+	 * @return JsonInterface
+	 */
+	public function fields(): JsonInterface
+	{
+		return $this->fields;
+	}
+
 
 	/**
 	 * @param $type
@@ -283,17 +285,11 @@ Class Write extends Where implements WriteInterface
 	 */
 	protected function getOne(): Record
 	{
-		$json   = new Json( $this->collection()
-								 ->client()
-								 ->search( $this->filter() ) );
-		$record = $json->getJson( 'hits.hits.0._source' )
-					   ->filterRecursive( function( $k, $v ) {
-						   return Collection::filterOut( $k, $v );
-					   } );
+		$find = $this->collection()
+					 ->find()
+					 ->importFilter( $this->exportFilter() );
 
-		$record->offsetSet( '_id', $json->get( 'hits.hits.0._id' ) );
-
-		return $record;
+		return $find->one();
 	}
 
 	/**
@@ -330,9 +326,8 @@ Class Write extends Where implements WriteInterface
 						->client()
 						->update( $this->filter( [
 							'id'                => $this->getOne()
-														->offsetGet( '_id' ),
+														->id(),
 							'body.script'       => $this->validatedUpdateFields(),
-							'conflicts'         => 'proceed',
 							'retry_on_conflict' => 3,
 						], false ) );
 
@@ -356,8 +351,8 @@ Class Write extends Where implements WriteInterface
 	 */
 	public function updateOrInsert(): ?string
 	{
-		$get = $this->getOne();
-		$id  = $get->offsetGet( '_id' );
+		$id = $this->getOne()
+				   ->id();
 
 		if ( $id ) {
 			$this->updateOne();

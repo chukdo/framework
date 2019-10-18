@@ -45,6 +45,26 @@ Abstract Class Where
 	}
 
 	/**
+	 * @return array
+	 */
+	public function exportFilter(): array
+	{
+		return $this->where;
+	}
+
+	/**
+	 * @param array $where
+	 *
+	 * @return FindInterface|WriteInterface|object
+	 */
+	public function importFilter( array $where )
+	{
+		$this->where = $where;
+
+		return $this;
+	}
+
+	/**
 	 * @param string $field
 	 * @param string $operator
 	 * @param null   $value

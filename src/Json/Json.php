@@ -456,8 +456,10 @@ class Json extends ArrayObject implements JsonInterface
 		$firstPath = $arr->getFirstAndRemove();
 		$endPath   = $arr->join( '.' );
 
-		return $this->offsetGetOrSet( $firstPath )
-					->set( $endPath, $value );
+		$this->offsetGetOrSet( $firstPath )
+			 ->set( $endPath, $value );
+
+		return $this;
 	}
 
 	/**

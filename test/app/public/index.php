@@ -106,11 +106,16 @@ $db      = $elastic->database();
  * ] )
  * ->insert();*/
 
-
 $find = $db->collection( 'test' )
 		   ->find();
+$r    = $find->all( true );
+/*
+$record = $r->offsetGet('5da9c3bbe45e32097263e991');
+$record->set('agence', 'bibiNew ');
+$record->set('meta.gestion.cp', 65010);
+$record->save();*/
 
-print_r( $find->one()
+print_r( $r
 			  ->toHtml() );
 
 die( 'ok' );

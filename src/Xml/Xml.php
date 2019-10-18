@@ -42,8 +42,7 @@ class Xml extends Node
 		$this->xml->preserveWhiteSpace = false;
 
 		parent::__construct( $this->xml->appendChild( $uri !== ''
-			? $this->xml->createElementNS( $uri,
-				$name )
+			? $this->xml->createElementNS( $uri, $name )
 			: $this->xml->createElement( $name ) ) );
 	}
 
@@ -74,7 +73,7 @@ class Xml extends Node
 	/**
 	 * @return DOMDocument
 	 */
-	public function doc()
+	public function doc(): DOMDocument
 	{
 		return $this->xml;
 	}
@@ -120,12 +119,8 @@ class Xml extends Node
 	{
 		$dir = dirname( $file );
 
-		if ( !is_dir( $dir ) ) {
-			if ( !mkdir( $dir,
-				0777,
-				true ) ) {
-				return false;
-			}
+		if ( !mkdir( $dir, 0777, true ) && !is_dir( $dir ) ) {
+			return false;
 		}
 
 		return $html
@@ -165,9 +160,9 @@ class Xml extends Node
 	 */
 	public function __wakeup(): void
 	{
-		$xml          = xml::loadFromString( $this->buffer );
-		$this->xml    = $xml->doc();
-		$this->__node = $xml->element();
+		$xml        = xml::loadFromString( $this->buffer );
+		$this->xml  = $xml->doc();
+		$this->node = $xml->element();
 	}
 
 	/**
@@ -183,14 +178,13 @@ class Xml extends Node
 			$xml = new Xml();
 			$html
 				? $xml->doc()
-					  ->loadHTML( '<?xml encoding="UTF-8">' . $string,
-						  LIBXML_COMPACT )
+					  ->loadHTML( '<?xml encoding="UTF-8">' . $string, LIBXML_COMPACT )
 				: $xml->doc()
 					  ->loadXML( $string );
 			$xml->setElement( $xml->doc()->documentElement );
 
 			return $xml;
-		} catch ( Exception $e ) {
+		} catch ( Throwable $e ) {
 			throw new XmlException( $e->getMessage(), $e->getCode(), $e );
 		}
 	}

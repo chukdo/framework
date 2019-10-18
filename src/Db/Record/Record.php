@@ -41,10 +41,10 @@ Class Record extends Json
 			return $collection->filterOut( $k, $v );
 		} );
 
-		parent::__construct( $filtered, false );
-
 		$this->collection = $collection;
-		$this->id         = $this->offsetUnset( '_id' );
+		$this->id         = $filtered->offsetUnset( '_id' );
+
+		parent::__construct( $filtered, false );
 	}
 
 	/**
@@ -147,10 +147,11 @@ Class Record extends Json
 	 */
 	public function record(): JsonInterface
 	{
+
 		return $this->filterRecursive( static function( $k, $v ) {
 			return $v instanceof Record
-				? $v
-				: null;
+				? null
+				: $v;
 		} );
 	}
 

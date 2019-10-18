@@ -94,41 +94,60 @@ Class Find extends Where implements FindInterface
 	 */
 	public function one(): Record
 	{
-		$find = $this->collection()
-					 ->client()
-					 ->search( $this->projection( [ 'size' => 1 ] ) );
+		$find = $this->search( $this->filter( [ 'size' => 1 ] ) );
 
 		return $this->collection()
-					->record( $this->hit( $find[ 'hits' ][ 'hits' ][ 0 ] ?? [] ) );
+					->record( $this->hit( $find[ 0 ] ?? [] ) );
 	}
 
 	/**
-	 * @param array $hit
+	 * @param array $filter
 	 *
 	 * @return array
 	 */
-	protected function hit( array $hit ): array
+	protected function search( array $filter ): array
 	{
-		$source = [];
+		$find = $this->collection()
+					 ->client()
+					 ->search( $filter );
 
-		if ( isset( $hit[ '_id' ], $hit[ '_source' ] ) ) {
-			$source          = $hit[ '_source' ];
-			$source[ '_id' ] = $hit[ '_id' ];
+		return $find[ 'hits' ][ 'hits' ] ?? [];
+	}
+
+	/**
+	 * @param array $find
+	 *
+	 * @return array
+	 */
+	protected function hit( array $find ): array
+	{
+
+		if ( !isset( $find[ '_id' ], $find[ '_source' ] ) ) {
+			return [];
 		}
+
+		$id  = $find[ '_id' ];
+		$hit = new Json( $find[ '_source' ] );
 
 		foreach ( $this->without as $without ) {
-			if ( $without !== '_id' && isset( $source[ $without ] ) ) {
-				unset( $source[ $without ] );
+			if ( $without !== '_id' ) {
+				$hit->unset( $without );
 			}
 		}
 
-		foreach ( $source as $key => $value ) {
-			if ( !Arr::in( $key, $this->with ) ) {
-				unset( $source[ $key ] );
+		if ( count( $this->with ) > 0 ) {
+			$filterHit = new Json();
+
+			foreach ( $this->with as $with ) {
+				$filterHit->set( $with, $hit->get( $with ) );
 			}
+
+			return $filterHit->offsetSet( '_id', $id )
+							 ->toArray();
 		}
 
-		return $source;
+		return $hit->offsetSet( '_id', $id )
+				   ->toArray();
 	}
 
 	/**
@@ -138,11 +157,7 @@ Class Find extends Where implements FindInterface
 	 */
 	public function all( bool $idAsKey = false ): RecordList
 	{
-		$find = $this->collection()
-					 ->client()
-					 ->search( $this->projection() );
-
-		$recordList = new RecordList( $this->collection(), $this->hits( $find ), $idAsKey );
+		$recordList = new RecordList( $this->collection(), $this->hits( $this->search( $this->projection() ) ), $idAsKey );
 
 		foreach ( $this->link as $link ) {
 			$recordList = $link->hydrate( $recordList );
@@ -160,10 +175,8 @@ Class Find extends Where implements FindInterface
 	{
 		$hits = new Json();
 
-		if ( isset( $find[ 'hits' ][ 'hits' ] ) ) {
-			foreach ( $find[ 'hits' ][ 'hits' ] as $hit ) {
-				$hits->append( $this->hit( $hit ) );
-			}
+		foreach ( $find as $hit ) {
+			$hits->append( $this->hit( $hit ) );
 		}
 
 		return $hits;
@@ -177,13 +190,9 @@ Class Find extends Where implements FindInterface
 	 */
 	public function distinct( string $field, bool $idAsKey = false ): RecordList
 	{
-		$find = $this->collection()
-					 ->client()
-					 ->search( $this->projection( [
-						 'body.aggs.' . $field . 's.terms.field' => $field,
-					 ] ) );
-
-		$recordList = new RecordList( $this->collection(), $this->hits( $find ), $idAsKey );
+		$recordList = new RecordList( $this->collection(), $this->hits( $this->search( $this->projection( [
+			'body.aggs.' . $field . 's.terms.field' => $field,
+		] ) ) ), $idAsKey );
 
 		foreach ( $this->link as $link ) {
 			$recordList = $link->hydrate( $recordList );

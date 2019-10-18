@@ -34,7 +34,8 @@
     "microsoft/azure-storage-blob": "~1.2.0",
     "guzzlehttp/guzzle": "~6.0",
     "elasticsearch/elasticsearch": "~7.0",
-    "league/climate": "^3.5"
+    "league/climate": "^3.5",
+    "ext-libxml": "*"
   },
   "autoload": {
     "psr-4": {
