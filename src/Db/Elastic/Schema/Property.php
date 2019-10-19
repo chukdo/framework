@@ -86,6 +86,11 @@ class Property implements PropertyInterface
 	 */
 	public function setType( $value ): PropertyInterface
 	{
+		/** Intercompatiblité propriété Mongo|Elastic */
+		if ($value === 'string') {
+			$value = 'keyword';
+		}
+
 		$this->property->offsetSet( 'type', $value );
 
 		return $this;

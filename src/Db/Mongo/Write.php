@@ -626,5 +626,28 @@ Class Write extends Where implements WriteInterface
 	public function rename( string $oldName, string $newName ): WriteInterface
 	{
 		return $this->field( 'rename', $oldName, $newName );
+
+	}
+
+	/**
+	 * @return WriteInterface
+	 */
+	public function resetFields(): WriteInterface
+	{
+		$this->fields = new Json();
+
+		return $this;
+	}
+
+
+	/**
+	 * @return WriteInterface
+	 */
+	public function resetWhere(): WriteInterface
+	{
+		$this->where = [];
+		$this->orWhere = [];
+
+		return $this;
 	}
 }

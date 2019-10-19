@@ -4,6 +4,7 @@ namespace Chukdo\Db\Mongo;
 
 use Chukdo\Helper\Arr;
 use Chukdo\Json\Json;
+use Chukdo\Contracts\Db\Database as DatabaseInterface;
 use Chukdo\Contracts\Db\Find as FindInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Db\Record\Link;
@@ -140,10 +141,10 @@ Class Find extends Where implements FindInterface
 	 *
 	 * @return FindInterface
 	 */
-	public function link( string $field, array $with = [], array $without = [], string $linked = null ): FindInterface
+	public function link( string $field, array $with = [], array $without = [], string $linked = null, DatabaseInterface $database = null ): FindInterface
 	{
-		$link = new Link( $this->collection()
-							   ->database(), $field );
+		$link = new Link( $database ?? $this->collection()
+											->database(), $field );
 
 		$this->link[] = $link->with( $with )
 							 ->without( $without )

@@ -20,14 +20,15 @@ interface Find
 	public function collection(): Collection;
 
 	/**
-	 * @param string      $field
-	 * @param array       $with
-	 * @param array       $without
-	 * @param string|null $linked
+	 * @param string        $field
+	 * @param array         $with
+	 * @param array         $without
+	 * @param string|null   $linked
+	 * @param Database|null $database
 	 *
 	 * @return Find
 	 */
-	public function link( string $field, array $with = [], array $without = [], string $linked = null ): Find;
+	public function link( string $field, array $with = [], array $without = [], string $linked = null, Database $database = null ): Find;
 
 	/**
 	 * @param mixed ...$fields

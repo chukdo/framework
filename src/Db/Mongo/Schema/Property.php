@@ -102,10 +102,9 @@ class Property implements PropertyInterface
 	 */
 	public function setType( $value ): PropertyInterface
 	{
-		$value = (array) $value;
-
-		if ( count( $value ) == 1 ) {
-			$value = reset( $value );
+		/** Intercompatiblité propriété Mongo|Elastic */
+		if ($value === 'keyword' || $value === 'text') {
+			$value = 'string';
 		}
 
 		$this->property->offsetSet( 'bsonType', $value );
@@ -301,6 +300,8 @@ class Property implements PropertyInterface
 				}
 			}
 		}
+
+		return $this;
 	}
 
 	/**
@@ -430,7 +431,7 @@ class Property implements PropertyInterface
 	 */
 	public function toArray(): array
 	{
-		return $this->property->filterRecursive( function( $k, $v ) {
+		return $this->property->filterRecursive( static function( $k, $v ) {
 			return $v instanceof Property
 				? $v->toArray()
 				: $v;

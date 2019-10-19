@@ -105,10 +105,12 @@ $app->registerServices( [
  * ] )
  * ->insert();*/
 
-$elastic = new ServerMongo();
-$db      = $elastic->database();
+$elastic = new ServerElastic();
+$dbElastic = $elastic->database();
+$mongo   = new ServerMongo();
+$dbMongo = $mongo->database();
 /*
-$schemaAgence = $db->dropCollection( 'agence' )
+$schemaAgence = $dbElastic->dropCollection( 'agence' )
 				   ->createCollection( 'agence' )
 				   ->schema();
 $schemaAgence->set( 'agence', 'string' )
@@ -116,25 +118,32 @@ $schemaAgence->set( 'agence', 'string' )
 			 ->set( 'cp', 'string' );
 $schemaAgence->save();
 
-$writeAgence = $db->collection( 'agence' )
+$writeAgence = $dbElastic->collection( 'agence' )
 				  ->write();
-$writeAgence->set( 'agence', 'demo immo 33' )
+$writeAgence->set('_id', '5da9e1ebe45e3209711d6533')
+			->set( 'agence', 'demo immo 33' )
 			->set( 'ville', 'bordeaux' )
 			->set( 'cp', '33000' )
 			->insert();
-$writeAgence->set( 'agence', 'demo immo 64' )
+$writeAgence->resetFields()
+			->set('_id', '5da9e1ebe45e3209711d6536')
+			->set( 'agence', 'demo immo 64' )
 			->set( 'ville', 'pau' )
 			->set( 'cp', '64000' )
 			->insert();
-$writeAgence->set( 'agence', 'demo immo 16' )
+$writeAgence->resetFields()
+			->set('_id', '5da9e1ebe45e3209711d6534')
+			->set( 'agence', 'demo immo 16' )
 			->set( 'ville', 'chassors' )
 			->set( 'cp', '16200' )
 			->insert();
-$writeAgence->set( 'agence', 'demo immo 75' )
+$writeAgence->resetFields()
+			->set('_id', '5da9e1ece45e3209711d6535')
+			->set( 'agence', 'demo immo 75' )
 			->set( 'ville', 'paris' )
 			->set( 'cp', '75012' )
 			->insert();
-
+/*
 $schemaContrat = $db->dropCollection( 'contrat' )
 					->createCollection( 'contrat' )
 					->schema();
@@ -193,9 +202,9 @@ $writeContrat->set( 'contrat', 'mandat' )
 			 ->insert();
 */
 
-$findContrat = $db->collection( 'contrat' )
-				  ->find()
-				  ->link( '_agence' );
+$findContrat = $dbMongo->collection( 'contrat' )
+					   ->find()
+					   ->link( '_agence', [], [], 'elastic_agence', $dbElastic );
 
 $contrats = $findContrat->all( true );
 //$contrat = $contrats->get('5daae00f07612923ed6dc08a');

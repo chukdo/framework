@@ -131,4 +131,14 @@ interface Write
 	 * @return string|null
 	 */
 	public function insert(): ?string;
+
+	/**
+	 * @return Write
+	 */
+	public function resetFields(): Write;
+
+	/**
+	 * @return Write
+	 */
+	public function resetWhere(): Write;
 }

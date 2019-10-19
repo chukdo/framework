@@ -368,15 +368,41 @@ Class Write extends Where implements WriteInterface
 	 */
 	public function insert(): string
 	{
-		$id = $this->collection()
-				   ->id();
+		$body = $this->validatedInsertFields();
+		$id   = $body[ '_id' ] ?? $this->collection()
+									   ->id();
+
+		if ( isset( $body[ '_id' ] ) ) {
+			unset( $body[ '_id' ] );
+		}
+
 		$this->collection()
 			 ->client()
 			 ->index( $this->filter( [
 				 'id'   => $id,
-				 'body' => $this->validatedInsertFields(),
+				 'body' => $body,
 			 ], false ) );
 
 		return $id;
+	}
+
+	/**
+	 * @return WriteInterface
+	 */
+	public function resetFields(): WriteInterface
+	{
+		$this->fields = new Json();
+
+		return $this;
+	}
+
+	/**
+	 * @return WriteInterface
+	 */
+	public function resetWhere(): WriteInterface
+	{
+		$this->where = [];
+
+		return $this;
 	}
 }
