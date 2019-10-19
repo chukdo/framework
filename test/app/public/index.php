@@ -9,7 +9,8 @@ function dd( $data )
 
 /** Namespaces */
 
-use Chukdo\DB\Elastic\Server;
+use Chukdo\DB\Mongo\Server as serverMongo;
+use Chukdo\DB\Elastic\Server as serverElastic;
 use \Chukdo\Facades\Mongo;
 use \Chukdo\Facades\Response;
 use \Chukdo\Facades\View;
@@ -104,16 +105,15 @@ $app->registerServices( [
  * ] )
  * ->insert();*/
 
-
-$elastic = new Server();
+$elastic = new ServerMongo();
 $db      = $elastic->database();
 /*
 $schemaAgence = $db->dropCollection( 'agence' )
 				   ->createCollection( 'agence' )
 				   ->schema();
-$schemaAgence->set( 'agence', 'text' )
-			 ->set( 'ville', 'keyword' )
-			 ->set( 'cp', 'keyword' );
+$schemaAgence->set( 'agence', 'string' )
+			 ->set( 'ville', 'string' )
+			 ->set( 'cp', 'string' );
 $schemaAgence->save();
 
 $writeAgence = $db->collection( 'agence' )
@@ -138,10 +138,10 @@ $writeAgence->set( 'agence', 'demo immo 75' )
 $schemaContrat = $db->dropCollection( 'contrat' )
 					->createCollection( 'contrat' )
 					->schema();
-$schemaContrat->set( 'contrat', 'text' )
-			  ->set( '_agence', 'keyword' )
-			  ->set( 'completion', 'keyword' )
-			  ->set( 'reference', 'keyword' );
+$schemaContrat->set( 'contrat', 'string' )
+			  ->set( '_agence', 'string' )
+			  ->set( 'completion', 'string' )
+			  ->set( 'reference', 'string' );
 $schemaContrat->save();
 
 $writeContrat = $db->collection( 'contrat' )
@@ -198,7 +198,8 @@ $findContrat = $db->collection( 'contrat' )
 				  ->link( '_agence' );
 
 $contrats = $findContrat->all( true );
-
+//$contrat = $contrats->get('5daae00f07612923ed6dc08a');
+//$contrat->set('reference', 'num_mandat:123456')->save();
 print_r( $contrats->toHtml() );
 die( 'ok' );
 

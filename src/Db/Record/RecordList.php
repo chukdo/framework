@@ -4,7 +4,6 @@ namespace Chukdo\Db\Record;
 
 use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
-use Chukdo\DB\Elastic\Collection;
 use Chukdo\Json\Json;
 
 /**
@@ -17,7 +16,7 @@ use Chukdo\Json\Json;
 Class RecordList extends Json
 {
 	/**
-	 * @var CollectionInterface|Collection
+	 * @var CollectionInterface
 	 */
 	protected $collection;
 
@@ -42,7 +41,7 @@ Class RecordList extends Json
 
 		foreach ( $json as $k => $v ) {
 			if ( $idAsKey ) {
-				$this->offsetSet( $v->offsetGet( '_id' ), $v );
+				$this->offsetSet( (string) $v->offsetGet( '_id' ), $v );
 			} else {
 				$this->append( $v );
 			}
@@ -58,7 +57,7 @@ Class RecordList extends Json
 	}
 
 	/**
-	 * @return CollectionInterface|Collection
+	 * @return CollectionInterface
 	 */
 	public function collection(): CollectionInterface
 	{

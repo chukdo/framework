@@ -6,6 +6,7 @@ use Chukdo\Helper\Arr;
 use Chukdo\Json\Json;
 use Chukdo\Contracts\Db\Find as FindInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\Db\Record\Link;
 use Chukdo\Db\Record\Record;
 use Chukdo\Db\Record\RecordList;
 use MongoDB\Driver\ReadPreference;
@@ -257,7 +258,7 @@ Class Find extends Where implements FindInterface
 		$find       = $this->collection()
 						   ->client()
 						   ->distinct( $field, $this->filter() );
-		$recordList = new RecordList( $this->collection(), new Json( $find ), $idAsKey, $this->hiddenId );
+		$recordList = new RecordList( $this->collection(), new Json( $find ), $idAsKey );
 
 		foreach ( $this->link as $link ) {
 			$recordList = $link->hydrate( $recordList );

@@ -55,14 +55,14 @@ Class Server implements ServerInterface
 	}
 
 	/**
-	 * @param array  $args
-	 * @param string $db
+	 * @param array       $args
+	 * @param string|null $db
 	 *
 	 * @return JsonInterface
 	 */
-	public function command( array $args, string $db ): JsonInterface
+	public function command( array $args, string $db = null ): JsonInterface
 	{
-		return $this->status();
+		throw new ElasticException('elasticsearch Command no exist');
 	}
 
 	/**
