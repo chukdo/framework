@@ -54,11 +54,6 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
 	public function offsetUnset( $key );
 
 	/**
-	 * @return Collect
-	 */
-	public function collect(): Collect;
-
-	/**
 	 * @param $key
 	 *
 	 * @return Json

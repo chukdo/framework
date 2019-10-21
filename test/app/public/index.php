@@ -108,7 +108,7 @@ $app->registerServices( [
 $elastic = new ServerElastic();
 $dbElastic = $elastic->database();
 $mongo   = new ServerMongo();
-$dbMongo = $mongo->database();
+$dbMongo = $mongo->database('statistiques');
 /*
 $schemaAgence = $dbElastic->dropCollection( 'agence' )
 				   ->createCollection( 'agence' )
@@ -202,6 +202,7 @@ $writeContrat->set( 'contrat', 'mandat' )
 			 ->insert();
 */
 
+/*
 $findContrat = $dbMongo->collection( 'contrat' )
 					   ->find()
 					   ->link( '_agence', [], [], 'elastic_agence', $dbElastic );
@@ -211,7 +212,19 @@ $contrats = $findContrat->all( true );
 //$contrat->set('reference', 'num_mandat:123456')->save();
 print_r( $contrats->toHtml() );
 die( 'ok' );
+*/
 
+$collectionMongo = $dbMongo->collection('esign');
+
+$recordsMongo = $collectionMongo->find()->limit(50)->stream();
+
+foreach ($recordsMongo as $record) {
+	echo $record->toHtml();
+}
+exit;
+$collectMongo = $recordsMongo->collect();
+
+echo $recordsMongo->wildcard('*.modeles.*._modele')->collect()->unique()->values()->toHtml();//$collectMongo->group('date')->values()->toHtml();
 
 exit;
 $contrat = Mongo::collection( 'contrat' );

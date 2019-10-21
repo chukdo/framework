@@ -237,6 +237,19 @@ Class Find extends Where implements FindInterface
 	}
 
 	/**
+	 * @return Stream
+	 */
+	public function stream(): Stream
+	{
+		$options    = Arr::merge( $this->projection(), $this->options );
+		$find       = $this->collection()
+						   ->client()
+						   ->find( $this->filter(), $options );
+
+		return new Stream($this->collection(), $find);
+	}
+
+	/**
 	 * @param int $limit
 	 *
 	 * @return FindInterface

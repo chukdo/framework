@@ -314,18 +314,6 @@ class Json extends ArrayObject implements JsonInterface
 	}
 
 	/**
-	 * @param bool $clone
-	 *
-	 * @return Collect
-	 */
-	public function collect( bool $clone = false ): Collect
-	{
-		return new Collect( $clone
-			? $this->getArrayCopy()
-			: $this );
-	}
-
-	/**
 	 * @param JsonInterface $json
 	 * @param bool          $flat
 	 *

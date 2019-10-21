@@ -7,6 +7,7 @@ use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
 use Chukdo\Helper\Arr;
 use Closure;
+use Iterable;
 
 /**
  * Manipulation de collection de données.
@@ -23,18 +24,78 @@ class Collect
 	 */
 	protected $collection;
 
+	protected $filters = [ 'where' => [] ];
+
+	/**
+	 * @var array
+	 */
+	protected $with = [];
+
+	/**
+	 * @var array
+	 */
+	protected $without = [];
+
 	/**
 	 * Collect constructor.
-	 *
-	 * @param $json
 	 */
-	public function __construct( $json )
+	public function __construct()
 	{
-		if ( $json instanceof JsonInterface ) {
-			$this->collection = $json;
-		} else if ( Is::arr( $json ) ) {
-			$this->collection = new Json( $json );
+		$this->collection = new Json( [], true );
+	}
+
+	/**
+	 * @param JsonInterface $data
+	 *
+	 * @return $this
+	 */
+	public function append( JsonInterface $data ): self
+	{
+		// if ($aggregate = this->aggregrate($data)) {$this->collection->append( $aggregate );}
+
+		// quid groupBy
+
+		$this->collection->append( $data );
+
+		return $this;
+	}
+
+	/**
+	 * @param iterable $datas
+	 *
+	 * @return $this
+	 */
+	public function push( Iterable $datas ): self
+	{
+		foreach ($datas as $data) {
+			$this->append($data);
 		}
+
+		return $this;
+	}
+
+	/**
+	 * @param mixed ...$names
+	 *
+	 * @return Collect
+	 */
+	public function with( ...$names ): self
+	{
+		$this->with = Arr::append( $this->with, Arr::spreadArgs( $names ) );
+
+		return $this;
+	}
+
+	/**
+	 * @param mixed ...$names
+	 *
+	 * @return Collect
+	 */
+	public function without( ...$names ): self
+	{
+		$this->without = Arr::append( $this->without, Arr::spreadArgs( $names ) );
+
+		return $this;
 	}
 
 	/**
@@ -331,6 +392,25 @@ class Collect
 		return $this;
 	}
 
+	public function unique(): self
+	{
+		$cache = [];
+		$json  = new Json();
+
+		foreach ( $this->collection as $k => $row ) {
+			$key = serialize( $row );
+
+			if ( !isset( $cache[ $key ] ) ) {
+				$cache[ $key ] = 1;
+				$json->append( $row );
+			}
+		}
+
+		$this->collection->reset( $json );
+
+		return $this;
+	}
+
 	/**
 	 * Applique une fonction a la collection.
 	 *
@@ -425,56 +505,6 @@ class Collect
 		foreach ( $toSort as $sorted ) {
 			$json->offsetSet( $sorted[ 'k' ], $sorted[ 'v' ] );
 		}
-
-		return $this;
-	}
-
-	/**
-	 * @param mixed ...$names
-	 *
-	 * @return Collect
-	 */
-	public function with( ...$names ): self
-	{
-		$names = Arr::spreadArgs( $names );
-		$json  = new Json();
-
-		foreach ( $this->collection as $k => $row ) {
-			if ( $row instanceof JsonInterface ) {
-				$with = $row->with( $names );
-
-				if ( $with->count() > 0 ) {
-					$json->offsetSet( $k, $with );
-				}
-			}
-		}
-
-		$this->collection->reset( $json );
-
-		return $this;
-	}
-
-	/**
-	 * @param mixed ...$names
-	 *
-	 * @return Collect
-	 */
-	public function without( ...$names ): self
-	{
-		$names = Arr::spreadArgs( $names );
-		$json  = new Json();
-
-		foreach ( $this->collection as $k => $row ) {
-			if ( $row instanceof JsonInterface ) {
-				$without = $row->without( $names );
-
-				if ( $without->count() > 0 ) {
-					$json->offsetSet( $k, $without );
-				}
-			}
-		}
-
-		$this->collection->reset( $json );
 
 		return $this;
 	}
