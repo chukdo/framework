@@ -70,40 +70,6 @@ class Json extends ArrayObject implements JsonInterface
 	}
 
 	/**
-	 * @param $key
-	 *
-	 * @return JsonInterface
-	 */
-	public function coll( $key ): JsonInterface
-	{
-		$coll = new Json();
-
-		foreach ( $this as $offsetKey => $offsetValue ) {
-			if ( $key === $offsetKey ) {
-				$coll->append( $offsetValue );
-			}
-		}
-
-		return $coll;
-	}
-
-	/**
-	 * @param mixed $value
-	 *
-	 * @return JsonInterface
-	 */
-	public function append( $value ): JsonInterface
-	{
-		if ( ( $this->strict === true && Is::iterable( $value ) ) || ( Is::arr( $value ) && !Is::jsonInterface( $value ) ) ) {
-			parent::append( new Json( $value, $this->strict ) );
-		} else {
-			parent::append( $value );
-		}
-
-		return $this;
-	}
-
-	/**
 	 * @param string $key
 	 *
 	 * @return mixed|null
@@ -165,14 +131,6 @@ class Json extends ArrayObject implements JsonInterface
 	public function __toString(): string
 	{
 		return $this->toJson( true );
-	}
-
-	/**
-	 * @return array
-	 */
-	public function __debugInfo(): array
-	{
-		return $this->getArrayCopy();
 	}
 
 	/**
@@ -274,6 +232,22 @@ class Json extends ArrayObject implements JsonInterface
 	}
 
 	/**
+	 * @param mixed $value
+	 *
+	 * @return JsonInterface
+	 */
+	public function append( $value ): JsonInterface
+	{
+		if ( ( $this->strict === true && Is::iterable( $value ) ) || ( Is::arr( $value ) && !Is::jsonInterface( $value ) ) ) {
+			parent::append( new Json( $value, $this->strict ) );
+		} else {
+			parent::append( $value );
+		}
+
+		return $this;
+	}
+
+	/**
 	 * @return $this
 	 */
 	public function all(): self
@@ -311,6 +285,24 @@ class Json extends ArrayObject implements JsonInterface
 		}
 
 		return $json;
+	}
+
+	/**
+	 * @param $key
+	 *
+	 * @return JsonInterface
+	 */
+	public function coll( $key ): JsonInterface
+	{
+		$coll = new Json();
+
+		foreach ( $this as $offsetKey => $offsetValue ) {
+			if ( $key === $offsetKey ) {
+				$coll->append( $offsetValue );
+			}
+		}
+
+		return $coll;
 	}
 
 	/**
@@ -389,46 +381,6 @@ class Json extends ArrayObject implements JsonInterface
 	}
 
 	/**
-	 * @param iterable|null $merge
-	 * @param bool|null     $overwrite
-	 *
-	 * @return JsonInterface
-	 */
-	public function merge( iterable $merge = null, bool $overwrite = null ): JsonInterface
-	{
-		if ( $merge ) {
-			foreach ( $merge as $k => $v ) {
-				if ( $overwrite || !$this->offsetExists( $k ) ) {
-					$this->offsetSet( $k, $v );
-				}
-			}
-		}
-
-		return $this;
-	}
-
-	/**
-	 * @param iterable|null $push
-	 * @param bool|null     $overwrite
-	 *
-	 * @return JsonInterface
-	 */
-	public function push( iterable $push = null, bool $overwrite = null ): JsonInterface
-	{
-		if ( $push ) {
-			foreach ( $push as $k => $v ) {
-				if ( is_int( $k ) ) {
-					$this->append( $v );
-				} else if ( $overwrite || !$this->offsetExists( $k ) ) {
-					$this->offsetSet( $k, $v );
-				}
-			}
-		}
-
-		return $this;
-	}
-
-	/**
 	 * @param string $path
 	 * @param        $value
 	 *
@@ -446,6 +398,25 @@ class Json extends ArrayObject implements JsonInterface
 
 		$this->offsetGetOrSet( $firstPath )
 			 ->set( $endPath, $value );
+
+		return $this;
+	}
+
+	/**
+	 * @param iterable|null $merge
+	 * @param bool|null     $overwrite
+	 *
+	 * @return JsonInterface
+	 */
+	public function merge( iterable $merge = null, bool $overwrite = null ): JsonInterface
+	{
+		if ( $merge ) {
+			foreach ( $merge as $k => $v ) {
+				if ( $overwrite || !$this->offsetExists( $k ) ) {
+					$this->offsetSet( $k, $v );
+				}
+			}
+		}
 
 		return $this;
 	}
@@ -481,6 +452,27 @@ class Json extends ArrayObject implements JsonInterface
 	}
 
 	/**
+	 * @param iterable|null $push
+	 * @param bool|null     $overwrite
+	 *
+	 * @return JsonInterface
+	 */
+	public function push( iterable $push = null, bool $overwrite = null ): JsonInterface
+	{
+		if ( $push ) {
+			foreach ( $push as $k => $v ) {
+				if ( is_int( $k ) ) {
+					$this->append( $v );
+				} else if ( $overwrite || !$this->offsetExists( $k ) ) {
+					$this->offsetSet( $k, $v );
+				}
+			}
+		}
+
+		return $this;
+	}
+
+	/**
 	 * @param string|null $path
 	 * @param null        $default
 	 *
@@ -506,16 +498,6 @@ class Json extends ArrayObject implements JsonInterface
 		}
 
 		return $default;
-	}
-
-	/**
-	 * @param string|null $path
-	 *
-	 * @return JsonInterface
-	 */
-	public function getJson( ?string $path ): JsonInterface
-	{
-		return $this->get( $path, new Json() );
 	}
 
 	/**
@@ -625,6 +607,16 @@ class Json extends ArrayObject implements JsonInterface
 	public function getIndexJson( int $key = 0 ): JsonInterface
 	{
 		return $this->getIndex( $key, new Json() );
+	}
+
+	/**
+	 * @param string|null $path
+	 *
+	 * @return JsonInterface
+	 */
+	public function getJson( ?string $path ): JsonInterface
+	{
+		return $this->get( $path, new Json() );
 	}
 
 	/**
@@ -910,6 +902,44 @@ class Json extends ArrayObject implements JsonInterface
 		$xml->import( $this->toArray() );
 
 		return $xml;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function __debugInfo(): array
+	{
+		return $this->getArrayCopy();
+	}
+
+	/**
+	 * @param string $path
+	 *
+	 * @return JsonInterface
+	 */
+	public function unwind( string $path ): JsonInterface
+	{
+		$unwinded = new Json( null, $this->strict );
+		$toUnwind = $this->get( $path );
+
+		if ( $toUnwind instanceof JsonInterface ) {
+			foreach ( $toUnwind as $unwind ) {
+				$json = $this->clone();
+				$json->unset( $path );
+				$json->set( $path, $unwind );
+				$unwinded->append( $json );
+			}
+		}
+
+		return $unwinded;
+	}
+
+	/**
+	 * @return JsonInterface
+	 */
+	public function clone(): JsonInterface
+	{
+		return new Json( $this->getArrayCopy(), $this->strict );
 	}
 
 	/**

@@ -36,6 +36,16 @@ class Collect
 	/**
 	 * @var array
 	 */
+	protected $unwind = [];
+
+	/**
+	 * @var array
+	 */
+	protected $group = [];
+
+	/**
+	 * @var array
+	 */
 	protected $filter = [];
 
 	/**
@@ -93,7 +103,14 @@ class Collect
 			( $data = $this->evalFilterRecursive( $data ) ) &&
 			( $data = $this->evalWhere( $data ) ) &&
 			( $data = $this->evalMatch( $data ) ) ) {
-			$this->collection->append( $data );
+
+			foreach ( $this->unwindData( $data ) as $unwind ) {
+				if ( $this->hasGroup() ) {
+					$this->groupData( $data );
+				} else {
+					$this->collection->append( $unwind );
+				}
+			}
 		}
 
 		return $this;
@@ -122,7 +139,7 @@ class Collect
 	 */
 	protected function evalWith( JsonInterface $data ): ?JsonInterface
 	{
-		if ( !empty( $this->with ) ) {
+		if ( Arr::hasContent( $this->with ) ) {
 			$tmpData = new Json( null, true );
 
 			foreach ( $this->with as $with ) {
@@ -213,6 +230,45 @@ class Collect
 		}
 
 		return $data;
+	}
+
+	/**
+	 * @param JsonInterface $data
+	 *
+	 * @return JsonInterface
+	 */
+	protected function unwindData( JsonInterface $data ): JsonInterface
+	{
+		if ( $this->hasUnwind() ) {
+			foreach ( $this->unwind as $unwind ) {
+				$data = $data->unwind( $unwind );
+			}
+
+			return $data;
+		}
+
+		$default = new Json();
+		$default->append( $data );
+
+		return $default;
+	}
+
+	/**
+	 * @return bool
+	 */
+	protected function hasGroup(): bool
+	{
+		return Arr::hasContent( $this->group );
+	}
+
+	/**
+	 * @param JsonInterface $data
+	 *
+	 * @return JsonInterface|null
+	 */
+	protected function groupData( JsonInterface $data ): ?JsonInterface
+	{
+
 	}
 
 	/**
@@ -370,12 +426,44 @@ class Collect
 	}
 
 	/**
+	 * @return bool
+	 */
+	protected function hasUnwind(): bool
+	{
+		return Arr::hasContent( $this->unwind );
+	}
+
+	/**
+	 * @param mixed ...$names
+	 *
+	 * @return Collect
+	 */
+	public function group( ...$names ): self
+	{
+		$this->group = Arr::append( $this->group, Arr::spreadArgs( $names ) );
+
+		return $this;
+	}
+
+	/**
+	 * @param mixed ...$names
+	 *
+	 * @return Collect
+	 */
+	public function unwind( ...$names ): self
+	{
+		$this->unwind = Arr::append( $this->unwind, Arr::spreadArgs( $names ) );
+
+		return $this;
+	}
+
+	/**
 	 * @return JsonInterface
 	 */
 	public function values(): JsonInterface
 	{
-		if ( !empty( $this->sort ) ) {
-			$this->sort();
+		if ( Arr::hasContent( $this->sort ) ) {
+			$this->sortCollection();
 		}
 
 		return $this->collection;
@@ -384,7 +472,7 @@ class Collect
 	/**
 	 *
 	 */
-	protected function sort(): void
+	protected function sortCollection(): void
 	{
 		$data = [];
 		$args = [];

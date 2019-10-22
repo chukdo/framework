@@ -42,6 +42,16 @@ final class Arr
 	}
 
 	/**
+	 * @param array $array
+	 *
+	 * @return bool
+	 */
+	public static function hasContent( array $array ): bool
+	{
+		return !empty( $array );
+	}
+
+	/**
 	 * @param       $value
 	 * @param array $array
 	 *

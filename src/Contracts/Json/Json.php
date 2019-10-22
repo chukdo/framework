@@ -278,6 +278,18 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
 	public function unset( string $path );
 
 	/**
+	 * @param string $path
+	 *
+	 * @return JsonInterface
+	 */
+	public function unwind( string $path ): JsonInterface;
+
+	/**
+	 * @return JsonInterface
+	 */
+	public function clone(): JsonInterface;
+
+	/**
 	 * @param $data
 	 *
 	 * @return Json
