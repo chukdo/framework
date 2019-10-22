@@ -105,10 +105,10 @@ $app->registerServices( [
  * ] )
  * ->insert();*/
 
-$elastic = new ServerElastic();
+$elastic   = new ServerElastic();
 $dbElastic = $elastic->database();
-$mongo   = new ServerMongo();
-$dbMongo = $mongo->database('statistiques');
+$mongo     = new ServerMongo();
+$dbMongo   = $mongo->database( 'statistiques' );
 /*
 $schemaAgence = $dbElastic->dropCollection( 'agence' )
 				   ->createCollection( 'agence' )
@@ -214,17 +214,62 @@ print_r( $contrats->toHtml() );
 die( 'ok' );
 */
 
-$collectionMongo = $dbMongo->collection('esign');
+$data   = [];
+$data[] = [
+	'volume'  => 67,
+	'edition' => 2,
+];
+$data[] = [
+	'volume'  => 86,
+	'edition' => 1,
+];
+$data[] = [
+	'volume'  => 85,
+	'edition' => 6,
+];
+$data[] = [
+	'volume'  => 98,
+	'edition' => 2,
+];
+$data[] = [
+	'volume'  => 86,
+	'edition' => 6,
+];
+$data[] = [
+	'volume'  => 67,
+	'edition' => 7,
+];
 
-$recordsMongo = $collectionMongo->find()->limit(50)->stream();
+$data = new Json( $data );
 
-foreach ($recordsMongo as $record) {
+$collect = new \Chukdo\Json\Collect();
+
+echo $collect->where( 'volume', '>', 68 )
+			 ->orderBy( 'volume', SORT_DESC )
+			 ->orderBy( 'edition', SORT_ASC )
+			 ->push( $data )
+			 ->values()
+			 ->toHtml();
+
+exit;
+
+$collectionMongo = $dbMongo->collection( 'esign' );
+
+$recordsMongo = $collectionMongo->find()
+								->limit( 50 )
+								->stream();
+
+foreach ( $recordsMongo as $record ) {
 	echo $record->toHtml();
 }
 exit;
 $collectMongo = $recordsMongo->collect();
 
-echo $recordsMongo->wildcard('*.modeles.*._modele')->collect()->unique()->values()->toHtml();//$collectMongo->group('date')->values()->toHtml();
+echo $recordsMongo->wildcard( '*.modeles.*._modele' )
+				  ->collect()
+				  ->unique()
+				  ->values()
+				  ->toHtml();//$collectMongo->group('date')->values()->toHtml();
 
 exit;
 $contrat = Mongo::collection( 'contrat' );

@@ -226,6 +226,7 @@ Class Collection implements CollectionInterface
 					   } )
 					   ->clean();
 
+
 		return $stats;
 	}
 

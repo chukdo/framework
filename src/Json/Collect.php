@@ -7,7 +7,6 @@ use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
 use Chukdo\Helper\Arr;
 use Closure;
-use Iterable;
 
 /**
  * Manipulation de collection de données.
@@ -24,8 +23,6 @@ class Collect
 	 */
 	protected $collection;
 
-	protected $filters = [ 'where' => [] ];
-
 	/**
 	 * @var array
 	 */
@@ -37,27 +34,36 @@ class Collect
 	protected $without = [];
 
 	/**
+	 * @var array
+	 */
+	protected $filter = [];
+
+	/**
+	 * @var array
+	 */
+	protected $sort = [];
+
+	/**
+	 * @var array
+	 */
+	protected $filterRecursive = [];
+
+	/**
+	 * @var array
+	 */
+	protected $where = [];
+
+	/**
+	 * @var array
+	 */
+	protected $match = [];
+
+	/**
 	 * Collect constructor.
 	 */
 	public function __construct()
 	{
-		$this->collection = new Json( [], true );
-	}
-
-	/**
-	 * @param JsonInterface $data
-	 *
-	 * @return $this
-	 */
-	public function append( JsonInterface $data ): self
-	{
-		// if ($aggregate = this->aggregrate($data)) {$this->collection->append( $aggregate );}
-
-		// quid groupBy
-
-		$this->collection->append( $data );
-
-		return $this;
+		$this->collection = new Json( null, true );
 	}
 
 	/**
@@ -67,59 +73,146 @@ class Collect
 	 */
 	public function push( Iterable $datas ): self
 	{
-		foreach ($datas as $data) {
-			$this->append($data);
+		foreach ( $datas as $data ) {
+			$this->append( $data );
 		}
 
 		return $this;
 	}
 
 	/**
-	 * @param mixed ...$names
+	 * @param JsonInterface $data
 	 *
-	 * @return Collect
+	 * @return $this
 	 */
-	public function with( ...$names ): self
+	public function append( JsonInterface $data ): self
 	{
-		$this->with = Arr::append( $this->with, Arr::spreadArgs( $names ) );
+		if ( ( $data = $this->evalWithout( $data ) ) &&
+			( $data = $this->evalWith( $data ) ) &&
+			( $data = $this->evalFilter( $data ) ) &&
+			( $data = $this->evalFilterRecursive( $data ) ) &&
+			( $data = $this->evalWhere( $data ) ) &&
+			( $data = $this->evalMatch( $data ) ) ) {
+			$this->collection->append( $data );
+		}
 
 		return $this;
 	}
 
 	/**
-	 * @param mixed ...$names
+	 * @param JsonInterface $data
 	 *
-	 * @return Collect
+	 * @return JsonInterface|null
 	 */
-	public function without( ...$names ): self
+	protected function evalWithout( JsonInterface $data ): ?JsonInterface
 	{
-		$this->without = Arr::append( $this->without, Arr::spreadArgs( $names ) );
+		foreach ( $this->without as $without ) {
+			$data->unset( $without );
+		}
 
-		return $this;
+		return $data->isEmpty()
+			? null
+			: $data;
 	}
 
 	/**
-	 * @param string $field
-	 * @param string $operator
-	 * @param        $fieldValue
-	 * @param null   $fieldValue2
+	 * @param JsonInterface $data
 	 *
-	 * @return Collect
+	 * @return JsonInterface|null
 	 */
-	public function match( string $field, string $operator, $fieldValue, $fieldValue2 = null ): Collect
+	protected function evalWith( JsonInterface $data ): ?JsonInterface
 	{
-		$json    = new json();
-		$closure = $this->whereClosure( $operator );
+		if ( !empty( $this->with ) ) {
+			$tmpData = new Json( null, true );
 
-		foreach ( $this->collection as $k => $row ) {
-			if ( ( $row instanceof JsonInterface ) && ( $get = $row->get( $field ) ) && $closure( $get, $row->get( $fieldValue ), $row->get( $fieldValue2 ) ) ) {
-				$json->offsetSet( $k, $row );
+			foreach ( $this->with as $with ) {
+				if ( $get = $data->get( $with ) ) {
+					$tmpData->set( $with, $get );
+				}
+			}
+
+			$data = $tmpData;
+		}
+
+		return $data->isEmpty()
+			? null
+			: $data;
+	}
+
+	/**
+	 * @param JsonInterface $data
+	 *
+	 * @return JsonInterface|null
+	 */
+	protected function evalFilter( JsonInterface $data ): ?JsonInterface
+	{
+		foreach ( $this->filter as $filter ) {
+			$data = $data->filter( $filter );
+		}
+
+		return $data->isEmpty()
+			? null
+			: $data;
+	}
+
+	/**
+	 * @param JsonInterface $data
+	 *
+	 * @return JsonInterface|null
+	 */
+	protected function evalFilterRecursive( JsonInterface $data ): ?JsonInterface
+	{
+		foreach ( $this->filterRecursive as $filter ) {
+			$data = $data->filterRecursive( $filter );
+		}
+
+		return $data->isEmpty()
+			? null
+			: $data;
+	}
+
+	/**
+	 * @param JsonInterface $data
+	 *
+	 * @return JsonInterface|null
+	 */
+	public function evalWhere( JsonInterface $data ): ?JsonInterface
+	{
+		foreach ( $this->where as $where ) {
+			if ( $get = $data->get( $where[ 'field' ] ) ) {
+				$closure = $this->evalClosure( $where[ 'operator' ] );
+
+				if ( !$closure( $get, $where[ 'value' ], $where[ 'value2' ] ) ) {
+					return null;
+				}
+			} else {
+				return null;
 			}
 		}
 
-		$this->collection->reset( $json );
+		return $data;
+	}
 
-		return $this;
+	/**
+	 * @param JsonInterface $data
+	 *
+	 * @return JsonInterface|null
+	 */
+	public function evalMatch( JsonInterface $data ): ?JsonInterface
+	{
+		foreach ( $this->where as $where ) {
+			if ( $get = $data->get( $where[ 'field' ] ) ) {
+				$closure = $this->evalClosure( $where[ 'operator' ] );
+
+				if ( !$closure( $get, $data->get( $where[ 'value' ] ), $data->get( $where[ 'value2' ] ) ) ) {
+					return null;
+				}
+			} else {
+				return null;
+			}
+		}
+
+		return $data;
 	}
 
 	/**
@@ -127,7 +220,7 @@ class Collect
 	 *
 	 * @return Closure
 	 */
-	protected function whereClosure( $operator ): Closure
+	protected function evalClosure( $operator ): Closure
 	{
 		$closure = null;
 
@@ -277,22 +370,108 @@ class Collect
 	}
 
 	/**
-	 * @param string $field
+	 * @return JsonInterface
+	 */
+	public function values(): JsonInterface
+	{
+		if ( !empty( $this->sort ) ) {
+			$this->sort();
+		}
+
+		return $this->collection;
+	}
+
+	/**
+	 *
+	 */
+	protected function sort(): void
+	{
+		$data = [];
+		$args = [];
+
+		foreach ( $this->collection as $k => $v ) {
+			$row = [];
+
+			foreach ( $this->sort as $path => $sort ) {
+				$row[ $path ] = $v->get( $path );
+			}
+
+			$row [ '__RAW__' ] = $v;
+			$data[]            = $row;
+		}
+
+		foreach ( $this->sort as $path => $sort ) {
+			$args[] = array_column( $data, $path );
+			$args[] = $sort;
+		}
+
+		$args[] = $data;
+		array_multisort( ...$args );
+
+		$json = $this->collection->reset();
+
+		foreach ( end( $args ) as $v ) {
+			$json->append( $v[ '__RAW__' ] );
+		}
+	}
+
+	/**
+	 * @param string $path
+	 * @param int    $sort
+	 *
+	 * @return $this
+	 */
+	public function orderBy( string $path, int $sort = SORT_ASC ): self
+	{
+		$this->sort[ $path ] = $sort;
+
+		return $this;
+	}
+
+	/**
+	 * @param Closure $closure
+	 *
+	 * @return $this
+	 */
+	public function filter( Closure $closure ): self
+	{
+		$this->filter[] = $closure;
+
+		return $this;
+	}
+
+	/**
+	 * @param Closure $closure
+	 *
+	 * @return $this
+	 */
+	public function filterRecursive( Closure $closure ): self
+	{
+		$this->filterRecursive[] = $closure;
+
+		return $this;
+	}
+
+	/**
+	 * @param mixed ...$names
 	 *
 	 * @return Collect
 	 */
-	public function group( string $field ): Collect
+	public function with( ...$names ): self
 	{
-		$json = new json();
+		$this->with = Arr::append( $this->with, Arr::spreadArgs( $names ) );
 
-		foreach ( $this->collection as $k => $row ) {
-			if ( $row instanceof JsonInterface ) {
-				$json->offsetGetOrSet( $row->get( $field ) )
-					 ->append( $row );
-			}
-		}
+		return $this;
+	}
 
-		$this->collection->reset( $json );
+	/**
+	 * @param mixed ...$names
+	 *
+	 * @return Collect
+	 */
+	public function without( ...$names ): self
+	{
+		$this->without = Arr::append( $this->without, Arr::spreadArgs( $names ) );
 
 		return $this;
 	}
@@ -307,204 +486,32 @@ class Collect
 	 */
 	public function where( string $field, $operator, $value, $value2 = null ): Collect
 	{
-		$json    = new json();
-		$closure = $this->whereClosure( $operator );
-
-		foreach ( $this->collection as $k => $row ) {
-			if ( $row instanceof JsonInterface ) {
-				if ( $get = $row->get( $field ) ) {
-					if ( $closure( $get, $value, $value2 ) ) {
-						$json->offsetSet( $k, $row );
-					}
-				}
-			}
-		}
-
-		$this->collection->reset( $json );
+		$this->where[] = [
+			'field'    => $field,
+			'operator' => $operator,
+			'value'    => $value,
+			'value2'   => $value2,
+		];
 
 		return $this;
 	}
 
 	/**
-	 * @param string $id
+	 * @param string         $field
+	 * @param string|Closure $operator
+	 * @param                $value
+	 * @param null           $value2
 	 *
 	 * @return Collect
 	 */
-	public function keyAsId( string $id ): self
+	public function match( string $field, $operator, $value, $value2 = null ): Collect
 	{
-		$json = new Json();
-
-		foreach ( $this->collection as $k => $row ) {
-			if ( ( $row instanceof JsonInterface ) && $unsetId = $row->unset( $id ) ) {
-				$json->set( $unsetId, $row );
-			}
-		}
-
-		$this->collection->reset( $json );
-
-		return $this;
-	}
-
-	/**
-	 * @param array   $paths
-	 * @param string  $field
-	 * @param Closure $closure
-	 *
-	 * @return Collect
-	 */
-	public function addToSet( array $paths, string $field, Closure $closure ): self
-	{
-		foreach ( $this->collection as $k => $row ) {
-			if ( $row instanceof JsonInterface ) {
-				$arr = [];
-
-				foreach ( $paths as $path ) {
-					$arr[ $path ] = $row->get( $path );
-				}
-
-				$row->set( $field, $closure( $arr ) );
-			}
-		}
-
-		return $this;
-	}
-
-	/**
-	 * @param string  $field
-	 * @param Closure $closure
-	 *
-	 * @return Collect
-	 */
-	public function filterKey( string $field, Closure $closure ): self
-	{
-		foreach ( $this->collection as $k => $row ) {
-			if ( $row instanceof JsonInterface ) {
-				$filter = $closure( $row->get( $field ) );
-
-				if ( $filter ) {
-					$row->set( $field, $filter );
-				} else {
-					$row->unset( $field );
-				}
-			}
-		}
-
-		return $this;
-	}
-
-	public function unique(): self
-	{
-		$cache = [];
-		$json  = new Json();
-
-		foreach ( $this->collection as $k => $row ) {
-			$key = serialize( $row );
-
-			if ( !isset( $cache[ $key ] ) ) {
-				$cache[ $key ] = 1;
-				$json->append( $row );
-			}
-		}
-
-		$this->collection->reset( $json );
-
-		return $this;
-	}
-
-	/**
-	 * Applique une fonction a la collection.
-	 *
-	 * @param Closure $closure
-	 *
-	 * @return Collect
-	 */
-	public function filter( Closure $closure ): self
-	{
-		$json = new Json();
-
-		foreach ( $this->collection as $k => $row ) {
-			if ( $row instanceof JsonInterface ) {
-				$filter = $row->filter( $closure );
-
-				if ( $filter->count() > 0 ) {
-					$json->set( $k, $filter );
-				}
-			}
-		}
-
-		$this->collection->reset( $json );
-
-		return $this;
-	}
-
-	/**
-	 * Applique une fonction a la collection de maniere recursive.
-	 *
-	 * @param closure $closure
-	 *
-	 * @return Collect
-	 */
-	public function filterRecursive( Closure $closure ): self
-	{
-		$json = new Json();
-
-		foreach ( $this->collection as $k => $row ) {
-			if ( $row instanceof JsonInterface ) {
-				$filter = $row->filterRecursive( $closure );
-
-				if ( $filter->count() > 0 ) {
-					$json->set( $k, $filter );
-				}
-			}
-		}
-
-		$this->collection->reset( $json );
-
-		return $this;
-	}
-
-	/**
-	 * @return JsonInterface
-	 */
-	public function values(): JsonInterface
-	{
-		return $this->collection;
-	}
-
-	/**
-	 * @param string $path
-	 * @param string $sort
-	 *
-	 * @return Collect
-	 */
-	public function sort( string $path, string $sort = 'ASC' ): self
-	{
-		$toSort = [];
-
-		foreach ( $this->collection as $k => $v ) {
-			$get = $v->get( $path );
-
-			if ( !Is::scalar( $get ) || Is::null( $get ) ) {
-				$get = uniqid( '', true );
-			}
-
-			$toSort[ $get ] = [
-				'k' => $k,
-				'v' => $v,
-			];
-		}
-
-		if ( $sort === 'ASC' || $sort === 'asc' ) {
-			ksort( $toSort );
-		} else {
-			krsort( $toSort );
-		}
-
-		$json = $this->collection->reset();
-
-		foreach ( $toSort as $sorted ) {
-			$json->offsetSet( $sorted[ 'k' ], $sorted[ 'v' ] );
-		}
+		$this->match[] = [
+			'field'    => $field,
+			'operator' => $operator,
+			'value'    => $value,
+			'value2'   => $value2,
+		];
 
 		return $this;
 	}

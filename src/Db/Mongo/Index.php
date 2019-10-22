@@ -54,30 +54,30 @@ Class Index
 
 	/**
 	 * @param string $field
-	 * @param string $order
+	 * @param string $sort
 	 * @param bool   $unique
 	 *
-	 * @return Index
+	 * @return $this
 	 */
-	public function set( string $field, string $order = 'desc', bool $unique = false ): self
+	public function set( string $field, string $sort = 'desc', bool $unique = false ): self
 	{
-		$name  = $unique
+		$name    = $unique
 			? $field . '_unique'
 			: $field;
-		$order = $order == 'asc' || $order == 'ASC'
+		$orderby = ( $sort === 'asc' || $sort === 'ASC' )
 			? 1
 			: -1;
 
 		$this->index[ $field ] = [
 			'name'   => $name,
-			'order'  => $order,
+			'order'  => $orderby,
 			'field'  => $field,
 			'unique' => $unique,
 		];
 
 		$this->collection()
 			 ->client()
-			 ->createIndex( [ $field => $order ], [
+			 ->createIndex( [ $field => $orderby ], [
 				 'unique' => $unique,
 				 'name'   => $name,
 			 ] );
