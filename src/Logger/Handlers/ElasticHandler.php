@@ -22,7 +22,7 @@ class ElasticHandler extends AbstractHandler
 	/**
 	 * @var string
 	 */
-	private $dsn = '';
+	private $dsn;
 
 	/**
 	 * ElasticHandler constructor.
@@ -33,8 +33,7 @@ class ElasticHandler extends AbstractHandler
 	{
 		$this->dsn     = $dsn;
 		$this->elastic = ClientBuilder::create()
-									  ->setHosts( explode( ',',
-										  $dsn ) )
+									  ->setHosts( explode( ',', $dsn ) )
 									  ->build();
 
 		$this->setFormatter( new NullFormatter() );
@@ -60,8 +59,7 @@ class ElasticHandler extends AbstractHandler
 		$write = $this->elastic->index( [
 			'index' => $record[ 'channel' ],
 			'type'  => 'search',
-			'id'    => uniqid( '',
-				true ),
+			'id'    => uniqid( '', true ),
 			'body'  => $record,
 		] );
 
@@ -74,9 +72,7 @@ class ElasticHandler extends AbstractHandler
 	protected function init( string $channel ): void
 	{
 		if ( !$this->elastic->indices()
-							->exists( [
-								'index' => $channel,
-							] ) ) {
+							->exists( [ 'index' => $channel ] ) ) {
 			$this->elastic->indices()
 						  ->create( [
 							  'index' => $channel,

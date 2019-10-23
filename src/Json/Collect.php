@@ -73,7 +73,7 @@ class Collect
 	 */
 	public function __construct()
 	{
-		$this->collection = new Json( null, true );
+		$this->collection = new Json( null, false );
 	}
 
 	/**
@@ -97,23 +97,43 @@ class Collect
 	 */
 	public function append( JsonInterface $data ): self
 	{
-		if ( ( $data = $this->evalWithout( $data ) ) &&
-			( $data = $this->evalWith( $data ) ) &&
-			( $data = $this->evalFilter( $data ) ) &&
-			( $data = $this->evalFilterRecursive( $data ) ) &&
-			( $data = $this->evalWhere( $data ) ) &&
-			( $data = $this->evalMatch( $data ) ) ) {
-
-			foreach ( $this->unwindData( $data ) as $unwind ) {
+		foreach ( $this->unwindData( $data ) as $unwind ) {
+			if ( ( $unwind = $this->evalWithout( $unwind ) ) &&
+				( $unwind = $this->evalWith( $unwind ) ) &&
+				( $unwind = $this->evalFilter( $unwind ) ) &&
+				( $unwind = $this->evalFilterRecursive( $unwind ) ) &&
+				( $unwind = $this->evalWhere( $unwind ) ) &&
+				( $unwind = $this->evalMatch( $unwind ) ) ) {
 				if ( $this->hasGroup() ) {
-					$this->groupData( $data );
+					$this->groupData( $unwind );
 				} else {
-					$this->collection->append( $unwind );
+					$this->appendData( $unwind );
 				}
 			}
 		}
 
 		return $this;
+	}
+
+	/**
+	 * @param JsonInterface $data
+	 *
+	 * @return JsonInterface
+	 */
+	protected function unwindData( JsonInterface $data ): JsonInterface
+	{
+		if ( $this->hasUnwind() ) {
+			foreach ( $this->unwind as $unwind ) {
+				$data = $data->unwind( $unwind );
+			}
+
+			return $data;
+		}
+
+		$default = new Json();
+		$default->append( $data );
+
+		return $default;
 	}
 
 	/**
@@ -233,27 +253,6 @@ class Collect
 	}
 
 	/**
-	 * @param JsonInterface $data
-	 *
-	 * @return JsonInterface
-	 */
-	protected function unwindData( JsonInterface $data ): JsonInterface
-	{
-		if ( $this->hasUnwind() ) {
-			foreach ( $this->unwind as $unwind ) {
-				$data = $data->unwind( $unwind );
-			}
-
-			return $data;
-		}
-
-		$default = new Json();
-		$default->append( $data );
-
-		return $default;
-	}
-
-	/**
 	 * @return bool
 	 */
 	protected function hasGroup(): bool
@@ -264,11 +263,45 @@ class Collect
 	/**
 	 * @param JsonInterface $data
 	 *
-	 * @return JsonInterface|null
+	 * @return $this
 	 */
-	protected function groupData( JsonInterface $data ): ?JsonInterface
+	protected function groupData( JsonInterface $data ): self
 	{
+		$path = [];
 
+		foreach ( $this->group as $group ) {
+			$get = $data->get( $group );
+
+			if ( Is::null( $get ) || !Is::scalar( $get ) ) {
+				return $this;
+			}
+
+			$path[] = $get;
+		}
+
+		$this->collection->addToSet( implode( '.', $path ), $data );
+
+		return $this;
+	}
+
+	/**
+	 * @param JsonInterface $data
+	 *
+	 * @return $this
+	 */
+	protected function appendData( JsonInterface $data ): self
+	{
+		$this->collection->append( $data );
+
+		return $this;
+	}
+
+	/**
+	 * @return bool
+	 */
+	protected function hasUnwind(): bool
+	{
+		return Arr::hasContent( $this->unwind );
 	}
 
 	/**
@@ -426,21 +459,13 @@ class Collect
 	}
 
 	/**
-	 * @return bool
-	 */
-	protected function hasUnwind(): bool
-	{
-		return Arr::hasContent( $this->unwind );
-	}
-
-	/**
 	 * @param mixed ...$names
 	 *
 	 * @return Collect
 	 */
 	public function group( ...$names ): self
 	{
-		$this->group = Arr::append( $this->group, Arr::spreadArgs( $names ) );
+		$this->group = Arr::push( $this->group, Arr::spreadArgs( $names ) );
 
 		return $this;
 	}
@@ -452,7 +477,7 @@ class Collect
 	 */
 	public function unwind( ...$names ): self
 	{
-		$this->unwind = Arr::append( $this->unwind, Arr::spreadArgs( $names ) );
+		$this->unwind = Arr::push( $this->unwind, Arr::spreadArgs( $names ) );
 
 		return $this;
 	}
@@ -462,11 +487,19 @@ class Collect
 	 */
 	public function values(): JsonInterface
 	{
-		if ( Arr::hasContent( $this->sort ) ) {
+		if ( $this->hasSort() && !$this->hasGroup() ) {
 			$this->sortCollection();
 		}
 
 		return $this->collection;
+	}
+
+	/**
+	 * @return bool
+	 */
+	protected function hasSort(): bool
+	{
+		return Arr::hasContent( $this->sort );
 	}
 
 	/**
@@ -509,7 +542,7 @@ class Collect
 	 *
 	 * @return $this
 	 */
-	public function orderBy( string $path, int $sort = SORT_ASC ): self
+	public function sort( string $path, int $sort = SORT_ASC ): self
 	{
 		$this->sort[ $path ] = $sort;
 
@@ -547,7 +580,7 @@ class Collect
 	 */
 	public function with( ...$names ): self
 	{
-		$this->with = Arr::append( $this->with, Arr::spreadArgs( $names ) );
+		$this->with = Arr::push( $this->with, Arr::spreadArgs( $names ) );
 
 		return $this;
 	}
@@ -559,7 +592,7 @@ class Collect
 	 */
 	public function without( ...$names ): self
 	{
-		$this->without = Arr::append( $this->without, Arr::spreadArgs( $names ) );
+		$this->without = Arr::push( $this->without, Arr::spreadArgs( $names ) );
 
 		return $this;
 	}

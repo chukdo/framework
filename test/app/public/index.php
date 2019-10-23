@@ -16,6 +16,7 @@ use \Chukdo\Facades\Response;
 use \Chukdo\Facades\View;
 use \App\Providers;
 use Chukdo\Json\Json;
+use Chukdo\Json\JsonException;
 use Chukdo\View\Functions\Basic;
 
 $app = require __DIR__ . '/../Bootstrap/App.php';
@@ -213,7 +214,7 @@ $contrats = $findContrat->all( true );
 print_r( $contrats->toHtml() );
 die( 'ok' );
 */
-
+/*
 $data   = [];
 $data[] = [
 	'volume'  => 67,
@@ -239,38 +240,44 @@ $data[] = [
 	'volume'  => 67,
 	'edition' => 7,
 ];
+$data[] = [
+	'volume'  => 86,
+	'edition' => 6,
+];
 
 $data = new Json( $data );
 
 $collect = new \Chukdo\Json\Collect();
 
 echo $collect->where( 'volume', '>', 68 )
-			 ->orderBy( 'volume', SORT_DESC )
-			 ->orderBy( 'edition', SORT_ASC )
+			 ->sort( 'volume', SORT_DESC )
+			 ->sort( 'edition', SORT_ASC )
+			->group('edition')
 			 ->push( $data )
 			 ->values()
+			 ->sort()
 			 ->toHtml();
 
 exit;
-
+*/
+set_time_limit( 3000 );
+$time            = time();
 $collectionMongo = $dbMongo->collection( 'esign' );
 
 $recordsMongo = $collectionMongo->find()
-								->limit( 50 )
+								->limit( 17000 )
 								->stream();
-
-foreach ( $recordsMongo as $record ) {
-	echo $record->toHtml();
-}
-exit;
-$collectMongo = $recordsMongo->collect();
-
-echo $recordsMongo->wildcard( '*.modeles.*._modele' )
-				  ->collect()
-				  ->unique()
-				  ->values()
-				  ->toHtml();//$collectMongo->group('date')->values()->toHtml();
-
+$collect      = new \Chukdo\Json\Collect();
+$count        = $collect//->where( 'volume', '>', 68 )
+						//->sort( 'volume', SORT_DESC )
+->with( '_agence', 'date', 'modeles._modele', 'modeles.titre' )
+->unwind( 'modeles' )
+->group( 'date', 'modeles._modele' )
+->push( $recordsMongo )
+->values()
+	//->sort()
+->count();
+echo time() - $time;
 exit;
 $contrat = Mongo::collection( 'contrat' );
 

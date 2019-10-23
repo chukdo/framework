@@ -12,7 +12,7 @@ class LoggerHandlerServiceProvider extends ServiceProvider
 		$this->app->singleton( 'LoggerHandler', [
 			'class' => FileHandler::class,
 			'args'  => [
-				'@log.file',
+				'@log.dsn',
 			],
 		] );
 	}

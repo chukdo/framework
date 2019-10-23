@@ -34,17 +34,17 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
 
 	/**
 	 * @param mixed $key
-	 * @param mixed $value
-	 */
-	public function offsetSet( $key, $value );
-
-	/**
-	 * @param mixed $key
 	 * @param null  $default
 	 *
 	 * @return mixed|null
 	 */
 	public function offsetGet( $key, $default = null );
+
+	/**
+	 * @param mixed $key
+	 * @param mixed $value
+	 */
+	public function offsetSet( $key, $value );
 
 	/**
 	 * @param mixed $key
@@ -191,11 +191,17 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
 	public function clean(): JsonInterface;
 
 	/**
-	 * @param iterable $data
+	 * @param string $path
+	 * @param        $value
 	 *
 	 * @return Json
 	 */
-	public function addToSet( iterable $data ): JsonInterface;
+	public function addToSet( string $path, $value ): JsonInterface;
+
+	/**
+	 * @return bool
+	 */
+	public function isArray(): bool;
 
 	/**
 	 * @param $value
@@ -316,12 +322,11 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
 	public function exists( string $path ): bool;
 
 	/**
-	 * @param string $path
-	 * @param string $sort
+	 * @param bool $byKey
 	 *
 	 * @return Json
 	 */
-	public function sort( string $path, string $sort = 'ASC' ): JsonInterface;
+	public function sort( bool $byKey = false ): JsonInterface;
 
 	/**
 	 * @param string $path

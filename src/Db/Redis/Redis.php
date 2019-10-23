@@ -187,8 +187,7 @@ class Redis implements RedisInterface
 				}
 
 				/** \r\n */
-				stream_get_line( $this->sock,
-					2 );
+				stream_get_line( $this->sock, 2 );
 				break;
 
 			/** Multi Bulk */
@@ -333,7 +332,7 @@ class Redis implements RedisInterface
 	 * Retourne la cle de l'element courant.
 	 * @return string
 	 */
-	public function key()
+	public function key(): string
 	{
 		return $this->stack[ 0 ] ?? '';
 	}
@@ -342,7 +341,7 @@ class Redis implements RedisInterface
 	 * Pointe sur l'element suivant.
 	 * @throws RedisException
 	 */
-	public function next()
+	public function next(): void
 	{
 		if ( !empty( $this->stack ) ) {
 			array_shift( $this->stack );
@@ -490,8 +489,7 @@ class Redis implements RedisInterface
 	 */
 	public function __isset( string $key )
 	{
-		return $this->__call( 'EXISTS',
-			[ $key ] );
+		return $this->__call( 'EXISTS', [ $key ] );
 	}
 
 	/**
