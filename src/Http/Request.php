@@ -11,6 +11,7 @@ use Chukdo\Storage\FileUploaded;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Bootstrap\ServiceException;
 use ReflectionException;
+use Chukdo\Http\Input;
 
 /**
  * Gestion de requete HTTP entrante.
@@ -52,16 +53,12 @@ class Request
 	public function __construct( App $app )
 	{
 		$this->app    = $app;
-		$this->inputs = $app->make( 'Chukdo\Http\Input', true );
+		$this->inputs = $app->make( Input::class, true );
 		$this->header = new Header();
 		$this->url    = new Url( HttpRequest::uri() );
 
-		$this->header->setHeader( 'Content-Type',
-			HttpRequest::server( 'CONTENT_TYPE',
-				'' ) );
-		$this->header->setHeader( 'Content-Length',
-			HttpRequest::server( 'CONTENT_LENGTH',
-				'' ) );
+		$this->header->setHeader( 'Content-Type', HttpRequest::server( 'CONTENT_TYPE', '' ) );
+		$this->header->setHeader( 'Content-Length', HttpRequest::server( 'CONTENT_LENGTH', '' ) );
 		$this->header->setHeaders( HttpRequest::headers() );
 	}
 

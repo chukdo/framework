@@ -62,10 +62,10 @@ class Router
 	public function __construct( App $app )
 	{
 		$this->app        = $app;
-		$this->request    = $app->make( 'Chukdo\Http\Request' );
-		$this->response   = $this->app->make( 'Chukdo\Http\Response' );
+		$this->request    = $app->make( Request::class );
+		$this->response   = $this->app->make( Response::class );
 		$this->attributes = new RouteAttributes();
-		$this->fallback   = function() {
+		$this->fallback   = static function() {
 			throw new RouteException( 'No valid route' );
 		};
 	}

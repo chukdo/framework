@@ -151,11 +151,7 @@ class Route
 	{
 		$method = $this->request->method();
 
-		if ( $this->method == $method || $this->method == 'ALL' ) {
-			return true;
-		}
-
-		return false;
+		return $this->method === $method || $this->method === 'ALL';
 	}
 
 	/**
@@ -168,11 +164,7 @@ class Route
 		$routeScheme   = $this->uri()
 							  ->getScheme();
 
-		if ( $requestScheme == $routeScheme || $routeScheme == 'file' ) {
-			return true;
-		}
-
-		return false;
+		return $requestScheme === $routeScheme || $routeScheme === 'file';
 	}
 
 	/**
@@ -193,7 +185,7 @@ class Route
 		$routeDomain   = $this->uri()
 							  ->getDomain();
 
-		if ( $requestDomain == $routeDomain || $routeDomain == null ) {
+		if ( $routeDomain === null || $requestDomain === $routeDomain ) {
 			return true;
 		}
 
@@ -237,7 +229,7 @@ class Route
 		$values      = (array) Str::match( '`^' . $routePath . '$`', $requestPath );
 		$countValues = count( $values );
 
-		if ( $countValues > 0 && $countValues == $countKeys ) {
+		if ( $countValues > 0 && $countValues === $countKeys ) {
 			$match = [];
 
 			foreach ( $keys as $k => $key ) {
@@ -257,9 +249,7 @@ class Route
 	 */
 	protected function parseWhere( string $name ): string
 	{
-		return isset( $this->wheres[ $name ] )
-			? $this->wheres[ $name ]
-			: '.*?';
+		return $this->wheres[ $name ] ?? '.*?';
 	}
 
 	/**
@@ -272,7 +262,7 @@ class Route
 		$routeSubDomain   = $this->uri()
 								 ->getSubDomain();
 
-		if ( $requestSubDomain == $routeSubDomain || $routeSubDomain == null ) {
+		if ( $routeSubDomain === null || $requestSubDomain === $routeSubDomain ) {
 			return true;
 		}
 
@@ -290,7 +280,7 @@ class Route
 							->getPrefix() . $this->uri()
 												 ->getPath();
 
-		if ( $requestPath == $routePath ) {
+		if ( $requestPath === $routePath ) {
 			return true;
 		}
 

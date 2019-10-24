@@ -27,8 +27,8 @@ final class Stream
 		if ( self::exists( $name ) ) {
 			stream_wrapper_unregister( $name );
 		}
-		stream_wrapper_register( $name,
-			$class );
+
+		stream_wrapper_register( $name, $class );
 	}
 
 	/**

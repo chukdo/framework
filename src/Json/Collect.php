@@ -19,9 +19,9 @@ use Closure;
 class Collect
 {
 	/**
-	 * @var Json
+	 * @var array
 	 */
-	protected $collection;
+	protected $collection = [];
 
 	/**
 	 * @var array
@@ -69,14 +69,6 @@ class Collect
 	protected $match = [];
 
 	/**
-	 * Collect constructor.
-	 */
-	public function __construct()
-	{
-		$this->collection = new Json( null, false );
-	}
-
-	/**
 	 * @param iterable $datas
 	 *
 	 * @return $this
@@ -91,11 +83,11 @@ class Collect
 	}
 
 	/**
-	 * @param JsonInterface $data
+	 * @param array $data
 	 *
 	 * @return $this
 	 */
-	public function append( JsonInterface $data ): self
+	public function append( array $data ): self
 	{
 		foreach ( $this->unwindData( $data ) as $unwind ) {
 			if ( ( $unwind = $this->evalWithout( $unwind ) ) &&
@@ -104,6 +96,7 @@ class Collect
 				( $unwind = $this->evalFilterRecursive( $unwind ) ) &&
 				( $unwind = $this->evalWhere( $unwind ) ) &&
 				( $unwind = $this->evalMatch( $unwind ) ) ) {
+
 				if ( $this->hasGroup() ) {
 					$this->groupData( $unwind );
 				} else {
@@ -116,107 +109,102 @@ class Collect
 	}
 
 	/**
-	 * @param JsonInterface $data
+	 * @param array $data
 	 *
-	 * @return JsonInterface
+	 * @return iterable
 	 */
-	protected function unwindData( JsonInterface $data ): JsonInterface
+	protected function unwindData( array $data ): Iterable
 	{
 		if ( $this->hasUnwind() ) {
 			foreach ( $this->unwind as $unwind ) {
-				$data = $data->unwind( $unwind );
+				$data = Arr::unwind( $data, $unwind );
 			}
 
 			return $data;
 		}
 
-		$default = new Json();
-		$default->append( $data );
-
-		return $default;
+		return [ $data ];
 	}
 
 	/**
-	 * @param JsonInterface $data
+	 * @param array $data
 	 *
-	 * @return JsonInterface|null
+	 * @return array|null
 	 */
-	protected function evalWithout( JsonInterface $data ): ?JsonInterface
+	protected function evalWithout( array $data ): ?array
 	{
 		foreach ( $this->without as $without ) {
-			$data->unset( $without );
+			Arr::unset( $data, $without );
 		}
 
-		return $data->isEmpty()
+		return Arr::empty( $data )
 			? null
 			: $data;
 	}
 
 	/**
-	 * @param JsonInterface $data
+	 * @param array $data
 	 *
-	 * @return JsonInterface|null
+	 * @return array|null
 	 */
-	protected function evalWith( JsonInterface $data ): ?JsonInterface
+	protected function evalWith( array $data ): ?array
 	{
-		if ( Arr::hasContent( $this->with ) ) {
-			$tmpData = new Json( null, true );
-
-			foreach ( $this->with as $with ) {
-				if ( $get = $data->get( $with ) ) {
-					$tmpData->set( $with, $get );
-				}
-			}
-
-			$data = $tmpData;
+		if ( !$this->hasWith() ) {
+			return $data;
 		}
 
-		return $data->isEmpty()
+		$arr = [];
+
+		foreach ( $this->with as $with ) {
+			Arr::set( $arr, $with, Arr::get( $data, $with ) );
+		}
+
+		return Arr::empty( $arr )
 			? null
-			: $data;
+			: $arr;
 	}
 
 	/**
-	 * @param JsonInterface $data
+	 * @param array $data
 	 *
-	 * @return JsonInterface|null
+	 * @return array|null
 	 */
-	protected function evalFilter( JsonInterface $data ): ?JsonInterface
+	protected function evalFilter( array $data ): ?array
 	{
 		foreach ( $this->filter as $filter ) {
-			$data = $data->filter( $filter );
+			$data = Arr::filter( $data, $filter );
 		}
 
-		return $data->isEmpty()
+		return Arr::empty( $data )
 			? null
 			: $data;
 	}
 
 	/**
-	 * @param JsonInterface $data
+	 * @param array $data
 	 *
-	 * @return JsonInterface|null
+	 * @return array|null
 	 */
-	protected function evalFilterRecursive( JsonInterface $data ): ?JsonInterface
+	protected function evalFilterRecursive( array $data ): ?array
 	{
 		foreach ( $this->filterRecursive as $filter ) {
-			$data = $data->filterRecursive( $filter );
+			$data = Arr::filterRecursive( $data, $filter );
 		}
 
-		return $data->isEmpty()
+		return Arr::empty( $data )
 			? null
 			: $data;
 	}
 
 	/**
-	 * @param JsonInterface $data
+	 * @param array $data
 	 *
-	 * @return JsonInterface|null
+	 * @return array|null
 	 */
-	public function evalWhere( JsonInterface $data ): ?JsonInterface
+	public function evalWhere( array $data ): ?array
 	{
 		foreach ( $this->where as $where ) {
-			if ( $get = $data->get( $where[ 'field' ] ) ) {
+			if ( $get = Arr::get( $data, $where[ 'field' ] ) ) {
 				$closure = $this->evalClosure( $where[ 'operator' ] );
 
 				if ( !$closure( $get, $where[ 'value' ], $where[ 'value2' ] ) ) {
@@ -231,17 +219,17 @@ class Collect
 	}
 
 	/**
-	 * @param JsonInterface $data
+	 * @param array $data
 	 *
-	 * @return JsonInterface|null
+	 * @return array|null
 	 */
-	public function evalMatch( JsonInterface $data ): ?JsonInterface
+	public function evalMatch( array $data ): ?array
 	{
 		foreach ( $this->where as $where ) {
-			if ( $get = $data->get( $where[ 'field' ] ) ) {
+			if ( $get = Arr::get( $data, $where[ 'field' ] ) ) {
 				$closure = $this->evalClosure( $where[ 'operator' ] );
 
-				if ( !$closure( $get, $data->get( $where[ 'value' ] ), $data->get( $where[ 'value2' ] ) ) ) {
+				if ( !$closure( $get, Arr::get( $data, $where[ 'value' ] ), Arr::get( $data, $where[ 'value2' ] ) ) ) {
 					return null;
 				}
 			} else {
@@ -261,16 +249,16 @@ class Collect
 	}
 
 	/**
-	 * @param JsonInterface $data
+	 * @param array $data
 	 *
 	 * @return $this
 	 */
-	protected function groupData( JsonInterface $data ): self
+	protected function groupData( array $data ): self
 	{
 		$path = [];
 
 		foreach ( $this->group as $group ) {
-			$get = $data->get( $group );
+			$get = Arr::get( $data, $group );
 
 			if ( Is::null( $get ) || !Is::scalar( $get ) ) {
 				return $this;
@@ -279,19 +267,19 @@ class Collect
 			$path[] = $get;
 		}
 
-		$this->collection->addToSet( implode( '.', $path ), $data );
+		Arr::addToSet( $this->collection, implode( '.', $path ), $data );
 
 		return $this;
 	}
 
 	/**
-	 * @param JsonInterface $data
+	 * @param array $data
 	 *
 	 * @return $this
 	 */
-	protected function appendData( JsonInterface $data ): self
+	protected function appendData( array $data ): self
 	{
-		$this->collection->append( $data );
+		$this->collection[] = $data;
 
 		return $this;
 	}
@@ -302,6 +290,14 @@ class Collect
 	protected function hasUnwind(): bool
 	{
 		return Arr::hasContent( $this->unwind );
+	}
+
+	/**
+	 * @return bool
+	 */
+	protected function hasWith(): bool
+	{
+		return Arr::hasContent( $this->with );
 	}
 
 	/**
@@ -483,9 +479,9 @@ class Collect
 	}
 
 	/**
-	 * @return JsonInterface
+	 * @return array
 	 */
-	public function values(): JsonInterface
+	public function values(): array
 	{
 		if ( $this->hasSort() && !$this->hasGroup() ) {
 			$this->sortCollection();
@@ -514,7 +510,7 @@ class Collect
 			$row = [];
 
 			foreach ( $this->sort as $path => $sort ) {
-				$row[ $path ] = $v->get( $path );
+				$row[ $path ] = Arr::get( $v, $path );
 			}
 
 			$row [ '__RAW__' ] = $v;
@@ -529,10 +525,10 @@ class Collect
 		$args[] = $data;
 		array_multisort( ...$args );
 
-		$json = $this->collection->reset();
+		$this->collection = [];
 
 		foreach ( end( $args ) as $v ) {
-			$json->append( $v[ '__RAW__' ] );
+			$this->collection[] = $v[ '__RAW__' ];
 		}
 	}
 

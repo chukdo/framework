@@ -40,19 +40,7 @@ final class HttpRequest
 	{
 		$request = self::all();
 
-		return isset( $request[ $name ] )
-			? $request[ $name ]
-			: $default;
-	}
-
-	/**
-	 * @return array
-	 */
-	public static function all(): array
-	{
-		return Cli::runningInConsole()
-			? Cli::inputs()
-			: $_REQUEST;
+		return $request[ $name ] ?? $default;
 	}
 
 	/**
@@ -63,9 +51,43 @@ final class HttpRequest
 	 */
 	public static function server( string $name, string $default = null ): ?string
 	{
-		return isset( $_SERVER[ $name ] )
-			? $_SERVER[ $name ]
-			: $default;
+		return $_SERVER[ $name ] ?? $default;
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function all(): array
+	{
+		if ( Cli::runningInConsole() ) {
+			return Cli::inputs();
+		}
+
+		if ( !empty( $_REQUEST ) ) {
+			return $_REQUEST;
+		}
+
+		if ( ( $data = self::input() ) && Str::contain( self::server( 'ACCEPT' ), 'json' ) ) {
+			return json_decode( $data, true, 512, JSON_THROW_ON_ERROR );
+		}
+
+		return [];
+	}
+
+	/**
+	 * @return string|null
+	 */
+	public static function input(): ?string
+	{
+		static $input = null;
+
+		if ( $input ) {
+			return $input;
+		}
+
+		$input = file_get_contents( 'php://input' );
+
+		return $input;
 	}
 
 	/**
@@ -73,8 +95,8 @@ final class HttpRequest
 	 */
 	public static function secured(): bool
 	{
-		return self::server( 'HTTPS' ) || self::server( 'SERVER_PORT' ) == '443'
-			|| self::server( 'REQUEST_SCHEME' ) == 'https';
+		return self::server( 'HTTPS' ) || self::server( 'SERVER_PORT' ) === '443'
+			|| self::server( 'REQUEST_SCHEME' ) === 'https';
 	}
 
 	/**

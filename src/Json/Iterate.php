@@ -11,7 +11,7 @@ use Iterator;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class Arr implements Iterator
+class Iterate implements Iterator
 {
 	/**
 	 * @var array
@@ -24,7 +24,7 @@ class Arr implements Iterator
 	protected $offset = 0;
 
 	/**
-	 * Arr constructor.
+	 * Iterate constructor.
 	 *
 	 * @param array $arr
 	 */
@@ -81,7 +81,7 @@ class Arr implements Iterator
 	/**
 	 * @param iterable $merge
 	 *
-	 * @return Arr
+	 * @return Iterate
 	 */
 	public function merge( Iterable $merge ): self
 	{
@@ -95,7 +95,7 @@ class Arr implements Iterator
 	/**
 	 * @param $append
 	 *
-	 * @return Arr
+	 * @return Iterate
 	 */
 	public function append( $append ): self
 	{

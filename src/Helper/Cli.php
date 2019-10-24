@@ -17,7 +17,7 @@ final class Cli
 	 */
 	public static function runningInConsole(): bool
 	{
-		return php_sapi_name() == 'cli';
+		return PHP_SAPI === 'cli';
 	}
 
 	/**
@@ -27,9 +27,7 @@ final class Cli
 	{
 		$inputs = self::argv();
 
-		return isset( $inputs[ 0 ] )
-			? $inputs[ 0 ]
-			: null;
+		return $inputs[ 0 ] ?? null;
 	}
 
 	/**
@@ -39,12 +37,10 @@ final class Cli
 	{
 		$key    = 0;
 		$inputs = [];
-		$argv   = isset( $_SERVER[ 'argv' ] )
-			? $_SERVER[ 'argv' ]
-			: [];
+		$argv   = $_SERVER[ 'argv' ] ?? [];
 
 		foreach ( $argv as $k => $arg ) {
-			if ( substr( $arg, 0, 1 ) == '-' ) {
+			if ( strpos( $arg, '-' ) === 0 ) {
 				$key = trim( $arg, '-' );
 			} else {
 				$inputs[ $key ] = $arg;

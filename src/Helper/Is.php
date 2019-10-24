@@ -3,7 +3,7 @@
 namespace Chukdo\Helper;
 
 use Chukdo\Contracts\Json\Json as JsonInterface;
-use Chukdo\Json\Arr;
+use Chukdo\Json\Iterate;
 use DateTime;
 use stdClass;
 use ArrayObject;
@@ -76,7 +76,7 @@ final class Is
 	 */
 	public static function arr( $value ): bool
 	{
-		return is_array( $value ) || $value instanceof ArrayObject || $value instanceof stdClass || $value instanceof Arr;
+		return is_array( $value ) || $value instanceof ArrayObject || $value instanceof stdClass || $value instanceof Iterate;
 	}
 
 	/**

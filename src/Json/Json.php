@@ -8,7 +8,7 @@ use Chukdo\Helper\Cli;
 use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
 use Chukdo\Helper\To;
-use Chukdo\Helper\Arr as ArrHelper;
+use Chukdo\Helper\Arr;
 use Chukdo\Xml\Xml;
 use Closure;
 use League\CLImate\CLImate;
@@ -26,6 +26,7 @@ class Json extends ArrayObject implements JsonInterface
 	 * @var bool $strict
 	 */
 	protected $strict = true;
+
 	/**
 	 * Json constructor.
 	 *
@@ -213,10 +214,10 @@ class Json extends ArrayObject implements JsonInterface
 		} else if ( ( $get instanceof JsonInterface ) ) {
 			$get->append( $value );
 		} else {
-			$json = new Json();
-			$json->append( $get )
-				 ->append( $value );
-			$this->set( $path, $json );
+			$this->set( $path, [
+				$get,
+				$value,
+			] );
 		}
 
 		return $this;
@@ -238,7 +239,7 @@ class Json extends ArrayObject implements JsonInterface
 			return $this->offsetGet( $path, $default );
 		}
 
-		$arr       = new Arr( Str::split( $path, '.' ) );
+		$arr       = new Iterate( Str::split( $path, '.' ) );
 		$firstPath = $arr->getFirstAndRemove();
 		$endPath   = $arr->join( '.' );
 		$get       = $this->offsetGet( $firstPath );
@@ -262,7 +263,7 @@ class Json extends ArrayObject implements JsonInterface
 			return $this->offsetSet( $path, $value );
 		}
 
-		$arr       = new Arr( Str::split( $path, '.' ) );
+		$arr       = new Iterate( Str::split( $path, '.' ) );
 		$firstPath = $arr->getFirstAndRemove();
 		$endPath   = $arr->join( '.' );
 
@@ -297,12 +298,15 @@ class Json extends ArrayObject implements JsonInterface
 	public function offsetGetOrSet( $key, $value = null )
 	{
 		if ( $this->offsetExists( $key ) ) {
-			return parent::offsetGet( $key );
+			$get = parent::offsetGet( $key );
+
+			if ( $get instanceof JsonInterface ) {
+				return $get;
+			}
 		}
 
-		return $this->offsetSet( $key,
-			$value
-				?: [] )
+		return $this->offsetSet( $key, $value
+			?? [] )
 					->offsetGet( $key );
 	}
 
@@ -355,24 +359,6 @@ class Json extends ArrayObject implements JsonInterface
 	}
 
 	/**
-	 * @param $key
-	 *
-	 * @return JsonInterface
-	 */
-	public function coll( $key ): JsonInterface
-	{
-		$coll = new Json();
-
-		foreach ( $this as $offsetKey => $offsetValue ) {
-			if ( $key === $offsetKey ) {
-				$coll->append( $offsetValue );
-			}
-		}
-
-		return $coll;
-	}
-
-	/**
 	 * @param int   $key
 	 * @param mixed $default
 	 *
@@ -414,59 +400,6 @@ class Json extends ArrayObject implements JsonInterface
 	}
 
 	/**
-	 * @param JsonInterface $json
-	 * @param bool          $flat
-	 *
-	 * @return JsonInterface
-	 */
-	public function diff( JsonInterface $json, bool $flat = false ): JsonInterface
-	{
-		$src  = $this->to2d();
-		$new  = $json->to2d();
-		$diff = new Json();
-		$set  = static function( $path, $data ) use ( $diff, $flat ) {
-			$flat
-				? $diff->append( ArrHelper::merge( [ 'path' => $path ], $data ) )
-				: $diff->set( $path, $data );
-		};
-
-		foreach ( $src as $path => $srcValue ) {
-			if ( $newValue = $new->offsetUnset( $path ) ) {
-
-				/** Common */
-				if ( $srcValue === $newValue ) {
-					$set( $path, [
-						'op'    => 'common',
-						'value' => $srcValue,
-					] );
-				} /** Replace */
-				else {
-					$set( $path, [
-						'op'    => 'replace',
-						'old'   => $srcValue,
-						'value' => $newValue,
-					] );
-				}
-			} /** Delete */
-			else {
-				$set( $path, [
-					'op' => 'remove',
-				] );
-			}
-		}
-
-		/** Add */
-		foreach ( $new as $path => $newValue ) {
-			$set( $path, [
-				'op'    => 'add',
-				'value' => $newValue,
-			] );
-		}
-
-		return $diff;
-	}
-
-	/**
 	 * @param string|null $path
 	 *
 	 * @return JsonInterface
@@ -505,28 +438,6 @@ class Json extends ArrayObject implements JsonInterface
 		}
 
 		return $default;
-	}
-
-	/**
-	 * @param string|null $prefix
-	 *
-	 * @return JsonInterface
-	 */
-	public function to2d( string $prefix = null ): JsonInterface
-	{
-		$mixed = new Json();
-
-		foreach ( $this as $k => $v ) {
-			$k = trim( $prefix . '.' . $k, '.' );
-
-			if ( $v instanceof JsonInterface ) {
-				$mixed->merge( $v->to2d( $k ) );
-			} else {
-				$mixed->offsetSet( $k, $v );
-			}
-		}
-
-		return $mixed;
 	}
 
 	/**
@@ -608,7 +519,7 @@ class Json extends ArrayObject implements JsonInterface
 	 */
 	public function is( ...$param )
 	{
-		$param      = ArrHelper::spreadArgs( $param );
+		$param      = Arr::spreadArgs( $param );
 		$function   = array_shift( $param );
 		$param[ 0 ] = $this->get( $param[ 0 ] );
 
@@ -617,25 +528,6 @@ class Json extends ArrayObject implements JsonInterface
 			$function,
 		],
 			$param );
-	}
-
-	/**
-	 * @param iterable|null $merge
-	 * @param bool|null     $overwrite
-	 *
-	 * @return JsonInterface
-	 */
-	public function merge( iterable $merge = null, bool $overwrite = null ): JsonInterface
-	{
-		if ( $merge ) {
-			foreach ( $merge as $k => $v ) {
-				if ( $overwrite || !$this->offsetExists( $k ) ) {
-					$this->offsetSet( $k, $v );
-				}
-			}
-		}
-
-		return $this;
 	}
 
 	/**
@@ -652,25 +544,6 @@ class Json extends ArrayObject implements JsonInterface
 	public function isEmpty(): bool
 	{
 		return $this->count() === 0;
-	}
-
-	/**
-	 * @param mixed ...$names
-	 *
-	 * @return JsonInterface
-	 */
-	public function map( ... $names ): JsonInterface
-	{
-		$json  = new Json();
-		$names = ArrHelper::spreadArgs( $names );
-
-		foreach ( $this as $k => $v ) {
-			if ( ArrHelper::in( $k, $names ) ) {
-				$json->offsetSet( $k, $v );
-			}
-		}
-
-		return $json;
 	}
 
 	/**
@@ -696,7 +569,7 @@ class Json extends ArrayObject implements JsonInterface
 	 */
 	public function to( ...$param )
 	{
-		$param      = ArrHelper::spreadArgs( $param );
+		$param      = Arr::spreadArgs( $param );
 		$function   = array_shift( $param );
 		$param[ 0 ] = $this->get( $param[ 0 ] );
 
@@ -704,18 +577,6 @@ class Json extends ArrayObject implements JsonInterface
 			To::class,
 			$function,
 		], $param );
-	}
-
-	/**
-	 * @param string $path
-	 *
-	 * @return bool
-	 */
-	public function exists( string $path ): bool
-	{
-		$value = $this->get( $path );
-
-		return $value !== null;
 	}
 
 	/**
@@ -771,18 +632,160 @@ class Json extends ArrayObject implements JsonInterface
 	}
 
 	/**
-	 * @param iterable|null $push
+	 * @param string $path
+	 *
+	 * @return mixed|null
+	 */
+	public function unset( string $path )
+	{
+		if ( Str::notContain( $path, '.' ) ) {
+			return $this->offsetUnset( $path );
+		}
+
+		$arr       = new Iterate( Str::split( $path, '.' ) );
+		$firstPath = $arr->getFirstAndRemove();
+		$endPath   = $arr->join( '.' );
+		$get       = $this->offsetGet( $firstPath );
+
+		if ( $get instanceof JsonInterface ) {
+			return $get->unset( $endPath );
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param string $path
+	 *
+	 * @return JsonInterface
+	 */
+	public function unwind( string $path ): JsonInterface
+	{
+		$unwinded = new Json( null, $this->strict );
+		$toUnwind = $this->get( $path );
+
+		if ( $toUnwind instanceof JsonInterface ) {
+			foreach ( $toUnwind as $unwind ) {
+				$unwinded->append( $this->clone()
+										->set( $path, $unwind ) );
+			}
+		}
+
+		return $unwinded;
+	}
+
+	/**
+	 * @return JsonInterface
+	 */
+	public function clone(): JsonInterface
+	{
+		return clone $this;
+	}
+
+	/**
+	 * @param $key
+	 *
+	 * @return JsonInterface
+	 */
+	public function coll( $key ): JsonInterface
+	{
+		$coll = new Json();
+
+		foreach ( $this as $offsetKey => $offsetValue ) {
+			if ( $key === $offsetKey ) {
+				$coll->append( $offsetValue );
+			}
+		}
+
+		return $coll;
+	}
+
+	/**
+	 * @param JsonInterface $json
+	 * @param bool          $flat
+	 *
+	 * @return JsonInterface
+	 */
+	public function diff( JsonInterface $json, bool $flat = false ): JsonInterface
+	{
+		$src  = $this->to2d();
+		$new  = $json->to2d();
+		$diff = new Json();
+		$set  = static function( $path, $data ) use ( $diff, $flat ) {
+			$flat
+				? $diff->append( Arr::merge( [ 'path' => $path ], $data ) )
+				: $diff->set( $path, $data );
+		};
+
+		foreach ( $src as $path => $srcValue ) {
+			if ( $newValue = $new->offsetUnset( $path ) ) {
+
+				/** Common */
+				if ( $srcValue === $newValue ) {
+					$set( $path, [
+						'op'    => 'common',
+						'value' => $srcValue,
+					] );
+				} /** Replace */
+				else {
+					$set( $path, [
+						'op'    => 'replace',
+						'old'   => $srcValue,
+						'value' => $newValue,
+					] );
+				}
+			} /** Delete */
+			else {
+				$set( $path, [
+					'op' => 'remove',
+				] );
+			}
+		}
+
+		/** Add */
+		foreach ( $new as $path => $newValue ) {
+			$set( $path, [
+				'op'    => 'add',
+				'value' => $newValue,
+			] );
+		}
+
+		return $diff;
+	}
+
+	/**
+	 * @param string|null $prefix
+	 *
+	 * @return JsonInterface
+	 */
+	public function to2d( string $prefix = null ): JsonInterface
+	{
+		$mixed = new Json();
+
+		foreach ( $this as $k => $v ) {
+			$k = trim( $prefix . '.' . $k, '.' );
+
+			if ( $v instanceof JsonInterface ) {
+				$mixed->merge( $v->to2d( $k ) );
+			} else {
+				$mixed->offsetSet( $k, $v );
+			}
+		}
+
+		return $mixed;
+	}
+
+	/**
+	 * @param iterable|null $merge
 	 * @param bool|null     $overwrite
 	 *
 	 * @return JsonInterface
 	 */
-	public function push( iterable $push = null, bool $overwrite = null ): JsonInterface
+	public function merge( iterable $merge = null, bool $overwrite = null ): JsonInterface
 	{
-		if ( $push ) {
-			foreach ( $push as $k => $v ) {
-				if ( is_int( $k ) ) {
-					$this->append( $v );
-				} else if ( $overwrite || !$this->offsetExists( $k ) ) {
+		if ( $merge ) {
+			foreach ( $merge as $k => $v ) {
+				if ( $overwrite || !$this->offsetExists( $k ) ) {
 					$this->offsetSet( $k, $v );
 				}
 			}
@@ -792,13 +795,16 @@ class Json extends ArrayObject implements JsonInterface
 	}
 
 	/**
-	 * @return array
+	 * @param string $path
+	 *
+	 * @return bool
 	 */
-	public function __debugInfo(): array
+	public function exists( string $path ): bool
 	{
-		return $this->getArrayCopy();
-	}
+		$value = $this->get( $path );
 
+		return $value !== null;
+	}
 
 	/**
 	 * @param string $path
@@ -811,7 +817,6 @@ class Json extends ArrayObject implements JsonInterface
 
 		return $value !== null && $value !== '';
 	}
-
 
 	/**
 	 * @param Closure $closure
@@ -832,7 +837,6 @@ class Json extends ArrayObject implements JsonInterface
 
 		return $json;
 	}
-
 
 	/**
 	 * @param Closure $closure
@@ -861,7 +865,6 @@ class Json extends ArrayObject implements JsonInterface
 
 		return $json;
 	}
-
 
 	/**
 	 * @param iterable|null $merge
@@ -909,33 +912,57 @@ class Json extends ArrayObject implements JsonInterface
 		return $default;
 	}
 
-
 	/**
 	 * @param string $path
+	 * @param bool   $scalarResultOnly
 	 *
 	 * @return JsonInterface
 	 */
-	public function unwind( string $path ): JsonInterface
+	public function wildcard( string $path, bool $scalarResultOnly = false ): JsonInterface
 	{
-		$unwinded = new Json( null, $this->strict );
-		$toUnwind = $this->get( $path );
+		$path      = rtrim( $path, '.*' );
+		$arr       = new Iterate( Str::split( $path, '.' ) );
+		$firstPath = $arr->getFirstAndRemove();
+		$emptyPath = $arr->empty();
+		$endPath   = $arr->join( '.' );
+		$json      = new Json( [] );
+		$get       = $this->offsetGet( $firstPath );
 
-		if ( $toUnwind instanceof JsonInterface ) {
-			foreach ( $toUnwind as $unwind ) {
-				$unwinded->append( $this->clone()
-										->set( $path, $unwind ) );
+		if ( $firstPath === '*' ) {
+			foreach ( $this as $key => $value ) {
+				if ( ( $value instanceof JsonInterface ) && ( $get = $value->wildcard( $endPath, $scalarResultOnly ) )->count() ) {
+					$json->push( $get );
+				}
 			}
+		} else if ( $get instanceof JsonInterface && !$emptyPath ) {
+			$json->merge( $get->wildcard( $endPath, $scalarResultOnly ) );
+
+		} else if ( $get && $emptyPath && ( ( is_scalar( $get ) && $scalarResultOnly ) || !$scalarResultOnly ) ) {
+			$json->append( $get );
 		}
 
-		return $unwinded;
+		return $json;
 	}
 
 	/**
+	 * @param iterable|null $push
+	 * @param bool|null     $overwrite
+	 *
 	 * @return JsonInterface
 	 */
-	public function clone(): JsonInterface
+	public function push( iterable $push = null, bool $overwrite = null ): JsonInterface
 	{
-		return new Json( $this->getArrayCopy(), $this->strict );
+		if ( $push ) {
+			foreach ( $push as $k => $v ) {
+				if ( is_int( $k ) ) {
+					$this->append( $v );
+				} else if ( $overwrite || !$this->offsetExists( $k ) ) {
+					$this->offsetSet( $k, $v );
+				}
+			}
+		}
+
+		return $this;
 	}
 
 	/**
@@ -945,7 +972,7 @@ class Json extends ArrayObject implements JsonInterface
 	 */
 	public function with( ...$offsets ): JsonInterface
 	{
-		$offsets = ArrHelper::spreadArgs( $offsets );
+		$offsets = Arr::spreadArgs( $offsets );
 		$only    = new Json();
 
 		foreach ( $offsets as $offset ) {
@@ -954,7 +981,6 @@ class Json extends ArrayObject implements JsonInterface
 		return $only;
 	}
 
-
 	/**
 	 * @param mixed ...$offsets
 	 *
@@ -962,40 +988,22 @@ class Json extends ArrayObject implements JsonInterface
 	 */
 	public function without( ... $offsets ): JsonInterface
 	{
-		$offsets = ArrHelper::spreadArgs( $offsets );
-		$except  = new Json( $this->toArray() );
+		$offsets = Arr::spreadArgs( $offsets );
+		$except  = $this->clone();
 
-		foreach ( $offsets as $offsetList ) {
-			foreach ( (array) $offsetList as $offset ) {
-				$except->unset( $offset );
-			}
+		foreach ( $offsets as $offset ) {
+			$except->unset( $offset );
 		}
 
 		return $except;
 	}
 
-
 	/**
-	 * @param string $path
-	 *
-	 * @return mixed|null
+	 * @return array
 	 */
-	public function unset( string $path )
+	public function __debugInfo(): array
 	{
-		if ( Str::notContain( $path, '.' ) ) {
-			return $this->offsetUnset( $path );
-		}
-
-		$arr       = new Arr( Str::split( $path, '.' ) );
-		$firstPath = $arr->getFirstAndRemove();
-		$endPath   = $arr->join( '.' );
-		$get       = $this->offsetGet( $firstPath );
-
-		if ( $get instanceof JsonInterface ) {
-			return $get->unset( $endPath );
-		}
-
-		return null;
+		return $this->getArrayCopy();
 	}
 
 	/**
@@ -1020,37 +1028,7 @@ class Json extends ArrayObject implements JsonInterface
 		return $this->reset( $arr );
 	}
 
-	/**
-	 * @param string $path
-	 * @param bool   $scalarResultOnly
-	 *
-	 * @return JsonInterface
-	 */
-	public function wildcard( string $path, bool $scalarResultOnly = false ): JsonInterface
-	{
-		$path      = rtrim( $path, '.*' );
-		$arr       = new Arr( Str::split( $path, '.' ) );
-		$firstPath = $arr->getFirstAndRemove();
-		$emptyPath = $arr->empty();
-		$endPath   = $arr->join( '.' );
-		$json      = new Json( [] );
-		$get       = $this->offsetGet( $firstPath );
 
-		if ( $firstPath === '*' ) {
-			foreach ( $this as $key => $value ) {
-				if ( ( $value instanceof JsonInterface ) && ( $get = $value->wildcard( $endPath, $scalarResultOnly ) )->count() ) {
-					$json->push( $get );
-				}
-			}
-		} else if ( $get instanceof JsonInterface && !$emptyPath ) {
-			$json->merge( $get->wildcard( $endPath, $scalarResultOnly ) );
-
-		} else if ( $get && $emptyPath && ( ( is_scalar( $get ) && $scalarResultOnly ) || !$scalarResultOnly ) ) {
-			$json->append( $get );
-		}
-
-		return $json;
-	}
 
 
 }

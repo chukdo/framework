@@ -3,6 +3,7 @@
 
 namespace Chukdo\Db\Mongo;
 
+use Chukdo\Helper\Arr;
 use Chukdo\Json\Json;
 use MongoDB\Driver\Cursor as MongoDbCursor;
 use Iterator;
@@ -78,11 +79,11 @@ class Stream implements Iterator
 	{
 		$current    = $this->iterator->current();
 		$collection = $this->collection;
-		$json       = new Json( $current );
+		$callback   = static function( $v ) use ( $collection ) {
+			return $collection->filterOut( null, $v );
+		};
 
-		return $json->filterRecursive( static function( $k, $v ) use ( $collection ) {
-			return $collection->filterOut( $k, $v );
-		} );
+		return Arr::filterRecursive( $current, $callback );
 	}
 
 	/**

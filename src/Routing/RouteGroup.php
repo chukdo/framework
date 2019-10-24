@@ -85,8 +85,10 @@ class RouteGroup
 
 	/**
 	 * @param Closure $closure
+	 *
+	 * @return RouteGroup
 	 */
-	public function group( Closure $closure )
+	public function group( Closure $closure ): self
 	{
 		$attributes = $this->router->attributes()
 								   ->get();
@@ -98,5 +100,7 @@ class RouteGroup
 
 		$this->router->attributes()
 					 ->set( $attributes );
+
+		return $this;
 	}
 }

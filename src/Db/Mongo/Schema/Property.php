@@ -5,8 +5,8 @@ namespace Chukdo\Db\Mongo\Schema;
 use Chukdo\Contracts\Db\Property as PropertyInterface;
 use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
-use Chukdo\Json\Arr;
-use Chukdo\Helper\Arr as ArrHelper;
+use Chukdo\Json\Iterate;
+use Chukdo\Helper\Arr;
 use Chukdo\Json\Json;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 
@@ -86,7 +86,7 @@ class Property implements PropertyInterface
 	 */
 	public function setProperties( array $value ): PropertyInterface
 	{
-		$properties = $this->property->offsetGetOrSet( 'properties', [] );
+		$properties = $this->property->offsetGetOrSet( 'properties' );
 
 		foreach ( $value as $k => $v ) {
 			$properties->offsetSet( $k, new Property( (array) $v, $k ) );
@@ -231,7 +231,7 @@ class Property implements PropertyInterface
 	{
 		$required = $this->required();
 
-		foreach ( ArrHelper::spreadArgs( $fields ) as $field ) {
+		foreach ( Arr::spreadArgs( $fields ) as $field ) {
 			foreach ( (array) $field as $f ) {
 				$required->appendIfNoExist( $f );
 			}
@@ -366,7 +366,7 @@ class Property implements PropertyInterface
 						->offsetGet( $name );
 		}
 
-		$arr       = new Arr( Str::split( $name, '.' ) );
+		$arr       = new Iterate( Str::split( $name, '.' ) );
 		$firstPath = $arr->getFirstAndRemove();
 		$endPath   = $arr->join( '.' );
 		$get       = $this->properties()
@@ -384,7 +384,7 @@ class Property implements PropertyInterface
 	 */
 	public function properties(): JsonInterface
 	{
-		return $this->property->offsetGetOrSet( 'properties', [] );
+		return $this->property->offsetGetOrSet( 'properties' );
 	}
 
 	/**

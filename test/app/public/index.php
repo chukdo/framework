@@ -260,13 +260,15 @@ echo $collect->where( 'volume', '>', 68 )
 
 exit;
 */
+
 set_time_limit( 3000 );
 $time            = time();
 $collectionMongo = $dbMongo->collection( 'esign' );
 
 $recordsMongo = $collectionMongo->find()
-								->limit( 17000 )
+								->limit( 170 )
 								->stream();
+
 $collect      = new \Chukdo\Json\Collect();
 $count        = $collect//->where( 'volume', '>', 68 )
 						//->sort( 'volume', SORT_DESC )
@@ -274,9 +276,11 @@ $count        = $collect//->where( 'volume', '>', 68 )
 ->unwind( 'modeles' )
 ->group( 'date', 'modeles._modele' )
 ->push( $recordsMongo )
-->values()
+->values();
 	//->sort()
-->count();
+echo '<pre>';
+print_r( $count );
+echo "\n____________________\n";
 echo time() - $time;
 exit;
 $contrat = Mongo::collection( 'contrat' );

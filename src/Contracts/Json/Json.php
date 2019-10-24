@@ -143,13 +143,6 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
 	public function push( iterable $push = null, bool $overwrite = null ): JsonInterface;
 
 	/**
-	 * @param mixed ...$names
-	 *
-	 * @return Json
-	 */
-	public function map( ... $names ): JsonInterface;
-
-	/**
 	 * @param Closure $closure
 	 *
 	 * @return Json

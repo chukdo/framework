@@ -412,20 +412,13 @@ class Header
 			}
 
 			if ( $isAllow || $origin === '*' ) {
-				$this->setHeader( 'Access-Control-Allow-Origin',
-					$_SERVER[ 'HTTP_ORIGIN' ] )
-					 ->setHeader( 'X-Origin',
-						 $_SERVER[ 'HTTP_ORIGIN' ] )
-					 ->setHeader( 'Access-Control-Allow-Methods',
-						 $method )
-					 ->setHeader( 'Access-Control-Allow-Credentials',
-						 'true' )
-					 ->setHeader( 'Access-Control-Allow-Headers',
-						 $allow )
-					 ->setHeader( 'Access-Control-Expose-Headers',
-						 'Content-Disposition' )
-					 ->setHeader( 'Vary',
-						 'Origin' );
+				$this->setHeader( 'Access-Control-Allow-Origin', $_SERVER[ 'HTTP_ORIGIN' ] )
+					 ->setHeader( 'X-Origin', $_SERVER[ 'HTTP_ORIGIN' ] )
+					 ->setHeader( 'Access-Control-Allow-Methods', $method )
+					 ->setHeader( 'Access-Control-Allow-Credentials', 'true' )
+					 ->setHeader( 'Access-Control-Allow-Headers', $allow )
+					 ->setHeader( 'Access-Control-Expose-Headers', 'Content-Disposition' )
+					 ->setHeader( 'Vary', 'Origin' );
 			}
 		}
 
@@ -644,11 +637,11 @@ class Header
 			'lastmodified',
 		];
 
-		/* La methode existe */
+		/** La methode existe */
 		if ( isset( $method[ $header ] ) ) {
 			$key = $method[ $header ];
 
-			/* Gestion des timestamp */
+			/** Gestion des timestamp */
 			if ( Arr::in( $header, $date ) ) {
 				switch ( $action ) {
 					case 'set':
@@ -667,7 +660,7 @@ class Header
 						return $this->unsetHeader( $key );
 				}
 
-				/* Gestion des methodes Set || Get */
+				/** Gestion des methodes Set || Get */
 			} else {
 				switch ( $action ) {
 					case 'set':

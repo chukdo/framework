@@ -174,10 +174,8 @@ class Response
 			?? Http::mimeContentType( $name );
 
 		$this->file = $file;
-		$this->header->setHeader( 'Content-Disposition',
-			'attachment; filename="' . $name . '"' )
-					 ->setHeader( 'Content-Type',
-						 $type );
+		$this->header->setHeader( 'Content-Disposition', 'attachment; filename="' . $name . '"' )
+					 ->setHeader( 'Content-Type', $type );
 
 		return $this;
 	}
@@ -197,10 +195,8 @@ class Response
 			?? Http::mimeContentType( $name );
 
 		$this->file = $file;
-		$this->header->setHeader( 'Content-Disposition',
-			'inline; filename="' . $name . '"' )
-					 ->setHeader( 'Content-Type',
-						 $type );
+		$this->header->setHeader( 'Content-Disposition', 'inline; filename="' . $name . '"' )
+					 ->setHeader( 'Content-Type', $type );
 
 		return $this;
 	}
@@ -212,8 +208,7 @@ class Response
 	 */
 	public function html( string $content ): self
 	{
-		$this->header->setHeader( 'Content-Type',
-			'text/html; charset=utf-8' );
+		$this->header->setHeader( 'Content-Type', 'text/html; charset=utf-8' );
 
 		$this->content( $content );
 
@@ -263,8 +258,7 @@ class Response
 	 */
 	public function text( $content ): self
 	{
-		$this->header->setHeader( 'Content-Type',
-			'text/plain; charset=utf-8' );
+		$this->header->setHeader( 'Content-Type', 'text/plain; charset=utf-8' );
 
 		$this->content( ( new Json( $content ) )->toJson() );
 
@@ -278,8 +272,7 @@ class Response
 	 */
 	public function json( $content ): self
 	{
-		$this->header->setHeader( 'Content-Type',
-			'application/json; charset=utf-8' );
+		$this->header->setHeader( 'Content-Type', 'application/json; charset=utf-8' );
 
 		$this->content( ( new Json( $content ) )->toJson() );
 
@@ -294,12 +287,10 @@ class Response
 	 */
 	public function xml( $content, bool $html = false ): self
 	{
-		$this->header->setHeader( 'Content-Type',
-			'text/xml; charset=utf-8' );
+		$this->header->setHeader( 'Content-Type', 'text/xml; charset=utf-8' );
 
 		$this->content( ( new Xml() )->import( $content )
-									 ->toXmlString( $html,
-										 true ) );
+									 ->toXmlString( $html, true ) );
 
 		return $this;
 	}
@@ -323,11 +314,11 @@ class Response
 	public function send(): self
 	{
 		if ( headers_sent( $filename, $linenum ) || error_get_last() !== null ) {
-			throw new HttpException( sprintf( "Headers already sent from file %s at line %s", $filename, $linenum ) );
+			throw new HttpException( sprintf( 'Headers already sent from file %s at line %s', $filename, $linenum ) );
 		}
 
-		$hasContent = $this->content != null;
-		$hasFile    = $this->file != null;
+		$hasContent = $this->content !== null;
+		$hasFile    = $this->file !== null;
 
 		if ( $hasContent ) {
 			$this->sendContentResponse();
@@ -351,19 +342,15 @@ class Response
 	{
 		$content = $this->content;
 
-		if ( Str::contain( HttpRequest::server( 'HTTP_ACCEPT_ENCODING' ),
-			'deflate' ) ) {
-			$this->header->setHeader( 'Content-Encoding',
-				'deflate' );
+		if ( Str::contain( HttpRequest::server( 'HTTP_ACCEPT_ENCODING' ), 'deflate' ) ) {
+			$this->header->setHeader( 'Content-Encoding', 'deflate' );
 			$content = gzdeflate( $this->content );
-		} else if ( Str::contain( HttpRequest::server( 'HTTP_ACCEPT_ENCODING' ),
-			'gzip' ) ) {
-			$this->header->setHeader( 'Content-Encoding',
-				'gzip' );
+		} else if ( Str::contain( HttpRequest::server( 'HTTP_ACCEPT_ENCODING' ), 'gzip' ) ) {
+			$this->header->setHeader( 'Content-Encoding', 'gzip' );
 			$content = gzencode( $this->content );
 		}
 
-		if ( $this->header->getHeader( 'Transfer-Encoding' ) == 'chunked' ) {
+		if ( $this->header->getHeader( 'Transfer-Encoding' ) === 'chunked' ) {
 			$this->sendHeaderResponse();
 
 			foreach ( str_split( $content,
@@ -388,28 +375,12 @@ class Response
 	/**
 	 * @return Response
 	 */
-	protected function sendHeaderResponse(): self
-	{
-		header_remove();
-
-		foreach ( explode( "\n",
-			$this->header->send() ) as $header ) {
-			header( $header, true );
-		}
-
-		return $this;
-	}
-
-	/**
-	 * @return Response
-	 */
 	protected function sendDownloadResponse(): self
 	{
-		if ( $this->header->getHeader( 'Transfer-Encoding' ) == 'chunked' ) {
+		if ( $this->header->getHeader( 'Transfer-Encoding' ) === 'chunked' ) {
 			$this->sendHeaderResponse();
 
-			$f = fopen( $this->file,
-				'rb' );
+			$f = fopen( $this->file, 'rb' );
 
 			while ( !feof( $f ) ) {
 				$c = fread( $f,
@@ -423,8 +394,7 @@ class Response
 
 			echo "0\r\n";
 		} else {
-			$this->header->setHeader( 'Content-Length',
-				filesize( $this->file ) );
+			$this->header->setHeader( 'Content-Length', filesize( $this->file ) );
 			$this->sendHeaderResponse();
 			readfile( $this->file );
 		}
@@ -433,9 +403,23 @@ class Response
 	}
 
 	/**
+	 * @return Response
+	 */
+	protected function sendHeaderResponse(): self
+	{
+		header_remove();
+
+		foreach ( explode( "\n", $this->header->send() ) as $header ) {
+			header( $header, true );
+		}
+
+		return $this;
+	}
+
+	/**
 	 *
 	 */
-	public function end()
+	public function end(): void
 	{
 		exit;
 	}

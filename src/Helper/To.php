@@ -204,8 +204,7 @@ final class To
 			$array = [ $value ];
 
 			/** La valeur est un object avec une fonction de transformation */
-		} else if ( Is::object( $value,
-			'toArray' ) ) {
+		} else if ( Is::object( $value, 'toArray' ) ) {
 			$array = $value->toArray();
 
 			/** La valeur est un tableau ou est travsersable */

@@ -64,8 +64,7 @@ final class Http
 
 		$ext = Str::extension( $name );
 
-		if ( array_key_exists( $ext,
-			$mimeTypes ) ) {
+		if ( array_key_exists( $ext, $mimeTypes ) ) {
 			return $mimeTypes[ $ext ];
 		}
 
@@ -105,22 +104,15 @@ final class Http
 		};
 
 		/** Browser & Version */
-		if ( !$is( 'firefox' ) ) {
-			if ( !$is( 'edge', 'msie' ) ) {
-				if ( !$is( 'msie' ) ) {
-					if ( !$is( 'trident', 'msie' ) ) {
-						if ( !$is( 'opera' ) ) {
-							if ( !$is( 'opr', 'opera' ) ) {
-								if ( !$is( 'chromium', 'chrome' ) ) {
-									if ( !$is( 'chrome' ) ) {
-										$is( 'safari' );
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+		if ( !$is( 'firefox' ) &&
+			!$is( 'edge', 'msie' ) &&
+			!$is( 'msie' ) &&
+			!$is( 'trident', 'msie' ) &&
+			!$is( 'opera' ) &&
+			!$is( 'opr', 'opera' ) &&
+			!$is( 'chromium', 'chrome' ) &&
+			!$is( 'chrome' ) ) {
+			$is( 'safari' );
 		}
 
 		/** Platform */

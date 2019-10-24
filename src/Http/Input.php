@@ -4,7 +4,7 @@ namespace Chukdo\Http;
 
 use Chukdo\Contracts\Http\Input as InputInterface;
 use Chukdo\Json\Json;
-use Chukdo\Helper\Cli;
+use Chukdo\Helper\HttpRequest;
 use Chukdo\Storage\FileUploaded;
 use Throwable;
 
@@ -25,11 +25,9 @@ class Input extends Json implements InputInterface
 	public function __construct( $data = null )
 	{
 		$data = $data
-			?? ( Cli::runningInConsole()
-				? Cli::inputs()
-				: $_REQUEST );
+			?? HttpRequest::all();
 
-		/* Trim all input */
+		/** Trim all input */
 		array_walk_recursive( $data,
 			function( &$v, $k ) {
 				if ( is_scalar( $v ) ) {

@@ -38,10 +38,8 @@ class Url
 	public function __construct( string $url = null, string $defaultScheme = null )
 	{
 		if ( $url ) {
-			if ( $defaultScheme ) {
-				if ( !Str::match( '/^[a-z0-9]+:\/\//', $url ) ) {
-					$url = $defaultScheme . '://' . $url;
-				}
+			if ( $defaultScheme && !Str::match( '/^[a-z0-9]+:\/\//', $url ) ) {
+				$url = $defaultScheme . '://' . $url;
 			}
 
 			$this->parseUrl( $url );
@@ -99,8 +97,7 @@ class Url
 	 */
 	public function setQuery( string $query ): Url
 	{
-		parse_str( $query,
-			$this->url[ 'input' ] );
+		parse_str( $query, $this->url[ 'input' ] );
 
 		return $this;
 	}
@@ -222,9 +219,7 @@ class Url
 	 */
 	public function getInput( string $key ): string
 	{
-		return isset( $this->url[ 'input' ][ $key ] )
-			? $this->url[ 'input' ][ $key ]
-			: '';
+		return $this->url[ 'input' ][ $key ] ?? '';
 	}
 
 	/**
