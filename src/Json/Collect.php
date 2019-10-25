@@ -46,6 +46,16 @@ class Collect
 	/**
 	 * @var array
 	 */
+	protected $sum = [];
+
+	/**
+	 * @var array
+	 */
+	protected $sumCache = [];
+
+	/**
+	 * @var array
+	 */
 	protected $filter = [];
 
 	/**
@@ -90,17 +100,11 @@ class Collect
 	public function append( array $data ): self
 	{
 		foreach ( $this->unwindData( $data ) as $unwind ) {
-			if ( ( $unwind = $this->evalWithout( $unwind ) ) &&
-				( $unwind = $this->evalWith( $unwind ) ) &&
-				( $unwind = $this->evalFilter( $unwind ) ) &&
-				( $unwind = $this->evalFilterRecursive( $unwind ) ) &&
-				( $unwind = $this->evalWhere( $unwind ) ) &&
-				( $unwind = $this->evalMatch( $unwind ) ) ) {
-
+			if ( $eval = $this->eval( $unwind ) ) {
 				if ( $this->hasGroup() ) {
-					$this->groupData( $unwind );
+					$this->groupData( $eval );
 				} else {
-					$this->appendData( $unwind );
+					$this->appendData( $eval );
 				}
 			}
 		}
@@ -124,6 +128,81 @@ class Collect
 		}
 
 		return [ $data ];
+	}
+
+	/**
+	 * @param array $data
+	 *
+	 * @return array|null
+	 */
+	protected function eval( array $data ): ?array
+	{
+		if ( ( $without = $this->evalWithout( $data ) ) &&
+			( $with = $this->evalWith( $without ) ) &&
+			( $filter = $this->evalFilter( $with ) ) &&
+			( $filterRecursive = $this->evalFilterRecursive( $filter ) ) &&
+			( $where = $this->evalWhere( $filterRecursive ) ) &&
+			( $match = $this->evalMatch( $where ) ) ) {
+			return $match;
+		}
+
+		return null;
+	}
+
+	/**
+	 * @return bool
+	 */
+	protected function hasGroup(): bool
+	{
+		return Arr::hasContent( $this->group );
+	}
+
+	/**
+	 * @param array $data
+	 *
+	 * @return $this
+	 */
+	protected function groupData( array $data ): self
+	{
+		$path = [];
+
+		foreach ( $this->group as $group ) {
+			$get = Arr::get( $data, $group );
+
+			if ( Is::null( $get ) || !Is::scalar( $get ) ) {
+				return $this;
+			}
+
+			$path[] = $get . '.projection';
+		}
+
+		Arr::addToSet( $this->collection, implode( '.', $path ), $data );
+
+		return $this;
+	}
+
+	/**
+	 * @param array $data
+	 *
+	 * @return $this
+	 */
+	protected function appendData( array $data ): self
+	{
+		if ( $this->hasSum() ) {
+			$this->evalSum( $data );
+		} else {
+			$this->collection[] = $data;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * @return bool
+	 */
+	protected function hasUnwind(): bool
+	{
+		return Arr::hasContent( $this->unwind );
 	}
 
 	/**
@@ -243,53 +322,23 @@ class Collect
 	/**
 	 * @return bool
 	 */
-	protected function hasGroup(): bool
+	protected function hasSum(): bool
 	{
-		return Arr::hasContent( $this->group );
+		return Arr::hasContent( $this->sum );
 	}
 
 	/**
 	 * @param array $data
-	 *
-	 * @return $this
 	 */
-	protected function groupData( array $data ): self
+	protected function evalSum( array $data ): void
 	{
-		$path = [];
-
-		foreach ( $this->group as $group ) {
-			$get = Arr::get( $data, $group );
-
-			if ( Is::null( $get ) || !Is::scalar( $get ) ) {
-				return $this;
+		foreach ( $this->sum as $sum ) {
+			if ( !isset( $this->sumCache[ $sum[ 'name' ] ] ) ) {
+				$this->sumCache[ $sum[ 'name' ] ] = 0;
 			}
 
-			$path[] = $get;
+			$this->sumCache[ $sum[ 'name' ] ] += Arr::get( $data, $sum[ 'field' ] );
 		}
-
-		Arr::addToSet( $this->collection, implode( '.', $path ), $data );
-
-		return $this;
-	}
-
-	/**
-	 * @param array $data
-	 *
-	 * @return $this
-	 */
-	protected function appendData( array $data ): self
-	{
-		$this->collection[] = $data;
-
-		return $this;
-	}
-
-	/**
-	 * @return bool
-	 */
-	protected function hasUnwind(): bool
-	{
-		return Arr::hasContent( $this->unwind );
 	}
 
 	/**
@@ -455,6 +504,24 @@ class Collect
 	}
 
 	/**
+	 * @param string      $field
+	 * @param string|null $name
+	 * @param string|null $group
+	 *
+	 * @return $this
+	 */
+	public function sum( string $field, string $name = null, string $group = null ): self
+	{
+		$this->sum[] = [
+			'field' => $field,
+			'name'  => $name ?? $field,
+			'group' => $group,
+		];
+
+		return $this;
+	}
+
+	/**
 	 * @param mixed ...$names
 	 *
 	 * @return Collect
@@ -483,6 +550,10 @@ class Collect
 	 */
 	public function values(): array
 	{
+		if ( $this->hasSum() ) {
+			return $this->sumCache;
+		}
+
 		if ( $this->hasSort() && !$this->hasGroup() ) {
 			$this->sortCollection();
 		}

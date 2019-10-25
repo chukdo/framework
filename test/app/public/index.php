@@ -266,15 +266,17 @@ $time            = time();
 $collectionMongo = $dbMongo->collection( 'esign' );
 
 $recordsMongo = $collectionMongo->find()
-								->limit( 170 )
+								->limit( 100 )
 								->stream();
 
 $collect      = new \Chukdo\Json\Collect();
 $count        = $collect//->where( 'volume', '>', 68 )
 						//->sort( 'volume', SORT_DESC )
-->with( '_agence', 'date', 'modeles._modele', 'modeles.titre' )
+->with( '_agence', 'date', 'modeles._modele', 'modeles.titre', 'modeles.mandat', 'modeles.signers' )
 ->unwind( 'modeles' )
 ->group( 'date', 'modeles._modele' )
+->sum( 'modeles.signers', 'signers', 'modeles._modele' )
+->sum( 'modeles.mandat', null, 'date' )
 ->push( $recordsMongo )
 ->values();
 	//->sort()
