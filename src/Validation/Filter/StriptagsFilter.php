@@ -6,6 +6,7 @@ use Chukdo\Contracts\Validation\Filter as FilterInterface;
 
 /**
  * Validate handler.
+ *
  * @version   1.0.0
  * @copyright licence MIT, Copyright (C) 2019 Domingo
  * @since     08/01/2019
@@ -20,7 +21,7 @@ class StriptagsFilter implements FilterInterface
 	{
 		return 'striptags';
 	}
-
+	
 	/**
 	 * @param array $attributes
 	 *
@@ -30,7 +31,7 @@ class StriptagsFilter implements FilterInterface
 	{
 		return $this;
 	}
-
+	
 	/**
 	 * @param $input
 	 *

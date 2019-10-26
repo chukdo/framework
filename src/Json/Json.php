@@ -15,6 +15,7 @@ use League\CLImate\CLImate;
 
 /**
  * Manipulation des données.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -26,7 +27,7 @@ class Json extends ArrayObject implements JsonInterface
 	 * @var bool $strict
 	 */
 	protected $strict = true;
-
+	
 	/**
 	 * Json constructor.
 	 *
@@ -36,22 +37,25 @@ class Json extends ArrayObject implements JsonInterface
 	public function __construct( $data = null, bool $strict = true )
 	{
 		$this->strict = $strict;
-
 		parent::__construct( [] );
-
+		
 		if ( Is::iterable( $data ) ) {
 			foreach ( $data as $k => $v ) {
 				$this->offsetSet( $k, $v );
 			}
-		} else if ( Is::jsonString( $data ) ) {
-			foreach ( json_decode( $data, true, 512, JSON_THROW_ON_ERROR ) as $k => $v ) {
-				$this->offsetSet( $k, $v );
+		} else {
+			if ( Is::jsonString( $data ) ) {
+				foreach ( json_decode( $data, true, 512, JSON_THROW_ON_ERROR ) as $k => $v ) {
+					$this->offsetSet( $k, $v );
+				}
+			} else {
+				if ( !Is::null( $data ) ) {
+					throw new JsonException( 'Data must be null or Iterable or JsonString' );
+				}
 			}
-		} else if ( !Is::null( $data ) ) {
-			throw new JsonException( 'Data must be null or Iterable or JsonString' );
 		}
 	}
-
+	
 	/**
 	 * @param mixed $key
 	 * @param mixed $value
@@ -60,15 +64,16 @@ class Json extends ArrayObject implements JsonInterface
 	 */
 	public function offsetSet( $key, $value ): JsonInterface
 	{
-		if ( ( $this->strict === true && Is::iterable( $value ) ) || ( Is::arr( $value ) && !Is::jsonInterface( $value ) ) ) {
+		if ( ( $this->strict === true && Is::iterable( $value ) ) ||
+		     ( Is::arr( $value ) && !Is::jsonInterface( $value ) ) ) {
 			parent::offsetSet( $key, new Json( $value, $this->strict ) );
 		} else {
 			parent::offsetSet( $key, $value );
 		}
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $key
 	 *
@@ -80,7 +85,7 @@ class Json extends ArrayObject implements JsonInterface
 			? $this->offsetGet( $key )
 			: null;
 	}
-
+	
 	/**
 	 * @param string $key
 	 * @param        $value
@@ -89,7 +94,7 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		$this->offsetSet( $key, $value );
 	}
-
+	
 	/**
 	 * @param mixed $key
 	 *
@@ -99,7 +104,7 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		return parent::offsetExists( $key );
 	}
-
+	
 	/**
 	 * @param mixed $key
 	 * @param null  $default
@@ -111,10 +116,10 @@ class Json extends ArrayObject implements JsonInterface
 		if ( $this->offsetExists( $key ) ) {
 			return parent::offsetGet( $key );
 		}
-
+		
 		return $default;
 	}
-
+	
 	/**
 	 * @param string $key
 	 *
@@ -124,7 +129,7 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		return $this->offsetExists( $key );
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -132,7 +137,7 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		return $this->toJson( true );
 	}
-
+	
 	/**
 	 * @param bool $prettify
 	 *
@@ -140,12 +145,11 @@ class Json extends ArrayObject implements JsonInterface
 	 */
 	public function toJson( bool $prettify = false ): string
 	{
-		return json_encode( $this->toArray(),
-			$prettify
-				? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
-				: JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR, 512 );
+		return json_encode( $this->toArray(), $prettify
+			? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
+			: JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR, 512 );
 	}
-
+	
 	/**
 	 * @return array
 	 */
@@ -153,14 +157,14 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		return $this->getArrayCopy();
 	}
-
+	
 	/**
 	 * @return array
 	 */
 	public function getArrayCopy(): array
 	{
 		$array = parent::getArrayCopy();
-
+		
 		/** Iteration de l'objet pour convertir
 		 * les sous elements data_array en array */
 		foreach ( $array as $k => $v ) {
@@ -168,10 +172,10 @@ class Json extends ArrayObject implements JsonInterface
 				$array[ $k ] = $v->getArrayCopy();
 			}
 		}
-
+		
 		return $array;
 	}
-
+	
 	/**
 	 * @param string $key
 	 *
@@ -181,7 +185,7 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		return (bool) $this->offsetUnset( $key );
 	}
-
+	
 	/**
 	 * @param mixed $key
 	 *
@@ -192,13 +196,13 @@ class Json extends ArrayObject implements JsonInterface
 		if ( $this->offsetExists( $key ) ) {
 			$offset = parent::offsetGet( $key );
 			parent::offsetUnset( $key );
-
+			
 			return $offset;
 		}
-
+		
 		return null;
 	}
-
+	
 	/**
 	 * @param string $path
 	 * @param        $value
@@ -208,21 +212,23 @@ class Json extends ArrayObject implements JsonInterface
 	public function addToSet( string $path, $value ): JsonInterface
 	{
 		$get = $this->get( $path );
-
+		
 		if ( $get === null ) {
 			$this->set( $path, [ $value ] );
-		} else if ( ( $get instanceof JsonInterface ) ) {
-			$get->append( $value );
 		} else {
-			$this->set( $path, [
-				$get,
-				$value,
-			] );
+			if ( ( $get instanceof JsonInterface ) ) {
+				$get->append( $value );
+			} else {
+				$this->set( $path, [
+					$get,
+					$value,
+				] );
+			}
 		}
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string|null $path
 	 * @param null        $default
@@ -234,23 +240,23 @@ class Json extends ArrayObject implements JsonInterface
 		if ( $path === null ) {
 			return $default;
 		}
-
+		
 		if ( Str::notContain( $path, '.' ) ) {
 			return $this->offsetGet( $path, $default );
 		}
-
+		
 		$arr       = new Iterate( Str::split( $path, '.' ) );
 		$firstPath = $arr->getFirstAndRemove();
 		$endPath   = $arr->join( '.' );
 		$get       = $this->offsetGet( $firstPath );
-
+		
 		if ( $get instanceof JsonInterface ) {
 			return $get->get( $endPath, $default );
 		}
-
+		
 		return $default;
 	}
-
+	
 	/**
 	 * @param string $path
 	 * @param        $value
@@ -262,17 +268,16 @@ class Json extends ArrayObject implements JsonInterface
 		if ( Str::notContain( $path, '.' ) ) {
 			return $this->offsetSet( $path, $value );
 		}
-
+		
 		$arr       = new Iterate( Str::split( $path, '.' ) );
 		$firstPath = $arr->getFirstAndRemove();
 		$endPath   = $arr->join( '.' );
-
 		$this->offsetGetOrSet( $firstPath )
-			 ->set( $endPath, $value );
-
+		     ->set( $endPath, $value );
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param mixed $value
 	 *
@@ -280,15 +285,16 @@ class Json extends ArrayObject implements JsonInterface
 	 */
 	public function append( $value ): JsonInterface
 	{
-		if ( ( $this->strict === true && Is::iterable( $value ) ) || ( Is::arr( $value ) && !Is::jsonInterface( $value ) ) ) {
+		if ( ( $this->strict === true && Is::iterable( $value ) ) ||
+		     ( Is::arr( $value ) && !Is::jsonInterface( $value ) ) ) {
 			parent::append( new Json( $value, $this->strict ) );
 		} else {
 			parent::append( $value );
 		}
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param       $key
 	 * @param mixed $value
@@ -299,17 +305,15 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		if ( $this->offsetExists( $key ) ) {
 			$get = parent::offsetGet( $key );
-
 			if ( $get instanceof JsonInterface ) {
 				return $get;
 			}
 		}
-
-		return $this->offsetSet( $key, $value
-			?? [] )
-					->offsetGet( $key );
+		
+		return $this->offsetSet( $key, $value ?? [] )
+		            ->offsetGet( $key );
 	}
-
+	
 	/**
 	 * @return $this
 	 */
@@ -317,7 +321,7 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		return $this;
 	}
-
+	
 	/**
 	 * @param mixed $value
 	 *
@@ -330,26 +334,25 @@ class Json extends ArrayObject implements JsonInterface
 				return $this;
 			}
 		}
-
+		
 		return $this->append( $value );
 	}
-
+	
 	/**
 	 * @return JsonInterface
 	 */
 	public function clean(): JsonInterface
 	{
 		$json = new Json();
-
 		foreach ( $this as $k => $v ) {
 			if ( $v !== null && $v !== '' ) {
 				$json->offsetSet( $k, $v );
 			}
 		}
-
+		
 		return $json;
 	}
-
+	
 	/**
 	 * @return mixed
 	 */
@@ -357,7 +360,7 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		return $this->getIndex( 0 );
 	}
-
+	
 	/**
 	 * @param int   $key
 	 * @param mixed $default
@@ -367,20 +370,19 @@ class Json extends ArrayObject implements JsonInterface
 	public function getIndex( int $key = 0, $default = null )
 	{
 		$index = 0;
-
+		
 		if ( $this->count() > 0 ) {
 			foreach ( $this as $value ) {
 				if ( $key === $index ) {
 					return $value;
 				}
-
 				++$index;
 			}
 		}
-
+		
 		return $default;
 	}
-
+	
 	/**
 	 * @return int
 	 */
@@ -388,7 +390,7 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		return parent::count();
 	}
-
+	
 	/**
 	 * @param int $key
 	 *
@@ -398,7 +400,7 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		return $this->getIndex( $key, new Json() );
 	}
-
+	
 	/**
 	 * @param string|null $path
 	 *
@@ -408,7 +410,7 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		return $this->get( $path, new Json() );
 	}
-
+	
 	/**
 	 * @return mixed|null
 	 */
@@ -417,10 +419,10 @@ class Json extends ArrayObject implements JsonInterface
 		foreach ( $this as $key => $unused ) {
 			return $key;
 		}
-
+		
 		return null;
 	}
-
+	
 	/**
 	 * @param int  $index
 	 * @param null $default
@@ -436,24 +438,24 @@ class Json extends ArrayObject implements JsonInterface
 				}
 			}
 		}
-
+		
 		return $default;
 	}
-
+	
 	/**
 	 * @return mixed|null
 	 */
 	public function getKeyLast()
 	{
 		$last = null;
-
+		
 		foreach ( $this as $key => $unused ) {
 			$last = $key;
 		}
-
+		
 		return $last;
 	}
-
+	
 	/**
 	 * @return mixed
 	 */
@@ -461,7 +463,7 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		return $this->getIndex( $this->count() - 1 );
 	}
-
+	
 	/**
 	 * @param $value
 	 *
@@ -474,10 +476,10 @@ class Json extends ArrayObject implements JsonInterface
 				return true;
 			}
 		}
-
+		
 		return false;
 	}
-
+	
 	/**
 	 * @param $value
 	 *
@@ -490,10 +492,10 @@ class Json extends ArrayObject implements JsonInterface
 				return $k;
 			}
 		}
-
+		
 		return null;
 	}
-
+	
 	/**
 	 * @param JsonInterface $json
 	 *
@@ -502,16 +504,15 @@ class Json extends ArrayObject implements JsonInterface
 	public function intersect( JsonInterface $json ): JsonInterface
 	{
 		$intersect = new Json();
-
 		foreach ( $this as $key => $value ) {
 			if ( $json->offsetExists( $key ) ) {
 				$intersect->offsetSet( $key, $value );
 			}
 		}
-
+		
 		return $intersect;
 	}
-
+	
 	/**
 	 * @param mixed ...$param
 	 *
@@ -522,14 +523,13 @@ class Json extends ArrayObject implements JsonInterface
 		$param      = Arr::spreadArgs( $param );
 		$function   = array_shift( $param );
 		$param[ 0 ] = $this->get( $param[ 0 ] );
-
+		
 		return call_user_func_array( [
-			Is::class,
-			$function,
-		],
-			$param );
+			                             Is::class,
+			                             $function,
+		                             ], $param );
 	}
-
+	
 	/**
 	 * @return bool
 	 */
@@ -537,7 +537,7 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		return $this->isArray;
 	}
-
+	
 	/**
 	 * @return bool
 	 */
@@ -545,7 +545,7 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		return $this->count() === 0;
 	}
-
+	
 	/**
 	 * @param bool $byKey
 	 *
@@ -558,10 +558,10 @@ class Json extends ArrayObject implements JsonInterface
 		} else {
 			$this->ksort();
 		}
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param mixed ...$param
 	 *
@@ -572,13 +572,13 @@ class Json extends ArrayObject implements JsonInterface
 		$param      = Arr::spreadArgs( $param );
 		$function   = array_shift( $param );
 		$param[ 0 ] = $this->get( $param[ 0 ] );
-
+		
 		return call_user_func_array( [
-			To::class,
-			$function,
-		], $param );
+			                             To::class,
+			                             $function,
+		                             ], $param );
 	}
-
+	
 	/**
 	 * @param string|null $title
 	 * @param string|null $color
@@ -590,25 +590,23 @@ class Json extends ArrayObject implements JsonInterface
 		if ( !Cli::runningInConsole() ) {
 			throw new JsonException( 'You can call json::toConsole only in CLI mode.' );
 		}
-
+		
 		$climate = new CLImate();
 		$climate->output->defaultTo( 'buffer' );
-
+		
 		if ( $title ) {
 			$climate->border();
-			$climate->style->addCommand( 'colored', $color
-				?? 'green' );
-			$climate->colored( ucfirst( $title
-				?? $this->name ) );
+			$climate->style->addCommand( 'colored', $color ?? 'green' );
+			$climate->colored( ucfirst( $title ?? $this->name ) );
 			$climate->border();
 		}
-
+		
 		$climate->json( $this->toArray() );
-
+		
 		return $climate->output->get( 'buffer' )
-							   ->get();
+		                       ->get();
 	}
-
+	
 	/**
 	 * @param string|null $title
 	 * @param string|null $color
@@ -619,7 +617,7 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		return To::html( $this, $title, $color, true );
 	}
-
+	
 	/**
 	 * @return Xml
 	 */
@@ -627,10 +625,10 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		$xml = new Xml();
 		$xml->import( $this->toArray() );
-
+		
 		return $xml;
 	}
-
+	
 	/**
 	 * @param string $path
 	 *
@@ -641,19 +639,19 @@ class Json extends ArrayObject implements JsonInterface
 		if ( Str::notContain( $path, '.' ) ) {
 			return $this->offsetUnset( $path );
 		}
-
+		
 		$arr       = new Iterate( Str::split( $path, '.' ) );
 		$firstPath = $arr->getFirstAndRemove();
 		$endPath   = $arr->join( '.' );
 		$get       = $this->offsetGet( $firstPath );
-
+		
 		if ( $get instanceof JsonInterface ) {
 			return $get->unset( $endPath );
 		}
-
+		
 		return null;
 	}
-
+	
 	/**
 	 * @param string $path
 	 *
@@ -663,17 +661,17 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		$unwinded = new Json( null, $this->strict );
 		$toUnwind = $this->get( $path );
-
+		
 		if ( $toUnwind instanceof JsonInterface ) {
 			foreach ( $toUnwind as $unwind ) {
 				$unwinded->append( $this->clone()
-										->set( $path, $unwind ) );
+				                        ->set( $path, $unwind ) );
 			}
 		}
-
+		
 		return $unwinded;
 	}
-
+	
 	/**
 	 * @return JsonInterface
 	 */
@@ -681,7 +679,7 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		return clone $this;
 	}
-
+	
 	/**
 	 * @param $key
 	 *
@@ -690,16 +688,16 @@ class Json extends ArrayObject implements JsonInterface
 	public function coll( $key ): JsonInterface
 	{
 		$coll = new Json();
-
+		
 		foreach ( $this as $offsetKey => $offsetValue ) {
 			if ( $key === $offsetKey ) {
 				$coll->append( $offsetValue );
 			}
 		}
-
+		
 		return $coll;
 	}
-
+	
 	/**
 	 * @param JsonInterface $json
 	 * @param bool          $flat
@@ -711,37 +709,35 @@ class Json extends ArrayObject implements JsonInterface
 		$src  = $this->to2d();
 		$new  = $json->to2d();
 		$diff = new Json();
-		$set  = static function( $path, $data ) use ( $diff, $flat ) {
+		$set  = static function ( $path, $data ) use ( $diff, $flat )
+		{
 			$flat
 				? $diff->append( Arr::merge( [ 'path' => $path ], $data ) )
 				: $diff->set( $path, $data );
 		};
-
+		
 		foreach ( $src as $path => $srcValue ) {
 			if ( $newValue = $new->offsetUnset( $path ) ) {
-
 				/** Common */
 				if ( $srcValue === $newValue ) {
 					$set( $path, [
 						'op'    => 'common',
 						'value' => $srcValue,
 					] );
-				} /** Replace */
-				else {
+					/** Replace */
+				} else {
 					$set( $path, [
 						'op'    => 'replace',
 						'old'   => $srcValue,
 						'value' => $newValue,
 					] );
 				}
-			} /** Delete */
-			else {
-				$set( $path, [
-					'op' => 'remove',
-				] );
+				/** Delete */
+			} else {
+				$set( $path, [ 'op' => 'remove', ] );
 			}
 		}
-
+		
 		/** Add */
 		foreach ( $new as $path => $newValue ) {
 			$set( $path, [
@@ -749,10 +745,10 @@ class Json extends ArrayObject implements JsonInterface
 				'value' => $newValue,
 			] );
 		}
-
+		
 		return $diff;
 	}
-
+	
 	/**
 	 * @param string|null $prefix
 	 *
@@ -761,20 +757,20 @@ class Json extends ArrayObject implements JsonInterface
 	public function to2d( string $prefix = null ): JsonInterface
 	{
 		$mixed = new Json();
-
+		
 		foreach ( $this as $k => $v ) {
 			$k = trim( $prefix . '.' . $k, '.' );
-
+			
 			if ( $v instanceof JsonInterface ) {
 				$mixed->merge( $v->to2d( $k ) );
 			} else {
 				$mixed->offsetSet( $k, $v );
 			}
 		}
-
+		
 		return $mixed;
 	}
-
+	
 	/**
 	 * @param iterable|null $merge
 	 * @param bool|null     $overwrite
@@ -790,10 +786,10 @@ class Json extends ArrayObject implements JsonInterface
 				}
 			}
 		}
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $path
 	 *
@@ -802,10 +798,10 @@ class Json extends ArrayObject implements JsonInterface
 	public function exists( string $path ): bool
 	{
 		$value = $this->get( $path );
-
+		
 		return $value !== null;
 	}
-
+	
 	/**
 	 * @param string $path
 	 *
@@ -814,10 +810,10 @@ class Json extends ArrayObject implements JsonInterface
 	public function filled( string $path ): bool
 	{
 		$value = $this->get( $path );
-
+		
 		return $value !== null && $value !== '';
 	}
-
+	
 	/**
 	 * @param Closure $closure
 	 *
@@ -826,18 +822,16 @@ class Json extends ArrayObject implements JsonInterface
 	public function filter( Closure $closure ): JsonInterface
 	{
 		$json = new Json();
-
 		foreach ( $this as $k => $v ) {
 			$r = $closure( $k, $v );
-
 			if ( $r !== null ) {
 				$json->offsetSet( $k, $r );
 			}
 		}
-
+		
 		return $json;
 	}
-
+	
 	/**
 	 * @param Closure $closure
 	 *
@@ -846,26 +840,23 @@ class Json extends ArrayObject implements JsonInterface
 	public function filterRecursive( Closure $closure ): JsonInterface
 	{
 		$json = new Json();
-
 		foreach ( $this as $k => $v ) {
 			if ( $v instanceof JsonInterface ) {
 				$r = $v->filterRecursive( $closure );
-
 				if ( $r->count() > 0 ) {
 					$json->offsetSet( $k, $r );
 				}
 			} else {
 				$r = $closure( $k, $v );
-
 				if ( $r !== null ) {
 					$json->offsetSet( $k, $r );
 				}
 			}
 		}
-
+		
 		return $json;
 	}
-
+	
 	/**
 	 * @param iterable|null $merge
 	 * @param bool|null     $overwrite
@@ -876,25 +867,21 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		if ( $merge ) {
 			foreach ( $merge as $k => $v ) {
-
 				/** Les deux sont iterables on boucle en recursif */
-				if ( is_iterable( $v )
-					&& $this->offsetGet( $k ) instanceof JsonInterface ) {
+				if ( is_iterable( $v ) && $this->offsetGet( $k ) instanceof JsonInterface ) {
 					$this->offsetGet( $k )
-						 ->mergeRecursive( $v,
-							 $overwrite );
+					     ->mergeRecursive( $v, $overwrite );
 					continue;
 				}
-
 				if ( $overwrite || !$this->offsetExists( $k ) ) {
 					$this->offsetSet( $k, $v );
 				}
 			}
 		}
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param array $keys
 	 * @param null  $default
@@ -908,10 +895,10 @@ class Json extends ArrayObject implements JsonInterface
 				return $get;
 			}
 		}
-
+		
 		return $default;
 	}
-
+	
 	/**
 	 * @param string $path
 	 * @param bool   $scalarResultOnly
@@ -927,23 +914,26 @@ class Json extends ArrayObject implements JsonInterface
 		$endPath   = $arr->join( '.' );
 		$json      = new Json( [] );
 		$get       = $this->offsetGet( $firstPath );
-
 		if ( $firstPath === '*' ) {
 			foreach ( $this as $key => $value ) {
-				if ( ( $value instanceof JsonInterface ) && ( $get = $value->wildcard( $endPath, $scalarResultOnly ) )->count() ) {
+				if ( ( $value instanceof JsonInterface ) &&
+				     ( $get = $value->wildcard( $endPath, $scalarResultOnly ) )->count() ) {
 					$json->push( $get );
 				}
 			}
-		} else if ( $get instanceof JsonInterface && !$emptyPath ) {
-			$json->merge( $get->wildcard( $endPath, $scalarResultOnly ) );
-
-		} else if ( $get && $emptyPath && ( ( is_scalar( $get ) && $scalarResultOnly ) || !$scalarResultOnly ) ) {
-			$json->append( $get );
+		} else {
+			if ( $get instanceof JsonInterface && !$emptyPath ) {
+				$json->merge( $get->wildcard( $endPath, $scalarResultOnly ) );
+			} else {
+				if ( $get && $emptyPath && ( ( is_scalar( $get ) && $scalarResultOnly ) || !$scalarResultOnly ) ) {
+					$json->append( $get );
+				}
+			}
 		}
-
+		
 		return $json;
 	}
-
+	
 	/**
 	 * @param iterable|null $push
 	 * @param bool|null     $overwrite
@@ -956,15 +946,17 @@ class Json extends ArrayObject implements JsonInterface
 			foreach ( $push as $k => $v ) {
 				if ( is_int( $k ) ) {
 					$this->append( $v );
-				} else if ( $overwrite || !$this->offsetExists( $k ) ) {
-					$this->offsetSet( $k, $v );
+				} else {
+					if ( $overwrite || !$this->offsetExists( $k ) ) {
+						$this->offsetSet( $k, $v );
+					}
 				}
 			}
 		}
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param mixed ...$offsets
 	 *
@@ -974,13 +966,13 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		$offsets = Arr::spreadArgs( $offsets );
 		$only    = new Json();
-
 		foreach ( $offsets as $offset ) {
 			$only->set( $offset, $this->get( $offset ) );
 		}
+		
 		return $only;
 	}
-
+	
 	/**
 	 * @param mixed ...$offsets
 	 *
@@ -990,14 +982,13 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		$offsets = Arr::spreadArgs( $offsets );
 		$except  = $this->clone();
-
 		foreach ( $offsets as $offset ) {
 			$except->unset( $offset );
 		}
-
+		
 		return $except;
 	}
-
+	
 	/**
 	 * @return array
 	 */
@@ -1005,7 +996,7 @@ class Json extends ArrayObject implements JsonInterface
 	{
 		return $this->getArrayCopy();
 	}
-
+	
 	/**
 	 * @param array $data
 	 *
@@ -1014,21 +1005,17 @@ class Json extends ArrayObject implements JsonInterface
 	public function reset( $data = [] ): JsonInterface
 	{
 		$this->exchangeArray( $data );
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @return JsonInterface
 	 */
 	public function resetKeys(): JsonInterface
 	{
 		$arr = array_values( $this->toArray() );
-
+		
 		return $this->reset( $arr );
 	}
-
-
-
-
 }

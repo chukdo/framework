@@ -6,6 +6,7 @@ use Chukdo\Contracts\Validation\Validate as ValidateInterface;
 
 /**
  * Validate handler.
+ *
  * @version   1.0.0
  * @copyright licence MIT, Copyright (C) 2019 Domingo
  * @since     08/01/2019
@@ -20,7 +21,7 @@ class EmailValidate implements ValidateInterface
 	{
 		return 'email';
 	}
-
+	
 	/**
 	 * @param array $attributes
 	 *
@@ -30,7 +31,7 @@ class EmailValidate implements ValidateInterface
 	{
 		return $this;
 	}
-
+	
 	/**
 	 * @param $input
 	 *
@@ -41,7 +42,7 @@ class EmailValidate implements ValidateInterface
 		if ( filter_var( $input, FILTER_VALIDATE_EMAIL ) ) {
 			return true;
 		}
-
+		
 		return false;
 	}
 }

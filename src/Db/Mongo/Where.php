@@ -9,6 +9,7 @@ use Chukdo\Contracts\Db\Write as WriteInterface;
 
 /**
  * Server Where.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -20,17 +21,17 @@ Abstract Class Where
 	 * @var Collection
 	 */
 	protected $collection;
-
+	
 	/**
 	 * @var array
 	 */
 	protected $where = [];
-
+	
 	/**
 	 * @var array
 	 */
 	protected $orWhere = [];
-
+	
 	/**
 	 * Find constructor.
 	 *
@@ -40,7 +41,7 @@ Abstract Class Where
 	{
 		$this->collection = $collection;
 	}
-
+	
 	/**
 	 * @return CollectionInterface|Collection
 	 */
@@ -48,7 +49,7 @@ Abstract Class Where
 	{
 		return $this->collection;
 	}
-
+	
 	/**
 	 * @param string $field
 	 * @param string $operator
@@ -60,10 +61,41 @@ Abstract Class Where
 	public function where( string $field, string $operator, $value = null, $value2 = null )
 	{
 		$this->where[ $field ] = $this->subQuery( $field, $operator, $value, $value2 );
-
+		
 		return $this;
 	}
-
+	
+	/**
+	 * @param string $field
+	 * @param string $operator
+	 * @param null   $value
+	 * @param null   $value2
+	 *
+	 * @return FindInterface|WriteInterface|object
+	 */
+	public function orWhere( string $field, string $operator, $value = null, $value2 = null )
+	{
+		$this->orWhere[ $field ] = $this->subQuery( $field, $operator, $value, $value2 );
+		
+		return $this;
+	}
+	
+	/**
+	 * @return array
+	 */
+	public function filter(): array
+	{
+		$filter = [];
+		if ( !empty( $this->where ) ) {
+			$filter[ '$and' ] = [ $this->where ];
+		}
+		if ( !empty( $this->orWhere ) ) {
+			$filter[ '$or' ] = [ $this->orWhere ];
+		}
+		
+		return $filter;
+	}
+	
 	/**
 	 * @param string $field
 	 * @param string $operator
@@ -107,20 +139,18 @@ Abstract Class Where
 				break;
 			case 'in':
 				$in = [];
-
 				foreach ( $value as $k => $v ) {
 					$in[ $k ] = Collection::filterIn( $field, $v );
 				}
-
+				
 				return [ '$in' => $in ];
 				break;
 			case '!in':
 				$nin = [];
-
 				foreach ( $value as $k => $v ) {
 					$nin[ $k ] = Collection::filterIn( $field, $v );
 				}
-
+				
 				return [ '$nin' => $nin ];
 				break;
 			case 'type':
@@ -145,8 +175,7 @@ Abstract Class Where
 				break;
 			case 'regex':
 				return [
-					'$regex' => new Regex( $value, $value2
-						?? 'i' ),
+					'$regex' => new Regex( $value, $value2 ?? 'i' ),
 				];
 				break;
 			case 'match':
@@ -157,40 +186,6 @@ Abstract Class Where
 				break;
 			default :
 				throw new MongoException( sprintf( 'Unknown operator [%s]', $operator ) );
-
 		}
-	}
-
-	/**
-	 * @param string $field
-	 * @param string $operator
-	 * @param null   $value
-	 * @param null   $value2
-	 *
-	 * @return FindInterface|WriteInterface|object
-	 */
-	public function orWhere( string $field, string $operator, $value = null, $value2 = null )
-	{
-		$this->orWhere[ $field ] = $this->subQuery( $field, $operator, $value, $value2 );
-
-		return $this;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function filter(): array
-	{
-		$filter = [];
-
-		if ( !empty( $this->where ) ) {
-			$filter[ '$and' ] = [ $this->where ];
-		}
-
-		if ( !empty( $this->orWhere ) ) {
-			$filter[ '$or' ] = [ $this->orWhere ];
-		}
-
-		return $filter;
 	}
 }

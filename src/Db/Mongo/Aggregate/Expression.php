@@ -6,6 +6,7 @@ use Chukdo\Helper\Is;
 
 /**
  * Server Aggregate Expression.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -13,17 +14,16 @@ use Chukdo\Helper\Is;
  */
 Class Expression
 {
-
 	/**
 	 * @var string
 	 */
 	protected $name;
-
+	
 	/**
 	 * @var mixed
 	 */
 	protected $expression;
-
+	
 	/**
 	 * Expression constructor.
 	 *
@@ -35,7 +35,7 @@ Class Expression
 		$this->name       = $name;
 		$this->expression = $expression;
 	}
-
+	
 	/**
 	 * @param Expression|string|array $expression
 	 *
@@ -44,24 +44,26 @@ Class Expression
 	public static function parseExpression( $expression )
 	{
 		$parsed = null;
-
 		if ( $expression instanceof Expression ) {
 			$parsed = $expression->projection();
-		} else if ( Is::arr( $expression ) ) {
-			$parsed = [];
-
-			foreach ( $expression as $key => $exp ) {
-				$parsed[ $key ] = self::parseExpression( $exp );
-			}
-		} else if ( Is::string( $expression ) ) {
-			$parsed = '$' . $expression;
 		} else {
-			$parsed = $expression;
+			if ( Is::arr( $expression ) ) {
+				$parsed = [];
+				foreach ( $expression as $key => $exp ) {
+					$parsed[ $key ] = self::parseExpression( $exp );
+				}
+			} else {
+				if ( Is::string( $expression ) ) {
+					$parsed = '$' . $expression;
+				} else {
+					$parsed = $expression;
+				}
+			}
 		}
-
+		
 		return $parsed;
 	}
-
+	
 	/**
 	 * @return array
 	 */
@@ -69,5 +71,4 @@ Class Expression
 	{
 		return [ '$' . $this->name => $this->parseExpression( $this->expression ) ];
 	}
-
 }

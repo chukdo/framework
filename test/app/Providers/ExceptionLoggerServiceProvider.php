@@ -23,7 +23,7 @@ class ExceptionLoggerServiceProvider extends ServiceProvider
 				],
 			],
 		] );
-
+		
 		$this->setClassAlias( ExceptionLogger::class, 'ExceptionLogger' );
 	}
 }

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Chukdo\Db\Mongo;
 
 use Chukdo\Helper\Arr;
@@ -12,6 +11,7 @@ use Traversable;
 
 /**
  * Mongodb cursor.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -23,22 +23,22 @@ class Stream implements Iterator
 	 * @var Collection
 	 */
 	protected $collection;
-
+	
 	/**
 	 * @var Find
 	 */
 	protected $find;
-
+	
 	/**
 	 * @var MongoDbCursor
 	 */
 	protected $cursor;
-
+	
 	/**
 	 * @var Iterator
 	 */
 	protected $iterator;
-
+	
 	/**
 	 * Cursor constructor.
 	 *
@@ -49,18 +49,15 @@ class Stream implements Iterator
 	{
 		$this->collection = $collection;
 		$this->cursor     = $cursor;
-
 		$this->cursor->setTypeMap( [
-			'root'     => 'array',
-			'document' => 'array',
-			'array'    => 'array',
-		] );
-
+			                           'root'     => 'array',
+			                           'document' => 'array',
+			                           'array'    => 'array',
+		                           ] );
 		$this->iterator = new IteratorIterator( $this->cursor );
-
 		$this->iterator->rewind();
 	}
-
+	
 	/**
 	 * @return MongoDbCursor
 	 */
@@ -68,9 +65,10 @@ class Stream implements Iterator
 	{
 		return $this->cursor;
 	}
-
+	
 	/**
 	 * Return the current element
+	 *
 	 * @link  https://php.net/manual/en/iterator.current.php
 	 * @return mixed Can return any type.
 	 * @since 5.0.0
@@ -79,15 +77,17 @@ class Stream implements Iterator
 	{
 		$current    = $this->iterator->current();
 		$collection = $this->collection;
-		$callback   = static function( $v ) use ( $collection ) {
+		$callback   = static function ( $v ) use ( $collection )
+		{
 			return $collection->filterOut( null, $v );
 		};
-
+		
 		return Arr::filterRecursive( $current, $callback );
 	}
-
+	
 	/**
 	 * Return the key of the current element
+	 *
 	 * @link  https://php.net/manual/en/iterator.key.php
 	 * @return mixed scalar on success, or null on failure.
 	 * @since 5.0.0
@@ -96,9 +96,10 @@ class Stream implements Iterator
 	{
 		return $this->iterator->key();
 	}
-
+	
 	/**
 	 * Move forward to next element
+	 *
 	 * @link  https://php.net/manual/en/iterator.next.php
 	 * @return void Any returned value is ignored.
 	 * @since 5.0.0
@@ -107,9 +108,10 @@ class Stream implements Iterator
 	{
 		$this->iterator->next();
 	}
-
+	
 	/**
 	 * Rewind the Iterator to the first element
+	 *
 	 * @link  https://php.net/manual/en/iterator.rewind.php
 	 * @return void Any returned value is ignored.
 	 * @since 5.0.0
@@ -118,9 +120,10 @@ class Stream implements Iterator
 	{
 		$this->iterator->rewind();
 	}
-
+	
 	/**
 	 * Checks if current position is valid
+	 *
 	 * @link  https://php.net/manual/en/iterator.valid.php
 	 * @return boolean The return value will be casted to boolean and then evaluated.
 	 * Returns true on success or false on failure.

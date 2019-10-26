@@ -7,6 +7,7 @@ use Chukdo\Helper\Arr;
 
 /**
  * Gestion des attributs d'une Route.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -18,22 +19,22 @@ class RouteAttributes
 	 * @var string
 	 */
 	protected $prefix = '';
-
+	
 	/**
 	 * @var ErrorMiddlewareInterface
 	 */
 	protected $errorMiddleware = null;
-
+	
 	/**
 	 * @var array
 	 */
 	protected $validators = [];
-
+	
 	/**
 	 * @var array
 	 */
 	protected $middlewares = [];
-
+	
 	/**
 	 * RouteAttributes constructor.
 	 */
@@ -41,7 +42,7 @@ class RouteAttributes
 	{
 		$this->reset();
 	}
-
+	
 	/**
 	 * @return RouteAttributes
 	 */
@@ -51,10 +52,10 @@ class RouteAttributes
 		$this->validators      = [];
 		$this->errorMiddleware = null;
 		$this->prefix          = '';
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @return array
 	 */
@@ -67,7 +68,7 @@ class RouteAttributes
 			'prefix'          => $this->getPrefix(),
 		];
 	}
-
+	
 	/**
 	 * @return array
 	 */
@@ -75,7 +76,7 @@ class RouteAttributes
 	{
 		return $this->middlewares;
 	}
-
+	
 	/**
 	 * @return array
 	 */
@@ -83,7 +84,7 @@ class RouteAttributes
 	{
 		return $this->validators;
 	}
-
+	
 	/**
 	 * @return ErrorMiddlewareInterface|null
 	 */
@@ -91,7 +92,7 @@ class RouteAttributes
 	{
 		return $this->errorMiddleware;
 	}
-
+	
 	/**
 	 * @param ErrorMiddlewareInterface|null $errorMiddleware
 	 *
@@ -100,10 +101,10 @@ class RouteAttributes
 	public function setErrorMiddleware( ErrorMiddlewareInterface $errorMiddleware = null ): self
 	{
 		$this->errorMiddleware = $errorMiddleware;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -111,7 +112,7 @@ class RouteAttributes
 	{
 		return $this->prefix;
 	}
-
+	
 	/**
 	 * @param string|null $prefix
 	 *
@@ -120,14 +121,13 @@ class RouteAttributes
 	public function setPrefix( ?string $prefix ): self
 	{
 		$prefix = trim( $prefix, '/' );
-
 		if ( $prefix !== '' ) {
 			$this->prefix .= '/' . $prefix;
 		}
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param array $attributes
 	 *
@@ -136,11 +136,11 @@ class RouteAttributes
 	public function set( array $attributes ): self
 	{
 		$this->reset()
-			 ->add( $attributes );
-
+		     ->add( $attributes );
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param array $attributes
 	 *
@@ -149,20 +149,18 @@ class RouteAttributes
 	public function add( array $attributes ): self
 	{
 		$attributes = Arr::merge( [
-			'middleware'      => [],
-			'validator'       => [],
-			'errorMiddleware' => null,
-			'prefix'          => '',
-		],
-			$attributes );
-
+			                          'middleware'      => [],
+			                          'validator'       => [],
+			                          'errorMiddleware' => null,
+			                          'prefix'          => '',
+		                          ], $attributes );
 		$this->setMiddleware( $attributes[ 'middleware' ] );
 		$this->setValidator( $attributes[ 'validator' ], $attributes[ 'errorMiddleware' ] );
 		$this->setPrefix( $attributes[ 'prefix' ] );
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param array $middlewares
 	 *
@@ -173,10 +171,10 @@ class RouteAttributes
 		foreach ( $middlewares as $middleware ) {
 			$this->middlewares[] = $middleware;
 		}
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param array                         $validators
 	 * @param ErrorMiddlewareInterface|null $errorMiddleware
@@ -186,11 +184,10 @@ class RouteAttributes
 	public function setValidator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
 	{
 		$this->errorMiddleware = $errorMiddleware;
-
 		foreach ( $validators as $key => $validator ) {
 			$this->validators[ $key ] = $validator;
 		}
-
+		
 		return $this;
 	}
 }

@@ -9,6 +9,7 @@ use Chukdo\Json\Json;
 
 /**
  * Server Where.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -20,12 +21,12 @@ Abstract Class Where
 	 * @var Collection
 	 */
 	protected $collection;
-
+	
 	/**
 	 * @var array
 	 */
 	protected $where = [];
-
+	
 	/**
 	 * Find constructor.
 	 *
@@ -35,7 +36,7 @@ Abstract Class Where
 	{
 		$this->collection = $collection;
 	}
-
+	
 	/**
 	 * @return CollectionInterface|Collection
 	 */
@@ -43,7 +44,7 @@ Abstract Class Where
 	{
 		return $this->collection;
 	}
-
+	
 	/**
 	 * @return array
 	 */
@@ -51,7 +52,7 @@ Abstract Class Where
 	{
 		return $this->where;
 	}
-
+	
 	/**
 	 * @param array $where
 	 *
@@ -60,10 +61,10 @@ Abstract Class Where
 	public function importFilter( array $where )
 	{
 		$this->where = $where;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $field
 	 * @param string $operator
@@ -75,7 +76,6 @@ Abstract Class Where
 	public function where( string $field, string $operator, $value = null, $value2 = null )
 	{
 		$keyword = 'must';
-
 		switch ( $operator ) {
 			case '==' :
 				$keyword = 'filter';
@@ -87,16 +87,67 @@ Abstract Class Where
 				$keyword = 'must_not';
 				break;
 		}
-
 		if ( !isset( $this->where[ $keyword ] ) ) {
 			$this->where[ $keyword ] = [];
 		}
-
 		$this->where[ $keyword ][] = $this->subQuery( $field, $operator, $value, $value2 );
-
+		
 		return $this;
 	}
-
+	
+	/**
+	 * @param string $field
+	 * @param string $operator
+	 * @param null   $value
+	 * @param null   $value2
+	 *
+	 * @return FindInterface|WriteInterface|object
+	 */
+	public function orWhere( string $field, string $operator, $value = null, $value2 = null )
+	{
+		$keyword = 'should';
+		switch ( $operator ) {
+			case '==' :
+				$keyword = 'filter';
+				break;
+			case '!==' :
+			case '!=' :
+			case '!in' :
+			case '!exists' :
+				$keyword = 'should_not';
+				break;
+		}
+		if ( !isset( $this->where[ $keyword ] ) ) {
+			$this->where[ $keyword ] = [];
+		}
+		$this->where[ $keyword ][] = $this->subQuery( $field, $operator, $value, $value2 );
+		
+		return $this;
+	}
+	
+	/**
+	 * @param array $params
+	 * @param bool  $withFilter
+	 *
+	 * @return array
+	 */
+	public function filter( array $params = [], bool $withFilter = true ): array
+	{
+		$query = new Json( [
+			                   'index' => $this->collection()
+			                                   ->fullName(),
+			                   'body'  => [],
+		                   ] );
+		foreach ( $params as $key => $value ) {
+			$query->set( $key, $value );
+		}
+		if ( $withFilter && count( $this->where ) > 0 ) {
+			$query->set( 'body.query.bool', $this->where );
+		}
+		
+		return $query->toArray();
+	}
+	
 	/**
 	 * @param string $field
 	 * @param string $operator
@@ -177,11 +228,10 @@ Abstract Class Where
 			case 'in':
 			case '!in':
 				$in = [];
-
 				foreach ( $value as $k => $v ) {
 					$in[ $k ] = Collection::filterIn( $field, $v );
 				}
-
+				
 				return [
 					'terms' => [
 						$field => $in,
@@ -209,8 +259,7 @@ Abstract Class Where
 					'regexp' => [
 						$field => [
 							'value' => $value,
-							'flags' => $value2
-								?? 'ALL',
+							'flags' => $value2 ?? 'ALL',
 						],
 					],
 				];
@@ -225,63 +274,5 @@ Abstract Class Where
 			default :
 				throw new ElasticException( sprintf( "Unknown operator [%s]", $operator ) );
 		}
-	}
-
-	/**
-	 * @param string $field
-	 * @param string $operator
-	 * @param null   $value
-	 * @param null   $value2
-	 *
-	 * @return FindInterface|WriteInterface|object
-	 */
-	public function orWhere( string $field, string $operator, $value = null, $value2 = null )
-	{
-		$keyword = 'should';
-
-		switch ( $operator ) {
-			case '==' :
-				$keyword = 'filter';
-				break;
-			case '!==' :
-			case '!=' :
-			case '!in' :
-			case '!exists' :
-				$keyword = 'should_not';
-				break;
-		}
-
-		if ( !isset( $this->where[ $keyword ] ) ) {
-			$this->where[ $keyword ] = [];
-		}
-
-		$this->where[ $keyword ][] = $this->subQuery( $field, $operator, $value, $value2 );
-
-		return $this;
-	}
-
-	/**
-	 * @param array $params
-	 * @param bool  $withFilter
-	 *
-	 * @return array
-	 */
-	public function filter( array $params = [], bool $withFilter = true ): array
-	{
-		$query  = new Json( [
-			'index' => $this->collection()
-				->fullName(),
-			'body'  => [],
-		] );
-
-		foreach ( $params as $key => $value ) {
-			$query->set( $key, $value );
-		}
-
-		if ( $withFilter && count( $this->where ) > 0 ) {
-			$query->set( 'body.query.bool', $this->where );
-		}
-
-		return $query->toArray();
 	}
 }

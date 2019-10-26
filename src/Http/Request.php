@@ -15,6 +15,7 @@ use Chukdo\Http\Input;
 
 /**
  * Gestion de requete HTTP entrante.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -26,22 +27,22 @@ class Request
 	 * @var App
 	 */
 	protected $app;
-
+	
 	/**
 	 * @param Input
 	 */
 	protected $inputs;
-
+	
 	/**
 	 * @param Header
 	 */
 	protected $header;
-
+	
 	/**
 	 * @param Url
 	 */
 	protected $url;
-
+	
 	/**
 	 * Request constructor.
 	 *
@@ -56,12 +57,11 @@ class Request
 		$this->inputs = $app->make( Input::class, true );
 		$this->header = new Header();
 		$this->url    = new Url( HttpRequest::uri() );
-
 		$this->header->setHeader( 'Content-Type', HttpRequest::server( 'CONTENT_TYPE', '' ) );
 		$this->header->setHeader( 'Content-Length', HttpRequest::server( 'CONTENT_LENGTH', '' ) );
 		$this->header->setHeaders( HttpRequest::headers() );
 	}
-
+	
 	/**
 	 * @param             $name
 	 * @param string|null $default
@@ -72,7 +72,7 @@ class Request
 	{
 		return HttpRequest::server( $name, $default );
 	}
-
+	
 	/**
 	 * @return Request
 	 */
@@ -80,7 +80,7 @@ class Request
 	{
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $key
 	 * @param null   $default
@@ -92,9 +92,9 @@ class Request
 	public function conf( string $key, $default = null ): ?string
 	{
 		return $this->app->conf()
-						 ->offsetGet( $key, $default );
+		                 ->offsetGet( $key, $default );
 	}
-
+	
 	/**
 	 * @param string $key
 	 * @param null   $default
@@ -106,9 +106,9 @@ class Request
 	public function lang( string $key, $default = null ): ?string
 	{
 		return $this->app->lang()
-						 ->offsetGet( 'validation.' . $key, $default );
+		                 ->offsetGet( 'validation.' . $key, $default );
 	}
-
+	
 	/**
 	 * @param array $rules
 	 *
@@ -121,10 +121,10 @@ class Request
 		$validator = $this->app->make( 'Chukdo\Validation\Validator' );
 		$validator->registerRules( $rules );
 		$validator->validate();
-
+		
 		return $validator;
 	}
-
+	
 	/**
 	 * @param string      $name
 	 * @param string|null $allowedMimeTypes
@@ -134,11 +134,9 @@ class Request
 	 */
 	public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): FileUploaded
 	{
-		return $this->inputs->file( $name,
-			$allowedMimeTypes,
-			$maxFileSize );
+		return $this->inputs->file( $name, $allowedMimeTypes, $maxFileSize );
 	}
-
+	
 	/**
 	 * @return Input
 	 */
@@ -146,7 +144,7 @@ class Request
 	{
 		return $this->inputs;
 	}
-
+	
 	/**
 	 * @param string $name
 	 *
@@ -156,7 +154,7 @@ class Request
 	{
 		return $this->inputs->get( $name );
 	}
-
+	
 	/**
 	 * @param mixed ...$offsets
 	 *
@@ -166,7 +164,7 @@ class Request
 	{
 		return $this->inputs->with( $offsets );
 	}
-
+	
 	/**
 	 * @param mixed ...$offsets
 	 *
@@ -176,7 +174,7 @@ class Request
 	{
 		return $this->inputs->without( $offsets );
 	}
-
+	
 	/**
 	 * @param string $path
 	 *
@@ -186,7 +184,7 @@ class Request
 	{
 		return $this->inputs->filled( $path );
 	}
-
+	
 	/**
 	 * @param string $path
 	 *
@@ -196,7 +194,7 @@ class Request
 	{
 		return $this->inputs->exists( $path );
 	}
-
+	
 	/**
 	 * @param string $path
 	 *
@@ -206,7 +204,7 @@ class Request
 	{
 		return $this->inputs->wildcard( $path );
 	}
-
+	
 	/**
 	 * @return string|null
 	 */
@@ -214,7 +212,7 @@ class Request
 	{
 		return $this->header->getHeader( 'Content-Type' );
 	}
-
+	
 	/**
 	 * @return string|null
 	 */
@@ -222,18 +220,17 @@ class Request
 	{
 		return $this->header->getHeader( 'Content-Length' );
 	}
-
+	
 	/**
 	 * @return string|null
 	 */
 	public function from(): ?string
 	{
 		return parse_url( HttpRequest::server( 'HTTP_ORIGIN' )
-			?: HttpRequest::server( 'HTTP_REFERER' )
-				?: HttpRequest::server( 'REMOTE_ADDR' ),
-			PHP_URL_HOST );
+			                  ?: HttpRequest::server( 'HTTP_REFERER' )
+				?: HttpRequest::server( 'REMOTE_ADDR' ), PHP_URL_HOST );
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -242,33 +239,29 @@ class Request
 		if ( Cli::runningInConsole() ) {
 			return 'cli';
 		}
-
 		$render = Str::extension( $this->url()
-									   ->getPath() );
-
+		                               ->getPath() );
 		if ( $render ) {
 			return $render;
 		}
-
 		if ( $accept = $this->header()
-							->getHeader( 'Accepts' ) ) {
+		                    ->getHeader( 'Accepts' ) ) {
 			$renders = [
 				'json' => 'json',
 				'xml'  => 'xml',
 				'pdf'  => 'pdf',
 				'zip'  => 'zip',
 			];
-
 			foreach ( $renders as $contain => $render ) {
 				if ( Str::contain( $accept, $contain ) ) {
 					return $render;
 				}
 			}
 		}
-
+		
 		return 'html';
 	}
-
+	
 	/**
 	 * @return Url
 	 */
@@ -276,7 +269,7 @@ class Request
 	{
 		return $this->url;
 	}
-
+	
 	/**
 	 * @return Header
 	 */
@@ -284,7 +277,7 @@ class Request
 	{
 		return $this->header;
 	}
-
+	
 	/**
 	 * @return bool
 	 */
@@ -292,7 +285,7 @@ class Request
 	{
 		return HttpRequest::ajax();
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -300,7 +293,7 @@ class Request
 	{
 		return HttpRequest::userAgent();
 	}
-
+	
 	/**
 	 * @return string|null
 	 */
@@ -308,7 +301,7 @@ class Request
 	{
 		return HttpRequest::method();
 	}
-
+	
 	/**
 	 * @return bool
 	 */

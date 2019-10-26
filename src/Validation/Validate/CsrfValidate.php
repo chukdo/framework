@@ -7,6 +7,7 @@ use Chukdo\Helper\Crypto;
 
 /**
  * Validate handler.
+ *
  * @version   1.0.0
  * @copyright licence MIT, Copyright (C) 2019 Domingo
  * @since     08/01/2019
@@ -18,7 +19,7 @@ class CsrfValidate implements ValidateInterface
 	 * @var string
 	 */
 	protected $salt;
-
+	
 	/**
 	 * @return string
 	 */
@@ -26,7 +27,7 @@ class CsrfValidate implements ValidateInterface
 	{
 		return 'csrf';
 	}
-
+	
 	/**
 	 * @param array $attributes
 	 *
@@ -37,10 +38,10 @@ class CsrfValidate implements ValidateInterface
 		foreach ( $attributes as $attr ) {
 			$this->salt = $attr;
 		}
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param $input
 	 *

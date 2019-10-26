@@ -13,6 +13,7 @@ use Throwable;
 
 /**
  * Server Server Database.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -24,17 +25,17 @@ Class Database implements DatabaseInterface
 	 * @var Server
 	 */
 	protected $server;
-
+	
 	/**
 	 * @var Client
 	 */
 	protected $client;
-
+	
 	/**
 	 * @var string|null
 	 */
 	protected $database = null;
-
+	
 	/**
 	 * Database constructor.
 	 *
@@ -47,7 +48,7 @@ Class Database implements DatabaseInterface
 		$this->server   = $server;
 		$this->client   = $server->client();
 	}
-
+	
 	/**
 	 * @return string|null
 	 */
@@ -57,7 +58,7 @@ Class Database implements DatabaseInterface
 			? $this->name() . '_'
 			: null;
 	}
-
+	
 	/**
 	 * @return string|null
 	 */
@@ -65,7 +66,7 @@ Class Database implements DatabaseInterface
 	{
 		return $this->database;
 	}
-
+	
 	/**
 	 * @return ServerInterface
 	 */
@@ -73,22 +74,21 @@ Class Database implements DatabaseInterface
 	{
 		return $this->server;
 	}
-
+	
 	/**
 	 * @return bool
 	 */
 	public function drop(): bool
 	{
 		$drop = true;
-
 		foreach ( $this->collections() as $collection ) {
 			$drop .= $this->collection( $collection )
-						  ->drop();
+			              ->drop();
 		}
-
+		
 		return $drop;
 	}
-
+	
 	/**
 	 * @return Client
 	 */
@@ -96,7 +96,7 @@ Class Database implements DatabaseInterface
 	{
 		return $this->client;
 	}
-
+	
 	/**
 	 * @param string $collection
 	 *
@@ -106,7 +106,7 @@ Class Database implements DatabaseInterface
 	{
 		return new Collection( $this, $collection );
 	}
-
+	
 	/**
 	 * @param string $collection
 	 *
@@ -116,13 +116,13 @@ Class Database implements DatabaseInterface
 	{
 		if ( !$this->collectionExist( $collection ) ) {
 			$this->client()
-				 ->indices()
-				 ->create( [ 'index' => $collection ] );
+			     ->indices()
+			     ->create( [ 'index' => $collection ] );
 		}
-
+		
 		return $this->collection( $collection );
 	}
-
+	
 	/**
 	 * @param string $collection
 	 *
@@ -135,10 +135,10 @@ Class Database implements DatabaseInterface
 				return true;
 			}
 		}
-
+		
 		return false;
 	}
-
+	
 	/**
 	 * @return JsonInterface
 	 */
@@ -146,18 +146,18 @@ Class Database implements DatabaseInterface
 	{
 		$list    = new Json();
 		$indices = $this->client()
-						->cat()
-						->indices();
-
+		                ->cat()
+		                ->indices();
 		foreach ( $indices as $indice ) {
-			if ( $this->name() === null || ( $this->name() !== null && Str::startWith( $indice[ 'index' ], $this->name() . '_' ) ) ) {
+			if ( $this->name() === null ||
+			     ( $this->name() !== null && Str::startWith( $indice[ 'index' ], $this->name() . '_' ) ) ) {
 				$list->append( $indice[ 'index' ] );
 			}
 		}
-
+		
 		return $list;
 	}
-
+	
 	/**
 	 * @param string $collection
 	 *
@@ -167,14 +167,14 @@ Class Database implements DatabaseInterface
 	{
 		try {
 			$this->client()
-				 ->indices()
-				 ->delete( [ 'index' => $this->prefixName() . $collection ] );
+			     ->indices()
+			     ->delete( [ 'index' => $this->prefixName() . $collection ] );
 		} catch ( Throwable $e ) {
 		}
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @return JsonInterface
 	 */
@@ -182,17 +182,14 @@ Class Database implements DatabaseInterface
 	{
 		$info  = new Json();
 		$stats = new Json( $this->client()
-								->indices()
-								->stats( [ 'index' => '*' ] ) );
-
+		                        ->indices()
+		                        ->stats( [ 'index' => '*' ] ) );
 		foreach ( $stats->offsetGet( 'indices' ) as $key => $indice ) {
 			if ( $indice instanceof JsonInterface && Str::startWith( $key, $this->name() ) ) {
 				$info->offsetSet( $key, $indice->offsetGet( 'total' ) );
 			}
 		}
-
+		
 		return $info;
 	}
-
-
 }

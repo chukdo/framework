@@ -9,6 +9,7 @@ use ErrorException;
 
 /**
  * Gestion des exception.
+ *
  * @version       1.0.0
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
  * @since         08/01/2019
@@ -20,7 +21,7 @@ class HandleExceptions
 	 * @var App
 	 */
 	protected $app;
-
+	
 	/**
 	 * HandleExceptions constructor.
 	 *
@@ -29,23 +30,22 @@ class HandleExceptions
 	public function __construct( App $app )
 	{
 		$this->app = $app;
-
 		error_reporting( -1 );
 		set_error_handler( [
-			$this,
-			'handleError',
-		] );
+			                   $this,
+			                   'handleError',
+		                   ] );
 		set_exception_handler( [
-			$this,
-			'handleException',
-		] );
+			                       $this,
+			                       'handleException',
+		                       ] );
 		register_shutdown_function( [
-			$this,
-			'handleShutdown',
-		] );
+			                            $this,
+			                            'handleShutdown',
+		                            ] );
 		ini_set( 'display_errors', 'Off' );
 	}
-
+	
 	/**
 	 * @param int    $level
 	 * @param string $message
@@ -60,7 +60,7 @@ class HandleExceptions
 			throw new ErrorException( $message, 0, $level, $file, $line );
 		}
 	}
-
+	
 	/**
 	 * @throws ServiceException
 	 * @throws ReflectionException
@@ -71,23 +71,7 @@ class HandleExceptions
 			$this->handleException( $this->fatalExceptionFromError( $error ) );
 		}
 	}
-
-	/**
-	 * @param int $type
-	 *
-	 * @return bool
-	 */
-	protected function isFatal( int $type ): bool
-	{
-		return in_array( $type,
-			[
-				E_COMPILE_ERROR,
-				E_CORE_ERROR,
-				E_ERROR,
-				E_PARSE,
-			], true );
-	}
-
+	
 	/**
 	 * @param Throwable $e
 	 *
@@ -99,17 +83,29 @@ class HandleExceptions
 		if ( !$e instanceof Exception ) {
 			$e = new AppException( $e->getMessage(), $e->getCode(), $e );
 		}
-
 		$exceptionHandler = $this->getExceptionHandler();
-
 		try {
 			$exceptionHandler->report( $e );
 		} catch ( Throwable $e ) {
 		}
-
 		$exceptionHandler->render( $e );
 	}
-
+	
+	/**
+	 * @param int $type
+	 *
+	 * @return bool
+	 */
+	protected function isFatal( int $type ): bool
+	{
+		return in_array( $type, [
+			                      E_COMPILE_ERROR,
+			                      E_CORE_ERROR,
+			                      E_ERROR,
+			                      E_PARSE,
+		                      ], true );
+	}
+	
 	/**
 	 * @return mixed|object|null
 	 * @throws ServiceException
@@ -119,7 +115,7 @@ class HandleExceptions
 	{
 		return $this->app->make( 'Chukdo\Bootstrap\ExceptionHandler' );
 	}
-
+	
 	/**
 	 * @param array $error
 	 *

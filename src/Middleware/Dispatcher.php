@@ -13,27 +13,27 @@ class Dispatcher
 	 * @var array
 	 */
 	private $middlewares = [];
-
+	
 	/**
 	 * @var array
 	 */
 	private $attributes = [];
-
+	
 	/**
 	 * @var int
 	 */
 	private $index = 0;
-
+	
 	/**
 	 * @var Request
 	 */
 	private $request;
-
+	
 	/**
 	 * @var Response
 	 */
 	private $response;
-
+	
 	/**
 	 * Dispatcher constructor.
 	 *
@@ -45,7 +45,7 @@ class Dispatcher
 		$this->request  = $request;
 		$this->response = $response;
 	}
-
+	
 	/**
 	 * @param string $name
 	 * @param null   $value
@@ -59,10 +59,9 @@ class Dispatcher
 				? $this->attributes[ $name ]
 				: null;
 		}
-
 		$this->attributes[ $name ] = $value;
 	}
-
+	
 	/**
 	 * @return Response
 	 */
@@ -70,7 +69,7 @@ class Dispatcher
 	{
 		return $this->response;
 	}
-
+	
 	/**
 	 * @param array $middlewares
 	 *
@@ -81,10 +80,10 @@ class Dispatcher
 		foreach ( $middlewares as $middleware ) {
 			$this->pipe( $middleware );
 		}
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string|MiddlewareInterface $middleware
 	 *
@@ -94,10 +93,10 @@ class Dispatcher
 	{
 		if ( is_string( $middleware ) ) {
 			if ( substr( $middleware, 0, 1 ) == '@' ) {
-
+				
 				try {
 					$confMiddleware = $this->request()
-										   ->conf( substr( $middleware, 1 ) );
+					                       ->conf( substr( $middleware, 1 ) );
 					$middleware     = new $confMiddleware();
 				} catch ( Throwable $e ) {
 				}
@@ -105,15 +104,14 @@ class Dispatcher
 				$middleware = new $middleware();
 			}
 		}
-
 		if ( $middleware instanceof MiddlewareInterface ) {
 			array_unshift( $this->middlewares, $middleware );
+			
 			return $this;
 		}
-
 		throw new MiddlewareException( 'Dispatcher::pipe need Middleware or Middleware string representation' );
 	}
-
+	
 	/**
 	 * @return Request
 	 */
@@ -121,7 +119,7 @@ class Dispatcher
 	{
 		return $this->request;
 	}
-
+	
 	/**
 	 * @return Response
 	 */
@@ -129,14 +127,13 @@ class Dispatcher
 	{
 		$middleware = $this->middleware();
 		$this->index++;
-
 		if ( is_null( $middleware ) ) {
 			return $this->response;
 		}
-
+		
 		return $middleware->process( $this );
 	}
-
+	
 	/**
 	 * @return callable|null
 	 */
@@ -145,7 +142,7 @@ class Dispatcher
 		if ( isset( $this->middlewares[ $this->index ] ) ) {
 			return $this->middlewares[ $this->index ];
 		}
-
+		
 		return null;
 	}
 }

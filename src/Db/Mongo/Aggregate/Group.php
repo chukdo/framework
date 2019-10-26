@@ -1,9 +1,9 @@
 <?php
 
 namespace Chukdo\Db\Mongo\Aggregate;
-
 /**
  * Server Aggregate Group.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -15,12 +15,12 @@ Class Group
 	 * @var array
 	 */
 	protected $group = [];
-
+	
 	/**
 	 * @var Aggregate
 	 */
 	protected $aggregate;
-
+	
 	/**
 	 * Group constructor.
 	 *
@@ -32,7 +32,7 @@ Class Group
 		$this->aggregate      = $aggregate;
 		$this->group[ '_id' ] = Expression::parseExpression( $expression );
 	}
-
+	
 	/**
 	 * @param string $field
 	 * @param        $expression
@@ -42,10 +42,10 @@ Class Group
 	public function calculate( string $field, $expression ): self
 	{
 		$this->group[ $field ] = Expression::parseExpression( $expression );
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @return array
 	 */
@@ -53,7 +53,7 @@ Class Group
 	{
 		return $this->group;
 	}
-
+	
 	public function pipe(): Aggregate
 	{
 		return $this->aggregate;

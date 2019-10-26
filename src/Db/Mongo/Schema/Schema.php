@@ -11,6 +11,7 @@ use Chukdo\Json\Json;
 
 /**
  * Server Schema.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -22,12 +23,12 @@ class Schema implements SchemaInterface
 	 * @var Collection
 	 */
 	protected $collection;
-
+	
 	/**
 	 * @var Property
 	 */
 	protected $property;
-
+	
 	/**
 	 * Schema constructor.
 	 *
@@ -38,15 +39,14 @@ class Schema implements SchemaInterface
 		$this->collection = $collection;
 		$db               = $collection->database();
 		$json             = $db->server()
-							   ->command( [
-								   'listCollections' => 1,
-								   'filter'          => [ 'name' => $collection->name() ],
-							   ], $db->name() );
-
-		$this->property = new Property( $json->getJson( '0.options.validator.$jsonSchema' )
-											 ->toArray() );
+		                       ->command( [
+			                                  'listCollections' => 1,
+			                                  'filter'          => [ 'name' => $collection->name() ],
+		                                  ], $db->name() );
+		$this->property   = new Property( $json->getJson( '0.options.validator.$jsonSchema' )
+		                                       ->toArray() );
 	}
-
+	
 	/**
 	 * @return CollectionInterface
 	 */
@@ -54,7 +54,7 @@ class Schema implements SchemaInterface
 	{
 		return $this->collection;
 	}
-
+	
 	/**
 	 * @return bool
 	 */
@@ -67,22 +67,20 @@ class Schema implements SchemaInterface
 			'validationLevel'  => 'strict',
 			'validationAction' => 'error',
 		];
-
-		$save = new Json( $this->collection()
-							   ->database()
-							   ->client()
-							   ->modifyCollection( $this->collection()
-														->name(), $schema ) );
-
+		$save   = new Json( $this->collection()
+		                         ->database()
+		                         ->client()
+		                         ->modifyCollection( $this->collection()
+		                                                  ->name(), $schema ) );
 		if ( $save->offsetGet( 'ok' ) === 1 ) {
 			$this->property = new Property();
-
+			
 			return true;
 		}
-
+		
 		return false;
 	}
-
+	
 	/**
 	 * @param string $name
 	 *
@@ -91,9 +89,9 @@ class Schema implements SchemaInterface
 	public function get( string $name ): ?PropertyInterface
 	{
 		return $this->property()
-					->get( $name );
+		            ->get( $name );
 	}
-
+	
 	/**
 	 * @param string $name
 	 *
@@ -102,11 +100,11 @@ class Schema implements SchemaInterface
 	public function unset( string $name ): SchemaInterface
 	{
 		$this->property()
-			 ->unset( $name );
-
+		     ->unset( $name );
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param array $properties
 	 *
@@ -115,11 +113,11 @@ class Schema implements SchemaInterface
 	public function setAll( array $properties ): SchemaInterface
 	{
 		$this->property()
-			 ->setAll( $properties );
-
+		     ->setAll( $properties );
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $name
 	 * @param null   $type
@@ -130,11 +128,11 @@ class Schema implements SchemaInterface
 	public function set( string $name, $type = null, array $options = [] ): SchemaInterface
 	{
 		$this->property()
-			 ->set( $name, $type, $options );
-
+		     ->set( $name, $type, $options );
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @return Property
 	 */
@@ -142,16 +140,16 @@ class Schema implements SchemaInterface
 	{
 		return $this->property;
 	}
-
+	
 	/**
 	 * @return JsonInterface
 	 */
 	public function properties(): JsonInterface
 	{
 		return $this->property()
-					->properties();
+		            ->properties();
 	}
-
+	
 	/**
 	 * @return bool
 	 */
@@ -164,24 +162,21 @@ class Schema implements SchemaInterface
 			'validationLevel'  => 'strict',
 			'validationAction' => 'error',
 		];
-
-		$save = new Json( $this->collection()
-							   ->database()
-							   ->client()
-							   ->modifyCollection( $this->collection()
-														->name(), $schema ) );
-
+		$save   = new Json( $this->collection()
+		                         ->database()
+		                         ->client()
+		                         ->modifyCollection( $this->collection()
+		                                                  ->name(), $schema ) );
+		
 		return $save->offsetGet( 'ok' ) === 1;
 	}
-
+	
 	/**
 	 * @return array
 	 */
 	public function toArray(): array
 	{
 		return $this->property()
-					->toArray();
+		            ->toArray();
 	}
-
-
 }

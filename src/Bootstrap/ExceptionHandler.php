@@ -8,6 +8,7 @@ use Throwable;
 
 /**
  * Gestionnaire par défauts des exceptions.
+ *
  * @version       1.0.0
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
  * @since         08/01/2019
@@ -19,7 +20,7 @@ class ExceptionHandler implements Handler
 	 * @var App
 	 */
 	protected $app;
-
+	
 	/**
 	 * ExceptionHandler constructor.
 	 *
@@ -29,17 +30,16 @@ class ExceptionHandler implements Handler
 	{
 		$this->app = $app;
 	}
-
+	
 	/**
 	 * @param Throwable $e
 	 */
 	public function render( Throwable $e ): void
 	{
 		$message = new ExceptionMessage( $e, $this->app->env() );
-
 		die( $message->render() );
 	}
-
+	
 	/**
 	 * @param Throwable $e
 	 */
@@ -47,9 +47,9 @@ class ExceptionHandler implements Handler
 	{
 		try {
 			$this->app->make( 'ExceptionLogger' )
-					  ->emergency( '#' . $e->getCode() . ' ' . $e->getMessage() . ' ' . $e->getFile() . '(' . $e->getLine() . ')' );
+			          ->emergency( '#' . $e->getCode() . ' ' . $e->getMessage() . ' ' . $e->getFile() . '(' .
+			                       $e->getLine() . ')' );
 		} catch ( Throwable $e ) {
 		}
-
 	}
 }

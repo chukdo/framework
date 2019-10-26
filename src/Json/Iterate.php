@@ -6,6 +6,7 @@ use Iterator;
 
 /**
  * Manipulation des tableaux.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -17,12 +18,12 @@ class Iterate implements Iterator
 	 * @var array
 	 */
 	protected $arr = [];
-
+	
 	/**
 	 * @var int
 	 */
 	protected $offset = 0;
-
+	
 	/**
 	 * Iterate constructor.
 	 *
@@ -32,7 +33,7 @@ class Iterate implements Iterator
 	{
 		$this->arr = array_values( $arr );
 	}
-
+	
 	/**
 	 * @return mixed|void
 	 */
@@ -40,7 +41,7 @@ class Iterate implements Iterator
 	{
 		return $this->arr[ $this->offset ];
 	}
-
+	
 	/**
 	 * @return int
 	 */
@@ -48,12 +49,12 @@ class Iterate implements Iterator
 	{
 		return $this->offset;
 	}
-
+	
 	public function next(): void
 	{
 		++$this->offset;
 	}
-
+	
 	/**
 	 * @return bool
 	 */
@@ -61,7 +62,7 @@ class Iterate implements Iterator
 	{
 		return isset( $this->arr[ $this->offset ] );
 	}
-
+	
 	/**
 	 * @return int
 	 */
@@ -69,7 +70,7 @@ class Iterate implements Iterator
 	{
 		return count( $this->arr );
 	}
-
+	
 	/**
 	 * @return bool
 	 */
@@ -77,7 +78,7 @@ class Iterate implements Iterator
 	{
 		return count( $this->arr ) === 0;
 	}
-
+	
 	/**
 	 * @param iterable $merge
 	 *
@@ -88,10 +89,10 @@ class Iterate implements Iterator
 		foreach ( $merge as $append ) {
 			$this->append( $append );
 		}
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param $append
 	 *
@@ -100,10 +101,10 @@ class Iterate implements Iterator
 	public function append( $append ): self
 	{
 		$this->arr[] = $append;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $glue
 	 *
@@ -113,7 +114,7 @@ class Iterate implements Iterator
 	{
 		return implode( $glue, $this->arr );
 	}
-
+	
 	/**
 	 * @return array
 	 */
@@ -121,54 +122,54 @@ class Iterate implements Iterator
 	{
 		return $this->arr;
 	}
-
+	
 	/**
 	 * @return mixed|null
 	 */
 	public function getFirst()
 	{
 		$first = reset( $this->arr );
-
+		
 		return $first
 			?: null;
 	}
-
+	
 	/**
 	 * @return mixed|null
 	 */
 	public function getLast()
 	{
 		$end = end( $this->arr );
-
+		
 		return $end
 			?: null;
 	}
-
+	
 	/**
 	 * @return mixed|null
 	 */
 	public function getFirstAndRemove()
 	{
 		$this->rewind();
-
+		
 		return array_shift( $this->arr );
 	}
-
+	
 	public function rewind(): void
 	{
 		$this->offset = 0;
 	}
-
+	
 	/**
 	 * @return mixed|null
 	 */
 	public function getLastAndRemove()
 	{
 		$this->rewind();
-
+		
 		return array_pop( $this->arr );
 	}
-
+	
 	/**
 	 * @return mixed|null
 	 */
@@ -176,16 +177,15 @@ class Iterate implements Iterator
 	{
 		$offset = $this->offset;
 		$next   = $this->getNext();
-
 		if ( $next !== null ) {
 			unset( $this->arr[ $offset ] );
-
+			
 			return $next;
 		}
-
+		
 		return null;
 	}
-
+	
 	/**
 	 * @return mixed|null
 	 */
@@ -194,7 +194,7 @@ class Iterate implements Iterator
 		if ( isset( $this->arr[ $this->offset ] ) ) {
 			return $this->arr[ $this->offset++ ];
 		}
-
+		
 		return null;
 	}
 }

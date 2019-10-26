@@ -7,6 +7,7 @@ use Chukdo\Bootstrap\AppException;
 /**
  * Classe Archive
  * gestion des fichiers compressés.
+ *
  * @version   1.0.0
  * @copyright licence GPL, Copyright (C) 2012 Domingo
  * @since     10/06/2012
@@ -20,7 +21,7 @@ final class Archive
 	private function __construct()
 	{
 	}
-
+	
 	/**
 	 * @param string $data
 	 *
@@ -28,45 +29,31 @@ final class Archive
 	 */
 	public static function ungzipString( string $data ): string
 	{
-		$flags       = ord( substr( $data,
-			3,
-			1 ) );
+		$flags       = ord( substr( $data, 3, 1 ) );
 		$headerlen   = 10;
 		$extralen    = 0;
 		$filenamelen = 0;
-
 		if ( $flags & 4 ) {
-			$extralen  = unpack( 'v',
-				substr( $data,
-					10,
-					2 ) );
+			$extralen  = unpack( 'v', substr( $data, 10, 2 ) );
 			$extralen  = $extralen[ 1 ];
 			$headerlen += 2 + $extralen;
 		}
-
 		/* Filename */
 		if ( $flags & 8 ) {
-			$headerlen = strpos( $data,
-					chr( 0 ),
-					$headerlen ) + 1;
+			$headerlen = strpos( $data, chr( 0 ), $headerlen ) + 1;
 		}
-
 		/* Comment */
 		if ( $flags & 16 ) {
-			$headerlen = strpos( $data,
-					chr( 0 ),
-					$headerlen ) + 1;
+			$headerlen = strpos( $data, chr( 0 ), $headerlen ) + 1;
 		}
-
 		/* CRC at end of file */
 		if ( $flags & 2 ) {
 			$headerlen += 2;
 		}
-
-		return gzinflate( substr( $data,
-			$headerlen ) );
+		
+		return gzinflate( substr( $data, $headerlen ) );
 	}
-
+	
 	/**
 	 * Decompresse une donnée encodé zip (compression des données via ajax).
 	 *
@@ -76,17 +63,12 @@ final class Archive
 	 */
 	public static function unzipString( string $data ): string
 	{
-		$head = unpack( 'Vsig/vver/vflag/vmeth/vmodt/vmodd/Vcrc/Vcsize/Vsize/vnamelen/vexlen',
-			substr( $data,
-				0,
-				30 ) );
-		$raw  = gzinflate( substr( $data,
-			30 + $head[ 'namelen' ] + $head[ 'exlen' ],
-			$head[ 'csize' ] ) );
-
+		$head = unpack( 'Vsig/vver/vflag/vmeth/vmodt/vmodd/Vcrc/Vcsize/Vsize/vnamelen/vexlen', substr( $data, 0, 30 ) );
+		$raw  = gzinflate( substr( $data, 30 + $head[ 'namelen' ] + $head[ 'exlen' ], $head[ 'csize' ] ) );
+		
 		return $raw;
 	}
-
+	
 	/**
 	 * @param      $file
 	 * @param      $path
@@ -96,8 +78,7 @@ final class Archive
 	 */
 	public static function unzipFile( $file, $path, $root = false ): array
 	{
-		$path     = rtrim( $path,
-				'/' ) . '/';
+		$path     = rtrim( $path, '/' ) . '/';
 		$ret      = [];
 		$open     = zip_open( $file );
 		$ziperror = [
@@ -125,77 +106,54 @@ final class Archive
 			ZIPARCHIVE::ER_REMOVE      => 'Can\'t remove file',
 			ZIPARCHIVE::ER_DELETED     => 'Entry has been deleted',
 		];
-
 		/* Creation repertoire */
-		mkdir( $path,
-			0777,
-			true );
-
+		mkdir( $path, 0777, true );
 		/* Erreur d'ouverture du fichier */
 		if ( !is_resource( $open ) ) {
 			throw new AppException( sprintf( 'Zip File Function error: %s', $ziperror[ $open ] ) );
 		}
-
 		while ( ( $read = zip_read( $open ) ) !== false ) {
 			/* Erreur d'ouverture du fichier */
 			if ( !is_resource( $read ) ) {
 				throw new AppException( sprintf( 'Zip File Function error: %s', $ziperror[ $read ] ) );
 			}
-
 			$name = zip_entry_name( $read );
-			$dir  = trim( dirname( $name ),
-					DIRECTORY_SEPARATOR ) . DIRECTORY_SEPARATOR;
+			$dir  = trim( dirname( $name ), DIRECTORY_SEPARATOR ) . DIRECTORY_SEPARATOR;
 			$file = ( $root
 					? $path
 					: $path . $dir ) . basename( $name );
 			$size = zip_entry_filesize( $read );
-
 			/* Dossier */
-			if ( substr( $name,
-					-1 ) == '/' ) {
+			if ( substr( $name, -1 ) == '/' ) {
 				if ( !is_dir( $path . $dir ) ) {
-					mkdir( $path . $dir,
-						0777,
-						true );
+					mkdir( $path . $dir, 0777, true );
 				}
-
 				/* Fichier */
 			} else {
 				if ( !$root ) {
 					if ( !is_dir( $path . $dir ) ) {
-						mkdir( $path . $dir,
-							0777,
-							true );
+						mkdir( $path . $dir, 0777, true );
 					}
 				}
-				if ( ( $fp = fopen( $file,
-						'wb' ) ) !== false ) {
+				if ( ( $fp = fopen( $file, 'wb' ) ) !== false ) {
 					while ( $size > 0 ) {
-						$block   = min( $size,
-							10240 );
+						$block   = min( $size, 10240 );
 						$size    -= $block;
-						$content = zip_entry_read( $read,
-							$block );
-
+						$content = zip_entry_read( $read, $block );
 						if ( $content !== false ) {
-							fwrite( $fp,
-								$content );
+							fwrite( $fp, $content );
 						}
 					}
-
 					fclose( $fp );
-					@chmod( $file,
-						0777 );
-
+					@chmod( $file, 0777 );
 					$ret[] = $file;
-
 					/* Error */
 				} else {
 					throw new AppException( sprintf( 'Zip File Function error: can\'t write file %s', $file ) );
 				}
 			}
 		}
-
+		
 		return $ret;
 	}
 }

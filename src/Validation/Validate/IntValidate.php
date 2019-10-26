@@ -6,6 +6,7 @@ use Chukdo\Contracts\Validation\Validate as ValidateInterface;
 
 /**
  * Validate handler.
+ *
  * @version   1.0.0
  * @copyright licence MIT, Copyright (C) 2019 Domingo
  * @since     08/01/2019
@@ -17,12 +18,12 @@ class IntValidate implements ValidateInterface
 	 * @var int
 	 */
 	protected $min = 0;
-
+	
 	/**
 	 * @var int
 	 */
 	protected $max = 10000000;
-
+	
 	/**
 	 * @return string
 	 */
@@ -30,7 +31,7 @@ class IntValidate implements ValidateInterface
 	{
 		return 'int';
 	}
-
+	
 	/**
 	 * @param array $attributes
 	 *
@@ -38,17 +39,15 @@ class IntValidate implements ValidateInterface
 	 */
 	public function attributes( array $attributes ): ValidateInterface
 	{
-		$attributes = array_pad( $attributes,
-			2,
-			0 );
+		$attributes = array_pad( $attributes, 2, 0 );
 		$this->min  = $attributes[ 0 ];
 		$this->max  = $attributes[ 1 ]
 			?: $attributes[ 0 ]
 				?: 10000000;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param $input
 	 *
@@ -61,7 +60,7 @@ class IntValidate implements ValidateInterface
 				return true;
 			}
 		}
-
+		
 		return false;
 	}
 }

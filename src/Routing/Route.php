@@ -14,6 +14,7 @@ use Chukdo\Middleware\ValidatorMiddleware;
 
 /**
  * Gestion d'une Route.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -25,32 +26,32 @@ class Route
 	 * @var string
 	 */
 	protected $method;
-
+	
 	/**
 	 * @var string
 	 */
 	protected $uri;
-
+	
 	/**
 	 * @var Request
 	 */
 	protected $request;
-
+	
 	/**
 	 * @var ClosureMiddleware
 	 */
 	protected $appMiddleware;
-
+	
 	/**
 	 * @var array
 	 */
 	protected $wheres = [];
-
+	
 	/**
 	 * @var RouteAttributes
 	 */
 	protected $attributes;
-
+	
 	/**
 	 * Route constructor.
 	 *
@@ -67,7 +68,7 @@ class Route
 		$this->request       = $request;
 		$this->attributes    = new RouteAttributes();
 	}
-
+	
 	/**
 	 * @param array $middlewares
 	 *
@@ -76,11 +77,11 @@ class Route
 	public function middleware( array $middlewares ): self
 	{
 		$this->attributes()
-			 ->setMiddleware( $middlewares );
-
+		     ->setMiddleware( $middlewares );
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @return RouteAttributes
 	 */
@@ -88,7 +89,7 @@ class Route
 	{
 		return $this->attributes;
 	}
-
+	
 	/**
 	 * @param array                         $validators
 	 * @param ErrorMiddlewareInterface|null $errorMiddleware
@@ -98,11 +99,11 @@ class Route
 	public function validator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
 	{
 		$this->attributes()
-			 ->setValidator( $validators, $errorMiddleware );
-
+		     ->setValidator( $validators, $errorMiddleware );
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string|null $prefix
 	 *
@@ -111,11 +112,11 @@ class Route
 	public function prefix( ?string $prefix ): self
 	{
 		$this->attributes()
-			 ->setPrefix( $prefix );
-
+		     ->setPrefix( $prefix );
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -123,7 +124,7 @@ class Route
 	{
 		return $this->method;
 	}
-
+	
 	/**
 	 * @return bool
 	 */
@@ -140,33 +141,10 @@ class Route
 				}
 			}
 		}
-
+		
 		return false;
 	}
-
-	/**
-	 * @return bool
-	 */
-	protected function matchMethod(): bool
-	{
-		$method = $this->request->method();
-
-		return $this->method === $method || $this->method === 'ALL';
-	}
-
-	/**
-	 * @return bool
-	 */
-	protected function matchScheme(): bool
-	{
-		$requestScheme = $this->request->url()
-									   ->getScheme();
-		$routeScheme   = $this->uri()
-							  ->getScheme();
-
-		return $requestScheme === $routeScheme || $routeScheme === 'file';
-	}
-
+	
 	/**
 	 * @return Url
 	 */
@@ -174,24 +152,93 @@ class Route
 	{
 		return $this->uri;
 	}
-
+	
+	/**
+	 * @param array $wheres
+	 *
+	 * @return Route
+	 */
+	public function wheres( array $wheres ): self
+	{
+		foreach ( $wheres as $key => $regex ) {
+			$this->where( $key, $regex );
+		}
+		
+		return $this;
+	}
+	
+	/**
+	 * @param string $key
+	 * @param string $regex
+	 *
+	 * @return Route
+	 */
+	public function where( string $key, string $regex ): self
+	{
+		$this->wheres[ $key ] = $regex;
+		
+		return $this;
+	}
+	
+	/**
+	 * @param Response $response
+	 *
+	 * @return Response
+	 */
+	public function dispatcher( Response $response ): Response
+	{
+		$dispatcher = new Dispatcher( $this->request, $response );
+		$dispatcher->pipe( $this->appMiddleware );
+		$dispatcher->pipe( new ValidatorMiddleware( $this->attributes()
+		                                                 ->getValidator(), $this->attributes()
+		                                                                        ->getErrorMiddleware() ) );
+		foreach ( $this->attributes()
+		               ->getMiddleware() as $middleware ) {
+			$dispatcher->pipe( $middleware );
+		}
+		
+		return $dispatcher->handle();
+	}
+	
+	/**
+	 * @return bool
+	 */
+	protected function matchMethod(): bool
+	{
+		$method = $this->request->method();
+		
+		return $this->method === $method || $this->method === 'ALL';
+	}
+	
+	/**
+	 * @return bool
+	 */
+	protected function matchScheme(): bool
+	{
+		$requestScheme = $this->request->url()
+		                               ->getScheme();
+		$routeScheme   = $this->uri()
+		                      ->getScheme();
+		
+		return $requestScheme === $routeScheme || $routeScheme === 'file';
+	}
+	
 	/**
 	 * @return bool
 	 */
 	protected function matchDomain(): bool
 	{
 		$requestDomain = $this->request->url()
-									   ->getDomain();
+		                               ->getDomain();
 		$routeDomain   = $this->uri()
-							  ->getDomain();
-
+		                      ->getDomain();
 		if ( $routeDomain === null || $requestDomain === $routeDomain ) {
 			return true;
 		}
-
+		
 		return $this->matchPattern( $routeDomain, $requestDomain );
 	}
-
+	
 	/**
 	 * @param string $routePattern
 	 * @param string $requestPattern
@@ -203,14 +250,15 @@ class Route
 		if ( Str::contain( $routePattern, '{' ) ) {
 			if ( $inputs = $this->extractInputs( $routePattern, $requestPattern ) ) {
 				$this->request->inputs()
-							  ->merge( $inputs, true );
+				              ->merge( $inputs, true );
+				
 				return true;
 			}
 		}
-
+		
 		return false;
 	}
-
+	
 	/**
 	 * @param string $routePath
 	 * @param string $requestPath
@@ -221,27 +269,23 @@ class Route
 	{
 		$keys      = Str::matchAll( '/\{([a-z0-9_]+)\}/', $routePath );
 		$countKeys = count( $keys );
-
 		foreach ( $keys as $key ) {
 			$routePath = str_replace( '{' . $key . '}', '(' . $this->parseWhere( $key ) . ')', $routePath );
 		}
-
 		$values      = (array) Str::match( '`^' . $routePath . '$`', $requestPath );
 		$countValues = count( $values );
-
 		if ( $countValues > 0 && $countValues === $countKeys ) {
 			$match = [];
-
 			foreach ( $keys as $k => $key ) {
 				$match[ $key ] = $values[ $k ];
 			}
-
+			
 			return $match;
 		}
-
+		
 		return null;
 	}
-
+	
 	/**
 	 * @param string $name
 	 *
@@ -251,88 +295,37 @@ class Route
 	{
 		return $this->wheres[ $name ] ?? '.*?';
 	}
-
+	
 	/**
 	 * @return bool
 	 */
 	protected function matchSubDomain(): bool
 	{
 		$requestSubDomain = $this->request->url()
-										  ->getSubDomain();
+		                                  ->getSubDomain();
 		$routeSubDomain   = $this->uri()
-								 ->getSubDomain();
-
+		                         ->getSubDomain();
 		if ( $routeSubDomain === null || $requestSubDomain === $routeSubDomain ) {
 			return true;
 		}
-
+		
 		return $this->matchPattern( $routeSubDomain, $requestSubDomain );
 	}
-
+	
 	/**
 	 * @return bool
 	 */
 	protected function matchPath(): bool
 	{
 		$requestPath = $this->request->url()
-									 ->getPath();
+		                             ->getPath();
 		$routePath   = $this->attributes()
-							->getPrefix() . $this->uri()
-												 ->getPath();
-
+		                    ->getPrefix() . $this->uri()
+		                                         ->getPath();
 		if ( $requestPath === $routePath ) {
 			return true;
 		}
-
+		
 		return $this->matchPattern( $routePath, $requestPath );
-	}
-
-	/**
-	 * @param array $wheres
-	 *
-	 * @return Route
-	 */
-	public function wheres( array $wheres ): self
-	{
-		foreach ( $wheres as $key => $regex ) {
-			$this->where( $key, $regex );
-		}
-
-		return $this;
-	}
-
-	/**
-	 * @param string $key
-	 * @param string $regex
-	 *
-	 * @return Route
-	 */
-	public function where( string $key, string $regex ): self
-	{
-		$this->wheres[ $key ] = $regex;
-
-		return $this;
-	}
-
-	/**
-	 * @param Response $response
-	 *
-	 * @return Response
-	 */
-	public function dispatcher( Response $response ): Response
-	{
-		$dispatcher = new Dispatcher( $this->request, $response );
-
-		$dispatcher->pipe( $this->appMiddleware );
-		$dispatcher->pipe( new ValidatorMiddleware( $this->attributes()
-														 ->getValidator(), $this->attributes()
-																				->getErrorMiddleware() ) );
-
-		foreach ( $this->attributes()
-					   ->getMiddleware() as $middleware ) {
-			$dispatcher->pipe( $middleware );
-		}
-
-		return $dispatcher->handle();
 	}
 }

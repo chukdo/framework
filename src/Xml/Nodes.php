@@ -6,6 +6,7 @@ use Chukdo\Json\Json;
 
 /**
  * Listes de noeuds XML.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -23,12 +24,11 @@ class Nodes extends Json
 	{
 		foreach ( $this as $node ) {
 			call_user_func_array( [
-				$node,
-				$name,
-			],
-				$params );
+				                      $node,
+				                      $name,
+			                      ], $params );
 		}
-
+		
 		return $this;
 	}
 }

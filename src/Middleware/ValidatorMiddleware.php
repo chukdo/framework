@@ -14,12 +14,12 @@ class ValidatorMiddleware implements MiddlewareInterface
 	 * @var array
 	 */
 	protected $validators = [];
-
+	
 	/**
 	 * @var ErrorMiddlewareInterface
 	 */
 	protected $errorMiddleware = null;
-
+	
 	/**
 	 * ValidatorMiddleware constructor.
 	 *
@@ -31,7 +31,7 @@ class ValidatorMiddleware implements MiddlewareInterface
 		$this->validators      = $validators;
 		$this->errorMiddleware = $errorMiddleware;
 	}
-
+	
 	/**
 	 * @param Dispatcher $dispatcher
 	 *
@@ -42,16 +42,13 @@ class ValidatorMiddleware implements MiddlewareInterface
 	public function process( Dispatcher $dispatcher ): Response
 	{
 		$validate = $dispatcher->request()
-							   ->validate( $this->validators );
-
+		                       ->validate( $this->validators );
 		if ( $validate->fails() ) {
-			return ( $this->errorMiddleware
-				?? new ErrorMiddleware() )->errorMessage( $validate->errors() )
-										  ->process( $dispatcher );
+			return ( $this->errorMiddleware ?? new ErrorMiddleware() )->errorMessage( $validate->errors() )
+			                                                          ->process( $dispatcher );
 		}
-
 		$dispatcher->attribute( 'inputs', $validate->validated() );
-
+		
 		return $dispatcher->handle();
 	}
 }

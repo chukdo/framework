@@ -11,12 +11,12 @@ class ControlerMiddleware implements MiddlewareInterface
 	 * @var string
 	 */
 	protected $controler = '';
-
+	
 	/**
 	 * @var string
 	 */
 	protected $action = '';
-
+	
 	/**
 	 * ControlerMiddleware constructor.
 	 *
@@ -27,9 +27,10 @@ class ControlerMiddleware implements MiddlewareInterface
 		[
 			$this->controler,
 			$this->action,
-		] = explode( '@', $uri );
+		]
+			= explode( '@', $uri );
 	}
-
+	
 	/**
 	 * @param Dispatcher $dispatcher
 	 *
@@ -37,13 +38,12 @@ class ControlerMiddleware implements MiddlewareInterface
 	 */
 	public function process( Dispatcher $dispatcher ): Response
 	{
-		$inputs = $dispatcher->attribute( 'inputs' )
+		$inputs    = $dispatcher->attribute( 'inputs' )
 			?: $dispatcher->request()
-						  ->inputs();
-
+			              ->inputs();
 		$controler = $this->controler;
 		$action    = $this->action;
-
+		
 		return ( new $controler() )->$action( $inputs, $dispatcher->response() );
 	}
 }

@@ -14,6 +14,7 @@ use ReflectionException;
 
 /**
  * Gestion des Routes.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -25,32 +26,32 @@ class Router
 	 * @var App
 	 */
 	protected $app;
-
+	
 	/**
 	 * @var Request
 	 */
 	protected $request;
-
+	
 	/**
 	 * @var Response
 	 */
 	protected $response;
-
+	
 	/**
 	 * @var array
 	 */
 	protected $stack = [];
-
+	
 	/**
 	 * @var RouteAttributes
 	 */
 	protected $attributes;
-
+	
 	/**
 	 * @var Closure
 	 */
 	protected $fallback = null;
-
+	
 	/**
 	 * Router constructor.
 	 *
@@ -65,11 +66,12 @@ class Router
 		$this->request    = $app->make( Request::class );
 		$this->response   = $this->app->make( Response::class );
 		$this->attributes = new RouteAttributes();
-		$this->fallback   = static function() {
+		$this->fallback   = static function ()
+		{
 			throw new RouteException( 'No valid route' );
 		};
 	}
-
+	
 	/**
 	 * @param array $middlewares
 	 *
@@ -79,7 +81,7 @@ class Router
 	{
 		return ( new RouteGroup( $this ) )->middleware( $middlewares );
 	}
-
+	
 	/**
 	 * @param array                         $validators
 	 * @param ErrorMiddlewareInterface|null $errorMiddleware
@@ -90,7 +92,7 @@ class Router
 	{
 		return ( new RouteGroup( $this ) )->validator( $validators, $errorMiddleware );
 	}
-
+	
 	/**
 	 * @param string|null $prefix
 	 *
@@ -100,7 +102,7 @@ class Router
 	{
 		return ( new RouteGroup( $this ) )->prefix( $prefix );
 	}
-
+	
 	/**
 	 * @return Request
 	 */
@@ -108,7 +110,7 @@ class Router
 	{
 		return $this->request;
 	}
-
+	
 	/**
 	 * @return Response
 	 */
@@ -116,7 +118,7 @@ class Router
 	{
 		return $this->response;
 	}
-
+	
 	/**
 	 * @param string $uri
 	 * @param        $closure
@@ -127,7 +129,7 @@ class Router
 	{
 		return $this->stack( 'GET', $uri, $closure );
 	}
-
+	
 	/**
 	 * @param string $method
 	 * @param string $uri
@@ -139,22 +141,22 @@ class Router
 	{
 		if ( $closure instanceof Closure ) {
 			$appMiddleware = new ClosureMiddleware( $closure );
-		} else if ( is_string( $closure ) ) {
-			$appMiddleware = new ControlerMiddleware( $closure );
 		} else {
-			throw new RouteException( 'Router stack need a Closure or a String' );
+			if ( is_string( $closure ) ) {
+				$appMiddleware = new ControlerMiddleware( $closure );
+			} else {
+				throw new RouteException( 'Router stack need a Closure or a String' );
+			}
 		}
-
 		$route = new Route( $method, $uri, $this->request, $appMiddleware );
 		$route->attributes()
-			  ->set( $this->attributes()
-						  ->get() );
-
+		      ->set( $this->attributes()
+		                  ->get() );
 		$this->stack[] = $route;
-
+		
 		return $route;
 	}
-
+	
 	/**
 	 * @return RouteAttributes
 	 */
@@ -162,7 +164,7 @@ class Router
 	{
 		return $this->attributes;
 	}
-
+	
 	/**
 	 * @param string $uri
 	 * @param        $closure
@@ -173,7 +175,7 @@ class Router
 	{
 		return $this->stack( 'POST', $uri, $closure );
 	}
-
+	
 	/**
 	 * @param string $uri
 	 * @param        $closure
@@ -184,7 +186,7 @@ class Router
 	{
 		return $this->stack( 'PUT', $uri, $closure );
 	}
-
+	
 	/**
 	 * @param string $uri
 	 * @param        $closure
@@ -195,7 +197,7 @@ class Router
 	{
 		return $this->stack( 'DELETE', $uri, $closure );
 	}
-
+	
 	/**
 	 * @param string $uri
 	 * @param        $closure
@@ -206,7 +208,7 @@ class Router
 	{
 		return $this->stack( 'ALL', $uri, $closure );
 	}
-
+	
 	/**
 	 * @param string $uri
 	 * @param        $closure
@@ -217,7 +219,7 @@ class Router
 	{
 		return $this->stack( 'CLI', $uri, $closure );
 	}
-
+	
 	/**
 	 * @return Response
 	 */
@@ -226,13 +228,12 @@ class Router
 		foreach ( $this->stack as $route ) {
 			if ( $route->match() ) {
 				return $route->dispatcher( $this->response )
-							 ->send();
+				             ->send();
 			}
 		}
-
 		( $this->fallback )( $this->request, $this->response );
 	}
-
+	
 	/**
 	 * @param Closure $fallback
 	 *
@@ -241,7 +242,7 @@ class Router
 	public function fallback( Closure $fallback ): self
 	{
 		$this->fallback = $fallback;
-
+		
 		return $this;
 	}
 }

@@ -15,7 +15,7 @@ class Contrat extends Record
 			$this->offsetSet( 'reference', $ref );
 		}
 	}
-
+	
 	//save
 	//delete
 	//softDelete

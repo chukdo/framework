@@ -15,6 +15,7 @@ use Throwable;
 
 /**
  * Message d'exception
+ *
  * @version       1.0.0
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
  * @since         08/01/2019
@@ -26,12 +27,12 @@ class ExceptionMessage
 	 * @var array
 	 */
 	protected $message = [];
-
+	
 	/**
 	 * @var int
 	 */
 	protected $env;
-
+	
 	/**
 	 * ExceptionMessage constructor.
 	 *
@@ -42,23 +43,19 @@ class ExceptionMessage
 	{
 		$this->env = $env;
 		$backTrace = [];
-
 		if ( $previous = $e->getPrevious() ) {
 			$e = $previous;
 		}
-
 		foreach ( $e->getTrace() as $trace ) {
-			$trace = Arr::merge( [
-				'file'     => null,
-				'line'     => null,
-				'class'    => null,
-				'type'     => null,
-				'function' => null,
-			],
-				$trace );
-			$file  = $trace[ 'file' ];
-			$line  = $trace[ 'line' ];
-
+			$trace       = Arr::merge( [
+				                           'file'     => null,
+				                           'line'     => null,
+				                           'class'    => null,
+				                           'type'     => null,
+				                           'function' => null,
+			                           ], $trace );
+			$file        = $trace[ 'file' ];
+			$line        = $trace[ 'line' ];
 			$backTrace[] = [
 				'Call' => $trace[ 'class' ] . $trace[ 'type' ] . $trace[ 'function' ] . '()',
 				'File' => $file,
@@ -68,7 +65,6 @@ class ExceptionMessage
 					: '',
 			];
 		}
-
 		$this->message[ 'Call' ]  = get_class( $e );
 		$this->message[ 'Error' ] = $e->getMessage();
 		$this->message[ 'Code' ]  = $e->getCode();
@@ -77,38 +73,7 @@ class ExceptionMessage
 		$this->message[ 'Php' ]   = $this->getCode( $e->getFile(), $e->getLine() );
 		$this->message[ 'Trace' ] = $backTrace;
 	}
-
-	/**
-	 * @param string $file
-	 * @param int    $line
-	 *
-	 * @return string
-	 */
-	protected function getCode( string $file, int $line ): string
-	{
-		$code = '';
-		$spl  = new SplFileObject( $file );
-
-		for ( $i = -7; $i < 3; ++$i ) {
-			try {
-				$spl->seek( $line + $i );
-				$code .= ( $line + $i + 1 ) . ( $i == -1
-						? '> '
-						: ': ' ) . $spl->current() . "\n";
-			} catch ( Throwable $e ) {
-			}
-		}
-
-		$code = highlight_string( '<?php ' . $code,
-			true );
-		$code = str_replace( '&lt;?php&nbsp;',
-			'',
-			$code );
-		$code = '<span style="line-height:0.6rem">' . $code . '</span>';
-
-		return $code;
-	}
-
+	
 	/**
 	 *
 	 */
@@ -116,12 +81,10 @@ class ExceptionMessage
 	{
 		$render   = HttpRequest::render();
 		$response = new Response();
-
 		/* Dev mode */
 		if ( $this->env != 0 ) {
 			$this->message = [ 'Error' => 'Error happened' ];
 		}
-
 		switch ( $render ) {
 			case 'cli':
 				$contentType = Http::mimeContentType( 'text' );
@@ -140,19 +103,43 @@ class ExceptionMessage
 				$contentType = Http::mimeContentType( 'html' );
 				$content     = $this->renderHtml( $this->message );;
 		}
-
 		try {
 			$response->status( 500 )
-				->header( 'Content-Type', $contentType . '; charset=utf-8' )
-				->content( $content )
-				->send()
-				->end();
+			         ->header( 'Content-Type', $contentType . '; charset=utf-8' )
+			         ->content( $content )
+			         ->send()
+			         ->end();
 		} catch ( Throwable $e ) {
 			die( $content );
 		}
-
 	}
-
+	
+	/**
+	 * @param string $file
+	 * @param int    $line
+	 *
+	 * @return string
+	 */
+	protected function getCode( string $file, int $line ): string
+	{
+		$code = '';
+		$spl  = new SplFileObject( $file );
+		for ( $i = -7; $i < 3; ++$i ) {
+			try {
+				$spl->seek( $line + $i );
+				$code .= ( $line + $i + 1 ) . ( $i == -1
+						? '> '
+						: ': ' ) . $spl->current() . "\n";
+			} catch ( Throwable $e ) {
+			}
+		}
+		$code = highlight_string( '<?php ' . $code, true );
+		$code = str_replace( '&lt;?php&nbsp;', '', $code );
+		$code = '<span style="line-height:0.6rem">' . $code . '</span>';
+		
+		return $code;
+	}
+	
 	/**
 	 * @param array $message
 	 *
@@ -164,21 +151,19 @@ class ExceptionMessage
 		$climate->output->defaultTo( 'buffer' );
 		$climate->border();
 		$climate->red()
-			->out( strtoupper( $message[ 'Call' ]
-				?: 'Exception' ) );
+		        ->out( strtoupper( $message[ 'Call' ]
+			                           ?: 'Exception' ) );
 		$climate->border();
 		$padding = $climate->padding( 7 );
 		$padding->label( 'Code' )
-			->result( $message[ 'Code' ] );
+		        ->result( $message[ 'Code' ] );
 		$padding->label( 'Message' )
-			->result( $message[ 'Error' ] );
+		        ->result( $message[ 'Error' ] );
 		$padding->label( 'File' )
-			->result( $message[ 'File' ] );
+		        ->result( $message[ 'File' ] );
 		$padding->label( 'Line' )
-			->result( $message[ 'Line' ] );
-
+		        ->result( $message[ 'Line' ] );
 		$backTrace = $message[ 'Trace' ];
-
 		if ( is_array( $backTrace ) ) {
 			foreach ( $backTrace as $k => $trace ) {
 				unset( $backTrace[ $k ][ 'Php' ] );
@@ -187,11 +172,11 @@ class ExceptionMessage
 			$climate->json( $backTrace );
 			$climate->border();
 		}
-
+		
 		return $climate->output->get( 'buffer' )
-			->get();
+		                       ->get();
 	}
-
+	
 	/**
 	 * @param array $message
 	 *
@@ -200,10 +185,10 @@ class ExceptionMessage
 	protected function renderXml( array $message ): string
 	{
 		return ( new Xml() )->import( $message )
-			->toXml()
-			->toXmlString();
+		                    ->toXml()
+		                    ->toXmlString();
 	}
-
+	
 	/**
 	 * @param array $message
 	 *
@@ -213,7 +198,7 @@ class ExceptionMessage
 	{
 		return ( new Json( $message ) )->toJson( true );
 	}
-
+	
 	/**
 	 * @param array $message
 	 *
@@ -223,7 +208,7 @@ class ExceptionMessage
 	{
 		$title = $message[ 'Call' ];
 		unset( $message[ 'Call' ] );
-
+		
 		return To::html( $message, $title, '#B30000' );
 	}
 }

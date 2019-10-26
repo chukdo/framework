@@ -10,6 +10,7 @@ use Throwable;
 
 /**
  * Gestion des inputs.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -24,20 +25,17 @@ class Input extends Json implements InputInterface
 	 */
 	public function __construct( $data = null )
 	{
-		$data = $data
-			?? HttpRequest::all();
-
+		$data = $data ?? HttpRequest::all();
 		/** Trim all input */
-		array_walk_recursive( $data,
-			function( &$v, $k ) {
-				if ( is_scalar( $v ) ) {
-					$v = trim( $v );
-				}
-			} );
-
+		array_walk_recursive( $data, function ( &$v, $k )
+		{
+			if ( is_scalar( $v ) ) {
+				$v = trim( $v );
+			}
+		} );
 		parent::__construct( $data );
 	}
-
+	
 	/**
 	 * @param string      $name
 	 * @param string|null $allowedMimeTypes

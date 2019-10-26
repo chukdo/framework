@@ -7,6 +7,7 @@ use Closure;
 
 /**
  * Gestion des Routes.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -18,12 +19,12 @@ class RouteGroup
 	 * @var Router
 	 */
 	protected $router;
-
+	
 	/**
 	 * @var RouteAttributes
 	 */
 	protected $attributes;
-
+	
 	/**
 	 * RouteGroup constructor.
 	 *
@@ -34,7 +35,7 @@ class RouteGroup
 		$this->router     = $router;
 		$this->attributes = new RouteAttributes();
 	}
-
+	
 	/**
 	 * @param array $middlewares
 	 *
@@ -43,11 +44,11 @@ class RouteGroup
 	public function middleware( array $middlewares ): self
 	{
 		$this->attributes()
-			 ->setMiddleware( $middlewares );
-
+		     ->setMiddleware( $middlewares );
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @return RouteAttributes
 	 */
@@ -55,7 +56,7 @@ class RouteGroup
 	{
 		return $this->attributes;
 	}
-
+	
 	/**
 	 * @param array                         $validators
 	 * @param ErrorMiddlewareInterface|null $errorMiddleware
@@ -65,11 +66,11 @@ class RouteGroup
 	public function validator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
 	{
 		$this->attributes()
-			 ->setValidator( $validators, $errorMiddleware );
-
+		     ->setValidator( $validators, $errorMiddleware );
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string|null $prefix
 	 *
@@ -78,11 +79,11 @@ class RouteGroup
 	public function prefix( ?string $prefix ): self
 	{
 		$this->attributes()
-			 ->setPrefix( $prefix );
-
+		     ->setPrefix( $prefix );
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param Closure $closure
 	 *
@@ -91,16 +92,14 @@ class RouteGroup
 	public function group( Closure $closure ): self
 	{
 		$attributes = $this->router->attributes()
-								   ->get();
+		                           ->get();
 		$this->router->attributes()
-					 ->add( $this->attributes()
-								 ->get() );
-
+		             ->add( $this->attributes()
+		                         ->get() );
 		( $closure )();
-
 		$this->router->attributes()
-					 ->set( $attributes );
-
+		             ->set( $attributes );
+		
 		return $this;
 	}
 }

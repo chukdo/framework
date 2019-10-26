@@ -7,6 +7,7 @@ use Chukdo\Helper\Str;
 
 /**
  * Validate handler.
+ *
  * @version   1.0.0
  * @copyright licence MIT, Copyright (C) 2019 Domingo
  * @since     08/01/2019
@@ -21,7 +22,7 @@ class PhoneValidate implements ValidateInterface
 	{
 		return 'phone';
 	}
-
+	
 	/**
 	 * @param array $attributes
 	 *
@@ -31,7 +32,7 @@ class PhoneValidate implements ValidateInterface
 	{
 		return $this;
 	}
-
+	
 	/**
 	 * @param $input
 	 *
@@ -42,7 +43,7 @@ class PhoneValidate implements ValidateInterface
 		if ( Str::match( '/^[0-9]{8,16}$/', $input ) ) {
 			return true;
 		}
-
+		
 		return false;
 	}
 }

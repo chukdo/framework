@@ -14,6 +14,7 @@ use MongoDB\Driver\ReadPreference;
 
 /**
  * Server Find.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -25,37 +26,37 @@ Class Find extends Where implements FindInterface
 	 * @var array
 	 */
 	protected $projection = [];
-
+	
 	/**
 	 * @var array
 	 */
 	protected $options = [];
-
+	
 	/**
 	 * @var array
 	 */
 	protected $link = [];
-
+	
 	/**
 	 * @var array
 	 */
 	protected $sort = [];
-
+	
 	/**
 	 * @var int
 	 */
 	protected $skip = 0;
-
+	
 	/**
 	 * @var int
 	 */
 	protected $limit = 0;
-
+	
 	/**
 	 * @var bool
 	 */
 	protected $hiddenId = false;
-
+	
 	/**
 	 * ReadPreference::RP_PRIMARY = 1,
 	 * RP_SECONDARY = 2,
@@ -70,24 +71,24 @@ Class Find extends Where implements FindInterface
 	public function setReadPreference( int $readPreference ): self
 	{
 		$this->collection()
-			 ->database()
-			 ->server()
-			 ->client()
-			 ->selectServer( new ReadPreference( $readPreference ) );
-
+		     ->database()
+		     ->server()
+		     ->client()
+		     ->selectServer( new ReadPreference( $readPreference ) );
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @return int
 	 */
 	public function count(): int
 	{
 		return (int) $this->collection()
-						  ->client()
-						  ->countDocuments( $this->filter() );
+		                  ->client()
+		                  ->countDocuments( $this->filter() );
 	}
-
+	
 	/**
 	 * @param bool $idAsKey
 	 *
@@ -97,17 +98,16 @@ Class Find extends Where implements FindInterface
 	{
 		$options    = Arr::merge( $this->projection(), $this->options );
 		$find       = $this->collection()
-						   ->client()
-						   ->find( $this->filter(), $options );
+		                   ->client()
+		                   ->find( $this->filter(), $options );
 		$recordList = new RecordList( $this->collection(), new Json( $find ), $idAsKey );
-
 		foreach ( $this->link as $link ) {
 			$recordList = $link->hydrate( $recordList );
 		}
-
+		
 		return $recordList;
 	}
-
+	
 	/**
 	 * @return array
 	 */
@@ -117,22 +117,19 @@ Class Find extends Where implements FindInterface
 			'projection'      => $this->projection,
 			'noCursorTimeout' => false,
 		];
-
 		if ( !empty( $this->sort ) ) {
 			$projection[ 'sort' ] = $this->sort;
 		}
-
 		if ( $this->skip > 0 ) {
 			$projection[ 'skip' ] = $this->skip;
 		}
-
 		if ( $this->limit > 0 ) {
 			$projection[ 'limit' ] = $this->limit;
 		}
-
+		
 		return $projection;
 	}
-
+	
 	/**
 	 * @param string      $field
 	 * @param array       $with
@@ -141,18 +138,18 @@ Class Find extends Where implements FindInterface
 	 *
 	 * @return FindInterface
 	 */
-	public function link( string $field, array $with = [], array $without = [], string $linked = null, DatabaseInterface $database = null ): FindInterface
+	public function link( string $field, array $with = [], array $without = [], string $linked = null,
+	                      DatabaseInterface $database = null ): FindInterface
 	{
-		$link = new Link( $database ?? $this->collection()
-											->database(), $field );
-
+		$link         = new Link( $database ?? $this->collection()
+		                                            ->database(), $field );
 		$this->link[] = $link->with( $with )
-							 ->without( $without )
-							 ->setLinkedName( $linked );
-
+		                     ->without( $without )
+		                     ->setLinkedName( $linked );
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param mixed ...$fields
 	 *
@@ -161,14 +158,13 @@ Class Find extends Where implements FindInterface
 	public function with( ...$fields ): FindInterface
 	{
 		$fields = Arr::spreadArgs( $fields );
-
 		foreach ( $fields as $field ) {
 			$this->projection[ $field ] = 1;
 		}
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param mixed ...$fields
 	 *
@@ -177,7 +173,6 @@ Class Find extends Where implements FindInterface
 	public function without( ...$fields ): FindInterface
 	{
 		$fields = Arr::spreadArgs( $fields );
-
 		foreach ( $fields as $field ) {
 			if ( $field === '_id' ) {
 				$this->hiddenId = true;
@@ -185,10 +180,10 @@ Class Find extends Where implements FindInterface
 				$this->projection[ $field ] = 0;
 			}
 		}
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $field
 	 * @param string $sort
@@ -200,10 +195,10 @@ Class Find extends Where implements FindInterface
 		$this->sort[ $field ] = $sort === 'asc' || $sort === 'ASC'
 			? 1
 			: -1;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param int $skip
 	 *
@@ -212,10 +207,10 @@ Class Find extends Where implements FindInterface
 	public function skip( int $skip ): FindInterface
 	{
 		$this->skip = $skip;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @return Record
 	 */
@@ -223,32 +218,30 @@ Class Find extends Where implements FindInterface
 	{
 		$options = Arr::merge( $this->projection(), $this->options );
 		$find    = $this->collection()
-						->client()
-						->findOne( $this->filter(), $options );
-
-		$record = $this->collection()
-					   ->record( $find, $this->hiddenId );
-
+		                ->client()
+		                ->findOne( $this->filter(), $options );
+		$record  = $this->collection()
+		                ->record( $find, $this->hiddenId );
 		foreach ( $this->link as $link ) {
 			$record = $link->hydrate( $record );
 		}
-
+		
 		return $record;
 	}
-
+	
 	/**
 	 * @return Stream
 	 */
 	public function stream(): Stream
 	{
-		$options    = Arr::merge( $this->projection(), $this->options );
-		$find       = $this->collection()
-						   ->client()
-						   ->find( $this->filter(), $options );
-
-		return new Stream($this->collection(), $find);
+		$options = Arr::merge( $this->projection(), $this->options );
+		$find    = $this->collection()
+		                ->client()
+		                ->find( $this->filter(), $options );
+		
+		return new Stream( $this->collection(), $find );
 	}
-
+	
 	/**
 	 * @param int $limit
 	 *
@@ -257,10 +250,10 @@ Class Find extends Where implements FindInterface
 	public function limit( int $limit ): FindInterface
 	{
 		$this->limit = $limit;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $field
 	 * @param bool   $idAsKey
@@ -270,38 +263,35 @@ Class Find extends Where implements FindInterface
 	public function distinct( string $field, bool $idAsKey = false ): RecordList
 	{
 		$find       = $this->collection()
-						   ->client()
-						   ->distinct( $field, $this->filter() );
+		                   ->client()
+		                   ->distinct( $field, $this->filter() );
 		$recordList = new RecordList( $this->collection(), new Json( $find ), $idAsKey );
-
 		foreach ( $this->link as $link ) {
 			$recordList = $link->hydrate( $recordList );
 		}
-
+		
 		return $recordList;
 	}
-
+	
 	/**
 	 * @return JsonInterface
 	 */
 	public function explain(): JsonInterface
 	{
 		$explain = $this->collection()
-						->database()
-						->server()
-						->command( [
-							'explain' => [
-								'find'   => $this->collection()
-												 ->name(),
-								'filter' => $this->filter(),
-							],
-						] );
-
-		$json = new Json();
-
+		                ->database()
+		                ->server()
+		                ->command( [
+			                           'explain' => [
+				                           'find'   => $this->collection()
+				                                            ->name(),
+				                           'filter' => $this->filter(),
+			                           ],
+		                           ] );
+		$json    = new Json();
 		$json->offsetSet( 'queryPlanner', $explain->get( '0.queryPlanner' ) );
 		$json->offsetSet( 'executionStats', $explain->get( '0.executionStats' ) );
-
+		
 		return $json;
 	}
 }

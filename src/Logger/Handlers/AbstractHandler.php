@@ -10,6 +10,7 @@ use Chukdo\Logger\Formatters\JsonStringFormatter;
 
 /**
  * Abstract class.
+ *
  * @version       1.0.0
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
  * @since         08/01/2019
@@ -21,17 +22,17 @@ abstract class AbstractHandler implements HandlerInterface
 	 * @var FormatterInterface
 	 */
 	protected $formatter;
-
+	
 	/**
 	 * @var array
 	 */
 	protected $levels = [];
-
+	
 	/**
 	 * @var array
 	 */
 	protected $processors = [];
-
+	
 	/**
 	 * Constructeur.
 	 */
@@ -39,7 +40,7 @@ abstract class AbstractHandler implements HandlerInterface
 	{
 		$this->setLevels( array_keys( Logger::getLevels() ) );
 	}
-
+	
 	/**
 	 * @param $levels
 	 */
@@ -47,7 +48,7 @@ abstract class AbstractHandler implements HandlerInterface
 	{
 		$this->levels = (array) $levels;
 	}
-
+	
 	/**
 	 * @param array $record
 	 *
@@ -57,17 +58,16 @@ abstract class AbstractHandler implements HandlerInterface
 	{
 		if ( $this->isHandling( $record ) ) {
 			$record = $this->processRecord( $record );
-
 			if ( !$this->formatter ) {
 				$this->setFormatter( new JsonStringFormatter() );
 			}
-
+			
 			return $this->write( $this->formatter->formatRecord( $record ) );
 		}
-
+		
 		return false;
 	}
-
+	
 	/**
 	 * @param array $record
 	 *
@@ -77,7 +77,7 @@ abstract class AbstractHandler implements HandlerInterface
 	{
 		return in_array( $record[ 'level' ], $this->levels, true );
 	}
-
+	
 	/**
 	 * @param array $record
 	 *
@@ -88,10 +88,10 @@ abstract class AbstractHandler implements HandlerInterface
 		foreach ( $this->processors as $processor ) {
 			$record = $processor->processRecord( $record );
 		}
-
+		
 		return $record;
 	}
-
+	
 	/**
 	 * @param FormatterInterface $formatter
 	 *
@@ -100,17 +100,10 @@ abstract class AbstractHandler implements HandlerInterface
 	public function setFormatter( FormatterInterface $formatter ): HandlerInterface
 	{
 		$this->formatter = $formatter;
-
+		
 		return $this;
 	}
-
-	/**
-	 * @param $record
-	 *
-	 * @return bool
-	 */
-	abstract protected function write( $record ): bool;
-
+	
 	/**
 	 * @param ProcessorInterface $processor
 	 *
@@ -119,7 +112,14 @@ abstract class AbstractHandler implements HandlerInterface
 	public function pushProcessor( ProcessorInterface $processor ): HandlerInterface
 	{
 		$this->processors[] = $processor;
-
+		
 		return $this;
 	}
+	
+	/**
+	 * @param $record
+	 *
+	 * @return bool
+	 */
+	abstract protected function write( $record ): bool;
 }

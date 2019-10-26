@@ -1,9 +1,9 @@
 <?php
 
 namespace Chukdo\Db\Mongo\Aggregate;
-
 /**
  * Server Aggregate AddFields.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -15,12 +15,12 @@ Class AddFields
 	 * @var array
 	 */
 	protected $addFields = [];
-
+	
 	/**
 	 * @var Aggregate
 	 */
 	protected $aggregate;
-
+	
 	/**
 	 * Group constructor.
 	 *
@@ -30,7 +30,7 @@ Class AddFields
 	{
 		$this->aggregate = $aggregate;
 	}
-
+	
 	/**
 	 * @param string $field
 	 * @param        $expression
@@ -40,10 +40,10 @@ Class AddFields
 	public function addField( string $field, $expression ): self
 	{
 		$this->addFields[ $field ] = Expression::parseExpression( $expression );
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @return array
 	 */
@@ -51,7 +51,7 @@ Class AddFields
 	{
 		return $this->addFields;
 	}
-
+	
 	public function pipe(): Aggregate
 	{
 		return $this->aggregate;

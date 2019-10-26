@@ -1,9 +1,9 @@
 <?php
 
 namespace Chukdo\Helper;
-
 /**
  * Stream.
+ *
  * @version       1.0.0
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
  * @since         08/01/2019
@@ -17,7 +17,7 @@ final class Stream
 	private function __construct()
 	{
 	}
-
+	
 	/**
 	 * @param string $name
 	 * @param string $class
@@ -27,10 +27,9 @@ final class Stream
 		if ( self::exists( $name ) ) {
 			stream_wrapper_unregister( $name );
 		}
-
 		stream_wrapper_register( $name, $class );
 	}
-
+	
 	/**
 	 * @param string $name
 	 *

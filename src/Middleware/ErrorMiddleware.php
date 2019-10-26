@@ -13,7 +13,7 @@ class ErrorMiddleware implements ErrorMiddlewareInterface
 	 * @var ErrorMiddlewareInterface
 	 */
 	protected $errors = null;
-
+	
 	/**
 	 * @param Message $errors
 	 *
@@ -22,10 +22,10 @@ class ErrorMiddleware implements ErrorMiddlewareInterface
 	public function errorMessage( Message $errors ): ErrorMiddlewareInterface
 	{
 		$this->errors = $errors;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param Dispatcher $dispatcher
 	 *
@@ -34,7 +34,6 @@ class ErrorMiddleware implements ErrorMiddlewareInterface
 	public function process( Dispatcher $dispatcher ): Response
 	{
 		$response = $dispatcher->response();
-
 		switch ( HttpRequest::render() ) {
 			case 'cli' :
 				$response->content( $this->errors->toConsole( null, 'red' ) );
@@ -48,7 +47,7 @@ class ErrorMiddleware implements ErrorMiddlewareInterface
 			default :
 				$response->html( $this->errors->toHtml( null, '#dd0000' ) );
 		}
-
+		
 		return $response->status( 412 );
 	}
 }

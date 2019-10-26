@@ -6,6 +6,7 @@ use Chukdo\View\View;
 
 /**
  * Interface d'enregistrement des functions pour le moteur de vue.
+ *
  * @version       1.0.0
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
  * @since         08/01/2019

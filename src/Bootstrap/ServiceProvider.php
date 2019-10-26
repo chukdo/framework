@@ -1,9 +1,9 @@
 <?php
 
 namespace Chukdo\Bootstrap;
-
 /**
  * Service Provider.
+ *
  * @version       1.0.0
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
  * @since         08/01/2019
@@ -15,7 +15,7 @@ abstract class ServiceProvider
 	 * @var App
 	 */
 	protected $app;
-
+	
 	/**
 	 * ServiceProvider constructor.
 	 *
@@ -25,17 +25,16 @@ abstract class ServiceProvider
 	{
 		$this->app = $app;
 	}
-
+	
 	/**
 	 * @param string $name
 	 * @param string $alias
 	 */
 	public function setClassAlias( string $name, string $alias ): void
 	{
-		class_alias( $name,
-			$alias );
+		class_alias( $name, $alias );
 	}
-
+	
 	/**
 	 * @return mixed
 	 */

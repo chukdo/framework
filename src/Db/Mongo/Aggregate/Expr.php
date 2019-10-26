@@ -1,20 +1,26 @@
 <?php
 
 namespace Chukdo\Db\Mongo\Aggregate;
-
 /**
  * Server Aggregate Expression Facading.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  *               https://docs.mongodb.com/manual/meta/aggregation-quick-reference/#aggregation-expressions
- * $abs $add $addToSet $allElementsTrue $and $anyElementTrue $arrayElemAt $arrayToObject $avg $cmp $concat $concatArrays $cond
- * $dateFromParts $dateToParts $dateFromString $dateToString $dayOfMonth $dayOfWeek $dayOfYear $divide $eq $exp $filter $first
- * $floor $gt $gte $hour $ifNull $in $indexOfArray $indexOfBytes $indexOfCP $isArray $isoDayOfWeek $isoWeek $isoWeekYear $last
- * $let $literal $ln $log $log10 $lt $lte $ltrim $map $max $mergeObjects $meta $min $millisecond $minute $mod $month $multiply
- * $ne $not $objectToArray $or $pow $push $range $reduce $reverseArray $rtrim $second $setDifference $setEquals $setIntersection
- * $setIsSubset $setUnion $size $slice $split $sqrt $stdDevPop $stdDevSamp $strcasecmp $strLenBytes $strLenCP $substr $substrBytes
+ * $abs $add $addToSet $allElementsTrue $and $anyElementTrue $arrayElemAt $arrayToObject $avg $cmp $concat
+ * $concatArrays $cond
+ * $dateFromParts $dateToParts $dateFromString $dateToString $dayOfMonth $dayOfWeek $dayOfYear $divide $eq $exp $filter
+ * $first
+ * $floor $gt $gte $hour $ifNull $in $indexOfArray $indexOfBytes $indexOfCP $isArray $isoDayOfWeek $isoWeek
+ * $isoWeekYear $last
+ * $let $literal $ln $log $log10 $lt $lte $ltrim $map $max $mergeObjects $meta $min $millisecond $minute $mod $month
+ * $multiply
+ * $ne $not $objectToArray $or $pow $push $range $reduce $reverseArray $rtrim $second $setDifference $setEquals
+ * $setIntersection
+ * $setIsSubset $setUnion $size $slice $split $sqrt $stdDevPop $stdDevSamp $strcasecmp $strLenBytes $strLenCP $substr
+ * $substrBytes
  * $substrCP $subtract $sum $switch $toLower $toUpper $trim $trunc $type $week $year $zip
  */
 class Expr
@@ -28,7 +34,7 @@ class Expr
 	{
 		return new Expression( 'multiply', $expression );
 	}
-
+	
 	/**
 	 * @param $expression
 	 *
@@ -38,7 +44,7 @@ class Expr
 	{
 		return new Expression( 'add', $expression );
 	}
-
+	
 	/**
 	 * @param $expression
 	 *
@@ -48,7 +54,7 @@ class Expr
 	{
 		return new Expression( 'sum', $expression );
 	}
-
+	
 	/**
 	 * @param $expression
 	 *
@@ -58,7 +64,7 @@ class Expr
 	{
 		return new Expression( 'year', $expression );
 	}
-
+	
 	/**
 	 * @param $expression
 	 *
@@ -68,7 +74,7 @@ class Expr
 	{
 		return new Expression( 'month', $expression );
 	}
-
+	
 	/**
 	 * @param $expression
 	 *
@@ -78,7 +84,7 @@ class Expr
 	{
 		return new Expression( 'dayOfMonth', $expression );
 	}
-
+	
 	/**
 	 * @param $expression
 	 *
@@ -88,7 +94,7 @@ class Expr
 	{
 		return new Expression( 'last', $expression );
 	}
-
+	
 	/**
 	 * @param $expression
 	 *
@@ -98,7 +104,7 @@ class Expr
 	{
 		return new Expression( 'first', $expression );
 	}
-
+	
 	/**
 	 * @param $expression
 	 *
@@ -108,7 +114,7 @@ class Expr
 	{
 		return new Expression( 'avg', $expression );
 	}
-
+	
 	/**
 	 * @param $expression
 	 *
@@ -118,7 +124,7 @@ class Expr
 	{
 		return new Expression( 'push', $expression );
 	}
-
+	
 	/**
 	 * @param $name
 	 * @param $expression

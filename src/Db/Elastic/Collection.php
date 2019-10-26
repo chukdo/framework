@@ -24,6 +24,7 @@ use ReflectionClass;
 
 /**
  * Server Server Collect.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -35,12 +36,12 @@ Class Collection implements CollectionInterface
 	 * @var Database
 	 */
 	protected $database;
-
+	
 	/**
 	 * @var string
 	 */
 	protected $collection;
-
+	
 	/**
 	 * Collection constructor.
 	 *
@@ -52,7 +53,7 @@ Class Collection implements CollectionInterface
 		$this->database   = $database;
 		$this->collection = $collection;
 	}
-
+	
 	/**
 	 * @param string|null $field
 	 * @param             $value
@@ -65,10 +66,10 @@ Class Collection implements CollectionInterface
 		if ( Str::contain( $field, 'date' ) ) {
 			return ( new DateTime() )->setTimestamp( 1000 * (int) (string) $value );
 		}
-
+		
 		return $value;
 	}
-
+	
 	/**
 	 * @param string|null $field
 	 * @param             $value
@@ -79,13 +80,15 @@ Class Collection implements CollectionInterface
 	{
 		if ( $value instanceof DateTime ) {
 			$value = $value->getTimestamp() * 1000;
-		} else if ( Str::contain( $field, 'date' ) && Is::scalar( $value ) ) {
-			$value = 1000 * (int) $value;
+		} else {
+			if ( Str::contain( $field, 'date' ) && Is::scalar( $value ) ) {
+				$value = 1000 * (int) $value;
+			}
 		}
-
+		
 		return $value;
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -93,7 +96,7 @@ Class Collection implements CollectionInterface
 	{
 		return (string) new ObjectId();
 	}
-
+	
 	/**
 	 * @param $data
 	 *
@@ -103,19 +106,18 @@ Class Collection implements CollectionInterface
 	{
 		try {
 			$reflector = new ReflectionClass( '\App\Model\Elastic\Record\\' . $this->name() );
-
 			if ( $reflector->implementsInterface( Record::class ) ) {
 				return $reflector->newInstanceArgs( [
-					$this,
-					$data,
-				] );
+					                                    $this,
+					                                    $data,
+				                                    ] );
 			}
 		} catch ( ReflectionException $e ) {
 		}
-
+		
 		return new Record( $this, $data );
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -123,7 +125,7 @@ Class Collection implements CollectionInterface
 	{
 		return $this->collection;
 	}
-
+	
 	/**
 	 * @param string      $collection
 	 * @param string|null $database
@@ -133,37 +135,34 @@ Class Collection implements CollectionInterface
 	 */
 	public function rename( string $collection, string $database = null, Schema $schema = null ): CollectionInterface
 	{
-		$database = $database
-			?? $this->database()
-					->name();
-
+		$database      = $database ?? $this->database()
+		                                   ->name();
 		$newCollection = $this->database()
-							  ->server()
-							  ->database( $database )
-							  ->dropCollection( $collection )
-							  ->createCollection( $collection );
-
+		                      ->server()
+		                      ->database( $database )
+		                      ->dropCollection( $collection )
+		                      ->createCollection( $collection );
 		$newCollection->client()
-			->indices()
-			->putMapping( [
-				'index' => $newCollection->fullName(),
-				'body'  => $schema
-					? $schema->toArray()
-					: $this->schema()
-						->toArray(),
-			] );
+		              ->indices()
+		              ->putMapping( [
+			                            'index' => $newCollection->fullName(),
+			                            'body'  => $schema
+				                            ? $schema->toArray()
+				                            : $this->schema()
+				                                   ->toArray(),
+		                            ] );
 		$this->client()
-			->reindex( [
-				'body' => [
-					'source' => [ 'index' => $this->fullName() ],
-					'dest'   => [ 'index' => $newCollection->fullName() ],
-				],
-			] );
+		     ->reindex( [
+			                'body' => [
+				                'source' => [ 'index' => $this->fullName() ],
+				                'dest'   => [ 'index' => $newCollection->fullName() ],
+			                ],
+		                ] );
 		$this->drop();
-
+		
 		return $newCollection;
 	}
-
+	
 	/**
 	 * @return DatabaseInterface
 	 */
@@ -171,25 +170,25 @@ Class Collection implements CollectionInterface
 	{
 		return $this->database;
 	}
-
+	
 	/**
 	 * @return Client
 	 */
 	public function client(): Client
 	{
 		return $this->database()
-			->client();
+		            ->client();
 	}
-
+	
 	/**
 	 * @return string
 	 */
 	public function fullName(): string
 	{
 		return $this->database()
-				->prefixName() . $this->name();
+		            ->prefixName() . $this->name();
 	}
-
+	
 	/**
 	 * @return Schema
 	 */
@@ -197,7 +196,7 @@ Class Collection implements CollectionInterface
 	{
 		return new Schema( $this );
 	}
-
+	
 	/**
 	 * @return bool
 	 */
@@ -205,9 +204,9 @@ Class Collection implements CollectionInterface
 	{
 		try {
 			$this->client()
-				->indices()
-				->delete( [ 'index' => $this->fullName() ] );
-
+			     ->indices()
+			     ->delete( [ 'index' => $this->fullName() ] );
+			
 			return true;
 		} catch ( Missing404Exception $e ) {
 			return true;
@@ -215,7 +214,7 @@ Class Collection implements CollectionInterface
 			return false;
 		}
 	}
-
+	
 	/**
 	 * @return Find
 	 */
@@ -223,19 +222,19 @@ Class Collection implements CollectionInterface
 	{
 		return new Find( $this );
 	}
-
+	
 	/**
 	 * @return JsonInterface
 	 */
 	public function info(): JsonInterface
 	{
 		$stats = new Json( $this->client()
-			->indices()
-			->stats( [ 'index' => $this->name() ] ) );
-
+		                        ->indices()
+		                        ->stats( [ 'index' => $this->name() ] ) );
+		
 		return $stats->getJson( 'indices.' . $this->fullName() );
 	}
-
+	
 	/**
 	 * @return Write
 	 */

@@ -9,6 +9,7 @@ use Chukdo\Contracts\View\Functions;
 
 /**
  * Moteur de template.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -20,32 +21,32 @@ class View
 	 * @var Response
 	 */
 	protected $response;
-
+	
 	/**
 	 * @var array
 	 */
 	protected $folders = [];
-
+	
 	/**
 	 * @var string
 	 */
 	protected $defaultFolder = null;
-
+	
 	/**
 	 * @var array
 	 */
 	protected $sharedData = [];
-
+	
 	/**
 	 * @var array
 	 */
 	protected $sharedTemplateData = [];
-
+	
 	/**
 	 * @var array
 	 */
 	protected $functions = [];
-
+	
 	/**
 	 * View constructor.
 	 *
@@ -57,7 +58,7 @@ class View
 		$this->setDefaultFolder( $folder );
 		$this->setResponseHandler( $response );
 	}
-
+	
 	/**
 	 * @param string|null $folder
 	 *
@@ -66,10 +67,10 @@ class View
 	public function setDefaultFolder( string $folder = null ): self
 	{
 		$this->defaultFolder = rtrim( $folder, '/' );
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param Response|null $response
 	 *
@@ -77,12 +78,11 @@ class View
 	 */
 	public function setResponseHandler( Response $response = null ): self
 	{
-		$this->response = $response
-			?? new Response();
-
+		$this->response = $response ?? new Response();
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @return View
 	 */
@@ -90,7 +90,7 @@ class View
 	{
 		return $this;
 	}
-
+	
 	/**
 	 * @return Response|null
 	 */
@@ -98,7 +98,7 @@ class View
 	{
 		return $this->response;
 	}
-
+	
 	/**
 	 * @param string $name
 	 * @param string $folder
@@ -108,10 +108,10 @@ class View
 	public function addFolder( string $name, string $folder ): self
 	{
 		$this->folders[ $name ] = rtrim( $folder, '/' );
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $template
 	 *
@@ -121,7 +121,7 @@ class View
 	{
 		return $this->path( $template )[ 'exists' ];
 	}
-
+	
 	/**
 	 * @param string $template
 	 *
@@ -132,37 +132,32 @@ class View
 		[
 			$folder,
 			$name,
-		] = Str::split( $template,
-			'::',
-			2 );
-
+		]
+			= Str::split( $template, '::', 2 );
 		$r = [
 			'folder' => null,
 			'name'   => null,
 			'file'   => null,
 			'exists' => false,
 		];
-
 		if ( $name ) {
 			$r[ 'folder' ] = $folder;
 			$r[ 'name' ]   = $name;
-
 			if ( isset( $this->folders[ $folder ] ) ) {
 				$r[ 'file' ]   = $this->folders[ $folder ] . '/' . $name . '.html';
 				$r[ 'exists' ] = file_exists( $r[ 'file' ] );
 			}
 		} else {
 			$r[ 'name' ] = $folder;
-
 			if ( $this->defaultFolder ) {
 				$r[ 'file' ]   = $this->defaultFolder . '/' . $folder . '.html';
 				$r[ 'exists' ] = file_exists( $r[ 'file' ] );
 			}
 		}
-
+		
 		return $r;
 	}
-
+	
 	/**
 	 * @param iterable          $data
 	 * @param array|string|null $templates
@@ -178,10 +173,10 @@ class View
 				$this->sharedTemplateData[ $template ] = $data;
 			}
 		}
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string|null $template
 	 *
@@ -192,10 +187,10 @@ class View
 		if ( $template === null ) {
 			return $this->sharedData;
 		}
-
+		
 		return $this->sharedTemplateData[ $template ] ?? null;
 	}
-
+	
 	/**
 	 * @param Functions $functions
 	 *
@@ -204,10 +199,10 @@ class View
 	public function loadFunction( Functions $functions ): self
 	{
 		$functions->register( $this );
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string  $name
 	 * @param Closure $closure
@@ -217,10 +212,10 @@ class View
 	public function registerFunction( string $name, Closure $closure ): self
 	{
 		$this->functions[ $name ] = $closure;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @return array
 	 */
@@ -228,7 +223,7 @@ class View
 	{
 		return $this->functions;
 	}
-
+	
 	/**
 	 * @param string $function
 	 *
@@ -239,11 +234,9 @@ class View
 		if ( $this->isRegisteredFunction( $function ) ) {
 			return $this->functions[ $function ];
 		}
-
-		throw new ViewException( sprintf( 'Method [%s] is not a template registered function',
-			$function ) );
+		throw new ViewException( sprintf( 'Method [%s] is not a template registered function', $function ) );
 	}
-
+	
 	/**
 	 * @param string $function
 	 *
@@ -253,7 +246,7 @@ class View
 	{
 		return isset( $this->functions[ $function ] );
 	}
-
+	
 	/**
 	 * @param string        $template
 	 * @param iterable|null $data
@@ -264,7 +257,7 @@ class View
 	{
 		return (string) $this->make( $template, $data );
 	}
-
+	
 	/**
 	 * @param string        $template
 	 * @param iterable|null $data
@@ -275,7 +268,7 @@ class View
 	{
 		return new Template( $template, $data, $this );
 	}
-
+	
 	/**
 	 * @param string        $template
 	 * @param iterable|null $data
@@ -285,6 +278,6 @@ class View
 	public function render( string $template, iterable $data = null ): Response
 	{
 		return $this->make( $template, $data )
-					->render();
+		            ->render();
 	}
 }

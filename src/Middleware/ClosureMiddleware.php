@@ -12,7 +12,7 @@ class ClosureMiddleware implements MiddlewareInterface
 	 * @var Closure
 	 */
 	protected $closure;
-
+	
 	/**
 	 * ClosureMiddleware constructor.
 	 *
@@ -22,7 +22,7 @@ class ClosureMiddleware implements MiddlewareInterface
 	{
 		$this->closure = $closure;
 	}
-
+	
 	/**
 	 * @param Dispatcher $dispatcher
 	 *
@@ -32,8 +32,8 @@ class ClosureMiddleware implements MiddlewareInterface
 	{
 		$inputs = $dispatcher->attribute( 'inputs' )
 			?: $dispatcher->request()
-						  ->inputs();
-
+			              ->inputs();
+		
 		return ( $this->closure )( $inputs, $dispatcher->response() );
 	}
 }

@@ -7,6 +7,7 @@ use Exception;
 
 /**
  * Gestionnaire de log pour Redis.
+ *
  * @version       1.0.0
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
  * @since         08/01/2019
@@ -18,12 +19,12 @@ class RedisHandler extends AbstractHandler
 	 * @var object
 	 */
 	protected $redis;
-
+	
 	/**
 	 * @var string
 	 */
 	protected $key;
-
+	
 	/**
 	 * RedisHandler constructor.
 	 *
@@ -33,12 +34,10 @@ class RedisHandler extends AbstractHandler
 	public function __construct( ?RedisInterface $redis, string $key = null )
 	{
 		$this->redis = $redis;
-		$this->key   = $key
-			?? 'log';
-
+		$this->key   = $key ?? 'log';
 		parent::__construct();
 	}
-
+	
 	/**
 	 * Destructeur.
 	 */
@@ -47,7 +46,7 @@ class RedisHandler extends AbstractHandler
 		$this->redis->__destruct();
 		$this->redis = null;
 	}
-
+	
 	/**
 	 * @param string $record
 	 *
@@ -56,9 +55,8 @@ class RedisHandler extends AbstractHandler
 	public function write( $record ): bool
 	{
 		try {
-			$this->redis->rpush( $this->key,
-				$record );
-
+			$this->redis->rpush( $this->key, $record );
+			
 			return true;
 		} catch ( Exception $e ) {
 			return false;

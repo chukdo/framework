@@ -12,6 +12,7 @@ use Chukdo\Contracts\Db\Collection as CollectionInterface;
 
 /**
  * Server Server.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -23,17 +24,17 @@ Class Server implements ServerInterface
 	 * @var string|null
 	 */
 	protected $dsn = null;
-
+	
 	/**
 	 * @var ClientBuilder
 	 */
 	protected $client;
-
+	
 	/**
 	 * @var string|null
 	 */
 	protected $database = null;
-
+	
 	/**
 	 * Server constructor.
 	 *
@@ -43,17 +44,16 @@ Class Server implements ServerInterface
 	 */
 	public function __construct( string $dsn = null, string $database = null, bool $synchronous = true )
 	{
-		$this->dsn      = $dsn
-			?? 'localhost:9200';
+		$this->dsn      = $dsn ?? 'localhost:9200';
 		$this->database = $database;
 		$this->client   = ClientBuilder::create()
-									   ->setHosts( explode( ',', $this->dsn ) )
-									   ->setHandler( $synchronous
-										   ? ClientBuilder::singleHandler()
-										   : ClientBuilder::multiHandler() )
-									   ->build();
+		                               ->setHosts( explode( ',', $this->dsn ) )
+		                               ->setHandler( $synchronous
+			                                             ? ClientBuilder::singleHandler()
+			                                             : ClientBuilder::multiHandler() )
+		                               ->build();
 	}
-
+	
 	/**
 	 * @param array       $args
 	 * @param string|null $db
@@ -62,9 +62,9 @@ Class Server implements ServerInterface
 	 */
 	public function command( array $args, string $db = null ): JsonInterface
 	{
-		throw new ElasticException('elasticsearch Command no exist');
+		throw new ElasticException( 'elasticsearch Command no exist' );
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -72,16 +72,16 @@ Class Server implements ServerInterface
 	{
 		return 'Elastic';
 	}
-
+	
 	/**
 	 * @return bool
 	 */
 	public function ping(): bool
 	{
 		return $this->client()
-					->ping();
+		            ->ping();
 	}
-
+	
 	/**
 	 * @return Client
 	 */
@@ -89,41 +89,40 @@ Class Server implements ServerInterface
 	{
 		return $this->client;
 	}
-
+	
 	/**
 	 * @return JsonInterface
 	 */
 	public function status(): JsonInterface
 	{
 		return new Json( $this->client()
-							  ->info() );
+		                      ->info() );
 	}
-
+	
 	/**
 	 * @return JsonInterface
 	 */
 	public function databases(): JsonInterface
 	{
 		$databases = new Json();
-
 		foreach ( $this->client()
-					   ->cat()
-					   ->indices( [ 'index' => '*' ] ) as $indice ) {
+		               ->cat()
+		               ->indices( [ 'index' => '*' ] ) as $indice ) {
 			$databases->append( $indice[ 'index' ] );
 		}
-
+		
 		return $databases;
 	}
-
+	
 	/**
 	 * @return string
 	 */
 	public function version(): string
 	{
 		return (string) $this->status()
-							 ->get( 'version.number' );
+		                     ->get( 'version.number' );
 	}
-
+	
 	/**
 	 * @param string      $collection
 	 * @param string|null $database
@@ -133,9 +132,9 @@ Class Server implements ServerInterface
 	public function collection( string $collection, string $database = null ): CollectionInterface
 	{
 		return $this->database( $database )
-					->collection( $collection );
+		            ->collection( $collection );
 	}
-
+	
 	/**
 	 * @param string|null $database
 	 *
@@ -143,9 +142,6 @@ Class Server implements ServerInterface
 	 */
 	public function database( string $database = null ): DatabaseInterface
 	{
-		return new Database( $this, $database
-			?? $this->database );
+		return new Database( $this, $database ?? $this->database );
 	}
-
-
 }

@@ -11,6 +11,7 @@ use Chukdo\Contracts\Db\Collection as CollectionInterface;
 
 /**
  * Server Server Database.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -22,12 +23,12 @@ Class Database implements DatabaseInterface
 	 * @var Server
 	 */
 	protected $server;
-
+	
 	/**
 	 * @var MongoDbDatabase
 	 */
 	protected $client;
-
+	
 	/**
 	 * Database constructor.
 	 *
@@ -37,20 +38,19 @@ Class Database implements DatabaseInterface
 	public function __construct( Server $server, string $database = null )
 	{
 		$this->server = $server;
-		$this->client = new MongoDbDatabase( $server->client(), $database
-			?? 'main' );
+		$this->client = new MongoDbDatabase( $server->client(), $database ?? 'main' );
 	}
-
+	
 	/**
 	 * @return bool
 	 */
 	public function repair(): bool
 	{
 		return $this->server()
-					->command( [ 'repairDatabase' => 1, ], $this->name() )
-					->get( '0.ok' ) === 1;
+		            ->command( [ 'repairDatabase' => 1, ], $this->name() )
+		            ->get( '0.ok' ) === 1;
 	}
-
+	
 	/**
 	 * @return ServerInterface
 	 */
@@ -58,16 +58,16 @@ Class Database implements DatabaseInterface
 	{
 		return $this->server;
 	}
-
+	
 	/**
 	 * @return string|null
 	 */
 	public function name(): ?string
 	{
 		return $this->client()
-					->getDatabaseName();
+		            ->getDatabaseName();
 	}
-
+	
 	/**
 	 * @return MongoDbDatabase
 	 */
@@ -75,7 +75,7 @@ Class Database implements DatabaseInterface
 	{
 		return $this->client;
 	}
-
+	
 	/**
 	 * @param string $collection
 	 *
@@ -85,7 +85,7 @@ Class Database implements DatabaseInterface
 	{
 		return new Collection( $this, $collection );
 	}
-
+	
 	/**
 	 * @param string $collection
 	 *
@@ -94,11 +94,11 @@ Class Database implements DatabaseInterface
 	public function dropCollection( string $collection ): DatabaseInterface
 	{
 		$this->client()
-			 ->dropCollection( $collection );
-
+		     ->dropCollection( $collection );
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $collection
 	 *
@@ -108,12 +108,12 @@ Class Database implements DatabaseInterface
 	{
 		if ( !$this->collectionExist( $collection ) ) {
 			$this->client()
-				 ->createCollection( $collection );
+			     ->createCollection( $collection );
 		}
-
+		
 		return $this->collection( $collection );
 	}
-
+	
 	/**
 	 * @param string $collection
 	 *
@@ -122,52 +122,52 @@ Class Database implements DatabaseInterface
 	public function collectionExist( string $collection ): bool
 	{
 		return $this->collections()
-					->in( $collection );
+		            ->in( $collection );
 	}
-
+	
 	/**
 	 * @return JsonInterface
 	 */
 	public function collections(): JsonInterface
 	{
 		$list = new Json();
-
 		foreach ( $this->client()
-					   ->listCollections() as $collection ) {
+		               ->listCollections() as $collection ) {
 			$list->append( $collection->getName() );
 		}
-
+		
 		return $list;
 	}
-
+	
 	/**
 	 * @return bool
 	 */
 	public function drop(): bool
 	{
 		$drop = $this->client()
-					 ->drop();
-
+		             ->drop();
+		
 		return $drop[ 'ok' ] === 1;
 	}
-
+	
 	/**
 	 * @return JsonInterface
 	 */
 	public function info(): JsonInterface
 	{
 		$stats = $this->server()
-					  ->command( [ 'dbStats' => 1 ], $this->name() )
-					  ->getIndexJson( 0 )
-					  ->filter( function( $k, $v ) {
-						  if ( is_scalar( $v ) ) {
-							  return $v;
-						  }
-
-						  return false;
-					  } )
-					  ->clean();
-
+		              ->command( [ 'dbStats' => 1 ], $this->name() )
+		              ->getIndexJson( 0 )
+		              ->filter( function ( $k, $v )
+		              {
+			              if ( is_scalar( $v ) ) {
+				              return $v;
+			              }
+			
+			              return false;
+		              } )
+		              ->clean();
+		
 		return $stats;
 	}
 }

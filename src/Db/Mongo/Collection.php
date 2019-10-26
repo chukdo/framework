@@ -24,6 +24,7 @@ use Exception;
 
 /**
  * Server Server Collect.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -35,12 +36,12 @@ Class Collection implements CollectionInterface
 	 * @var Database
 	 */
 	protected $database;
-
+	
 	/**
 	 * @var MongoDbCollection
 	 */
 	protected $client;
-
+	
 	/**
 	 * Collection constructor.
 	 *
@@ -51,10 +52,10 @@ Class Collection implements CollectionInterface
 	{
 		$this->database = $database;
 		$client         = $database->server()
-								   ->client();
+		                           ->client();
 		$this->client   = new MongoDbCollection( $client, $database->name(), $collection );
 	}
-
+	
 	/**
 	 * @param string|null $field
 	 * @param             $value
@@ -67,18 +68,16 @@ Class Collection implements CollectionInterface
 		if ( $value instanceof ObjectId ) {
 			return (string) $value;
 		}
-
 		if ( $value instanceof Timestamp ) {
 			return ( new DateTime() )->setTimestamp( (int) (string) $value );
 		}
-
 		if ( $value instanceof UTCDateTime ) {
 			return $value->toDateTime();
 		}
-
+		
 		return $value;
 	}
-
+	
 	/**
 	 * @param string|null $field
 	 * @param             $value
@@ -89,15 +88,19 @@ Class Collection implements CollectionInterface
 	{
 		if ( $field === '_id' && Is::string( $value ) ) {
 			$value = new ObjectId( $value );
-		} else if ( $value instanceof DateTime ) {
-			$value = new UTCDateTime( $value->getTimestamp() * 1000 );
-		} else if ( Str::contain( $field, 'date' ) && Is::scalar( $value ) ) {
-			$value = new UTCDateTime( 1000 * (int) $value );
+		} else {
+			if ( $value instanceof DateTime ) {
+				$value = new UTCDateTime( $value->getTimestamp() * 1000 );
+			} else {
+				if ( Str::contain( $field, 'date' ) && Is::scalar( $value ) ) {
+					$value = new UTCDateTime( 1000 * (int) $value );
+				}
+			}
 		}
-
+		
 		return $value;
 	}
-
+	
 	/**
 	 * @return ObjectId
 	 */
@@ -105,7 +108,7 @@ Class Collection implements CollectionInterface
 	{
 		return new ObjectId();
 	}
-
+	
 	/**
 	 * @param $data
 	 *
@@ -115,28 +118,27 @@ Class Collection implements CollectionInterface
 	{
 		try {
 			$reflector = new ReflectionClass( '\App\Model\Mongo\Record\\' . $this->name() );
-
 			if ( $reflector->implementsInterface( Record::class ) ) {
 				return $reflector->newInstanceArgs( [
-					$this,
-					$data,
-				] );
+					                                    $this,
+					                                    $data,
+				                                    ] );
 			}
 		} catch ( ReflectionException $e ) {
 		}
-
+		
 		return new Record( $this, $data );
 	}
-
+	
 	/**
 	 * @return string
 	 */
 	public function name(): string
 	{
 		return $this->client()
-					->getCollectionName();
+		            ->getCollectionName();
 	}
-
+	
 	/**
 	 * @return MongoDbCollection
 	 */
@@ -144,7 +146,7 @@ Class Collection implements CollectionInterface
 	{
 		return $this->client;
 	}
-
+	
 	/**
 	 * @param string      $collection
 	 * @param string|null $database
@@ -154,30 +156,27 @@ Class Collection implements CollectionInterface
 	public function rename( string $collection, string $database = null ): CollectionInterface
 	{
 		$oldDatabase   = $this->database()
-							  ->name();
+		                      ->name();
 		$oldCollection = $this->name();
 		$old           = $oldDatabase . '.' . $oldCollection;
-		$newDatabase   = $database
-			?? $oldDatabase;
+		$newDatabase   = $database ?? $oldDatabase;
 		$newCollection = $collection;
 		$new           = $newDatabase . '.' . $newCollection;
 		$command       = $this->database()
-							  ->server()
-							  ->command( [
-								  'renameCollection' => $old,
-								  'to'               => $new,
-							  ] );
-
+		                      ->server()
+		                      ->command( [
+			                                 'renameCollection' => $old,
+			                                 'to'               => $new,
+		                                 ] );
 		if ( $command->offsetGet( 'ok' ) === 1 ) {
 			return $this->database()
-						->server()
-						->database( $newDatabase )
-						->collection( $newCollection );
+			            ->server()
+			            ->database( $newDatabase )
+			            ->collection( $newCollection );
 		}
-
 		throw new MongoException( sprintf( 'Impossible de renommer la collection [%s] vers [%s]', $old, $new ) );
 	}
-
+	
 	/**
 	 * @return Database
 	 */
@@ -185,18 +184,18 @@ Class Collection implements CollectionInterface
 	{
 		return $this->database;
 	}
-
+	
 	/**
 	 * @return bool
 	 */
 	public function drop(): bool
 	{
 		$drop = $this->client()
-					 ->drop();
-
+		             ->drop();
+		
 		return $drop[ 'ok' ] === 1;
 	}
-
+	
 	/**
 	 * @return Find
 	 */
@@ -204,7 +203,7 @@ Class Collection implements CollectionInterface
 	{
 		return new Find( $this );
 	}
-
+	
 	/**
 	 * @return JsonInterface
 	 */
@@ -212,24 +211,24 @@ Class Collection implements CollectionInterface
 	{
 		$name   = $this->name();
 		$dbName = $this->database()
-					   ->name();
+		               ->name();
 		$stats  = $this->database()
-					   ->server()
-					   ->command( [ 'collStats' => $name ], $dbName )
-					   ->getIndexJson( 0 )
-					   ->filter( static function( $k, $v ) {
-						   if ( is_scalar( $v ) ) {
-							   return $v;
-						   }
-
-						   return false;
-					   } )
-					   ->clean();
-
-
+		               ->server()
+		               ->command( [ 'collStats' => $name ], $dbName )
+		               ->getIndexJson( 0 )
+		               ->filter( static function ( $k, $v )
+		               {
+			               if ( is_scalar( $v ) ) {
+				               return $v;
+			               }
+			
+			               return false;
+		               } )
+		               ->clean();
+		
 		return $stats;
 	}
-
+	
 	/**
 	 * @return Schema
 	 */
@@ -237,7 +236,7 @@ Class Collection implements CollectionInterface
 	{
 		return new Schema( $this );
 	}
-
+	
 	/**
 	 * @return Write
 	 */
@@ -245,7 +244,7 @@ Class Collection implements CollectionInterface
 	{
 		return new Write( $this );
 	}
-
+	
 	/**
 	 * @return Index
 	 */
@@ -253,7 +252,7 @@ Class Collection implements CollectionInterface
 	{
 		return new Index( $this );
 	}
-
+	
 	/**
 	 * @return Aggregate
 	 */

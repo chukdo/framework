@@ -24,20 +24,20 @@ $app = require __DIR__ . '/../Bootstrap/App.php';
 $app->channel( \Chukdo\Helper\HttpRequest::subDomain() );
 
 $app->conf()
-	->loadDefault( __DIR__ . '/../Conf/', $app->env(), $app->channel() );
+    ->loadDefault( __DIR__ . '/../Conf/', $app->env(), $app->channel() );
 
 $app->lang()
-	->loadDir( __DIR__ . '/../Lang/' . \Chukdo\Helper\HttpRequest::tld() );
+    ->loadDir( __DIR__ . '/../Lang/' . \Chukdo\Helper\HttpRequest::tld() );
 
 /** Service APP register */
 $app->registerServices( [
-	Providers\AppServiceProvider::class,
-	Providers\ServiceLocatorServiceProvider::class,
-	Providers\LoggerHandlerServiceProvider::class,
-	Providers\ExceptionLoggerServiceProvider::class,
-	Providers\ValidatorServiceProvider::class,
-	Providers\MongoServiceProvider::class,
-] );
+	                        Providers\AppServiceProvider::class,
+	                        Providers\ServiceLocatorServiceProvider::class,
+	                        Providers\LoggerHandlerServiceProvider::class,
+	                        Providers\ExceptionLoggerServiceProvider::class,
+	                        Providers\ValidatorServiceProvider::class,
+	                        Providers\MongoServiceProvider::class,
+                        ] );
 
 /**$schema  = $db->dropCollection( 'test' )
  * ->createCollection( 'test' )
@@ -261,61 +261,63 @@ echo $collect->where( 'volume', '>', 68 )
 exit;
 */
 
+ini_set('memory_limit', '256M');
 set_time_limit( 3000 );
 $time            = time();
 $collectionMongo = $dbMongo->collection( 'esign' );
 
 $recordsMongo = $collectionMongo->find()
-								->limit( 100 )
-								->stream();
+                                ->limit( 10 )
+                                ->stream();
 
-$collect      = new \Chukdo\Json\Collect();
-$count        = $collect//->where( 'volume', '>', 68 )
-						//->sort( 'volume', SORT_DESC )
+$collect = new \Chukdo\Json\Collect();
+$count   = $collect//->where( 'volume', '>', 68 )
+                   //->sort( 'volume', SORT_DESC )
 ->with( '_agence', 'date', 'modeles._modele', 'modeles.titre', 'modeles.mandat', 'modeles.signers' )
 ->unwind( 'modeles' )
 ->group( 'date', 'modeles._modele' )
-->sum( 'modeles.signers', 'signers', 'modeles._modele' )
-->sum( 'modeles.mandat', null, 'date' )
+	->sum( 'modeles.signers', 'signers', 'modeles._modele' )
+	->sum( 'modeles.signers', 'allSigners', 'date' )
 ->push( $recordsMongo )
 ->values();
-	//->sort()
+//->sort()
 echo '<pre>';
-print_r( $count );
+print_r($count);
+print_r( count($count) );
 echo "\n____________________\n";
 echo time() - $time;
 exit;
 $contrat = Mongo::collection( 'contrat' );
 
 $app->dd( $contrat->find()
-				  ->without( '_id' )
-				  ->with( '_agence', '_modele', 'reference', 'history.id', 'history._version' )
-				  ->link( '_agence', [
-					  'agence',
-					  'cp',
-					  'ville',
-					  'date_created',
-					  'date_modified',
-				  ] )
-				  ->limit( 4 )
-				  ->where( 'version', '=', '2' )
-				  ->where( 'state', '=', '1' )
-	//->where('history', 'size', 4)
-				  ->where( 'history._version', '=', '5a3c37db3fcd9e16e21fe0b5' )
-				  ->all()
-				  ->toHtml() );
+                  ->without( '_id' )
+                  ->with( '_agence', '_modele', 'reference', 'history.id', 'history._version' )
+                  ->link( '_agence', [
+	                  'agence',
+	                  'cp',
+	                  'ville',
+	                  'date_created',
+	                  'date_modified',
+                  ] )
+                  ->limit( 4 )
+                  ->where( 'version', '=', '2' )
+                  ->where( 'state', '=', '1' )
+	          //->where('history', 'size', 4)
+	              ->where( 'history._version', '=', '5a3c37db3fcd9e16e21fe0b5' )
+                  ->all()
+                  ->toHtml() );
 
 Response::header( 'X-test', 'test header' );
 View::setDefaultFolder( __DIR__ . '/../Views/' )
-	->loadFunction( new Basic() )
-	->render( 'test', [
-		'title' => 'chukdo test',
-		'list'  => [
-			'c',
-			'h',
-			'u',
-			'k',
-			'd',
-			'o',
-		],
-	] );
+    ->loadFunction( new Basic() )
+    ->render( 'test', [
+	    'title' => 'chukdo test',
+	    'list'  => [
+		    'c',
+		    'h',
+		    'u',
+		    'k',
+		    'd',
+		    'o',
+	    ],
+    ] );

@@ -15,7 +15,8 @@ class ServiceLocatorServiceProvider extends ServiceProvider
 		$serviceLocator = ServiceLocator::getInstance();
 		$this->app->instance( ServiceLocator::class, $serviceLocator );
 		Stream::register( 'azure', AzureStream::class );
-		$serviceLocator->setService( 'azure', function() {
+		$serviceLocator->setService( 'azure', function ()
+		{
 			return BlobRestProxy::createBlobService( $this->app->conf( 'storage.azure.endpoint' ) );
 		} );
 	}

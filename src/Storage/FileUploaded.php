@@ -6,6 +6,7 @@ use Chukdo\Helper\Str;
 
 /**
  * Gestion des fichiers uploadés.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -17,22 +18,22 @@ class FileUploaded
 	 * @var string|null
 	 */
 	protected $name = null;
-
+	
 	/**
 	 * @var int|null
 	 */
 	protected $maxFileSize = null;
-
+	
 	/**
 	 * @var string|null
 	 */
 	protected $allowedMimeTypes = null;
-
+	
 	/**
 	 * @var array
 	 */
 	protected $uploadedFile = [];
-
+	
 	/**
 	 * FileUploaded constructor.
 	 *
@@ -43,26 +44,22 @@ class FileUploaded
 	public function __construct( string $name, string $allowedMimeTypes = null, int $maxFileSize = null )
 	{
 		$uploadedFiles = $this->normalizeUploadedFiles();
-
 		if ( isset( $uploadedFiles[ $name ] ) ) {
 			$this->name         = $name;
 			$this->uploadedFile = $uploadedFiles[ $name ];
-
 			$this->setMaxFileSize( $maxFileSize );
 			$this->setAllowedMimeTypes( $allowedMimeTypes );
-
 		} else {
 			throw new FileUploadedException( sprintf( 'Uploaded file [%s] does not exist', $name ) );
 		}
 	}
-
+	
 	/**
 	 * @return array
 	 */
 	private static function normalizeUploadedFiles(): array
 	{
 		$uploadedFiles = [];
-
 		foreach ( $_FILES as $name => $file ) {
 			foreach ( $file as $type => $value ) {
 				if ( is_array( $value ) ) {
@@ -74,10 +71,10 @@ class FileUploaded
 				}
 			}
 		}
-
+		
 		return $uploadedFiles;
 	}
-
+	
 	/**
 	 * @param array $array
 	 *
@@ -86,7 +83,6 @@ class FileUploaded
 	private static function __normalizeUploadedFiles( array $array ): array
 	{
 		$uploadedFiles = [];
-
 		foreach ( $array as $k => $v ) {
 			if ( is_array( $v ) ) {
 				foreach ( self::__normalizeUploadedFiles( $v ) as $_k => $_v ) {
@@ -96,10 +92,10 @@ class FileUploaded
 				$uploadedFiles[ $k ] = $v;
 			}
 		}
-
+		
 		return $uploadedFiles;
 	}
-
+	
 	/**
 	 * @param int|null $maxFileSize
 	 *
@@ -108,10 +104,10 @@ class FileUploaded
 	public function setMaxFileSize( int $maxFileSize = null ): self
 	{
 		$this->maxFileSize = $maxFileSize;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string|null $allowedMimeTypes
 	 *
@@ -120,10 +116,10 @@ class FileUploaded
 	public function setAllowedMimeTypes( string $allowedMimeTypes = null ): self
 	{
 		$this->allowedMimeTypes = $allowedMimeTypes;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -131,7 +127,7 @@ class FileUploaded
 	{
 		return (string) $this->uploadedFile[ 'name' ];
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -139,7 +135,7 @@ class FileUploaded
 	{
 		return Str::extension( $this->uploadedFile[ 'name' ] );
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -147,7 +143,7 @@ class FileUploaded
 	{
 		return (string) $this->uploadedFile[ 'error' ];
 	}
-
+	
 	/**
 	 * @param $path
 	 *
@@ -159,16 +155,13 @@ class FileUploaded
 			if ( move_uploaded_file( $this->path(), $path ) ) {
 				return true;
 			} else {
-				throw new FileUploadedException( sprintf( 'Can\'t store uploaded file [%s] to [%s]',
-					$this->name,
-					$path ) );
+				throw new FileUploadedException( sprintf( 'Can\'t store uploaded file [%s] to [%s]', $this->name,
+				                                          $path ) );
 			}
 		}
-
-		throw new FileUploadedException( sprintf( 'Uploaded file [%s] is not valid',
-			$this->name ) );
+		throw new FileUploadedException( sprintf( 'Uploaded file [%s] is not valid', $this->name ) );
 	}
-
+	
 	/**
 	 * @return bool
 	 */
@@ -176,7 +169,7 @@ class FileUploaded
 	{
 		return $this->isValidSize() && $this->isValidMimeType();
 	}
-
+	
 	/**
 	 * @return bool
 	 */
@@ -185,10 +178,10 @@ class FileUploaded
 		if ( $this->maxFileSize ) {
 			return $this->size() < $this->maxFileSize;
 		}
-
+		
 		return true;
 	}
-
+	
 	/**
 	 * @return int
 	 */
@@ -196,7 +189,7 @@ class FileUploaded
 	{
 		return (int) $this->uploadedFile[ 'size' ];
 	}
-
+	
 	/**
 	 * @return bool
 	 */
@@ -208,13 +201,13 @@ class FileUploaded
 					return true;
 				}
 			}
-
+			
 			return false;
 		}
-
+		
 		return true;
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -222,7 +215,7 @@ class FileUploaded
 	{
 		return (string) $this->uploadedFile[ 'type' ];
 	}
-
+	
 	/**
 	 * @return string
 	 */

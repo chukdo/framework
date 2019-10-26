@@ -8,6 +8,7 @@ use Chukdo\Json\Json;
 
 /**
  * Server RecordList.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -19,12 +20,12 @@ Class RecordList extends Json
 	 * @var CollectionInterface
 	 */
 	protected $collection;
-
+	
 	/**
 	 * @var bool
 	 */
 	protected $idAsKey = false;
-
+	
 	/**
 	 * RecordList constructor.
 	 *
@@ -36,9 +37,7 @@ Class RecordList extends Json
 	{
 		$this->collection = $collection;
 		$this->idAsKey    = $idAsKey;
-
 		parent::__construct( [], false );
-
 		foreach ( $json as $k => $v ) {
 			if ( $idAsKey ) {
 				$this->offsetSet( (string) $v->offsetGet( '_id' ), $v );
@@ -47,15 +46,15 @@ Class RecordList extends Json
 			}
 		}
 	}
-
+	
 	public function offsetSet( $key, $value ): JsonInterface
 	{
 		parent::offsetSet( $key, $this->collection()
-									  ->record( $value ) );
-
+		                              ->record( $value ) );
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @return CollectionInterface
 	 */

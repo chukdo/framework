@@ -12,6 +12,7 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
  * Server Aggregate Group.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -23,17 +24,17 @@ Class Aggregate
 	 * @var Collection
 	 */
 	protected $collection;
-
+	
 	/**
 	 * @var array
 	 */
 	protected $options = [];
-
+	
 	/**
 	 * @var array
 	 */
 	protected $pipe = [];
-
+	
 	/**
 	 * Index constructor.
 	 *
@@ -43,7 +44,7 @@ Class Aggregate
 	{
 		$this->collection = $collection;
 	}
-
+	
 	/**
 	 * https://docs.mongodb.com/manual/reference/operator/aggregation/addFields/
 	 * @param string $field
@@ -56,10 +57,10 @@ Class Aggregate
 		$addFields = new AddFields( $this );
 		$addFields->addField( $field, $expression );
 		$this->pipe[] = [ '$addFields' => $addFields ];
-
+		
 		return $addFields;
 	}
-
+	
 	/**
 	 * @param bool $allowDiskUse
 	 * @param bool $bypassDocumentValidation
@@ -69,12 +70,12 @@ Class Aggregate
 	public function all( bool $allowDiskUse = false, bool $bypassDocumentValidation = false ): JsonInterface
 	{
 		return new Json( $this->cursor( [
-			'allowDiskUse'             => $allowDiskUse,
-			'bypassDocumentValidation' => $bypassDocumentValidation,
-			'useCursor'                => true,
-		] ) );
+			                                'allowDiskUse'             => $allowDiskUse,
+			                                'bypassDocumentValidation' => $bypassDocumentValidation,
+			                                'useCursor'                => true,
+		                                ] ) );
 	}
-
+	
 	/**
 	 * @param array $options
 	 *
@@ -83,35 +84,35 @@ Class Aggregate
 	public function cursor( array $options = [] ): Cursor
 	{
 		$options = Arr::merge( $this->options, $options );
-
+		
 		return new Cursor( $this->collection, $this->collection->client()
-															   ->aggregate( $this->projection(), $options ) );
+		                                                       ->aggregate( $this->projection(), $options ) );
 	}
-
+	
 	/**
 	 * @return array
 	 */
 	public function projection(): array
 	{
 		$pipes = [];
-
 		foreach ( $this->pipe as $pipe ) {
 			$json        = new Json( $pipe );
 			$accumulator = $json->getKeyFirst();
 			$expression  = $json->getFirst();
-
 			if ( $accumulator === '$group' || $accumulator === '$addFields' ) {
 				$pipes[] = [ $accumulator => $expression->projection() ];
-			} else if ( $accumulator === '$match' ) {
-				$pipes[] = [ $accumulator => $expression->filter() ];
 			} else {
-				$pipes[] = $pipe;
+				if ( $accumulator === '$match' ) {
+					$pipes[] = [ $accumulator => $expression->filter() ];
+				} else {
+					$pipes[] = $pipe;
+				}
 			}
 		}
-
+		
 		return $pipes;
 	}
-
+	
 	/**
 	 * @param string $field
 	 *
@@ -120,22 +121,22 @@ Class Aggregate
 	public function count( string $field ): self
 	{
 		$this->pipe[] = [ '$count' => $field ];
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @return JsonInterface
 	 */
 	public function explain(): JsonInterface
 	{
 		return new Json( new Cursor( $this->collection, $this->collection->client()
-																		 ->aggregate( $this->projection(), [
-																			 'explain'   => true,
-																			 'useCursor' => true,
-																		 ] ) ) );
+		                                                                 ->aggregate( $this->projection(), [
+			                                                                 'explain'   => true,
+			                                                                 'useCursor' => true,
+		                                                                 ] ) ) );
 	}
-
+	
 	/**
 	 * https://docs.mongodb.com/manual/reference/operator/aggregation/graphLookup/
 	 * @param string $foreignCollection
@@ -146,7 +147,8 @@ Class Aggregate
 	 *
 	 * @return Aggregate
 	 */
-	public function graphLookup( string $foreignCollection, string $foreignField, string $localField, string $as = 'lookup', int $maxDepth = 3 ): self
+	public function graphLookup( string $foreignCollection, string $foreignField, string $localField,
+	                             string $as = 'lookup', int $maxDepth = 3 ): self
 	{
 		$this->pipe[] = [
 			'$graphLookup' => [
@@ -158,10 +160,10 @@ Class Aggregate
 				'as'               => $as,
 			],
 		];
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * https://docs.mongodb.com/manual/reference/operator/aggregation/group/
 	 * @param $expression
@@ -172,10 +174,10 @@ Class Aggregate
 	{
 		$group        = new Group( $this, $expression );
 		$this->pipe[] = [ '$group' => $group ];
-
+		
 		return $group;
 	}
-
+	
 	/**
 	 * @param int $limit
 	 *
@@ -184,13 +186,14 @@ Class Aggregate
 	public function limit( int $limit ): self
 	{
 		$this->pipe[] = [ '$limit' => $limit ];
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/
-	 * SELECT *, {as} FROM {localCollection} WHERE {as} IN (SELECT * FROM {foreignCollection} WHERE {foreignField=localField});
+	 * SELECT *, {as} FROM {localCollection} WHERE {as} IN (SELECT * FROM {foreignCollection} WHERE
+	 * {foreignField=localField});
 	 *
 	 * @param string $foreignCollection
 	 * @param string $foreignField
@@ -199,7 +202,8 @@ Class Aggregate
 	 *
 	 * @return Aggregate
 	 */
-	public function lookup( string $foreignCollection, string $foreignField, string $localField, string $as = 'lookup' ): self
+	public function lookup( string $foreignCollection, string $foreignField, string $localField,
+	                        string $as = 'lookup' ): self
 	{
 		$this->pipe[] = [
 			'$lookup' => [
@@ -209,10 +213,10 @@ Class Aggregate
 				'as'           => $as,
 			],
 		];
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * https://docs.mongodb.com/manual/reference/operator/aggregation/geoNear/
 	 * @param float      $lon
@@ -224,7 +228,8 @@ Class Aggregate
 	 *
 	 * @return Aggregate
 	 */
-	public function near( float $lon, float $lat, int $distance, int $limit = 20, string $as = 'distance', Where $where = null ): self
+	public function near( float $lon, float $lat, int $distance, int $limit = 20, string $as = 'distance',
+	                      Where $where = null ): self
 	{
 		$this->pipe[] = [
 			'$geoNear' => [
@@ -244,10 +249,10 @@ Class Aggregate
 				],
 			],
 		];
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * Save to collection
 	 *
@@ -258,10 +263,10 @@ Class Aggregate
 	public function out( string $collection ): self
 	{
 		$this->pipe[] = [ '$out' => $collection ];
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param array $with
 	 * @param array $without
@@ -271,20 +276,17 @@ Class Aggregate
 	public function project( array $with = [], array $without = [] ): self
 	{
 		$project = [];
-
 		foreach ( $with as $field ) {
 			$project[ $field ] = 1;
 		}
-
 		foreach ( $without as $field ) {
 			$project[ $field ] = 0;
 		}
-
 		$this->pipe[] = [ '$project' => $project ];
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * https://docs.mongodb.com/manual/reference/operator/aggregation/replaceRoot/
 	 * @param $expression
@@ -294,10 +296,10 @@ Class Aggregate
 	public function replaceRoot( $expression ): self
 	{
 		$this->pipe[] = [ '$replaceRoot' => [ 'newRoot' => Expression::parseExpression( $expression ) ] ];
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param int $size
 	 *
@@ -306,10 +308,10 @@ Class Aggregate
 	public function sample( int $size ): self
 	{
 		$this->pipe[] = [ '$sample' => [ 'size' => $size ] ];
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param int $skip
 	 *
@@ -318,10 +320,10 @@ Class Aggregate
 	public function skip( int $skip ): self
 	{
 		$this->pipe[] = [ '$skip' => $skip ];
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $field
 	 * @param string $sort
@@ -337,15 +339,16 @@ Class Aggregate
 					: -1,
 			],
 		];
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/
 	 * > { "_id" : 1, "item" : "ABC1", sizes: [ "S", "M", "L"] }
 	 * = db.collection.aggregate( [ { $unwind : "$sizes" } ] )
-	 * < { "_id" : 1, "item" : "ABC1", "sizes" : "S" }, { "_id" : 1, "item" : "ABC1", "sizes" : "M" }, { "_id" : 1, "item" : "ABC1", "sizes" : "L" }
+	 * < { "_id" : 1, "item" : "ABC1", "sizes" : "S" }, { "_id" : 1, "item" : "ABC1", "sizes" : "M" }, { "_id" : 1,
+	 * "item" : "ABC1", "sizes" : "L" }
 	 *
 	 * @param string $path
 	 *
@@ -354,10 +357,10 @@ Class Aggregate
 	public function unwind( string $path ): self
 	{
 		$this->pipe[] = [ '$unwind' => '$' . $path ];
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * https://docs.mongodb.com/manual/reference/operator/aggregation/match/
 	 * @param string $field
@@ -372,7 +375,7 @@ Class Aggregate
 		$match = new Match( $this, $this->collection );
 		$match->where( $field, $operator, $value, $value2 );
 		$this->pipe[] = [ '$match' => $match ];
-
+		
 		return $match;
 	}
 }

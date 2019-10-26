@@ -7,6 +7,7 @@ use Chukdo\Storage\FileUploaded;
 
 /**
  * Validate handler.
+ *
  * @version   1.0.0
  * @copyright licence MIT, Copyright (C) 2019 Domingo
  * @since     08/01/2019
@@ -18,12 +19,12 @@ class FileValidate implements ValidateInterface
 	 * @var int|null
 	 */
 	protected $maxFileSize = null;
-
+	
 	/**
 	 * @var string|null
 	 */
 	protected $allowedMimeTypes = null;
-
+	
 	/**
 	 * @return string
 	 */
@@ -31,7 +32,7 @@ class FileValidate implements ValidateInterface
 	{
 		return 'file';
 	}
-
+	
 	/**
 	 * @param array $attributes
 	 *
@@ -46,12 +47,11 @@ class FileValidate implements ValidateInterface
 				$this->allowedMimeTypes .= $attr . ',';
 			}
 		}
-
 		$this->allowedMimeTypes = trim( $this->allowedMimeTypes, ',' );
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param $input
 	 *
@@ -62,10 +62,10 @@ class FileValidate implements ValidateInterface
 		if ( $input instanceof FileUploaded ) {
 			$input->setAllowedMimeTypes( $this->allowedMimeTypes );
 			$input->setMaxFileSize( $this->maxFileSize );
-
+			
 			return $input->isValid();
 		}
-
+		
 		return false;
 	}
 }

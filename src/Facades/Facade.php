@@ -8,6 +8,7 @@ use ReflectionException;
 
 /**
  * Initialisation d'une facade.
+ *
  * @version       1.0.0
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
  * @since         08/01/2019
@@ -17,16 +18,18 @@ class Facade
 {
 	/**
 	 * Instance App.
+	 *
 	 * @var App
 	 */
 	protected static $app;
-
+	
 	/**
 	 * Cache facades.
+	 *
 	 * @var array
 	 */
 	protected static $facades = [];
-
+	
 	/**
 	 * Attache APP (extension de service) à la facade pour la resolution des injections de dependance.
 	 *
@@ -38,7 +41,7 @@ class Facade
 		static::$app = $app;
 		self::registerAlias( $alias );
 	}
-
+	
 	/**
 	 * @param array|null $alias
 	 */
@@ -48,7 +51,7 @@ class Facade
 			self::setClassAlias( $name, $class );
 		}
 	}
-
+	
 	/**
 	 * @param string $name
 	 * @param string $class
@@ -57,7 +60,7 @@ class Facade
 	{
 		class_alias( $class, $name );
 	}
-
+	
 	/**
 	 * @return App
 	 */
@@ -65,7 +68,7 @@ class Facade
 	{
 		return static::$app;
 	}
-
+	
 	/**
 	 * @return mixed
 	 * @throws FacadeException
@@ -76,7 +79,7 @@ class Facade
 	{
 		return static::getInstance( static::name() );
 	}
-
+	
 	/**
 	 * Retourne l'instance resolu attaché à un nom.
 	 *
@@ -91,10 +94,10 @@ class Facade
 		if ( !isset( static::$facades[ $name ] ) ) {
 			static::$facades[ $name ] = static::$app->make( $name, true );
 		}
-
+		
 		return static::$facades[ $name ];
 	}
-
+	
 	/**
 	 * @return string
 	 * @throws FacadeException
@@ -103,7 +106,7 @@ class Facade
 	{
 		throw new FacadeException( "Facade does not implement 'Name' method." );
 	}
-
+	
 	/**
 	 * @param string $method
 	 * @param array  $args
@@ -117,17 +120,14 @@ class Facade
 	{
 		$name     = static::name();
 		$instance = static::getInstance( $name );
-
 		if ( !method_exists( $instance, $method ) && !method_exists( $instance, '__call' ) ) {
 			$class = get_called_class();
-
 			throw new FacadeException( sprintf( "[%s] does not implement [%s] method.", $class, $method ) );
 		}
-
+		
 		return call_user_func_array( [
-			$instance,
-			$method,
-		],
-			$args );
+			                             $instance,
+			                             $method,
+		                             ], $args );
 	}
 }

@@ -1,9 +1,9 @@
 <?php
 
 namespace Chukdo\Event;
-
 /**
  * Gestion des evenements.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -17,7 +17,7 @@ class Event
 	 * @param array $listeners
 	 */
 	protected $listeners = [];
-
+	
 	/**
 	 * Vide un Evenement (Ecouteur).
 	 *
@@ -29,7 +29,7 @@ class Event
 			$this->listeners[ $event ] = [];
 		}
 	}
-
+	
 	/**
 	 * Ecouteur.
 	 *
@@ -41,10 +41,9 @@ class Event
 		if ( !isset( $this->listeners[ $event ] ) ) {
 			$this->listeners[ $event ] = [];
 		}
-
 		$this->listeners[ $event ][] = $listener;
 	}
-
+	
 	/**
 	 * Trigger
 	 * Declenche les triggers en cascade (dans l'ordre des ajouts).
@@ -57,16 +56,14 @@ class Event
 		if ( !is_array( $payload ) ) {
 			$payload = [ $payload ];
 		}
-
 		foreach ( $this->getListeners( $event ) as $listener ) {
 			/* Stop la propagation si une reponse = false */
-			if ( call_user_func_array( $listener,
-					$payload ) === false ) {
+			if ( call_user_func_array( $listener, $payload ) === false ) {
 				return;
 			}
 		}
 	}
-
+	
 	/**
 	 * Retourne la liste des ecouteurs.
 	 *
@@ -79,7 +76,7 @@ class Event
 		if ( isset( $this->listeners[ $event ] ) ) {
 			return $this->listeners[ $event ];
 		}
-
+		
 		return [];
 	}
 }

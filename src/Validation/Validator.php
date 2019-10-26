@@ -12,6 +12,7 @@ use ReflectionException;
 
 /**
  * Validation de données.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -23,37 +24,37 @@ class Validator
 	 * @var Request
 	 */
 	protected $request;
-
+	
 	/**
 	 * @var Input
 	 */
 	protected $inputs;
-
+	
 	/**
 	 * @var Input
 	 */
 	protected $validated;
-
+	
 	/**
 	 * @var Message
 	 */
 	protected $error;
-
+	
 	/**
 	 * @var array
 	 */
 	protected $rules = [];
-
+	
 	/**
 	 * @var array
 	 */
 	protected $validators = [];
-
+	
 	/**
 	 * @var array
 	 */
 	protected $filters = [];
-
+	
 	/**
 	 * Validator constructor.
 	 *
@@ -66,7 +67,7 @@ class Validator
 		$this->validated = new Input( [] );
 		$this->inputs    = $request->inputs();
 	}
-
+	
 	/**
 	 * @param array $rules
 	 *
@@ -77,10 +78,10 @@ class Validator
 		foreach ( $rules as $path => $rule ) {
 			$this->rules[] = new Rule( $this, $path, $rule );
 		}
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param array $validators
 	 *
@@ -91,10 +92,10 @@ class Validator
 		foreach ( $validators as $validator ) {
 			$this->registerValidator( $validator );
 		}
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param ValidateInterface $validator
 	 *
@@ -103,10 +104,10 @@ class Validator
 	public function registerValidator( ValidateInterface $validator ): self
 	{
 		$this->validators[ $validator->name() ] = $validator;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param array $filters
 	 *
@@ -117,10 +118,10 @@ class Validator
 		foreach ( $filters as $filter ) {
 			$this->registerFilter( $filter );
 		}
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param FilterInterface $filter
 	 *
@@ -129,10 +130,10 @@ class Validator
 	public function registerFilter( FilterInterface $filter ): self
 	{
 		$this->filters[ $filter->name() ] = $filter;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @return bool
 	 */
@@ -140,21 +141,20 @@ class Validator
 	{
 		return $this->error->count() > 0;
 	}
-
+	
 	/**
 	 * @return bool
 	 */
 	public function validate(): bool
 	{
 		$validate = true;
-
 		foreach ( $this->rules() as $rule ) {
 			$validate .= $rule->validate();
 		}
-
+		
 		return $validate;
 	}
-
+	
 	/**
 	 * @return array
 	 */
@@ -162,7 +162,7 @@ class Validator
 	{
 		return $this->rules;
 	}
-
+	
 	/**
 	 * @return Request
 	 */
@@ -170,7 +170,7 @@ class Validator
 	{
 		return $this->request;
 	}
-
+	
 	/**
 	 * @param string $filter
 	 *
@@ -181,10 +181,10 @@ class Validator
 		if ( isset( $this->filters[ $filter ] ) ) {
 			return $this->filters[ $filter ];
 		}
-
+		
 		return null;
 	}
-
+	
 	/**
 	 * @return array
 	 */
@@ -192,7 +192,7 @@ class Validator
 	{
 		return $this->filters;
 	}
-
+	
 	/**
 	 * @param string $validator
 	 *
@@ -203,10 +203,10 @@ class Validator
 		if ( isset( $this->validators[ $validator ] ) ) {
 			return $this->validators[ $validator ];
 		}
-
+		
 		return null;
 	}
-
+	
 	/**
 	 * @return array
 	 */
@@ -214,7 +214,7 @@ class Validator
 	{
 		return $this->validators;
 	}
-
+	
 	/**
 	 * @return Input
 	 */
@@ -222,7 +222,7 @@ class Validator
 	{
 		return $this->validated;
 	}
-
+	
 	/**
 	 * @return Input
 	 */
@@ -230,7 +230,7 @@ class Validator
 	{
 		return $this->inputs;
 	}
-
+	
 	/**
 	 * @return Message
 	 */
@@ -238,7 +238,7 @@ class Validator
 	{
 		return $this->error;
 	}
-
+	
 	/**
 	 * @param string $key
 	 *

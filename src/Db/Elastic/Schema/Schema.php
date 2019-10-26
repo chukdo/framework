@@ -12,6 +12,7 @@ use Chukdo\Json\Json;
 
 /**
  * Server Schema.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -23,12 +24,12 @@ class Schema implements SchemaInterface
 	 * @var Collection
 	 */
 	protected $collection;
-
+	
 	/**
 	 * @var Property
 	 */
 	protected $property;
-
+	
 	/**
 	 * Index constructor.
 	 *
@@ -38,17 +39,14 @@ class Schema implements SchemaInterface
 	{
 		$this->collection = $collection;
 		$name             = $collection->fullName();
-		$info             = new Json( $collection
-			->client()
-			->indices()
-			->getMapping( [ 'index' => $name ] ) );
+		$info             = new Json( $collection->client()
+		                                         ->indices()
+		                                         ->getMapping( [ 'index' => $name ] ) );
 		$properties       = $info->getJson( $name . '.mappings' )
-								 ->toArray();
-
-
-		$this->property = new Property( $properties );
+		                         ->toArray();
+		$this->property   = new Property( $properties );
 	}
-
+	
 	/**
 	 * @param array $properties
 	 *
@@ -57,11 +55,11 @@ class Schema implements SchemaInterface
 	public function setAll( array $properties ): SchemaInterface
 	{
 		$this->property()
-			 ->setAll( $properties );
-
+		     ->setAll( $properties );
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $name
 	 * @param null   $type
@@ -72,11 +70,11 @@ class Schema implements SchemaInterface
 	public function set( string $name, $type = null, array $options = [] ): SchemaInterface
 	{
 		$this->property()
-			 ->set( $name, $type, $options );
-
+		     ->set( $name, $type, $options );
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @return Property
 	 */
@@ -84,7 +82,7 @@ class Schema implements SchemaInterface
 	{
 		return $this->property;
 	}
-
+	
 	/**
 	 * @return JsonInterface
 	 */
@@ -92,7 +90,7 @@ class Schema implements SchemaInterface
 	{
 		return $this->property->properties();
 	}
-
+	
 	/**
 	 * @return bool
 	 */
@@ -100,20 +98,20 @@ class Schema implements SchemaInterface
 	{
 		try {
 			$this->collection()
-				 ->client()
-				 ->indices()
-				 ->putMapping( [
-					 'index' => $this->collection()
-									 ->fullName(),
-					 'body'  => [],
-				 ] );
-
+			     ->client()
+			     ->indices()
+			     ->putMapping( [
+				                   'index' => $this->collection()
+				                                   ->fullName(),
+				                   'body'  => [],
+			                   ] );
+			
 			return true;
 		} catch ( Throwable $e ) {
 			return false;
 		}
 	}
-
+	
 	/**
 	 * @return CollectionInterface
 	 */
@@ -121,7 +119,7 @@ class Schema implements SchemaInterface
 	{
 		return $this->collection;
 	}
-
+	
 	/**
 	 * @param string $name
 	 *
@@ -130,9 +128,9 @@ class Schema implements SchemaInterface
 	public function get( string $name ): ?PropertyInterface
 	{
 		return $this->property()
-					->get( $name );
+		            ->get( $name );
 	}
-
+	
 	/**
 	 * @param string $name
 	 *
@@ -141,34 +139,34 @@ class Schema implements SchemaInterface
 	public function unset( string $name ): SchemaInterface
 	{
 		$this->property()
-			 ->unset( $name );
-
+		     ->unset( $name );
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @return bool
 	 */
 	public function save(): bool
 	{
 		$save = new Json( $this->collection()
-							   ->client()
-							   ->indices()
-							   ->putMapping( [
-								   'index' => $this->collection()
-									   ->name(),
-								   'body'  => $this->toArray(),
-							   ] ) );
-
+		                       ->client()
+		                       ->indices()
+		                       ->putMapping( [
+			                                     'index' => $this->collection()
+			                                                     ->name(),
+			                                     'body'  => $this->toArray(),
+		                                     ] ) );
+		
 		return $save->offsetGet( 'acknowledged' ) === 1;
 	}
-
+	
 	/**
 	 * @return array
 	 */
 	public function toArray(): array
 	{
 		return $this->property()
-			->toArray();
+		            ->toArray();
 	}
 }

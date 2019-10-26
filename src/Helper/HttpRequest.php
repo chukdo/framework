@@ -6,6 +6,7 @@ use Chukdo\Http\Url;
 
 /**
  * Gestion des messages HTTP.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -19,7 +20,7 @@ final class HttpRequest
 	private function __construct()
 	{
 	}
-
+	
 	/**
 	 * @return string|null
 	 */
@@ -29,7 +30,7 @@ final class HttpRequest
 			? 'CLI'
 			: self::request( 'httpverb', self::server( 'REQUEST_METHOD' ) );
 	}
-
+	
 	/**
 	 * @param             $name
 	 * @param string|null $default
@@ -39,10 +40,10 @@ final class HttpRequest
 	public static function request( $name, string $default = null ): ?string
 	{
 		$request = self::all();
-
+		
 		return $request[ $name ] ?? $default;
 	}
-
+	
 	/**
 	 * @param string      $name
 	 * @param string|null $default
@@ -53,7 +54,7 @@ final class HttpRequest
 	{
 		return $_SERVER[ $name ] ?? $default;
 	}
-
+	
 	/**
 	 * @return array
 	 */
@@ -62,43 +63,39 @@ final class HttpRequest
 		if ( Cli::runningInConsole() ) {
 			return Cli::inputs();
 		}
-
 		if ( !empty( $_REQUEST ) ) {
 			return $_REQUEST;
 		}
-
 		if ( ( $data = self::input() ) && Str::contain( self::server( 'ACCEPT' ), 'json' ) ) {
 			return json_decode( $data, true, 512, JSON_THROW_ON_ERROR );
 		}
-
+		
 		return [];
 	}
-
+	
 	/**
 	 * @return string|null
 	 */
 	public static function input(): ?string
 	{
 		static $input = null;
-
 		if ( $input ) {
 			return $input;
 		}
-
 		$input = file_get_contents( 'php://input' );
-
+		
 		return $input;
 	}
-
+	
 	/**
 	 * @return bool
 	 */
 	public static function secured(): bool
 	{
-		return self::server( 'HTTPS' ) || self::server( 'SERVER_PORT' ) === '443'
-			|| self::server( 'REQUEST_SCHEME' ) === 'https';
+		return self::server( 'HTTPS' ) || self::server( 'SERVER_PORT' ) === '443' ||
+		       self::server( 'REQUEST_SCHEME' ) === 'https';
 	}
-
+	
 	/**
 	 * @return bool
 	 */
@@ -106,7 +103,7 @@ final class HttpRequest
 	{
 		return self::server( 'HTTP_X_REQUESTED_WITH' ) === 'XMLHttpRequest';
 	}
-
+	
 	/**
 	 * @return string|null
 	 */
@@ -114,7 +111,7 @@ final class HttpRequest
 	{
 		return self::server( 'HTTP_USER_AGENT' );
 	}
-
+	
 	/**
 	 * @return string|null
 	 */
@@ -124,7 +121,7 @@ final class HttpRequest
 			? 'cli'
 			: Str::extension( self::uri() );
 	}
-
+	
 	/**
 	 * @return string|null
 	 */
@@ -134,7 +131,7 @@ final class HttpRequest
 			? Cli::uri()
 			: self::server( 'SCRIPT_URI' );
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -142,7 +139,7 @@ final class HttpRequest
 	{
 		return self::server( 'HTTP_HOST' );
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -150,7 +147,7 @@ final class HttpRequest
 	{
 		return ( new Url( self::uri() ) )->getTld();
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -158,7 +155,7 @@ final class HttpRequest
 	{
 		return ( new Url( self::uri() ) )->getDomain();
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -166,7 +163,7 @@ final class HttpRequest
 	{
 		return ( new Url( self::uri() ) )->getSubDomain();
 	}
-
+	
 	/**
 	 * @return array
 	 */
@@ -174,17 +171,15 @@ final class HttpRequest
 	{
 		return (array) self::server( 'HTTP_COOKIE' );
 	}
-
+	
 	/**
 	 * @return array
 	 */
 	public static function headers(): array
 	{
 		$headers = [];
-
 		foreach ( $_SERVER as $key => $value ) {
-			if ( $name = Str::match( '/^HTTP_(.*)/',
-				$key ) ) {
+			if ( $name = Str::match( '/^HTTP_(.*)/', $key ) ) {
 				switch ( $name ) {
 					case 'HOST':
 					case 'COOKIE':
@@ -194,7 +189,7 @@ final class HttpRequest
 				}
 			}
 		}
-
+		
 		return $headers;
 	}
 }

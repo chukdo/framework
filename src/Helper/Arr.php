@@ -8,6 +8,7 @@ use Closure;
 /**
  * Classe Iterate
  * Fonctionnalités des tableaux.
+ *
  * @version       1.0.0
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
  * @since         08/01/2019
@@ -24,7 +25,7 @@ final class Arr
 	{
 		return count( $array );
 	}
-
+	
 	/**
 	 * @param array $array
 	 *
@@ -34,7 +35,7 @@ final class Arr
 	{
 		return empty( $array );
 	}
-
+	
 	/**
 	 * @param array $args
 	 *
@@ -45,10 +46,10 @@ final class Arr
 		if ( isset( $args[ 0 ] ) && self::isArray( $args[ 0 ] ) ) {
 			return $args[ 0 ];
 		}
-
+		
 		return $args;
 	}
-
+	
 	/**
 	 * @param $array
 	 *
@@ -58,7 +59,7 @@ final class Arr
 	{
 		return is_array( $array );
 	}
-
+	
 	/**
 	 * @param array $mergeTo
 	 * @param array $toMerge
@@ -70,10 +71,10 @@ final class Arr
 		foreach ( $toMerge as $key => $merge ) {
 			$mergeTo[ $key ] = $merge;
 		}
-
+		
 		return $mergeTo;
 	}
-
+	
 	/**
 	 * @param array $array
 	 *
@@ -83,7 +84,7 @@ final class Arr
 	{
 		return !empty( $array );
 	}
-
+	
 	/**
 	 * @param       $value
 	 * @param array $array
@@ -96,10 +97,10 @@ final class Arr
 		if ( $unique === false || ( $unique === true && !self::in( $value, $array ) ) ) {
 			$array[] = $value;
 		}
-
+		
 		return $array;
 	}
-
+	
 	/**
 	 * @param       $value
 	 * @param array $array
@@ -110,7 +111,7 @@ final class Arr
 	{
 		return in_array( $value, $array, true );
 	}
-
+	
 	/**
 	 * @param array $pushTo
 	 * @param array $toPush
@@ -126,10 +127,10 @@ final class Arr
 				$pushTo[] = $push;
 			}
 		}
-
+		
 		return $pushTo;
 	}
-
+	
 	/**
 	 * @param array   $array
 	 * @param Closure $callback
@@ -140,7 +141,7 @@ final class Arr
 	{
 		return array_filter( $array, $callback );
 	}
-
+	
 	/**
 	 * @param array   $array
 	 * @param Closure $callback
@@ -156,10 +157,22 @@ final class Arr
 				$value = $callback( $value );
 			}
 		}
-
+		
 		return $array;
 	}
-
+	
+	/**
+	 * @param array       $array
+	 * @param string|null $path
+	 * @param             $value
+	 *
+	 * @return array
+	 */
+	public static function inc( array &$array, ?string $path, int $value ): array
+	{
+		return self::set( $array, $path, $value + self::get( $array, $path ) );
+	}
+	
 	/**
 	 * @param array       $array
 	 * @param string|null $path
@@ -170,22 +183,24 @@ final class Arr
 	public static function addToSet( array &$array, ?string $path, $value ): array
 	{
 		$get = self::get( $array, $path );
-
+		
 		if ( $get === null ) {
 			self::set( $array, $path, [ $value ] );
-		} else if ( Is::arr( $get ) ) {
-			$get[] = $value;
-			self::set( $array, $path, $get );
 		} else {
-			self::set( $array, $path, [
-				$get,
-				$value,
-			] );
+			if ( Is::arr( $get ) ) {
+				$get[] = $value;
+				self::set( $array, $path, $get );
+			} else {
+				self::set( $array, $path, [
+					$get,
+					$value,
+				] );
+			}
 		}
-
+		
 		return $array;
 	}
-
+	
 	/**
 	 * @param array       $array
 	 * @param string|null $path
@@ -197,23 +212,23 @@ final class Arr
 		if ( $path === null ) {
 			return null;
 		}
-
+		
 		if ( Str::notContain( $path, '.' ) ) {
 			return $array[ $path ] ?? null;
 		}
-
+		
 		$arr       = new Iterate( Str::split( $path, '.' ) );
 		$firstPath = $arr->getFirstAndRemove();
 		$endPath   = $arr->join( '.' );
 		$get       = $array[ $firstPath ] ?? null;
-
+		
 		if ( Is::arr( $get ) ) {
 			return self::get( $get, $endPath );
 		}
-
+		
 		return null;
 	}
-
+	
 	/**
 	 * @param array       $array
 	 * @param string|null $path
@@ -225,29 +240,28 @@ final class Arr
 	{
 		if ( $path === null ) {
 			$array[] = $value;
-
+			
 			return $array;
 		}
-
+		
 		if ( Str::notContain( $path, '.' ) ) {
 			$array[ $path ] = $value;
-
+			
 			return $array;
 		}
-
+		
 		$arr       = new Iterate( Str::split( $path, '.' ) );
 		$firstPath = $arr->getFirstAndRemove();
 		$endPath   = $arr->join( '.' );
-
+		
 		if ( !isset( $array[ $firstPath ] ) || !Is::arr( $array[ $firstPath ] ) ) {
 			$array[ $firstPath ] = [];
 		}
-
 		self::set( $array[ $firstPath ], $endPath, $value );
-
+		
 		return $array;
 	}
-
+	
 	/**
 	 * @param array       $array
 	 * @param string|null $path
@@ -259,38 +273,38 @@ final class Arr
 		if ( $path === null || !isset( $array[ $path ] ) ) {
 			return null;
 		}
-
+		
 		if ( Str::notContain( $path, '.' ) ) {
 			$get = $array[ $path ];
 			unset( $array[ $path ] );
-
+			
 			return $get;
 		}
-
+		
 		$arr       = new Iterate( Str::split( $path, '.' ) );
 		$firstPath = $arr->getFirstAndRemove();
 		$endPath   = $arr->join( '.' );
 		$get       = $array[ $firstPath ] ?? null;
-
+		
 		if ( Is::arr( $get ) ) {
 			return self::unset( $get, $endPath );
 		}
-
+		
 		return null;
 	}
-
+	
 	public static function unwind( array &$array, ?string $path ): array
 	{
 		$unwinded = [];
 		$toUnwind = self::get( $array, $path );
-
+		
 		if ( self::isArray( $toUnwind ) ) {
 			foreach ( $toUnwind as $unwind ) {
 				$cloneArray = self::merge( [], $array );
 				$unwinded[] = self::set( $cloneArray, $path, $unwind );
 			}
 		}
-
+		
 		return $unwinded;
 	}
 }

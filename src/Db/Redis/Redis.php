@@ -6,6 +6,7 @@ use Chukdo\Contracts\Db\Redis as RedisInterface;
 
 /**
  * Gestion de la base de donnée NOSQL Redis basé sur son protocole unifié.
+ *
  * @version       1.0.0
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
  * @since         08/01/2019
@@ -15,34 +16,39 @@ class Redis implements RedisInterface
 {
 	/**
 	 * Socket.
+	 *
 	 * @var resource
 	 */
 	protected $sock = null;
-
+	
 	/**
 	 * Pointer SCAN pour iteration.
+	 *
 	 * @var int
 	 */
 	protected $pointer = 0;
-
+	
 	/**
 	 * Pile de stockage SCAN.
+	 *
 	 * @var array
 	 */
 	protected $stack = [];
-
+	
 	/**
 	 * Arguements par defaut pour le SCAN.
+	 *
 	 * @var array
 	 */
 	protected $args = [];
-
+	
 	/**
 	 * type de SCAN (SCAN, HSCAN, SSCAN).
+	 *
 	 * @var string
 	 */
 	protected $type = null;
-
+	
 	/**
 	 * Redis constructor.
 	 *
@@ -53,25 +59,19 @@ class Redis implements RedisInterface
 	 */
 	public function __construct( string $dsn = null, int $timeout = null )
 	{
-		$dsn  = parse_url( $dsn
-			?? 'redis://127.0.0.1:6379' );
-		$host = $dsn[ 'host' ];
-		$port = $dsn[ 'port' ];
-
-		$this->sock = fsockopen( $host, $port, $errno, $errstr, $timeout
-			?? 5 );
-
+		$dsn        = parse_url( $dsn ?? 'redis://127.0.0.1:6379' );
+		$host       = $dsn[ 'host' ];
+		$port       = $dsn[ 'port' ];
+		$this->sock = fsockopen( $host, $port, $errno, $errstr, $timeout ?? 5 );
 		if ( $this->sock === null ) {
 			throw new RedisException( "[$errno $errstr]" );
 		}
-
 		if ( isset( $dsn[ 'pass' ] ) && !$this->__call( 'AUTH', [ $dsn[ 'pass' ] ] ) ) {
 			throw new RedisException( 'Wrong password' );
 		}
-
 		$this->setTypeIterator( 'scan' );
 	}
-
+	
 	/**
 	 * Appel des commandes redis au travers de la surcharge magique de PHP.
 	 *
@@ -84,12 +84,11 @@ class Redis implements RedisInterface
 	public function __call( string $name, array $args )
 	{
 		array_unshift( $args, str_replace( '_', ' ', strtoupper( $name ) ) );
-
 		$this->write( $this->command( $args ) );
-
+		
 		return $this->read();
 	}
-
+	
 	/**
 	 * Ecriture d'une commande basé sur le protocol unifié de Redis.
 	 *
@@ -100,16 +99,14 @@ class Redis implements RedisInterface
 	public function write( string $c ): void
 	{
 		$length = mb_strlen( $c );
-
 		for ( $written = 0; $written < $length; $written += $fwrite ) {
 			$fwrite = fwrite( $this->sock, mb_substr( $c, $written ) );
-
 			if ( $fwrite === false || $fwrite <= 0 ) {
 				throw new RedisException( 'Stream write error' );
 			}
 		}
 	}
-
+	
 	/**
 	 * Formate une commande Redis (protocol unifié de Redis).
 	 *
@@ -120,16 +117,16 @@ class Redis implements RedisInterface
 	public function command( array $args ): string
 	{
 		$c = '*' . count( $args ) . "\r\n";
-
 		foreach ( $args as $arg ) {
 			$c .= '$' . mb_strlen( $arg ) . "\r\n" . $arg . "\r\n";
 		}
-
+		
 		return $c;
 	}
-
+	
 	/**
 	 * Lecture d'une reponse du serveur.
+	 *
 	 * @return mixed
 	 * @throws RedisException
 	 */
@@ -137,82 +134,62 @@ class Redis implements RedisInterface
 	{
 		$get   = stream_get_line( $this->sock, 512, "\r\n" );
 		$reply = substr( $get, 1 );
-
 		if ( $get === 0 ) {
 			throw new RedisException( 'Failed to read type of response from stream' );
 		}
-
 		switch ( $get[ 0 ] ) {
-			/** Error */
-			case '-':
-				throw new RedisException( $reply );
+			/** Error */ case '-':
+			throw new RedisException( $reply );
+			break;
+			/** Inline */ case '+':
+			$s = $reply;
+			if ( $s === 'OK' ) {
+				$s = true;
+			}
+			break;
+			/** Integer */ case ':':
+			$s = (int) $reply;
+			break;
+			/** Bulk */ case '$':
+			$s = null;
+			if ( $reply === '-1' ) {
 				break;
-
-			/** Inline */
-			case '+':
-				$s = $reply;
-
-				if ( $s === 'OK' ) {
-					$s = true;
-				}
-				break;
-
-			/** Integer */
-			case ':':
-				$s = (int) $reply;
-				break;
-
-			/** Bulk */
-			case '$':
-				$s = null;
-
-				if ( $reply === '-1' ) {
-					break;
-				}
-
-				$size = (int) $reply;
-				$read = 0;
-
-				if ( $size > 0 ) {
-					while ( $read < $size ) {
-						$len  = min( 1024, $size - $read );
-						$read += $len;
-
-						if ( ( $r = stream_get_line( $this->sock, $len ) ) !== 0 ) {
-							$s .= $r;
-						} else {
-							throw new RedisException( 'Failed to read response from stream' );
-						}
+			}
+			$size = (int) $reply;
+			$read = 0;
+			if ( $size > 0 ) {
+				while ( $read < $size ) {
+					$len  = min( 1024, $size - $read );
+					$read += $len;
+					if ( ( $r = stream_get_line( $this->sock, $len ) ) !== 0 ) {
+						$s .= $r;
+					} else {
+						throw new RedisException( 'Failed to read response from stream' );
 					}
 				}
-
-				/** \r\n */
-				stream_get_line( $this->sock, 2 );
+			}
+			/** \r\n */
+			stream_get_line( $this->sock, 2 );
+			break;
+			/** Multi Bulk */ case '*':
+			$s = null;
+			if ( $reply === '*-1' ) {
 				break;
-
-			/** Multi Bulk */
-			case '*':
-				$s = null;
-
-				if ( $reply === '*-1' ) {
-					break;
-				}
-
-				$c = (int) $reply;
-				$s = [];
-
-				for ( $i = 0; $i < $c; ++$i ) {
-					$s[] = $this->read();
-				}
-				break;
+			}
+			$c = (int) $reply;
+			$s = [];
+			for ( $i = 0; $i < $c; ++$i ) {
+				$s[] = $this->read();
+			}
+			break;
 			default:
 				throw new RedisException( sprintf( "Unknow response [%s]", $reply ) );
 				break;
 		}
-
+		
 		return $s;
 	}
-
+	
 	/**
 	 * Défini le type de commande SCAN lors d'une itération Redis
 	 * Ex. SCAN SSCAN HSCAN.
@@ -223,21 +200,23 @@ class Redis implements RedisInterface
 	{
 		$this->type = strtoupper( $type );
 	}
-
+	
 	/**
 	 * Retourne le nombre d'enregistrement dans la base redis.
+	 *
 	 * @return int|mixed
 	 * @throws RedisException
 	 */
 	public function count()
 	{
 		$this->write( $this->command( [ 'dbsize' ] ) );
-
+		
 		return $this->read();
 	}
-
+	
 	/**
 	 * Initialise l'iteration.
+	 *
 	 * @throws RedisException
 	 */
 	public function rewind(): void
@@ -245,36 +224,14 @@ class Redis implements RedisInterface
 		/** Reset */
 		$this->stack   = [];
 		$this->pointer = 0;
-
 		/** command SCAN */
 		$scan = $this->getIterator( $this->pointer );
-
 		if ( count( $scan ) === 2 ) {
 			$this->pointer = (int) $scan[ 0 ];
 			$this->stack   = (array) $scan[ 1 ];
 		}
 	}
-
-	/**
-	 * Ecris la commande SCAN lors d'une itération Redis
-	 * Ex. SCAN SSCAN HSCAN.
-	 *
-	 * @param int $pointer
-	 *
-	 * @return mixed
-	 * @throws RedisException
-	 */
-	protected function getIterator( int $pointer )
-	{
-		$this->write( $this->command( array_merge( [
-			$this->type,
-			$pointer,
-		],
-			$this->args ) ) );
-
-		return $this->read();
-	}
-
+	
 	/**
 	 * @return bool|mixed
 	 * @throws RedisException
@@ -282,41 +239,36 @@ class Redis implements RedisInterface
 	public function current()
 	{
 		$current = false;
-
 		if ( isset( $this->stack[ 0 ] ) ) {
 			$key = $this->stack[ 0 ];
-
-			switch ( $this->__call( 'TYPE',
-				[ $key ] ) ) {
+			switch ( $this->__call( 'TYPE', [ $key ] ) ) {
 				case 'string':
 				case 'set':
 					$current = $this->get( $key );
 					break;
 				case 'list':
-					$current = $this->__call( 'LRANGE',
-						[
-							$key,
-							'0',
-							'-1',
-						] );
+					$current = $this->__call( 'LRANGE', [
+						                                  $key,
+						                                  '0',
+						                                  '-1',
+					                                  ] );
 					break;
 				case 'zset':
-					$current = $this->__call( 'ZRANGE',
-						[
-							$key,
-							'0',
-							'-1',
-						] );
+					$current = $this->__call( 'ZRANGE', [
+						                                  $key,
+						                                  '0',
+						                                  '-1',
+					                                  ] );
 					break;
 				case 'hash':
 					$current = $this->__call( 'HGETALL', [ $key ] );
 					break;
 			}
 		}
-
+		
 		return $current;
 	}
-
+	
 	/**
 	 * @param string $key
 	 *
@@ -327,45 +279,49 @@ class Redis implements RedisInterface
 	{
 		return $this->__call( 'GET', [ $key ] );
 	}
-
+	
 	/**
 	 * Retourne la cle de l'element courant.
+	 *
 	 * @return string
 	 */
 	public function key(): string
 	{
 		return $this->stack[ 0 ] ?? '';
 	}
-
+	
 	/**
 	 * Pointe sur l'element suivant.
+	 *
 	 * @throws RedisException
 	 */
 	public function next(): void
 	{
 		if ( !empty( $this->stack ) ) {
 			array_shift( $this->stack );
-		} else if ( $this->pointer !== 0 ) {
-			/** command SCAN */
-			$scan = $this->getIterator( $this->pointer );
-
-			if ( count( $scan ) === 2 ) {
-				$this->pointer = (int) $scan[ 0 ];
-				$this->stack   = (array) $scan[ 1 ];
+		} else {
+			if ( $this->pointer !== 0 ) {
+				/** command SCAN */
+				$scan = $this->getIterator( $this->pointer );
+				if ( count( $scan ) === 2 ) {
+					$this->pointer = (int) $scan[ 0 ];
+					$this->stack   = (array) $scan[ 1 ];
+				}
 			}
 		}
 	}
-
+	
 	/**
 	 * Verifie si il y a un element apres l'element courant
 	 * apres l'appel de rewind() ou next().
+	 *
 	 * @return bool
 	 */
 	public function valid(): bool
 	{
 		return !( $this->pointer === 0 && empty( $this->stack ) );
 	}
-
+	
 	/**
 	 * Ecriture de commandes dans un pipeline (gain de performance).
 	 *
@@ -379,22 +335,19 @@ class Redis implements RedisInterface
 		$s = [];
 		$c = '';
 		$i = 0;
-
 		foreach ( $commands as $command ) {
 			$args = str_getcsv( $command, ' ', '"' );
 			$c    .= $this->command( $args );
 			++$i;
 		}
-
 		$this->write( $c );
-
 		for ( $j = 0; $j < $i; ++$j ) {
 			$s[ $j ] = $this->read();
 		}
-
+		
 		return $s;
 	}
-
+	
 	/**
 	 * Retourne les informations sur le serveur Redis.
 	 *
@@ -406,24 +359,20 @@ class Redis implements RedisInterface
 	public function info( string $key = null )
 	{
 		$info  = [];
-		$items = explode( "\r\n",
-			$this->__call( 'info', [] ) );
-
+		$items = explode( "\r\n", $this->__call( 'info', [] ) );
 		foreach ( $items as $item ) {
 			$item = explode( ':', $item );
-
 			if ( isset( $item[ 1 ] ) ) {
 				$info[ $item[ 0 ] ] = $item[ 1 ];
 			}
 		}
-
 		if ( $key ) {
 			return $info[ $key ] ?? false;
 		}
-
+		
 		return $info;
 	}
-
+	
 	/**
 	 * Arguments à ajouter à la commande SCAN lors d'une itération Redis
 	 * Ex. scan 0 MATCH *11*.
@@ -434,7 +383,7 @@ class Redis implements RedisInterface
 	{
 		$this->args = $args;
 	}
-
+	
 	/**
 	 * Détruit la connexion au serveur Redis.
 	 */
@@ -442,7 +391,7 @@ class Redis implements RedisInterface
 	{
 		$this->sock = '';
 	}
-
+	
 	/**
 	 * @param string $key
 	 *
@@ -453,7 +402,7 @@ class Redis implements RedisInterface
 	{
 		return $this->__call( 'EXISTS', [ $key ] );
 	}
-
+	
 	/**
 	 * @param string $key
 	 * @param        $value
@@ -463,13 +412,12 @@ class Redis implements RedisInterface
 	 */
 	public function set( string $key, $value )
 	{
-		return $this->__call( 'SET',
-			[
-				$key,
-				$value,
-			] );
+		return $this->__call( 'SET', [
+			                           $key,
+			                           $value,
+		                           ] );
 	}
-
+	
 	/**
 	 * @param string $key
 	 *
@@ -480,7 +428,7 @@ class Redis implements RedisInterface
 	{
 		return (bool) $this->__call( 'DEL', [ $key ] );
 	}
-
+	
 	/**
 	 * @param string $key
 	 *
@@ -491,7 +439,7 @@ class Redis implements RedisInterface
 	{
 		return $this->__call( 'EXISTS', [ $key ] );
 	}
-
+	
 	/**
 	 * @param string $key
 	 *
@@ -502,7 +450,7 @@ class Redis implements RedisInterface
 	{
 		return $this->__call( 'GET', [ $key ] );
 	}
-
+	
 	/**
 	 * @param string $key
 	 * @param        $value
@@ -512,13 +460,12 @@ class Redis implements RedisInterface
 	 */
 	public function __set( string $key, $value )
 	{
-		return $this->__call( 'SET',
-			[
-				$key,
-				$value,
-			] );
+		return $this->__call( 'SET', [
+			                           $key,
+			                           $value,
+		                           ] );
 	}
-
+	
 	/**
 	 * @param string $key
 	 *
@@ -528,5 +475,24 @@ class Redis implements RedisInterface
 	public function __unset( string $key )
 	{
 		return $this->__call( 'DEL', [ $key ] );
+	}
+	
+	/**
+	 * Ecris la commande SCAN lors d'une itération Redis
+	 * Ex. SCAN SSCAN HSCAN.
+	 *
+	 * @param int $pointer
+	 *
+	 * @return mixed
+	 * @throws RedisException
+	 */
+	protected function getIterator( int $pointer )
+	{
+		$this->write( $this->command( array_merge( [
+			                                           $this->type,
+			                                           $pointer,
+		                                           ], $this->args ) ) );
+		
+		return $this->read();
 	}
 }

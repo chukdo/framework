@@ -7,6 +7,7 @@ use Chukdo\Helper\Str;
 
 /**
  * Validate handler.
+ *
  * @version   1.0.0
  * @copyright licence MIT, Copyright (C) 2019 Domingo
  * @since     08/01/2019
@@ -21,7 +22,7 @@ class FloatFilter implements FilterInterface
 	{
 		return 'float';
 	}
-
+	
 	/**
 	 * @param array $attributes
 	 *
@@ -31,7 +32,7 @@ class FloatFilter implements FilterInterface
 	{
 		return $this;
 	}
-
+	
 	/**
 	 * @param $input
 	 *
@@ -41,16 +42,14 @@ class FloatFilter implements FilterInterface
 	{
 		if ( Str::match( '/^[0-9 .,]+$/', $input ) ) {
 			$input = str_replace( ' ', '', $input );
-
 			if ( Str::contain( $input, '.' ) && Str::contain( $input, ',' ) ) {
 				$input = str_replace( '.', '', $input );
 			}
-
 			$input = str_replace( ',', '.', $input );
-
+			
 			return (float) $input;
 		}
-
+		
 		return $input;
 	}
 }

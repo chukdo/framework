@@ -7,6 +7,7 @@ use Chukdo\Support\Singleton;
 
 /**
  * Annuaire de ressource pour les flux de données.
+ *
  * @version       1.0.0
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
  * @since         08/01/2019
@@ -18,12 +19,12 @@ class ServiceLocator extends Singleton
 	 * @var array
 	 */
 	private $cache = [];
-
+	
 	/**
 	 * @var array
 	 */
 	private $resources = [];
-
+	
 	/**
 	 * Ajoute un service à l'annuaire.
 	 *
@@ -34,7 +35,7 @@ class ServiceLocator extends Singleton
 	{
 		$this->resources[ $scheme ] = $closure;
 	}
-
+	
 	/**
 	 * Retourne une ressource à l'annuaire.
 	 *
@@ -48,16 +49,13 @@ class ServiceLocator extends Singleton
 		if ( $cache = $this->getCacheResource( $scheme ) ) {
 			return $cache;
 		}
-
 		$service  = $this->getService( $scheme );
 		$resource = call_user_func( $service );
-
-		$this->cacheResource( $scheme,
-			$resource );
-
+		$this->cacheResource( $scheme, $resource );
+		
 		return $resource;
 	}
-
+	
 	/**
 	 * Retourne une ressource en cache.
 	 *
@@ -71,7 +69,7 @@ class ServiceLocator extends Singleton
 			? $this->cache[ $scheme ]
 			: null;
 	}
-
+	
 	/**
 	 * Retourne un service de l'annuaire.
 	 *
@@ -83,13 +81,12 @@ class ServiceLocator extends Singleton
 	public function getService( $scheme ): Closure
 	{
 		if ( !isset( $this->resources[ $scheme ] ) ) {
-			throw new ServiceLocatorException( sprintf( '[%s] is not a registered service',
-				$scheme ) );
+			throw new ServiceLocatorException( sprintf( '[%s] is not a registered service', $scheme ) );
 		}
-
+		
 		return $this->resources[ $scheme ];
 	}
-
+	
 	/**
 	 * Cache une ressource.
 	 *
@@ -100,7 +97,7 @@ class ServiceLocator extends Singleton
 	{
 		$this->cache[ $scheme ] = $resource;
 	}
-
+	
 	/**
 	 * Supprime une ressource en cache.
 	 *
@@ -112,10 +109,10 @@ class ServiceLocator extends Singleton
 	{
 		if ( isset( $this->cache[ $scheme ] ) ) {
 			unset( $this->cache[ $scheme ] );
-
+			
 			return true;
 		}
-
+		
 		return false;
 	}
 }

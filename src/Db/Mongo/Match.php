@@ -6,6 +6,7 @@ use Chukdo\Db\Mongo\Aggregate\Aggregate;
 
 /**
  * Server Match.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -17,12 +18,12 @@ Class Match extends Where
 	 * @var Collection
 	 */
 	protected $collection;
-
+	
 	/**
 	 * @var Aggregate
 	 */
 	protected $aggregate;
-
+	
 	/**
 	 * Match constructor.
 	 *
@@ -34,7 +35,7 @@ Class Match extends Where
 		parent::__construct( $collection );
 		$this->aggregate = $aggregate;
 	}
-
+	
 	public function pipe(): Aggregate
 	{
 		return $this->aggregate;

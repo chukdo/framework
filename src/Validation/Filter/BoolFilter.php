@@ -7,6 +7,7 @@ use Chukdo\Helper\Str;
 
 /**
  * Validate handler.
+ *
  * @version   1.0.0
  * @copyright licence MIT, Copyright (C) 2019 Domingo
  * @since     08/01/2019
@@ -21,7 +22,7 @@ class BoolFilter implements FilterInterface
 	{
 		return 'bool';
 	}
-
+	
 	/**
 	 * @param array $attributes
 	 *
@@ -31,7 +32,7 @@ class BoolFilter implements FilterInterface
 	{
 		return $this;
 	}
-
+	
 	/**
 	 * @param $input
 	 *
@@ -41,10 +42,12 @@ class BoolFilter implements FilterInterface
 	{
 		if ( $input === '0' ) {
 			return false;
-		} else if ( $input === '1' ) {
-			return true;
+		} else {
+			if ( $input === '1' ) {
+				return true;
+			}
 		}
-
+		
 		return $input;
 	}
 }

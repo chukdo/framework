@@ -7,6 +7,7 @@ use Chukdo\Helper\Str;
 
 /**
  * Validate handler.
+ *
  * @version   1.0.0
  * @copyright licence MIT, Copyright (C) 2019 Domingo
  * @since     08/01/2019
@@ -21,7 +22,7 @@ class PhoneFilter implements FilterInterface
 	{
 		return 'phone';
 	}
-
+	
 	/**
 	 * @param array $attributes
 	 *
@@ -31,7 +32,7 @@ class PhoneFilter implements FilterInterface
 	{
 		return $this;
 	}
-
+	
 	/**
 	 * @param $input
 	 *
@@ -39,23 +40,21 @@ class PhoneFilter implements FilterInterface
 	 */
 	public function filter( $input )
 	{
-
+		
 		if ( Str::match( '/^(?:(?:\+|00)\d{2}|0)\s{0,2}[1-9](?:[\s.-]{0,3}\d{2}){4}$/', $input ) ) {
 			return str_replace( [
-				'.',
-				',',
-				' ',
-				'+',
-			],
-				[
-					'',
-					'',
-					'',
-					'00',
-				],
-				$input );
+				                    '.',
+				                    ',',
+				                    ' ',
+				                    '+',
+			                    ], [
+				                    '',
+				                    '',
+				                    '',
+				                    '00',
+			                    ], $input );
 		}
-
+		
 		return $input;
 	}
 }

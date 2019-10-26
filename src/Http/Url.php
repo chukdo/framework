@@ -7,6 +7,7 @@ use Chukdo\Helper\Arr;
 
 /**
  * Gestion des URLs.
+ *
  * @version       1.0.0
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
  * @since         08/01/2019
@@ -17,18 +18,19 @@ class Url
 	/**
 	 * @var array
 	 */
-	protected $url = [
-		'scheme'   => 'file',
-		'host'     => '',
-		'port'     => '',
-		'user'     => '',
-		'pass'     => '',
-		'dir'      => '',
-		'file'     => '',
-		'input'    => [],
-		'fragment' => '',
-	];
-
+	protected $url
+		= [
+			'scheme'   => 'file',
+			'host'     => '',
+			'port'     => '',
+			'user'     => '',
+			'pass'     => '',
+			'dir'      => '',
+			'file'     => '',
+			'input'    => [],
+			'fragment' => '',
+		];
+	
 	/**
 	 * Url constructor.
 	 *
@@ -41,11 +43,10 @@ class Url
 			if ( $defaultScheme && !Str::match( '/^[a-z0-9]+:\/\//', $url ) ) {
 				$url = $defaultScheme . '://' . $url;
 			}
-
 			$this->parseUrl( $url );
 		}
 	}
-
+	
 	/**
 	 * @param string $url
 	 *
@@ -63,21 +64,19 @@ class Url
 			'query'    => '',
 			'fragment' => '',
 		];
-
-		$url = Arr::merge( $mergeUrl, (array) parse_url( $url ) );
-
+		$url      = Arr::merge( $mergeUrl, (array) parse_url( $url ) );
 		$this->setScheme( $url[ 'scheme' ] )
-			 ->setHost( $url[ 'host' ] )
-			 ->setPort( $url[ 'port' ] )
-			 ->setUser( $url[ 'user' ] )
-			 ->setPass( $url[ 'pass' ] )
-			 ->setPath( $url[ 'path' ] )
-			 ->setQuery( $url[ 'query' ] )
-			 ->SetFragment( $url[ 'fragment' ] );
-
+		     ->setHost( $url[ 'host' ] )
+		     ->setPort( $url[ 'port' ] )
+		     ->setUser( $url[ 'user' ] )
+		     ->setPass( $url[ 'pass' ] )
+		     ->setPath( $url[ 'path' ] )
+		     ->setQuery( $url[ 'query' ] )
+		     ->SetFragment( $url[ 'fragment' ] );
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $fragment
 	 *
@@ -86,10 +85,10 @@ class Url
 	public function setFragment( string $fragment ): Url
 	{
 		$this->url[ 'fragment' ] = $fragment;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $query
 	 *
@@ -98,10 +97,10 @@ class Url
 	public function setQuery( string $query ): Url
 	{
 		parse_str( $query, $this->url[ 'input' ] );
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $path
 	 *
@@ -111,10 +110,10 @@ class Url
 	{
 		$this->setDir( dirname( $path ) );
 		$this->setFile( basename( $path ) );
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $dir
 	 *
@@ -123,10 +122,10 @@ class Url
 	public function setDir( string $dir ): Url
 	{
 		$this->url[ 'dir' ] = $dir;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $file
 	 *
@@ -135,10 +134,10 @@ class Url
 	public function setFile( string $file ): Url
 	{
 		$this->url[ 'file' ] = $file;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $pass
 	 *
@@ -147,10 +146,10 @@ class Url
 	public function setPass( string $pass ): Url
 	{
 		$this->url[ 'pass' ] = $pass;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $user
 	 *
@@ -159,10 +158,10 @@ class Url
 	public function setUser( string $user ): Url
 	{
 		$this->url[ 'user' ] = $user;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $port
 	 *
@@ -171,10 +170,10 @@ class Url
 	public function setPort( string $port ): Url
 	{
 		$this->url[ 'port' ] = $port;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $host
 	 *
@@ -183,10 +182,10 @@ class Url
 	public function setHost( string $host ): Url
 	{
 		$this->url[ 'host' ] = $host;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $scheme
 	 *
@@ -195,10 +194,10 @@ class Url
 	public function setScheme( string $scheme ): Url
 	{
 		$this->url[ 'scheme' ] = $scheme;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $key
 	 * @param string $value
@@ -208,10 +207,10 @@ class Url
 	public function setInput( string $key, string $value ): Url
 	{
 		$this->url[ 'input' ][ $key ] = $value;
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string $key
 	 *
@@ -221,17 +220,17 @@ class Url
 	{
 		return $this->url[ 'input' ][ $key ] ?? '';
 	}
-
+	
 	/**
 	 * @return string|null
 	 */
 	public function getSubDomain(): ?string
 	{
 		$subDomains = $this->getSubDomains();
-
+		
 		return reset( $subDomains );
 	}
-
+	
 	/**
 	 * @return array
 	 */
@@ -239,14 +238,13 @@ class Url
 	{
 		$domainAndTld = '.' . $this->getDomain() . '.' . $this->getTld();
 		$host         = str_replace( 'www.', '', $this->getHost() );
-
 		if ( Str::contain( $host, $domainAndTld ) ) {
 			return explode( '.', str_replace( $domainAndTld, '', $host ) );
 		}
-
+		
 		return [];
 	}
-
+	
 	/**
 	 * @return string|null
 	 */
@@ -254,16 +252,15 @@ class Url
 	{
 		$tld  = '.' . $this->getTld();
 		$host = $this->getHost();
-
 		if ( Str::contain( $host, '.' ) ) {
 			$domain = explode( '.', str_replace( $tld, '', $host ) );
-
+			
 			return end( $domain );
 		}
-
+		
 		return null;
 	}
-
+	
 	/**
 	 * @return string|null
 	 */
@@ -271,12 +268,12 @@ class Url
 	{
 		$tld = explode( '.', substr( $this->getHost(), strlen( $this->getHost() ) - 8 ) );
 		array_shift( $tld );
-
+		
 		return empty( $tld )
 			? null
 			: implode( '.', $tld );
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -284,12 +281,12 @@ class Url
 	{
 		return $this->url[ 'host' ];
 	}
-
+	
 	public function __toString()
 	{
 		return $this->buildUrl();
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -297,16 +294,17 @@ class Url
 	{
 		return $this->buildDsn() . $this->buildPath() . $this->buildQuery() . $this->buildFragment();
 	}
-
+	
 	/**
 	 * Construit la partie de l'url "protocole://authentification@hote:port".
+	 *
 	 * @return string
 	 */
 	public function buildDsn(): string
 	{
 		return $this->buildScheme() . $this->buildAuth() . $this->buildHost() . $this->buildPort();
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -315,10 +313,10 @@ class Url
 		if ( $scheme = $this->getScheme() ) {
 			return $scheme . '://';
 		}
-
+		
 		return '';
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -326,7 +324,7 @@ class Url
 	{
 		return $this->url[ 'scheme' ];
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -336,13 +334,13 @@ class Url
 			if ( $pass = $this->getPass() ) {
 				$pass = ':' . $pass;
 			}
-
+			
 			return $user . $pass . '@';
 		}
-
+		
 		return '';
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -350,7 +348,7 @@ class Url
 	{
 		return $this->url[ 'user' ];
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -358,7 +356,7 @@ class Url
 	{
 		return $this->url[ 'pass' ];
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -366,7 +364,7 @@ class Url
 	{
 		return $this->getHost();
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -375,10 +373,10 @@ class Url
 		if ( $port = $this->getPort() ) {
 			return ':' . $port;
 		}
-
+		
 		return '';
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -386,7 +384,7 @@ class Url
 	{
 		return $this->url[ 'port' ];
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -394,7 +392,7 @@ class Url
 	{
 		return $this->getPath();
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -402,7 +400,7 @@ class Url
 	{
 		return rtrim( $this->getDir(), '/' ) . '/' . $this->getFile();
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -410,7 +408,7 @@ class Url
 	{
 		return $this->url[ 'dir' ];
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -418,7 +416,7 @@ class Url
 	{
 		return $this->url[ 'file' ];
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -427,10 +425,10 @@ class Url
 		if ( $query = $this->getQuery() ) {
 			return '?' . $query;
 		}
-
+		
 		return '';
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -438,7 +436,7 @@ class Url
 	{
 		return http_build_query( $this->url[ 'input' ] );
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -447,10 +445,10 @@ class Url
 		if ( $fragment = $this->getFragment() ) {
 			return '#' . $fragment;
 		}
-
+		
 		return '';
 	}
-
+	
 	/**
 	 * @return string
 	 */

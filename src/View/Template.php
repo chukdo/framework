@@ -8,6 +8,7 @@ use Chukdo\Json\Json;
 
 /**
  * Moteur de template.
+ *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
@@ -19,17 +20,17 @@ class Template
 	 * @var string
 	 */
 	protected $file = '';
-
+	
 	/**
 	 * @var Json
 	 */
 	protected $data;
-
+	
 	/**
 	 * @var View
 	 */
 	protected $view;
-
+	
 	/**
 	 * Template constructor.
 	 *
@@ -41,20 +42,16 @@ class Template
 	{
 		$path       = $view->path( $template );
 		$this->data = new Json();
-
 		if ( !$path[ 'exists' ] ) {
-			throw new ViewException( sprintf( 'Template file [%s] does not exist',
-				$template ) );
+			throw new ViewException( sprintf( 'Template file [%s] does not exist', $template ) );
 		}
-
 		$this->data( $view->getData() )
-			 ->data( $view->getData( $template ) )
-			 ->data( $data );
-
+		     ->data( $view->getData( $template ) )
+		     ->data( $data );
 		$this->file = $path[ 'file' ];
 		$this->view = $view;
 	}
-
+	
 	/**
 	 * @param iterable|null $data
 	 *
@@ -63,10 +60,10 @@ class Template
 	public function data( Iterable $data = null ): self
 	{
 		$this->data->mergeRecursive( $data, true );
-
+		
 		return $this;
 	}
-
+	
 	/**
 	 * @param string      $key
 	 * @param string|null $functions
@@ -77,7 +74,7 @@ class Template
 	{
 		return $this->v( $this->data->get( $key ), $functions );
 	}
-
+	
 	/**
 	 * @param             $data
 	 * @param string|null $functions
@@ -87,15 +84,14 @@ class Template
 	public function v( $data, string $functions = null )
 	{
 		if ( $functions ) {
-			foreach ( Str::split( $functions,
-				'|' ) as $function ) {
+			foreach ( Str::split( $functions, '|' ) as $function ) {
 				$data = $this->$function( $data );
 			}
 		}
-
+		
 		return $data;
 	}
-
+	
 	/**
 	 * @param string      $key
 	 * @param string|null $functions
@@ -106,7 +102,7 @@ class Template
 	{
 		return $this->v( $this->data->wildcard( $key ), $functions );
 	}
-
+	
 	/**
 	 * @param string     $name
 	 * @param array|null $arguments
@@ -118,22 +114,22 @@ class Template
 		if ( is_callable( $name ) ) {
 			return call_user_func_array( $name, $arguments );
 		}
-
+		
 		return call_user_func_array( $this->view->callRegisteredFunction( $name ), $arguments );
 	}
-
+	
 	/**
 	 * @return Response
 	 */
 	public function render(): Response
 	{
 		return $this->view()
-					->getResponseHandler()
-					->header( 'Content-Type', 'text/html; charset=utf-8' )
-					->content( $this->__toString() )
-					->send();
+		            ->getResponseHandler()
+		            ->header( 'Content-Type', 'text/html; charset=utf-8' )
+		            ->content( $this->__toString() )
+		            ->send();
 	}
-
+	
 	/**
 	 * @return View
 	 */
@@ -141,7 +137,7 @@ class Template
 	{
 		return $this->view;
 	}
-
+	
 	/**
 	 * @return string
 	 */
@@ -149,7 +145,7 @@ class Template
 	{
 		ob_start();
 		include $this->file;
-
+		
 		return ob_get_clean();
 	}
 }

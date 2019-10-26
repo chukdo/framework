@@ -7,6 +7,7 @@ use Iterator;
 
 /**
  * Interface de la base de donnée NOSQL Redis basé sur son protocole unifié.
+ *
  * @version       1.0.0
  * @copyright     licence MIT, Copyright (C) 2019 Domingo
  * @since         08/01/2019
@@ -16,17 +17,18 @@ interface Redis extends Iterator, Countable
 {
 	/**
 	 * Lecture d'une reponse du serveur.
+	 *
 	 * @return mixed
 	 */
 	public function read();
-
+	
 	/**
 	 * Ecriture d'une commande basé sur le protocol unifié de Redis.
 	 *
 	 * @param string $c command
 	 */
 	public function write( string $c );
-
+	
 	/**
 	 * Formate une commande Redis (protocol unifié de Redis).
 	 *
@@ -35,7 +37,7 @@ interface Redis extends Iterator, Countable
 	 * @return string
 	 */
 	public function command( array $args );
-
+	
 	/**
 	 * Ecriture de commandes dans un pipeline (gain de performance).
 	 *
@@ -44,7 +46,7 @@ interface Redis extends Iterator, Countable
 	 * @return mixed
 	 */
 	public function pipe( array $commands );
-
+	
 	/**
 	 * Retourne les informations sur le serveur Redis.
 	 *
@@ -53,7 +55,7 @@ interface Redis extends Iterator, Countable
 	 * @return mixed
 	 */
 	public function info( string $key = null );
-
+	
 	/**
 	 * @param string $name
 	 * @param array  $args
