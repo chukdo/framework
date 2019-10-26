@@ -19,6 +19,11 @@ use Closure;
 class Collect
 {
 	/**
+	 * @var iterable
+	 */
+	protected $data;
+	
+	/**
 	 * @var array
 	 */
 	protected $collection = [];
@@ -79,17 +84,13 @@ class Collect
 	protected $match = [];
 	
 	/**
-	 * @param iterable $datas
+	 * Collect constructor.
 	 *
-	 * @return $this
+	 * @param iterable $data
 	 */
-	public function push( Iterable $datas ): self
+	public function __construct(Iterable $data)
 	{
-		foreach ( $datas as $data ) {
-			$this->append( $data );
-		}
-		
-		return $this;
+		$this->data = $data;
 	}
 	
 	/**
@@ -97,7 +98,7 @@ class Collect
 	 *
 	 * @return $this
 	 */
-	public function append( array $data ): self
+	protected function append( array $data ): self
 	{
 		foreach ( $this->unwindData( $data ) as $unwind ) {
 			if ( $eval = $this->eval( $unwind ) ) {
@@ -200,7 +201,11 @@ class Collect
 	 */
 	public function values(): array
 	{
-		if ( $this->hasSort() && !$this->hasGroup() ) {
+		foreach ( $this->data as $data ) {
+			$this->append( $data );
+		}
+		
+		if ( $this->hasSort() && !$this->hasGroup() && !$this->hasSum() ) {
 			$this->sortCollection();
 		}
 		
@@ -361,7 +366,7 @@ class Collect
 	{
 		$name    = $this->sum[ $group ][ 'name' ];
 		$field   = $this->sum[ $group ][ 'field' ];
-		$sumPath = ltrim( implode( '.projection.', $path ) . '.sum.' . $name, '.projection' );
+		$sumPath = ltrim( implode( '.', $path ) . '.sum.' . $name, '.' );
 		
 		$getField = Arr::get( $data, $field );
 		
@@ -402,7 +407,7 @@ class Collect
 		}
 		
 		if ( !$sum ) {
-			$groupPath = implode( '.projection.', $path ) . '.projection';
+			$groupPath = implode( '.', $path );
 			
 			Arr::addToSet( $this->collection, $groupPath, $data );
 		}

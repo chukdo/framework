@@ -270,15 +270,14 @@ $recordsMongo = $collectionMongo->find()
                                 ->limit( 10 )
                                 ->stream();
 
-$collect = new \Chukdo\Json\Collect();
+$collect = new \Chukdo\Json\Collect($recordsMongo);
 $count   = $collect//->where( 'volume', '>', 68 )
                    //->sort( 'volume', SORT_DESC )
 ->with( '_agence', 'date', 'modeles._modele', 'modeles.titre', 'modeles.mandat', 'modeles.signers' )
 ->unwind( 'modeles' )
 ->group( 'date', 'modeles._modele' )
-	->sum( 'modeles.signers', 'signers', 'modeles._modele' )
-	->sum( 'modeles.signers', 'allSigners', 'date' )
-->push( $recordsMongo )
+->sum( 'modeles.signers', 'signers', 'modeles._modele' )
+->sum( 'modeles.signers', 'allSigners', 'date' )
 ->values();
 //->sort()
 echo '<pre>';
