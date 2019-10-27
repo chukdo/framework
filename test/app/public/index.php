@@ -231,13 +231,14 @@ $aggregate->group( [
 	                   'year'  => Expr::year( '_date_created' ),
                    ] )
           ->calculate( 'totalSigners', Expr::sum( Expr::size( 'user' ) ) );
+$aggregate->where( 'totalSigners', '>', 9000 );
 $aggregate->sort('_id', SORT_ASC);
 
 //@todo
 // revoir la structure aggregate avec pipe() pour pouvoir tout chainer !!!
 // pseudo language litteralExpr
-// group('month:_date_created,year:_date_created')
-// calculate('sum:size:user')
+// groupByQueryString('month:_date_created,year:_date_created')
+// calculateByQueryString('sum:size:user')
 
 echo $aggregate->all()->toHtml();
 exit;
