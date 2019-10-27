@@ -45,17 +45,17 @@ Class Index
 	
 	/**
 	 * @param string $field
-	 * @param string $sort
+	 * @param int    $sort
 	 * @param bool   $unique
 	 *
 	 * @return $this
 	 */
-	public function set( string $field, string $sort = 'desc', bool $unique = false ): self
+	public function set( string $field, int $sort = SORT_DESC, bool $unique = false ): self
 	{
 		$name                  = $unique
 			? $field . '_unique'
 			: $field;
-		$orderby               = ( $sort === 'asc' || $sort === 'ASC' )
+		$orderby               = $sort === SORT_ASC
 			? 1
 			: -1;
 		$this->index[ $field ] = [

@@ -108,8 +108,7 @@ $app->registerServices( [
 
 $elastic   = new ServerElastic();
 $dbElastic = $elastic->database();
-$mongo     = new ServerMongo();
-$dbMongo   = $mongo->database( 'statistiques' );
+
 /*
 $schemaAgence = $dbElastic->dropCollection( 'agence' )
 				   ->createCollection( 'agence' )
@@ -214,63 +213,69 @@ $contrats = $findContrat->all( true );
 print_r( $contrats->toHtml() );
 die( 'ok' );
 */
-/*
-$data   = [];
-$data[] = [
-	'volume'  => 67,
-	'edition' => 2,
-];
-$data[] = [
-	'volume'  => 86,
-	'edition' => 1,
-];
-$data[] = [
-	'volume'  => 85,
-	'edition' => 6,
-];
-$data[] = [
-	'volume'  => 98,
-	'edition' => 2,
-];
-$data[] = [
-	'volume'  => 86,
-	'edition' => 6,
-];
-$data[] = [
-	'volume'  => 67,
-	'edition' => 7,
-];
-$data[] = [
-	'volume'  => 86,
-	'edition' => 6,
-];
 
-$data = new Json( $data );
+use \Chukdo\Db\Mongo\Aggregate\Expr;
 
-$collect = new \Chukdo\Json\Collect();
-
-echo $collect->where( 'volume', '>', 68 )
-			 ->sort( 'volume', SORT_DESC )
-			 ->sort( 'edition', SORT_ASC )
-			->group('edition')
-			 ->push( $data )
-			 ->values()
-			 ->sort()
-			 ->toHtml();
-
-exit;
-*/
-
-ini_set('memory_limit', '256M');
+ini_set( 'memory_limit', '256M' );
 set_time_limit( 3000 );
 $time            = time();
-$collectionMongo = $dbMongo->collection( 'esign' );
+
+$mongo     = new ServerMongo();
+$db   = $mongo->database( 'foncia' );
+$collection = $db->collection( 'esign' );
+$aggregate       = new \Chukdo\Db\Mongo\Aggregate\Aggregate( $collection );
+$aggregate->where( '_date_created', '>=', DateTime::createFromFormat( 'd/m/y', '01/01/19' ) )
+          ->where( 'state', '=', '3' );
+$aggregate->group( [
+	                   'month' => Expr::month( '_date_created' ),
+	                   'year'  => Expr::year( '_date_created' ),
+                   ] )
+          ->calculate( 'totalSigners', Expr::sum( Expr::size( 'user' ) ) );
+$aggregate->sort('_id', SORT_ASC);
+
+//@todo
+// revoir la structure aggregate avec pipe() pour pouvoir tout chainer !!!
+// pseudo language litteralExpr
+// group('month:_date_created,year:_date_created')
+// calculate('sum:size:user')
+
+echo $aggregate->all()->toHtml();
+exit;
+/*db . getCollection( 'esign' ) . aggregate( [
+     {
+       $match: {
+	_date_created : {
+		$gte: ISODate( "2019-01-01T01:01:01.171Z" )}, state:
+	"3"
+       }
+     },
+     {
+	     $group:
+         {
+	         _id: {
+	         month: {
+		         $month: "$_date_created" }, year: {
+		         $year: "$_date_created" }
+         }, totalSigners: {
+	         $sum: {
+		         $size: "$user" } }
+         }
+     },
+     {
+	     $sort: {
+	     "_id": 1
+        }
+     }
+   ]
+)*/
+
+// mongo find > groupBy + sum
 
 $recordsMongo = $collectionMongo->find()
                                 ->limit( 10 )
                                 ->stream();
 
-$collect = new \Chukdo\Json\Collect($recordsMongo);
+$collect = new \Chukdo\Json\Collect( $recordsMongo );
 $count   = $collect//->where( 'volume', '>', 68 )
                    //->sort( 'volume', SORT_DESC )
 ->with( '_agence', 'date', 'modeles._modele', 'modeles.titre', 'modeles.mandat', 'modeles.signers' )
@@ -281,8 +286,8 @@ $count   = $collect//->where( 'volume', '>', 68 )
 ->values();
 //->sort()
 echo '<pre>';
-print_r($count);
-print_r( count($count) );
+print_r( $count );
+print_r( count( $count ) );
 echo "\n____________________\n";
 echo time() - $time;
 exit;

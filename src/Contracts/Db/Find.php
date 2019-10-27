@@ -48,11 +48,11 @@ interface Find
 	
 	/**
 	 * @param string $field
-	 * @param string $sort
+	 * @param int    $sort
 	 *
 	 * @return Find
 	 */
-	public function sort( string $field, string $sort = 'ASC' ): Find;
+	public function sort( string $field, int $sort = SORT_ASC ): Find;
 	
 	/**
 	 * @param int $skip

@@ -60,6 +60,16 @@ class Expr
 	 *
 	 * @return Expression
 	 */
+	public static function size( $expression ): Expression
+	{
+		return new Expression( 'size', $expression );
+	}
+	
+	/**
+	 * @param $expression
+	 *
+	 * @return Expression
+	 */
 	public static function year( $expression ): Expression
 	{
 		return new Expression( 'year', $expression );

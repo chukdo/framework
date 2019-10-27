@@ -2,13 +2,15 @@
 
 namespace Chukdo\Db\Mongo\Aggregate;
 
+use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\DB\Mongo\Collection;
-use Chukdo\Db\Mongo\Cursor;
+use Chukdo\Db\Mongo\Aggregate\Cursor;
 use Chukdo\Db\Mongo\Match;
 use Chukdo\Db\Mongo\Where;
 use Chukdo\Json\Json;
 use Chukdo\Helper\Arr;
 use Chukdo\Contracts\Json\Json as JsonInterface;
+use Traversable;
 
 /**
  * Server Aggregate Group.
@@ -36,11 +38,11 @@ Class Aggregate
 	protected $pipe = [];
 	
 	/**
-	 * Index constructor.
+	 * Aggregate constructor.
 	 *
-	 * @param Collection $collection
+	 * @param CollectionInterface $collection
 	 */
-	public function __construct( Collection $collection )
+	public function __construct( CollectionInterface $collection )
 	{
 		$this->collection = $collection;
 	}
@@ -79,14 +81,14 @@ Class Aggregate
 	/**
 	 * @param array $options
 	 *
-	 * @return Cursor
+	 * @return \Chukdo\Db\Mongo\Aggregate\Cursor
 	 */
 	public function cursor( array $options = [] ): Cursor
 	{
 		$options = Arr::merge( $this->options, $options );
-		
-		return new Cursor( $this->collection, $this->collection->client()
-		                                                       ->aggregate( $this->projection(), $options ) );
+
+		return new Cursor($this->collection->client()
+		                        ->aggregate( $this->projection(), $options ));
 	}
 	
 	/**
@@ -95,10 +97,12 @@ Class Aggregate
 	public function projection(): array
 	{
 		$pipes = [];
+		
 		foreach ( $this->pipe as $pipe ) {
 			$json        = new Json( $pipe );
 			$accumulator = $json->getKeyFirst();
 			$expression  = $json->getFirst();
+			
 			if ( $accumulator === '$group' || $accumulator === '$addFields' ) {
 				$pipes[] = [ $accumulator => $expression->projection() ];
 			} else {
@@ -130,11 +134,11 @@ Class Aggregate
 	 */
 	public function explain(): JsonInterface
 	{
-		return new Json( new Cursor( $this->collection, $this->collection->client()
-		                                                                 ->aggregate( $this->projection(), [
-			                                                                 'explain'   => true,
-			                                                                 'useCursor' => true,
-		                                                                 ] ) ) );
+		return new Json( new Cursor( $this->collection->client()
+			                             ->aggregate( $this->projection(), [
+				                             'explain'   => true,
+				                             'useCursor' => true,
+			                             ] ) ) );
 	}
 	
 	/**
@@ -326,15 +330,15 @@ Class Aggregate
 	
 	/**
 	 * @param string $field
-	 * @param string $sort
+	 * @param int    $sort
 	 *
-	 * @return Aggregate
+	 * @return $this
 	 */
-	public function sort( string $field, string $sort = 'ASC' ): self
+	public function sort( string $field, int $sort = SORT_ASC ): self
 	{
 		$this->pipe[] = [
 			'$sort' => [
-				$field => $sort === 'asc' || $sort === 'ASC'
+				$field => $sort === SORT_ASC
 					? 1
 					: -1,
 			],

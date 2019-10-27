@@ -500,12 +500,12 @@ Class Write extends Where implements WriteInterface
 	 * @param int|null    $position
 	 * @param int|null    $slice
 	 * @param string|null $orderby
-	 * @param string      $sort
+	 * @param int         $sort
 	 *
 	 * @return WriteInterface
 	 */
 	public function pushAll( string $field, array $values, int $position = null, int $slice = null,
-	                         string $orderby = null, string $sort = 'ASC' ): WriteInterface
+	                         string $orderby = null, int $sort = SORT_ASC ): WriteInterface
 	{
 		$value = [
 			'$each' => $values,
@@ -518,7 +518,7 @@ Class Write extends Where implements WriteInterface
 		}
 		if ( $orderby !== null ) {
 			$value[ '$sort' ] = [
-				$orderby => $sort === 'asc' || $sort === 'ASC'
+				$orderby => $sort === SORT_ASC
 					? 1
 					: -1,
 			];

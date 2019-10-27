@@ -186,13 +186,13 @@ Class Find extends Where implements FindInterface
 	
 	/**
 	 * @param string $field
-	 * @param string $sort
+	 * @param int    $sort
 	 *
 	 * @return FindInterface
 	 */
-	public function sort( string $field, string $sort = 'ASC' ): FindInterface
+	public function sort( string $field, int $sort = SORT_ASC ): FindInterface
 	{
-		$this->sort[ $field ] = $sort === 'asc' || $sort === 'ASC'
+		$this->sort[ $field ] = $sort === SORT_ASC
 			? 1
 			: -1;
 		

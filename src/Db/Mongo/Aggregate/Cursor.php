@@ -1,7 +1,8 @@
 <?php
 
-namespace Chukdo\Db\Mongo;
+namespace Chukdo\Db\Mongo\Aggregate;
 
+use Chukdo\Helper\Arr;
 use MongoDB\Driver\Cursor as MongoDbCursor;
 use Iterator;
 use IteratorIterator;
@@ -18,11 +19,6 @@ use Traversable;
 class Cursor implements Iterator
 {
 	/**
-	 * @var Collection
-	 */
-	protected $collection;
-	
-	/**
 	 * @var MongoDbCursor
 	 */
 	protected $cursor;
@@ -35,12 +31,10 @@ class Cursor implements Iterator
 	/**
 	 * Cursor constructor.
 	 *
-	 * @param Collection  $collection
 	 * @param Traversable $cursor
 	 */
-	public function __construct( Collection $collection, Traversable $cursor )
+	public function __construct( Traversable $cursor )
 	{
-		$this->collection = $collection;
 		$this->cursor     = $cursor;
 		$this->cursor->setTypeMap( [
 			                           'root'     => 'array',
@@ -68,7 +62,17 @@ class Cursor implements Iterator
 	 */
 	public function current()
 	{
-		return $this->collection->record( $this->iterator->current() );
+		$current = $this->iterator->current();
+		
+		if (isset($current['_id']) && Arr::isArray($current['_id'])) {
+			foreach ($current['_id'] as $k => $v) {
+				$current[$k] = $v;
+			}
+			
+			unset($current['_id']);
+		}
+		
+		return $current;
 	}
 	
 	/**
