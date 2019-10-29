@@ -4,13 +4,11 @@ namespace Chukdo\Db\Mongo\Aggregate;
 
 use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\DB\Mongo\Collection;
-use Chukdo\Db\Mongo\Aggregate\Cursor;
 use Chukdo\Db\Mongo\Match;
 use Chukdo\Db\Mongo\Where;
 use Chukdo\Json\Json;
 use Chukdo\Helper\Arr;
 use Chukdo\Contracts\Json\Json as JsonInterface;
-use Traversable;
 
 /**
  * Server Aggregate Group.
@@ -54,7 +52,7 @@ Class Aggregate
 	 *
 	 * @return AddFields
 	 */
-	public function addField( string $field, $expression ): AddFields
+	public function set( string $field, $expression ): AddFields
 	{
 		$addFields = new AddFields( $this );
 		$addFields->addField( $field, $expression );
@@ -81,14 +79,14 @@ Class Aggregate
 	/**
 	 * @param array $options
 	 *
-	 * @return \Chukdo\Db\Mongo\Aggregate\Cursor
+	 * @return Cursor
 	 */
 	public function cursor( array $options = [] ): Cursor
 	{
 		$options = Arr::merge( $this->options, $options );
-
-		return new Cursor($this->collection->client()
-		                        ->aggregate( $this->projection(), $options ));
+		
+		return new Cursor( $this->collection->client()
+		                                    ->aggregate( $this->projection(), $options ) );
 	}
 	
 	/**
@@ -135,10 +133,10 @@ Class Aggregate
 	public function explain(): JsonInterface
 	{
 		return new Json( new Cursor( $this->collection->client()
-			                             ->aggregate( $this->projection(), [
-				                             'explain'   => true,
-				                             'useCursor' => true,
-			                             ] ) ) );
+		                                              ->aggregate( $this->projection(), [
+			                                              'explain'   => true,
+			                                              'useCursor' => true,
+		                                              ] ) ) );
 	}
 	
 	/**
@@ -170,11 +168,11 @@ Class Aggregate
 	
 	/**
 	 * https://docs.mongodb.com/manual/reference/operator/aggregation/group/
-	 * @param $expression
+	 * @param null $expression
 	 *
 	 * @return Group
 	 */
-	public function group( $expression ): Group
+	public function group( $expression = null ): Group
 	{
 		$group        = new Group( $this, $expression );
 		$this->pipe[] = [ '$group' => $group ];

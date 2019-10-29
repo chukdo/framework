@@ -231,13 +231,17 @@ $aggregate->group( [
 	                   'year'  => Expr::year( '_date_created' ),
                    ] )
           ->calculate( 'totalSigners', Expr::sum( Expr::size( 'user' ) ) );
-$aggregate->where( 'totalSigners', '>', 9000 );
+
 $aggregate->sort('_id', SORT_ASC);
 
+//$aggregate->facet('name')->where()->bucket(Expr $groupBy, $boundaries, Expr $output, $default);
+//$aggregate->facet('name')->where()->bucketAuto(Expr $groupBy, $buckets, Expr $output, $granularity);
+//$aggregate->facet('name')->unwind()->sortByCount(Expr $sortBy);
+
 //@todo
-// revoir la structure aggregate avec pipe() pour pouvoir tout chainer !!!
+
 // pseudo language litteralExpr
-// groupByQueryString('month:_date_created,year:_date_created')
+// groupByQueryString('month:_date_created,year:_date_created,datetostring:ord_date|%Y-%m-%d, multiply:price|quantity')
 // calculateByQueryString('sum:size:user')
 
 echo $aggregate->all()->toHtml();
