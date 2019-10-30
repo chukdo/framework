@@ -2,51 +2,30 @@
 
 namespace Chukdo\Db\Mongo\Aggregate;
 
-use Chukdo\Contracts\Db\Collection as CollectionInterface;
-use Chukdo\DB\Mongo\Collection;
-use Chukdo\Db\Mongo\Match;
-use Chukdo\Db\Mongo\Where;
-use Chukdo\Json\Json;
-use Chukdo\Helper\Arr;
-use Chukdo\Contracts\Json\Json as JsonInterface;
-
 /**
- * Aggregate.
+ * Aggregate Stage.
  *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Aggregate
+Class Stage
 {
-	/**
-	 * @var Collection
-	 */
-	protected $collection;
-	
-	/**
-	 * @var array
-	 */
-	protected $options = [];
-	
 	/**
 	 * @var array
 	 */
 	protected $pipe = [];
 	
 	/**
-	 * Aggregate constructor.
-	 *
-	 * @param CollectionInterface $collection
+	 * @return array
 	 */
-	public function __construct( CollectionInterface $collection )
+	public function projection(): array
 	{
-		$this->collection = $collection;
+		return [];
 	}
 	
 	/**
-	 * https://docs.mongodb.com/manual/reference/operator/aggregation/addFields/
 	 * @param string $field
 	 * @param        $expression
 	 *
@@ -54,89 +33,79 @@ Class Aggregate
 	 */
 	public function set( string $field, $expression ): Set
 	{
-		$addFields = new Set( $this );
-		$addFields->set( $field, $expression );
-		$this->pipe[] = [ '$addFields' => $addFields ];
+		$stage = new Set();
+		$stage->set( $field, $expression );
 		
-		return $addFields;
+		return $this->pipe[] = $stage;
 	}
 	
 	/**
-	 * @param bool $allowDiskUse
-	 * @param bool $bypassDocumentValidation
+	 * @param null $expression
+	 * @param null $default
 	 *
-	 * @return JsonInterface
+	 * @return Bucket
 	 */
-	public function all( bool $allowDiskUse = false, bool $bypassDocumentValidation = false ): JsonInterface
+	public function bucket( $expression = null, $default = null ): Bucket
 	{
-		return new Json( $this->cursor( [
-			                                'allowDiskUse'             => $allowDiskUse,
-			                                'bypassDocumentValidation' => $bypassDocumentValidation,
-			                                'useCursor'                => true,
-		                                ] ) );
-	}
-	
-	/**
-	 * @param array $options
-	 *
-	 * @return Cursor
-	 */
-	public function cursor( array $options = [] ): Cursor
-	{
-		$options = Arr::merge( $this->options, $options );
+		$stage = new Bucket();
 		
-		return new Cursor( $this->collection->client()
-		                                    ->aggregate( $this->projection(), $options ) );
-	}
-	
-	/**
-	 * @return array
-	 */
-	public function projection(): array
-	{
-		$pipes = [];
-		
-		foreach ( $this->pipe as $pipe ) {
-			$json        = new Json( $pipe );
-			$accumulator = $json->getKeyFirst();
-			$expression  = $json->getFirst();
-			
-			if ( $accumulator === '$group' || $accumulator === '$addFields' ) {
-				$pipes[] = [ $accumulator => $expression->projection() ];
-			} else {
-				if ( $accumulator === '$match' ) {
-					$pipes[] = [ $accumulator => $expression->filter() ];
-				} else {
-					$pipes[] = $pipe;
-				}
-			}
+		if ( $expression ) {
+			$stage->groupBy( $expression );
 		}
 		
-		return $pipes;
+		if ( $default ) {
+			$stage->default( $default );
+		}
+		
+		return $this->pipe[] = $stage;
+	}
+	
+	/**
+	 * @param null        $expression
+	 * @param int|null    $buckets
+	 * @param string|null $granularity
+	 *
+	 * @return BucketAuto
+	 */
+	public function bucketAuto( $expression = null, int $buckets = null, string $granularity = null ): BucketAuto
+	{
+		$stage = new BucketAuto();
+		
+		if ( $expression ) {
+			$stage->groupBy( $expression );
+		}
+		
+		if ( $buckets ) {
+			$stage->buckets( $buckets );
+		}
+		
+		if ( $granularity ) {
+			$stage->granularity( $granularity );
+		}
+		
+		return $this->pipe[] = $stage;
+	}
+	
+	/**
+	 * @return Facet
+	 */
+	public function facet(): Facet
+	{
+		$stage = new Facet();
+		
+		return $this->pipe[] = $stage;
 	}
 	
 	/**
 	 * @param string $field
 	 *
-	 * @return Aggregate
+	 * @return $this
 	 */
 	public function count( string $field ): self
 	{
 		$this->pipe[] = [ '$count' => $field ];
 		
 		return $this;
-	}
-	
-	/**
-	 * @return JsonInterface
-	 */
-	public function explain(): JsonInterface
-	{
-		return new Json( new Cursor( $this->collection->client()
-		                                              ->aggregate( $this->projection(), [
-			                                              'explain'   => true,
-			                                              'useCursor' => true,
-		                                              ] ) ) );
 	}
 	
 	/**
