@@ -2,6 +2,9 @@
 
 namespace Chukdo\Db\Mongo\Aggregate;
 
+use Chukdo\Helper\Arr;
+use Chukdo\Db\Mongo;
+
 /**
  * Aggregate Stage.
  *
@@ -22,7 +25,21 @@ Class Stage
 	 */
 	public function projection(): array
 	{
-		return [];
+		$projection = [];
+		
+		foreach ( $this->pipe as $key => $stage ) {
+			if ( Arr::isArray( $stage ) ) {
+				$projection[ $key ] = [];
+				
+				foreach ( $stage as $item ) {
+					$projection[ $key ][] = $item->projection();
+				}
+			} else {
+				$projection[ $key ] = $stage->projection();
+			}
+		}
+		
+		return $projection;
 	}
 	
 	/**
@@ -33,67 +50,61 @@ Class Stage
 	 */
 	public function set( string $field, $expression ): Set
 	{
-		$stage = new Set();
+		$stage = $this->pipe( 'set' );
+		
 		$stage->set( $field, $expression );
 		
-		return $this->pipe[] = $stage;
+		return $stage;
 	}
 	
 	/**
-	 * @param null $expression
-	 * @param null $default
+	 * @param       $expression
+	 * @param array $boundaries
 	 *
 	 * @return Bucket
 	 */
-	public function bucket( $expression = null, $default = null ): Bucket
+	public function bucket( $expression, array $boundaries ): Bucket
 	{
 		$stage = new Bucket();
 		
-		if ( $expression ) {
-			$stage->groupBy( $expression );
-		}
+		$stage->groupBy( $expression )
+		      ->boundaries( $boundaries );
 		
-		if ( $default ) {
-			$stage->default( $default );
-		}
+		$this->pipe[ '$bucket' ] = $stage;
 		
-		return $this->pipe[] = $stage;
+		return $stage;
 	}
 	
 	/**
-	 * @param null        $expression
-	 * @param int|null    $buckets
-	 * @param string|null $granularity
+	 * @param     $expression
+	 * @param int $buckets
 	 *
 	 * @return BucketAuto
 	 */
-	public function bucketAuto( $expression = null, int $buckets = null, string $granularity = null ): BucketAuto
+	public function bucketAuto( $expression, int $buckets ): BucketAuto
 	{
 		$stage = new BucketAuto();
 		
-		if ( $expression ) {
-			$stage->groupBy( $expression );
-		}
+		$stage->groupBy( $expression )
+		      ->buckets( $buckets );
 		
-		if ( $buckets ) {
-			$stage->buckets( $buckets );
-		}
+		$this->pipe[ '$bucketAuto' ] = $stage;
 		
-		if ( $granularity ) {
-			$stage->granularity( $granularity );
-		}
-		
-		return $this->pipe[] = $stage;
+		return $stage;
 	}
 	
 	/**
+	 * @param string $field
+	 *
 	 * @return Facet
 	 */
-	public function facet(): Facet
+	public function facet( string $field ): Facet
 	{
-		$stage = new Facet();
+		$stage = new Facet( $field );
 		
-		return $this->pipe[] = $stage;
+		Arr::addToSet( $this->pipe, '$facet', $stage );
+		
+		return $stage;
 	}
 	
 	/**
@@ -103,237 +114,103 @@ Class Stage
 	 */
 	public function count( string $field ): self
 	{
-		$this->pipe[] = [ '$count' => $field ];
+		$this->pipe[ '$count' ] = new Count( $field );
 		
 		return $this;
 	}
 	
 	/**
-	 * https://docs.mongodb.com/manual/reference/operator/aggregation/graphLookup/
-	 * @param string $foreignCollection
-	 * @param string $foreignField
-	 * @param string $localField
-	 * @param string $as
-	 * @param int    $maxDepth
+	 * @param float  $lon
+	 * @param float  $lat
+	 * @param string $distanceField
+	 * @param int    $distance
 	 *
-	 * @return Aggregate
+	 * @return GeoNear
 	 */
-	public function graphLookup( string $foreignCollection, string $foreignField, string $localField,
-	                             string $as = 'lookup', int $maxDepth = 3 ): self
+	public function geoNear( float $lon, float $lat, string $distanceField, int $distance ): GeoNear
 	{
-		$this->pipe[] = [
-			'$graphLookup' => [
-				'from'             => $foreignCollection,
-				'startWith'        => '$' . $foreignField,
-				'connectFromField' => $foreignField,
-				'connectToField'   => $localField,
-				'maxDepth'         => $maxDepth,
-				'as'               => $as,
-			],
-		];
+		$stage = new GeoNear();
 		
-		return $this;
+		$stage->near( $lon, $lat )
+		      ->distanceField( $distanceField )
+		      ->maxDistance( $distance );
+		
+		$this->pipe[ '$geoNear' ] = $stage;
+		
+		return $stage;
 	}
 	
 	/**
-	 * https://docs.mongodb.com/manual/reference/operator/aggregation/group/
+	 * @param string|null $foreignCollection
+	 * @param string|null $foreignField
+	 * @param string|null $localField
+	 *
+	 * @return GraphLookup
+	 */
+	public function graphLookup( string $foreignCollection, string $foreignField, string $localField ): GraphLookup
+	{
+		$stage = new GraphLookup();
+		
+		$stage->from( $foreignCollection )
+		      ->connectFromField( $foreignField )
+		      ->connectToField( $localField )
+		      ->as( 'lookup' );
+		
+		$this->pipe[ '$graphLookup' ] = $stage;
+		
+		return $stage;
+	}
+	
+	/**
 	 * @param null $expression
 	 *
 	 * @return Group
 	 */
-	public function group( $expression = null ): Group
+	public function group( $expression ): Group
 	{
-		$group        = new Group( $this, $expression );
-		$this->pipe[] = [ '$group' => $group ];
+		$stage = new Group();
 		
-		return $group;
+		$stage->id( $expression );
+		
+		$this->pipe[ '$group' ] = $stage;
+		
+		return $stage;
 	}
 	
 	/**
 	 * @param int $limit
 	 *
-	 * @return Aggregate
+	 * @return $this
 	 */
 	public function limit( int $limit ): self
 	{
-		$this->pipe[] = [ '$limit' => $limit ];
+		$this->pipe[ '$limit' ] = new Limit( $limit );
 		
 		return $this;
 	}
 	
 	/**
-	 * https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/
-	 * SELECT *, {as} FROM {localCollection} WHERE {as} IN (SELECT * FROM {foreignCollection} WHERE
-	 * {foreignField=localField});
+	 * @param string|null $foreignCollection
+	 * @param string|null $foreignField
+	 * @param string|null $localField
 	 *
-	 * @param string $foreignCollection
-	 * @param string $foreignField
-	 * @param string $localField
-	 * @param string $as
-	 *
-	 * @return Aggregate
+	 * @return Lookup
 	 */
-	public function lookup( string $foreignCollection, string $foreignField, string $localField,
-	                        string $as = 'lookup' ): self
+	public function lookup( string $foreignCollection, string $foreignField, string $localField ): Lookup
 	{
-		$this->pipe[] = [
-			'$lookup' => [
-				'from'         => $foreignCollection,
-				'localField'   => $localField,
-				'foreignField' => $foreignField,
-				'as'           => $as,
-			],
-		];
+		$stage = new lookup();
 		
-		return $this;
+		$stage->from( $foreignCollection )
+		      ->foreignField( $foreignField )
+		      ->localField( $localField )
+		      ->as( 'lookup' );
+		
+		$this->pipe[ '$lookup' ] = $stage;
+		
+		return $stage;
 	}
 	
 	/**
-	 * https://docs.mongodb.com/manual/reference/operator/aggregation/geoNear/
-	 * @param float      $lon
-	 * @param float      $lat
-	 * @param int        $distance (in meter)
-	 * @param int        $limit
-	 * @param string     $as
-	 * @param Where|null $where
-	 *
-	 * @return Aggregate
-	 */
-	public function near( float $lon, float $lat, int $distance, int $limit = 20, string $as = 'distance',
-	                      Where $where = null ): self
-	{
-		$this->pipe[] = [
-			'$geoNear' => [
-				'near' => [
-					'type'          => 'Point',
-					'coordinates'   => [
-						$lon,
-						$lat,
-					],
-					'distanceField' => $as,
-					'maxDistance'   => $distance,
-					'spherical'     => true,
-					'query'         => $where
-						? $where->filter()
-						: [],
-					'num'           => $limit,
-				],
-			],
-		];
-		
-		return $this;
-	}
-	
-	/**
-	 * Save to collection
-	 *
-	 * @param string $collection
-	 *
-	 * @return Aggregate
-	 */
-	public function out( string $collection ): self
-	{
-		$this->pipe[] = [ '$out' => $collection ];
-		
-		return $this;
-	}
-	
-	/**
-	 * @param array $with
-	 * @param array $without
-	 *
-	 * @return Aggregate
-	 */
-	public function project( array $with = [], array $without = [] ): self
-	{
-		$project = [];
-		foreach ( $with as $field ) {
-			$project[ $field ] = 1;
-		}
-		foreach ( $without as $field ) {
-			$project[ $field ] = 0;
-		}
-		$this->pipe[] = [ '$project' => $project ];
-		
-		return $this;
-	}
-	
-	/**
-	 * https://docs.mongodb.com/manual/reference/operator/aggregation/replaceRoot/
-	 * @param $expression
-	 *
-	 * @return Aggregate
-	 */
-	public function replaceRoot( $expression ): self
-	{
-		$this->pipe[] = [ '$replaceRoot' => [ 'newRoot' => Expression::parseExpression( $expression ) ] ];
-		
-		return $this;
-	}
-	
-	/**
-	 * @param int $size
-	 *
-	 * @return Aggregate
-	 */
-	public function sample( int $size ): self
-	{
-		$this->pipe[] = [ '$sample' => [ 'size' => $size ] ];
-		
-		return $this;
-	}
-	
-	/**
-	 * @param int $skip
-	 *
-	 * @return Aggregate
-	 */
-	public function skip( int $skip ): self
-	{
-		$this->pipe[] = [ '$skip' => $skip ];
-		
-		return $this;
-	}
-	
-	/**
-	 * @param string $field
-	 * @param int    $sort
-	 *
-	 * @return $this
-	 */
-	public function sort( string $field, int $sort = SORT_ASC ): self
-	{
-		$this->pipe[] = [
-			'$sort' => [
-				$field => $sort === SORT_ASC
-					? 1
-					: -1,
-			],
-		];
-		
-		return $this;
-	}
-	
-	/**
-	 * https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/
-	 * > { "_id" : 1, "item" : "ABC1", sizes: [ "S", "M", "L"] }
-	 * = db.collection.aggregate( [ { $unwind : "$sizes" } ] )
-	 * < { "_id" : 1, "item" : "ABC1", "sizes" : "S" }, { "_id" : 1, "item" : "ABC1", "sizes" : "M" }, { "_id" : 1,
-	 * "item" : "ABC1", "sizes" : "L" }
-	 *
-	 * @param string $path
-	 *
-	 * @return Aggregate
-	 */
-	public function unwind( string $path ): self
-	{
-		$this->pipe[] = [ '$unwind' => '$' . $path ];
-		
-		return $this;
-	}
-	
-	/**
-	 * https://docs.mongodb.com/manual/reference/operator/aggregation/match/
 	 * @param string $field
 	 * @param string $operator
 	 * @param        $value
@@ -343,10 +220,170 @@ Class Stage
 	 */
 	public function where( string $field, string $operator, $value, $value2 = null ): Match
 	{
-		$match = new Match( $this, $this->collection );
-		$match->where( $field, $operator, $value, $value2 );
-		$this->pipe[] = [ '$match' => $match ];
+		$match = new Match();
 		
-		return $match;
+		$match->where( $field, $operator, $value, $value2 );
+		
+		return $this->pipe[ '$match' ] = $match;
+	}
+	
+	/**
+	 * @param string $collection
+	 * @param string $on
+	 *
+	 * @return $this
+	 */
+	public function mergeTo( string $collection, string $on = '_id' ): self
+	{
+		$stage = new Merge();
+		
+		if ( $collection ) {
+			$stage->into( $collection );
+		}
+		
+		if ( $on ) {
+			$stage->on( $on );
+		}
+		
+		$this->pipe[ '$merge' ] = $stage;
+		
+		return $this;
+	}
+	
+	/**
+	 * @param string $collection
+	 *
+	 * @return $this
+	 */
+	public function saveTo( string $collection ): self
+	{
+		$this->pipe[ '$out' ] = new Out( $collection );
+		
+		return $this;
+	}
+	
+	/**
+	 * @param array $with
+	 *
+	 * @return $this
+	 */
+	public function with( array $with ): self
+	{
+		$stage = $this->pipe( 'project' );
+		
+		foreach ( $with as $field ) {
+			$stage->set( $field, true );
+		}
+		
+		return $this;
+	}
+	
+	/**
+	 * @param array $without
+	 *
+	 * @return $this
+	 */
+	public function without( array $without ): self
+	{
+		$stage = $this->pipe( 'project' );
+		
+		foreach ( $without as $field ) {
+			$stage->set( $field, false );
+		}
+		
+		return $this;
+	}
+	
+	/**
+	 * @param $expression
+	 *
+	 * @return $this
+	 */
+	public function replaceWith( $expression ): self
+	{
+		$this->pipe[ '$replaceRoot' ] = new ReplaceRoot( $expression );
+		
+		return $this;
+	}
+	
+	/**
+	 * @param int $size
+	 *
+	 * @return $this
+	 */
+	public function sample( int $size ): self
+	{
+		$this->pipe[ '$sample' ] = new Sample( $size );
+		
+		return $this;
+	}
+	
+	/**
+	 * @param int $skip
+	 *
+	 * @return $this
+	 */
+	public function skip( int $skip ): self
+	{
+		$this->pipe[ '$skip' ] = new Skip( $skip );
+		
+		return $this;
+	}
+	
+	/**
+	 * @param $pipe
+	 *
+	 * @return mixed
+	 */
+	protected function pipe( $pipe )
+	{
+		$key = '$' . $pipe;
+		
+		if ( isset( $this->pipe[ $key ] ) ) {
+			return $this->pipe[ $key ];
+		}
+		
+		$class = '\Chukdo\DB\Mongo\Aggregate\\' . ucfirst( $pipe );
+		
+		return $this->pipe[ $key ] = new $class;
+	}
+	
+	/**
+	 * @param string $field
+	 * @param int    $sort
+	 *
+	 * @return Sort
+	 */
+	public function sort( string $field, int $sort = SORT_ASC ): Sort
+	{
+		$stage = $this->pipe( 'sort' );
+		
+		$stage->sort( $field, $sort );
+		
+		return $stage;
+	}
+	
+	/**
+	 * @param $expression
+	 *
+	 * @return $this
+	 */
+	public function sortByCount( $expression ): self
+	{
+		$this->pipe[ '$sortByCount' ] = new SortByCount( $expression );
+		
+		return $this;
+	}
+	
+	/**
+	 * @param string $field
+	 *
+	 * @return $this
+	 */
+	public function unwind( string $field ): self
+	{
+		$this->pipe[ '$unwind' ] = new Unwind( $field );
+		
+		return $this;
 	}
 }

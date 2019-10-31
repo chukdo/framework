@@ -1,8 +1,12 @@
 <?php
 
 namespace Chukdo\Db\Mongo\Aggregate;
+
+use Chukdo\Helper\Arr;
+
 /**
  * Server Aggregate Group.
+ * https://docs.mongodb.com/manual/reference/operator/aggregation/group/
  *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
@@ -14,34 +18,29 @@ Class Group
 	/**
 	 * @var array
 	 */
-	protected $group = [];
+	protected $pipe = [];
 	
 	/**
-	 * @var Aggregate
-	 */
-	protected $aggregate;
-	
-	/**
-	 * Group constructor.
+	 * @param $expression
 	 *
-	 * @param Aggregate $aggregate
-	 * @param           $expression
+	 * @return $this
 	 */
-	public function __construct( Aggregate $aggregate, $expression )
+	public function id( $expression ): self
 	{
-		$this->aggregate      = $aggregate;
-		$this->group[ '_id' ] = Expression::parseExpression( $expression );
+		$this->pipe[ '_id' ] = Expression::parseExpression( $expression );
+		
+		return $this;
 	}
 	
 	/**
 	 * @param string $field
 	 * @param        $expression
 	 *
-	 * @return Group
+	 * @return $this
 	 */
-	public function calculate( string $field, $expression ): self
+	public function field( string $field, $expression ): self
 	{
-		$this->group[ $field ] = Expression::parseExpression( $expression );
+		$this->pipe[ $field ] = Expression::parseExpression( $expression );
 		
 		return $this;
 	}
@@ -51,11 +50,6 @@ Class Group
 	 */
 	public function projection(): array
 	{
-		return $this->group;
-	}
-	
-	public function pipe(): Aggregate
-	{
-		return $this->aggregate;
+		return $this->pipe;
 	}
 }

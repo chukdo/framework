@@ -74,6 +74,6 @@ Class BucketAuto
 	 */
 	public function projection(): array
 	{
-		return [ '$bucketAuto' => $this->pipe ];
+		return $this->pipe;
 	}
 }

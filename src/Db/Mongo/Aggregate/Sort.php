@@ -3,15 +3,15 @@
 namespace Chukdo\Db\Mongo\Aggregate;
 
 /**
- * Aggregate AddFields.
- * https://docs.mongodb.com/manual/reference/operator/aggregation/addFields/
+ * Aggregate Sort.
+ * https://docs.mongodb.com/manual/reference/operator/aggregation/sort/
  *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Set
+Class Sort
 {
 	/**
 	 * @var array
@@ -20,13 +20,15 @@ Class Set
 	
 	/**
 	 * @param string $field
-	 * @param        $expression
+	 * @param int    $sort
 	 *
-	 * @return Set
+	 * @return $this
 	 */
-	public function set( string $field, $expression ): self
+	public function sort( string $field, int $sort = SORT_ASC ): self
 	{
-		$this->pipe[ $field ] = Expression::parseExpression( $expression );
+		$this->pipe[ $field ] = $sort === SORT_ASC
+			? 1
+			: -1;
 		
 		return $this;
 	}

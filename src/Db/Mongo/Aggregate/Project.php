@@ -3,29 +3,32 @@
 namespace Chukdo\Db\Mongo\Aggregate;
 
 /**
- * Aggregate Facet.
- * https://docs.mongodb.com/manual/reference/operator/aggregation/facet/
+ * Aggregate Project.
+ * https://docs.mongodb.com/manual/reference/operator/aggregation/project/
  *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Facet extends Stage
+Class Project
 {
 	/**
-	 * @var string
+	 * @var array
 	 */
-	protected $field;
+	protected $pipe = [];
 	
 	/**
-	 * Facet constructor.
-	 *
 	 * @param string $field
+	 * @param bool   $visibility
+	 *
+	 * @return $this
 	 */
-	public function __construct( string $field )
+	public function set( string $field, bool $visibility ): self
 	{
-		$this->field = $field;
+		$this->pipe[ $field ] = (int) $visibility;
+		
+		return $this;
 	}
 	
 	/**
@@ -33,6 +36,6 @@ Class Facet extends Stage
 	 */
 	public function projection(): array
 	{
-		return [ $this->field => $this->pipe ];
+		return $this->pipe;
 	}
 }

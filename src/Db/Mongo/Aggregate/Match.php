@@ -1,8 +1,8 @@
 <?php
 
-namespace Chukdo\Db\Mongo;
+namespace Chukdo\Db\Mongo\Aggregate;
 
-use Chukdo\Db\Mongo\Aggregate\Aggregate;
+use Chukdo\Db\Mongo\Where;
 
 /**
  * Server Match.
@@ -15,29 +15,10 @@ use Chukdo\Db\Mongo\Aggregate\Aggregate;
 Class Match extends Where
 {
 	/**
-	 * @var Collection
+	 * @return array
 	 */
-	protected $collection;
-	
-	/**
-	 * @var Aggregate
-	 */
-	protected $aggregate;
-	
-	/**
-	 * Match constructor.
-	 *
-	 * @param Aggregate  $aggregate
-	 * @param Collection $collection
-	 */
-	public function __construct( Aggregate $aggregate, Collection $collection )
+	public function projection(): array
 	{
-		parent::__construct( $collection );
-		$this->aggregate = $aggregate;
-	}
-	
-	public function pipe(): Aggregate
-	{
-		return $this->aggregate;
+		return $this->filter();
 	}
 }

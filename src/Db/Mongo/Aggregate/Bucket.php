@@ -74,6 +74,6 @@ Class Bucket
 	 */
 	public function projection(): array
 	{
-		return [ '$bucket' => $this->pipe ];
+		return $this->pipe;
 	}
 }

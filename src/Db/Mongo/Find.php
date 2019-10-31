@@ -2,6 +2,7 @@
 
 namespace Chukdo\Db\Mongo;
 
+use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\Helper\Arr;
 use Chukdo\Json\Json;
 use Chukdo\Contracts\Db\Database as DatabaseInterface;
@@ -58,6 +59,29 @@ Class Find extends Where implements FindInterface
 	protected $hiddenId = false;
 	
 	/**
+	 * @var Collection
+	 */
+	protected $collection;
+	
+	/**
+	 * Find constructor.
+	 *
+	 * @param Collection $collection
+	 */
+	public function __construct( Collection $collection )
+	{
+		$this->collection = $collection;
+	}
+	
+	/**
+	 * @return CollectionInterface|Collection
+	 */
+	public function collection(): CollectionInterface
+	{
+		return $this->collection;
+	}
+	
+	/**
 	 * ReadPreference::RP_PRIMARY = 1,
 	 * RP_SECONDARY = 2,
 	 * RP_PRIMARY_PREFERRED = 5,
@@ -85,8 +109,8 @@ Class Find extends Where implements FindInterface
 	public function count(): int
 	{
 		return (int) $this->collection()
-		                  ->client()
-		                  ->countDocuments( $this->filter() );
+			->client()
+			->countDocuments( $this->filter() );
 	}
 	
 	/**
@@ -98,8 +122,8 @@ Class Find extends Where implements FindInterface
 	{
 		$options    = Arr::merge( $this->projection(), $this->options );
 		$find       = $this->collection()
-		                   ->client()
-		                   ->find( $this->filter(), $options );
+			->client()
+			->find( $this->filter(), $options );
 		$recordList = new RecordList( $this->collection(), new Json( $find ), $idAsKey );
 		foreach ( $this->link as $link ) {
 			$recordList = $link->hydrate( $recordList );
@@ -138,14 +162,13 @@ Class Find extends Where implements FindInterface
 	 *
 	 * @return FindInterface
 	 */
-	public function link( string $field, array $with = [], array $without = [], string $linked = null,
-	                      DatabaseInterface $database = null ): FindInterface
+	public function link( string $field, array $with = [], array $without = [], string $linked = null, DatabaseInterface $database = null ): FindInterface
 	{
 		$link         = new Link( $database ?? $this->collection()
-		                                            ->database(), $field );
+			                          ->database(), $field );
 		$this->link[] = $link->with( $with )
-		                     ->without( $without )
-		                     ->setLinkedName( $linked );
+			->without( $without )
+			->setLinkedName( $linked );
 		
 		return $this;
 	}
@@ -218,10 +241,10 @@ Class Find extends Where implements FindInterface
 	{
 		$options = Arr::merge( $this->projection(), $this->options );
 		$find    = $this->collection()
-		                ->client()
-		                ->findOne( $this->filter(), $options );
+			->client()
+			->findOne( $this->filter(), $options );
 		$record  = $this->collection()
-		                ->record( $find, $this->hiddenId );
+			->record( $find, $this->hiddenId );
 		foreach ( $this->link as $link ) {
 			$record = $link->hydrate( $record );
 		}
@@ -236,8 +259,8 @@ Class Find extends Where implements FindInterface
 	{
 		$options = Arr::merge( $this->projection(), $this->options );
 		$find    = $this->collection()
-		                ->client()
-		                ->find( $this->filter(), $options );
+			->client()
+			->find( $this->filter(), $options );
 		
 		return new Stream( $this->collection(), $find );
 	}
@@ -263,8 +286,8 @@ Class Find extends Where implements FindInterface
 	public function distinct( string $field, bool $idAsKey = false ): RecordList
 	{
 		$find       = $this->collection()
-		                   ->client()
-		                   ->distinct( $field, $this->filter() );
+			->client()
+			->distinct( $field, $this->filter() );
 		$recordList = new RecordList( $this->collection(), new Json( $find ), $idAsKey );
 		foreach ( $this->link as $link ) {
 			$recordList = $link->hydrate( $recordList );
@@ -279,15 +302,15 @@ Class Find extends Where implements FindInterface
 	public function explain(): JsonInterface
 	{
 		$explain = $this->collection()
-		                ->database()
-		                ->server()
-		                ->command( [
-			                           'explain' => [
-				                           'find'   => $this->collection()
-				                                            ->name(),
-				                           'filter' => $this->filter(),
-			                           ],
-		                           ] );
+			->database()
+			->server()
+			->command( [
+				           'explain' => [
+					           'find'   => $this->collection()
+						           ->name(),
+					           'filter' => $this->filter(),
+				           ],
+			           ] );
 		$json    = new Json();
 		$json->offsetSet( 'queryPlanner', $explain->get( '0.queryPlanner' ) );
 		$json->offsetSet( 'executionStats', $explain->get( '0.executionStats' ) );

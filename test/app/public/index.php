@@ -215,6 +215,7 @@ die( 'ok' );
 */
 
 use \Chukdo\Db\Mongo\Aggregate\Expr;
+use \Chukdo\Db\Mongo\Aggregate\Aggregate;
 
 ini_set( 'memory_limit', '256M' );
 set_time_limit( 3000 );
@@ -223,6 +224,23 @@ $time            = time();
 $mongo     = new ServerMongo();
 $db   = $mongo->database( 'foncia' );
 $collection = $db->collection( 'esign' );
+
+$ag  = new Aggregate( $collection );
+$agp = $ag->pipe();
+$agp->where( '_date_created', '>=', DateTime::createFromFormat( 'd/m/y', '01/01/19' ) )
+    ->where( 'state', '=', '3' );
+$agp->group( [
+	             'month' => Expr::month( '_date_created' ),
+	             'year'  => Expr::year( '_date_created' ),
+             ] )
+    ->field( 'totalSigners', Expr::sum( Expr::size( 'user' ) ) );
+$agp->sort( '_id', SORT_ASC );
+echo '<pre>';
+print_r( $ag->projection() );
+echo $ag->all()
+        ->toHtml();
+exit;
+
 $aggregate       = new \Chukdo\Db\Mongo\Aggregate\Aggregate( $collection );
 $aggregate->where( '_date_created', '>=', DateTime::createFromFormat( 'd/m/y', '01/01/19' ) )
           ->where( 'state', '=', '3' );

@@ -3,36 +3,36 @@
 namespace Chukdo\Db\Mongo\Aggregate;
 
 /**
- * Aggregate Facet.
- * https://docs.mongodb.com/manual/reference/operator/aggregation/facet/
+ * Aggregate Unwind.
+ * https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/
  *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Facet extends Stage
+Class Unwind
 {
 	/**
 	 * @var string
 	 */
-	protected $field;
+	protected $pipe;
 	
 	/**
-	 * Facet constructor.
+	 * Count constructor.
 	 *
 	 * @param string $field
 	 */
 	public function __construct( string $field )
 	{
-		$this->field = $field;
+		$this->pipe = $field;
 	}
 	
 	/**
-	 * @return array
+	 * @return string
 	 */
-	public function projection(): array
+	public function projection(): string
 	{
-		return [ $this->field => $this->pipe ];
+		return $this->pipe;
 	}
 }
