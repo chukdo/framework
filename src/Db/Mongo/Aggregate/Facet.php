@@ -2,6 +2,8 @@
 
 namespace Chukdo\Db\Mongo\Aggregate;
 
+use Chukdo\Helper\Arr;
+
 /**
  * Aggregate Facet.
  * https://docs.mongodb.com/manual/reference/operator/aggregation/facet/
@@ -31,8 +33,8 @@ Class Facet extends Stage
 	/**
 	 * @return array
 	 */
-	public function projection(): array
+	public function projectionOld(): array
 	{
-		return [ $this->field => $this->pipe ];
+		return [ $this->field => parent::projection() ];
 	}
 }

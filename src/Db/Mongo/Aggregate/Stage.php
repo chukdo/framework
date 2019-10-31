@@ -31,8 +31,8 @@ Class Stage
 			if ( Arr::isArray( $stage ) ) {
 				$projection[ $key ] = [];
 				
-				foreach ( $stage as $item ) {
-					$projection[ $key ][] = $item->projection();
+				foreach ( $stage as $k => $item ) {
+					$projection[ $key ][ $k ] = $item->projection();
 				}
 			} else {
 				$projection[ $key ] = $stage->projection();
@@ -102,7 +102,7 @@ Class Stage
 	{
 		$stage = new Facet( $field );
 		
-		Arr::addToSet( $this->pipe, '$facet', $stage );
+		$this->pipe[ '$facet' ][ $field ] = $stage;
 		
 		return $stage;
 	}
@@ -213,12 +213,12 @@ Class Stage
 	/**
 	 * @param string $field
 	 * @param string $operator
-	 * @param        $value
+	 * @param null   $value
 	 * @param null   $value2
 	 *
 	 * @return Match
 	 */
-	public function where( string $field, string $operator, $value, $value2 = null ): Match
+	public function where( string $field, string $operator, $value = null, $value2 = null ): Match
 	{
 		$match = new Match();
 		

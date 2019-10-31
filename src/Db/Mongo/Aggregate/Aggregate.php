@@ -5,7 +5,6 @@ namespace Chukdo\Db\Mongo\Aggregate;
 use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\DB\Mongo\Collection;
 use Chukdo\Json\Json;
-use Chukdo\Helper\Arr;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**

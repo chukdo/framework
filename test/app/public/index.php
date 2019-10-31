@@ -219,10 +219,40 @@ use \Chukdo\Db\Mongo\Aggregate\Aggregate;
 
 ini_set( 'memory_limit', '256M' );
 set_time_limit( 3000 );
-$time            = time();
+$time = time();
 
-$mongo     = new ServerMongo();
-$db   = $mongo->database( 'foncia' );
+$mongo = new ServerMongo();
+
+$db         = $mongo->database( 'test' );
+$collection = $db->collection( 'artwork' );
+
+$ag  = new Aggregate( $collection );
+$agp = $ag->pipe();
+$agp->facet( 'categorizedByTags' )
+    ->unwind( 'tag' )
+    ->sortByCount( 'tags' );
+$facet = $agp->facet( 'categorizedByPrice' );
+$facet->where( 'price', 'exists' );
+$facet->bucket( 'price', [
+	0,
+	150,
+	200,
+	300,
+	400,
+] )
+      ->default( 'Other' )
+      ->output( 'count', Expr::sum( 1 ) )
+      ->output( 'titles', Expr::push( 'title' ) );
+$agp->facet( 'categorizedByYears(Auto)' )
+    ->bucketAuto( 'year', 4 );
+echo '<pre>';
+print_r( $ag->projection() );
+exit;
+echo $ag->all()
+        ->toHtml();
+exit;
+
+$db         = $mongo->database( 'foncia' );
 $collection = $db->collection( 'esign' );
 
 $ag  = new Aggregate( $collection );
@@ -235,22 +265,9 @@ $agp->group( [
              ] )
     ->field( 'totalSigners', Expr::sum( Expr::size( 'user' ) ) );
 $agp->sort( '_id', SORT_ASC );
-echo '<pre>';
-print_r( $ag->projection() );
-echo $ag->all()
-        ->toHtml();
-exit;
 
-$aggregate       = new \Chukdo\Db\Mongo\Aggregate\Aggregate( $collection );
-$aggregate->where( '_date_created', '>=', DateTime::createFromFormat( 'd/m/y', '01/01/19' ) )
-          ->where( 'state', '=', '3' );
-$aggregate->group( [
-	                   'month' => Expr::month( '_date_created' ),
-	                   'year'  => Expr::year( '_date_created' ),
-                   ] )
-          ->calculate( 'totalSigners', Expr::sum( Expr::size( 'user' ) ) );
-
-$aggregate->sort('_id', SORT_ASC);
+//@todo test avec Facet !!!
+// @todo voir comment faire du short code !!!
 
 //$aggregate->facet('name')->where()->bucket(Expr $groupBy, $boundaries, Expr $output, $default);
 //$aggregate->facet('name')->where()->bucketAuto(Expr $groupBy, $buckets, Expr $output, $granularity);
@@ -262,7 +279,8 @@ $aggregate->sort('_id', SORT_ASC);
 // groupByQueryString('month:_date_created,year:_date_created,datetostring:ord_date|%Y-%m-%d, multiply:price|quantity')
 // calculateByQueryString('sum:size:user')
 
-echo $aggregate->all()->toHtml();
+echo $ag->all()
+        ->toHtml();
 exit;
 /*db . getCollection( 'esign' ) . aggregate( [
      {
