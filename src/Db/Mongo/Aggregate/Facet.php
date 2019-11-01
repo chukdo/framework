@@ -33,8 +33,14 @@ Class Facet extends Stage
 	/**
 	 * @return array
 	 */
-	public function projectionOld(): array
+	public function projection(): array
 	{
-		return [ $this->field => parent::projection() ];
+		$projection = [];
+		
+		foreach ( $this->pipe as $key => $stage ) {
+			$projection[][ $key ] = $stage->projection();
+		}
+		
+		return $projection;
 	}
 }

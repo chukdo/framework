@@ -25,7 +25,7 @@ Class Unwind
 	 */
 	public function __construct( string $field )
 	{
-		$this->pipe = $field;
+		$this->pipe = '$' . $field;
 	}
 	
 	/**

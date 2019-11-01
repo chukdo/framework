@@ -64,7 +64,7 @@ Class Bucket
 	 */
 	public function output( string $name, $expression ): self
 	{
-		Arr::addToSet( $this->pipe, 'output', Expression::parseExpression( $expression ) );
+		$this->pipe[ 'output' ][ $name ] = Expression::parseExpression( $expression );
 		
 		return $this;
 	}

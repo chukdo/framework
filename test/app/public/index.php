@@ -247,7 +247,7 @@ $agp->facet( 'categorizedByYears(Auto)' )
     ->bucketAuto( 'year', 4 );
 echo '<pre>';
 print_r( $ag->projection() );
-exit;
+//exit;
 echo $ag->all()
         ->toHtml();
 exit;
@@ -265,6 +265,9 @@ $agp->group( [
              ] )
     ->field( 'totalSigners', Expr::sum( Expr::size( 'user' ) ) );
 $agp->sort( '_id', SORT_ASC );
+echo $ag->all()
+        ->toHtml();
+exit;
 
 //@todo test avec Facet !!!
 // @todo voir comment faire du short code !!!
