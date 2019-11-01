@@ -13,13 +13,8 @@ use Chukdo\Helper\Arr;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Group
+Class Group extends Stage
 {
-	/**
-	 * @var array
-	 */
-	protected $pipe = [];
-	
 	/**
 	 * @param $expression
 	 *
@@ -43,13 +38,5 @@ Class Group
 		$this->pipe[ $field ] = Expression::parseExpression( $expression );
 		
 		return $this;
-	}
-	
-	/**
-	 * @return array
-	 */
-	public function projection(): array
-	{
-		return $this->pipe;
 	}
 }

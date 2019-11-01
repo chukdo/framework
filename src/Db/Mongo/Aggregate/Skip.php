@@ -11,28 +11,15 @@ namespace Chukdo\Db\Mongo\Aggregate;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Skip
+Class Skip extends Stage
 {
-	/**
-	 * @var string
-	 */
-	protected $pipe;
-	
 	/**
 	 * Sample constructor.
 	 *
 	 * @param int $skip
 	 */
-	public function __construct( int $skip )
+	public function set( int $skip )
 	{
 		$this->pipe = $skip;
-	}
-	
-	/**
-	 * @return int
-	 */
-	public function projection(): int
-	{
-		return $this->pipe;
 	}
 }

@@ -11,13 +11,8 @@ namespace Chukdo\Db\Mongo\Aggregate;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Set
+Class Set extends Stage
 {
-	/**
-	 * @var array
-	 */
-	protected $pipe = [];
-	
 	/**
 	 * @param string $field
 	 * @param        $expression
@@ -29,13 +24,5 @@ Class Set
 		$this->pipe[ $field ] = Expression::parseExpression( $expression );
 		
 		return $this;
-	}
-	
-	/**
-	 * @return array
-	 */
-	public function projection(): array
-	{
-		return $this->pipe;
 	}
 }

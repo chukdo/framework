@@ -11,13 +11,8 @@ namespace Chukdo\Db\Mongo\Aggregate;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Project
+Class Project extends Stage
 {
-	/**
-	 * @var array
-	 */
-	protected $pipe = [];
-	
 	/**
 	 * @param string $field
 	 * @param bool   $visibility
@@ -29,13 +24,5 @@ Class Project
 		$this->pipe[ $field ] = (int) $visibility;
 		
 		return $this;
-	}
-	
-	/**
-	 * @return array
-	 */
-	public function projection(): array
-	{
-		return $this->pipe;
 	}
 }

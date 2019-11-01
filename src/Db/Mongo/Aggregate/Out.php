@@ -11,28 +11,13 @@ namespace Chukdo\Db\Mongo\Aggregate;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Out
+Class Out extends Stage
 {
 	/**
-	 * @var string
-	 */
-	protected $collection;
-	
-	/**
-	 * Count constructor.
-	 *
 	 * @param string $collection
 	 */
-	public function __construct( string $collection )
+	public function set( string $collection )
 	{
-		$this->collection = $collection;
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function projection(): string
-	{
-		return $this->collection;
+		$this->pipe = $collection;
 	}
 }

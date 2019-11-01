@@ -11,13 +11,8 @@ namespace Chukdo\Db\Mongo\Aggregate;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class GraphLookup
+Class GraphLookup extends Stage
 {
-	/**
-	 * @var array
-	 */
-	protected $pipe = [];
-	
 	/**
 	 * @param string $collection
 	 *
@@ -116,13 +111,5 @@ Class GraphLookup
 		$match->where( $field, $operator, $value, $value2 );
 		
 		return $this->pipe[ 'restrictSearchWithMatch' ] = $match;
-	}
-	
-	/**
-	 * @return array
-	 */
-	public function projection(): array
-	{
-		return $this->pipe;
 	}
 }

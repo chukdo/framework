@@ -11,13 +11,8 @@ namespace Chukdo\Db\Mongo\Aggregate;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Lookup
+Class Lookup extends Stage
 {
-	/**
-	 * @var array
-	 */
-	protected $pipe = [];
-	
 	/**
 	 * @param string $collection
 	 *
@@ -64,13 +59,5 @@ Class Lookup
 		$this->pipe[ 'as' ] = $field;
 		
 		return $this;
-	}
-	
-	/**
-	 * @return array
-	 */
-	public function projection(): array
-	{
-		return $this->pipe;
 	}
 }

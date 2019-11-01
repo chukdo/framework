@@ -11,28 +11,13 @@ namespace Chukdo\Db\Mongo\Aggregate;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Limit
+Class Limit extends Stage
 {
 	/**
-	 * @var string
-	 */
-	protected $pipe;
-	
-	/**
-	 * Limit constructor.
-	 *
 	 * @param int $limit
 	 */
-	public function __construct( int $limit )
+	public function set( int $limit )
 	{
 		$this->pipe = $limit;
-	}
-	
-	/**
-	 * @return int
-	 */
-	public function projection(): int
-	{
-		return $this->pipe;
 	}
 }

@@ -2,8 +2,6 @@
 
 namespace Chukdo\Db\Mongo\Aggregate;
 
-use Chukdo\Helper\Arr;
-
 /**
  * Aggregate Facet.
  * https://docs.mongodb.com/manual/reference/operator/aggregation/facet/
@@ -13,23 +11,8 @@ use Chukdo\Helper\Arr;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Facet extends Stage
+Class Facet extends PipelineStage
 {
-	/**
-	 * @var string
-	 */
-	protected $field;
-	
-	/**
-	 * Facet constructor.
-	 *
-	 * @param string $field
-	 */
-	public function __construct( string $field )
-	{
-		$this->field = $field;
-	}
-	
 	/**
 	 * @return array
 	 */

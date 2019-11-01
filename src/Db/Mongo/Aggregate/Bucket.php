@@ -13,13 +13,8 @@ use Chukdo\Helper\Arr;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Bucket
+Class Bucket extends Stage
 {
-	/**
-	 * @var array
-	 */
-	protected $pipe = [];
-	
 	/**
 	 * @param $expression
 	 *
@@ -67,13 +62,5 @@ Class Bucket
 		$this->pipe[ 'output' ][ $name ] = Expression::parseExpression( $expression );
 		
 		return $this;
-	}
-	
-	/**
-	 * @return array
-	 */
-	public function projection(): array
-	{
-		return $this->pipe;
 	}
 }

@@ -11,28 +11,13 @@ namespace Chukdo\Db\Mongo\Aggregate;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class ReplaceRoot
+Class ReplaceRoot extends Stage
 {
 	/**
-	 * @var array
-	 */
-	protected $pipe = [];
-	
-	/**
-	 * ReplaceRoot constructor.
-	 *
 	 * @param $expression
 	 */
-	public function __construct( $expression )
+	public function set( $expression )
 	{
 		$this->pipe = [ 'newRoot' => Expression::parseExpression( $expression ) ];
-	}
-	
-	/**
-	 * @return array
-	 */
-	public function projection(): array
-	{
-		return $this->pipe;
 	}
 }

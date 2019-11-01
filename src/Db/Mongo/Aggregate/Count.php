@@ -11,28 +11,13 @@ namespace Chukdo\Db\Mongo\Aggregate;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Count
+Class Count extends Stage
 {
 	/**
-	 * @var string
-	 */
-	protected $pipe;
-	
-	/**
-	 * Count constructor.
-	 *
 	 * @param string $field
 	 */
-	public function __construct( string $field )
+	public function set( string $field )
 	{
 		$this->pipe = $field;
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function projection(): string
-	{
-		return $this->pipe;
 	}
 }

@@ -227,7 +227,30 @@ $db         = $mongo->database( 'test' );
 $collection = $db->collection( 'artwork' );
 
 $ag  = new Aggregate( $collection );
-$agp = $ag->pipe();
+
+$agp = $ag->stage()
+          ->facet( 'categorizedByTags' )
+          ->unwind( 'tag' )
+          ->sortByCount( 'tags' )
+          ->stage()
+          ->where( 'price', 'exists' )
+          ->stage()
+          ->bucket( 'price', [
+	          0,
+	          150,
+	          200,
+	          300,
+	          400,
+          ] )
+          ->default( 'Other' )
+          ->output( 'count', Expr::sum( 1 ) )
+          ->output( 'titles', Expr::push( 'title' ) )
+          ->stage()
+          ->facet( 'categorizedByYears(Auto)' )
+          ->bucketAuto( 'year', 4 )
+          ->stage();
+
+$agp = $ag->stage();
 $agp->facet( 'categorizedByTags' )
     ->unwind( 'tag' )
     ->sortByCount( 'tags' );
@@ -256,7 +279,7 @@ $db         = $mongo->database( 'foncia' );
 $collection = $db->collection( 'esign' );
 
 $ag  = new Aggregate( $collection );
-$agp = $ag->pipe();
+$agp = $ag->stage();
 $agp->where( '_date_created', '>=', DateTime::createFromFormat( 'd/m/y', '01/01/19' ) )
     ->where( 'state', '=', '3' );
 $agp->group( [

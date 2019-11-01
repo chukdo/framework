@@ -11,28 +11,13 @@ namespace Chukdo\Db\Mongo\Aggregate;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class SortByCount
+Class SortByCount extends Stage
 {
 	/**
-	 * @var mixed
-	 */
-	protected $pipe;
-	
-	/**
-	 * SortByCount constructor.
-	 *
 	 * @param $expression
 	 */
-	public function __construct( $expression )
+	public function set( $expression )
 	{
 		$this->pipe = Expression::parseExpression( $expression );
-	}
-	
-	/**
-	 * @return array|mixed|string|null
-	 */
-	public function projection()
-	{
-		return $this->pipe;
 	}
 }

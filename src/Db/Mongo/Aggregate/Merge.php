@@ -13,13 +13,8 @@ use Chukdo\Helper\Arr;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Merge
+Class Merge extends Stage
 {
-	/**
-	 * @var array
-	 */
-	protected $pipe = [];
-	
 	/**
 	 * @param string      $collection
 	 * @param string|null $db
@@ -56,13 +51,5 @@ Class Merge
 		}
 		
 		return $this;
-	}
-	
-	/**
-	 * @return array
-	 */
-	public function projection(): array
-	{
-		return $this->pipe;
 	}
 }

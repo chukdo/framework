@@ -43,11 +43,11 @@ Class Aggregate
 	}
 	
 	/**
-	 * @return Stage
+	 * @return PipelineStage
 	 */
-	public function pipe(): Stage
+	public function stage(): PipelineStage
 	{
-		return $this->pipe[] = new Stage();
+		return $this->pipe[] = new PipelineStage();
 	}
 	
 	/**
