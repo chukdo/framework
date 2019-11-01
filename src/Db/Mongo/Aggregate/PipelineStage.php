@@ -58,11 +58,8 @@ Class PipelineStage implements StageInterface
 	 */
 	public function set( string $field, $expression ): Set
 	{
-		$stage = $this->pipeStage( 'set' );
-		
-		$stage->set( $field, $expression );
-		
-		return $stage;
+		return $this->pipeStage( 'set' )
+		            ->set( $field, $expression );
 	}
 	
 	/**
@@ -73,14 +70,9 @@ Class PipelineStage implements StageInterface
 	 */
 	public function bucket( $expression, array $boundaries ): Bucket
 	{
-		$stage = new Bucket();
-		
-		$stage->groupBy( $expression )
-		      ->boundaries( $boundaries );
-		
-		$this->pipe[ '$bucket' ] = $stage;
-		
-		return $stage;
+		return $this->pipeStage( 'Bucket' )
+		            ->groupBy( $expression )
+		            ->boundaries( $boundaries );
 	}
 	
 	/**
@@ -91,14 +83,9 @@ Class PipelineStage implements StageInterface
 	 */
 	public function bucketAuto( $expression, int $buckets ): BucketAuto
 	{
-		$stage = new BucketAuto();
-		
-		$stage->groupBy( $expression )
-		      ->buckets( $buckets );
-		
-		$this->pipe[ '$bucketAuto' ] = $stage;
-		
-		return $stage;
+		return $this->pipeStage( 'BucketAuto' )
+		            ->groupBy( $expression )
+		            ->buckets( $buckets );
 	}
 	
 	/**
@@ -122,7 +109,8 @@ Class PipelineStage implements StageInterface
 	 */
 	public function count( string $field ): self
 	{
-		$this->pipe[ '$count' ] = new Count( $field );
+		$this->pipeStage( 'count' )
+		     ->set( $field );
 		
 		return $this;
 	}
@@ -137,15 +125,10 @@ Class PipelineStage implements StageInterface
 	 */
 	public function geoNear( float $lon, float $lat, string $distanceField, int $distance ): GeoNear
 	{
-		$stage = new GeoNear();
-		
-		$stage->near( $lon, $lat )
-		      ->distanceField( $distanceField )
-		      ->maxDistance( $distance );
-		
-		$this->pipe[ '$geoNear' ] = $stage;
-		
-		return $stage;
+		return $this->pipeStage( 'geoNear' )
+		            ->near( $lon, $lat )
+		            ->distanceField( $distanceField )
+		            ->maxDistance( $distance );
 	}
 	
 	/**
@@ -157,16 +140,11 @@ Class PipelineStage implements StageInterface
 	 */
 	public function graphLookup( string $foreignCollection, string $foreignField, string $localField ): GraphLookup
 	{
-		$stage = new GraphLookup();
-		
-		$stage->from( $foreignCollection )
-		      ->connectFromField( $foreignField )
-		      ->connectToField( $localField )
-		      ->as( 'lookup' );
-		
-		$this->pipe[ '$graphLookup' ] = $stage;
-		
-		return $stage;
+		return $this->pipeStage( 'graphLookup' )
+		            ->from( $foreignCollection )
+		            ->connectFromField( $foreignField )
+		            ->connectToField( $localField )
+		            ->as( 'lookup' );
 	}
 	
 	/**
@@ -176,13 +154,8 @@ Class PipelineStage implements StageInterface
 	 */
 	public function group( $expression ): Group
 	{
-		$stage = new Group();
-		
-		$stage->id( $expression );
-		
-		$this->pipe[ '$group' ] = $stage;
-		
-		return $stage;
+		return $this->pipeStage( 'group' )
+		            ->id( $expression );
 	}
 	
 	/**
@@ -192,7 +165,8 @@ Class PipelineStage implements StageInterface
 	 */
 	public function limit( int $limit ): self
 	{
-		$this->pipe[ '$limit' ] = new Limit( $limit );
+		$this->pipeStage( 'limit' )
+		     ->set( $limit );
 		
 		return $this;
 	}
@@ -206,16 +180,11 @@ Class PipelineStage implements StageInterface
 	 */
 	public function lookup( string $foreignCollection, string $foreignField, string $localField ): Lookup
 	{
-		$stage = new lookup();
-		
-		$stage->from( $foreignCollection )
-		      ->foreignField( $foreignField )
-		      ->localField( $localField )
-		      ->as( 'lookup' );
-		
-		$this->pipe[ '$lookup' ] = $stage;
-		
-		return $stage;
+		return $this->pipeStage( 'lookup' )
+		            ->from( $foreignCollection )
+		            ->foreignField( $foreignField )
+		            ->localField( $localField )
+		            ->as( 'lookup' );
 	}
 	
 	/**
@@ -228,11 +197,8 @@ Class PipelineStage implements StageInterface
 	 */
 	public function where( string $field, string $operator, $value = null, $value2 = null ): Match
 	{
-		$match = new Match();
-		
-		$match->where( $field, $operator, $value, $value2 );
-		
-		return $this->pipe[ '$match' ] = $match;
+		return $this->pipeStage( 'match' )
+		            ->where( $field, $operator, $value, $value2 );
 	}
 	
 	/**
@@ -243,17 +209,9 @@ Class PipelineStage implements StageInterface
 	 */
 	public function mergeTo( string $collection, string $on = '_id' ): self
 	{
-		$stage = new Merge();
-		
-		if ( $collection ) {
-			$stage->into( $collection );
-		}
-		
-		if ( $on ) {
-			$stage->on( $on );
-		}
-		
-		$this->pipe[ '$merge' ] = $stage;
+		$this->pipeStage( 'merge' )
+		     ->into( $collection )
+		     ->on( $on );
 		
 		return $this;
 	}
@@ -265,7 +223,8 @@ Class PipelineStage implements StageInterface
 	 */
 	public function saveTo( string $collection ): self
 	{
-		$this->pipe[ '$out' ] = new Out( $collection );
+		$this->pipeStage( 'out' )
+		     ->set( $collection );
 		
 		return $this;
 	}
@@ -309,7 +268,8 @@ Class PipelineStage implements StageInterface
 	 */
 	public function replaceWith( $expression ): self
 	{
-		$this->pipe[ '$replaceRoot' ] = new ReplaceRoot( $expression );
+		$this->pipeStage( 'replaceRoot' )
+		     ->set( $expression );
 		
 		return $this;
 	}
@@ -321,7 +281,8 @@ Class PipelineStage implements StageInterface
 	 */
 	public function sample( int $size ): self
 	{
-		$this->pipe[ '$sample' ] = new Sample( $size );
+		$this->pipeStage( 'sample' )
+		     ->set( $size );
 		
 		return $this;
 	}
@@ -333,7 +294,8 @@ Class PipelineStage implements StageInterface
 	 */
 	public function skip( int $skip ): self
 	{
-		$this->pipe[ '$skip' ] = new Skip( $skip );
+		$this->pipeStage( 'skip' )
+		     ->set( $skip );
 		
 		return $this;
 	}
@@ -360,7 +322,8 @@ Class PipelineStage implements StageInterface
 	 */
 	public function sortByCount( $expression ): self
 	{
-		$this->pipe[ '$sortByCount' ] = new SortByCount( $expression );
+		$this->pipeStage( 'sortByCount' )
+		     ->set( $expression );
 		
 		return $this;
 	}
@@ -372,7 +335,8 @@ Class PipelineStage implements StageInterface
 	 */
 	public function unwind( string $field ): self
 	{
-		$this->pipe[ '$unwind' ] = new Unwind( $field );
+		$this->pipeStage( 'unwind' )
+		     ->set( $field );
 		
 		return $this;
 	}
@@ -380,9 +344,9 @@ Class PipelineStage implements StageInterface
 	/**
 	 * @param $pipe
 	 *
-	 * @return mixed
+	 * @return StageInterface|set|bucket|bucketAuto|facet|count|geoNear|graphLookup|group|limit|lookup|match|merge|out|project|replaceRoot|sample|skip|sort|sortByCount|unwind
 	 */
-	protected function pipeStage( $pipe )
+	protected function pipeStage( $pipe ): StageInterface
 	{
 		$key = '$' . $pipe;
 		

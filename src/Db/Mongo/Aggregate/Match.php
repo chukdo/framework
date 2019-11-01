@@ -26,19 +26,19 @@ Class Match extends Where implements StageInterface
 	protected $stage;
 	
 	/**
-	 * Set constructor.
+	 * Match constructor.
 	 *
-	 * @param StageInterface $stage
+	 * @param PipelineStage $stage
 	 */
-	public function __construct( StageInterface $stage )
+	public function __construct( PipelineStage $stage )
 	{
 		$this->stage = $stage;
 	}
 	
 	/**
-	 * @return StageInterface
+	 * @return PipelineStage
 	 */
-	public function stage(): StageInterface
+	public function stage(): PipelineStage
 	{
 		return $this->stage;
 	}
