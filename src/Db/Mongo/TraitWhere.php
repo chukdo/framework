@@ -7,14 +7,14 @@ use Chukdo\Contracts\Db\Find as FindInterface;
 use Chukdo\Contracts\Db\Write as WriteInterface;
 
 /**
- * Server Where.
+ * Trait Where.
  *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Abstract Class Where
+Trait TraitWhere
 {
 	/**
 	 * @var array

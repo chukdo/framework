@@ -226,15 +226,14 @@ $mongo = new ServerMongo();
 $db         = $mongo->database( 'test' );
 $collection = $db->collection( 'artwork' );
 
-$ag  = new Aggregate( $collection );
+$ag = new Aggregate( $collection );
 
 $agp = $ag->stage()
           ->facet( 'categorizedByTags' )
           ->unwind( 'tag' )
           ->sortByCount( 'tags' )
-          ->stage()
+          ->facet( 'categorizedByPrice' )
           ->where( 'price', 'exists' )
-          ->stage()
           ->bucket( 'price', [
 	          0,
 	          150,
@@ -245,32 +244,13 @@ $agp = $ag->stage()
           ->default( 'Other' )
           ->output( 'count', Expr::sum( 1 ) )
           ->output( 'titles', Expr::push( 'title' ) )
-          ->stage()
+
           ->facet( 'categorizedByYears(Auto)' )
           ->bucketAuto( 'year', 4 )
           ->stage();
-
-$agp = $ag->stage();
-$agp->facet( 'categorizedByTags' )
-    ->unwind( 'tag' )
-    ->sortByCount( 'tags' );
-$facet = $agp->facet( 'categorizedByPrice' );
-$facet->where( 'price', 'exists' );
-$facet->bucket( 'price', [
-	0,
-	150,
-	200,
-	300,
-	400,
-] )
-      ->default( 'Other' )
-      ->output( 'count', Expr::sum( 1 ) )
-      ->output( 'titles', Expr::push( 'title' ) );
-$agp->facet( 'categorizedByYears(Auto)' )
-    ->bucketAuto( 'year', 4 );
 echo '<pre>';
 print_r( $ag->projection() );
-//exit;
+
 echo $ag->all()
         ->toHtml();
 exit;
@@ -292,7 +272,7 @@ echo $ag->all()
         ->toHtml();
 exit;
 
-//@todo test avec Facet !!!
+//@todo test avec FacetPipelineStage !!!
 // @todo voir comment faire du short code !!!
 
 //$aggregate->facet('name')->where()->bucket(Expr $groupBy, $boundaries, Expr $output, $default);

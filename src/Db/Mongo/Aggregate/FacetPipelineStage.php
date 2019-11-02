@@ -2,8 +2,6 @@
 
 namespace Chukdo\Db\Mongo\Aggregate;
 
-use Chukdo\Contracts\Db\Stage as StageInterface;
-
 /**
  * Aggregate FacetPipelineStage.
  * https://docs.mongodb.com/manual/reference/operator/aggregation/facet/
@@ -13,15 +11,10 @@ use Chukdo\Contracts\Db\Stage as StageInterface;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Facet implements StageInterface
+Class FacetPipelineStage extends PipelineStage
 {
 	/**
-	 * @var array
-	 */
-	protected $pipe = [];
-	
-	/**
-	 * @var stageInterface
+	 * @var PipelineStage
 	 */
 	protected $stage;
 	
@@ -33,6 +26,20 @@ Class Facet implements StageInterface
 	public function __construct( PipelineStage $stage )
 	{
 		$this->stage = $stage;
+	}
+	
+	/**
+	 * @return array
+	 */
+	public function projection(): array
+	{
+		$projection = [];
+		
+		foreach ( $this->pipe as $key => $stage ) {
+			$projection[][ $key ] = $stage->projection();
+		}
+		
+		return $projection;
 	}
 	
 	/**
@@ -48,22 +55,9 @@ Class Facet implements StageInterface
 	 *
 	 * @return FacetPipelineStage
 	 */
-	public function facetPipelineStage( string $field ): FacetPipelineStage
+	public function facet( string $field ): FacetPipelineStage
 	{
-		return $this->pipe[ $field ] = new FacetPipelineStage( $this->stage() );
-	}
-	
-	/**
-	 * @return array
-	 */
-	public function projection(): array
-	{
-		$projection = [];
-		
-		foreach ( $this->pipe as $key => $stage ) {
-			$projection[ $key ] = $stage->projection();
-		}
-		
-		return $projection;
+		return $this->stage()
+		            ->facet( $field );
 	}
 }

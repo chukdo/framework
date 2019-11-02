@@ -474,7 +474,7 @@ class Header
 	                           string $domain = null ): self
 	{
 		$value  = rawurlencode( $value );
-		$cookie = 'Set-Cookie: ' . $name . '=' . $value;
+		$cookie = 'AddFields-Cookie: ' . $name . '=' . $value;
 		if ( $expires ) {
 			$expires = gmdate( DATE_RFC850, $expires );
 			$cookie  .= "; expires=$expires";
@@ -615,7 +615,7 @@ class Header
 					case 'unset':
 						return $this->unsetHeader( $key );
 				}
-				/** Gestion des methodes Set || Get */
+				/** Gestion des methodes AddFields || Get */
 			} else {
 				switch ( $action ) {
 					case 'set':

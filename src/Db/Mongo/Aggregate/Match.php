@@ -2,19 +2,24 @@
 
 namespace Chukdo\Db\Mongo\Aggregate;
 
-use Chukdo\Db\Mongo\Where;
+use Chukdo\Db\Mongo\TraitWhere;
 use Chukdo\Contracts\Db\Stage as StageInterface;
 
 /**
  * Server Match.
+ * https://docs.mongodb.com/manual/reference/operator/aggregation/match/
  *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Match extends Where implements StageInterface
+Class Match implements StageInterface
 {
+	use TraitPipelineStage, TraitWhere {
+		TraitWhere::where insteadof TraitPipelineStage;
+	}
+	
 	/**
 	 * @var array
 	 */
@@ -26,7 +31,7 @@ Class Match extends Where implements StageInterface
 	protected $stage;
 	
 	/**
-	 * Match constructor.
+	 * Stage constructor.
 	 *
 	 * @param PipelineStage $stage
 	 */
@@ -49,5 +54,16 @@ Class Match extends Where implements StageInterface
 	public function projection(): array
 	{
 		return $this->filter();
+	}
+	
+	/**
+	 * @param $pipe
+	 *
+	 * @return StageInterface
+	 */
+	public function pipeStage( $pipe ): StageInterface
+	{
+		return $this->stage()
+		            ->pipeStage( $pipe );
 	}
 }

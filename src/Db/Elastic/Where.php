@@ -8,7 +8,7 @@ use Chukdo\Contracts\Db\Write as WriteInterface;
 use Chukdo\Json\Json;
 
 /**
- * Server Where.
+ * Server TraitWhere.
  *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo

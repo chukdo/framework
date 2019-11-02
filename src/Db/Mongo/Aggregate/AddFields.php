@@ -11,13 +11,13 @@ namespace Chukdo\Db\Mongo\Aggregate;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Set extends Stage
+Class AddFields extends Stage
 {
 	/**
 	 * @param string $field
 	 * @param        $expression
 	 *
-	 * @return Set
+	 * @return AddFields
 	 */
 	public function set( string $field, $expression ): self
 	{

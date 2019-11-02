@@ -22,8 +22,10 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Write extends Where implements WriteInterface
+Class Write implements WriteInterface
 {
+	use TraitWhere;
+	
 	/**
 	 * @var Json
 	 */

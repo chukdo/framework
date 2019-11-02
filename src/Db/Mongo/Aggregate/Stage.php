@@ -15,6 +15,8 @@ use Chukdo\Contracts\Db\Stage as StageInterface;
  */
 Class Stage implements StageInterface
 {
+	use TraitPipelineStage;
+	
 	/**
 	 * @var array
 	 */
@@ -49,5 +51,17 @@ Class Stage implements StageInterface
 	public function projection()
 	{
 		return $this->pipe;
+	}
+	
+	/**
+	 * @param $pipe
+	 *
+	 * @return StageInterface
+	 */
+	public function pipeStage( $pipe ): StageInterface
+	{
+		return $this->stage()
+		            ->stage()
+		            ->pipeStage( $pipe );
 	}
 }
