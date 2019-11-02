@@ -3,8 +3,8 @@
 namespace Chukdo\Jwt;
 
 use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\Json\Json;
 use Chukdo\Helper\Arr;
-use Chukdo\Helper\To;
 use iterable;
 
 /**
@@ -17,10 +17,17 @@ use iterable;
  */
 class Builder
 {
+    use TraitEncode;
+
     /**
      * @var array
      */
     protected $claims = [];
+
+    /**
+     * @var string
+     */
+    protected $secret;
 
     protected $keywords = [ 'iss',
                             'iat',
@@ -29,153 +36,21 @@ class Builder
                             'jti', ];
 
     /**
-     * @param string      $jwt
-     * @param string      $secret
-     * @param string|null $validIssuer
-     * @param string|null $validAudience
-     *
-     * @return bool
-     */
-    public function parse( string $jwt, string $secret, string $validIssuer = null, string $validAudience = null ): bool
-    {
-        $tokenParts = $this->getTokensParts( $jwt );
-
-        if ( Arr::empty( $tokenParts ) ) {
-            return false;
-        }
-
-        $header    = $this->headerDecode( $tokenParts[ 'header' ] );
-        $payload   = $this->payloadDecode( $tokenParts[ 'payload' ] );
-        $signature = $this->signatureEncode( $header, $payload, $secret );
-
-        $time = time();
-        $nbf  = $payload[ 'nbf' ] ?? null;
-        $exp  = $payload[ 'exp' ] ?? null;
-        $iss  = $payload[ 'iss' ] ?? null;
-        $aud  = (array)( $payload[ 'aud' ] ?? [] );
-
-        $this->setAll( $payload );
-
-        if ( $signature !== $tokenParts[ 'signature' ] ) {
-            return false;
-        }
-
-        if ( $nbf && $time <= $nbf ) {
-            return false;
-        }
-
-        if ( $exp && $time >= $exp ) {
-            return false;
-        }
-
-        if ( $validIssuer && $iss !== $validIssuer ) {
-            return false;
-        }
-
-        if ( $validAudience && !Arr::in( $validAudience, $aud ) ) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param string $jwt
-     *
-     * @return array
-     */
-    protected function getTokensParts( string $jwt ): array
-    {
-        $tokenParts = explode( '.', $jwt );
-
-        if ( count( $tokenParts ) !== 3 ) {
-            return [];
-        }
-
-        return [ 'header'    => $tokenParts[ 0 ],
-                 'payload'   => $tokenParts[ 1 ],
-                 'signature' => $tokenParts[ 2 ], ];
-    }
-
-    /**
-     * @param string $header
-     *
-     * @return array
-     */
-    protected function headerDecode( string $header ): array
-    {
-        return $this->jsonDecode( To::base64Decode( $header ) );
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return mixed
-     */
-    protected function jsonDecode( string $value )
-    {
-        return json_decode( $value, true, 512, JSON_THROW_ON_ERROR );
-    }
-
-    /**
-     * @param string $payload
-     *
-     * @return array
-     */
-    protected function payloadDecode( string $payload ): array
-    {
-        return $this->jsonDecode( To::base64Decode( $payload ) );
-    }
-
-    /**
-     * @param array  $header
-     * @param array  $payload
      * @param string $secret
      *
-     * @return string|null
+     * @return $this
      */
-    protected function signatureEncode( array $header, array $payload, string $secret ): ?string
+    public function secret( string $secret ): self
     {
-        $alg            = $header[ 'alg' ] ?? null;
-        $headerEncoded  = $this->headerEncode( $header );
-        $payLoadEncoded = $this->payloadEncode( $payload );
-
-        switch ( $alg ) {
-            case 'H256' :
-                return To::base64UrlEncode( hash_hmac( 'sha256', $headerEncoded . '.' . $payLoadEncoded, $secret, true ) );
-        }
-
-        return null;
+        $this->secret = $secret;
     }
 
     /**
-     * @param array $header
-     *
      * @return string
      */
-    protected function headerEncode( array $header ): string
+    public function getSecret(): string
     {
-        return To::base64UrlEncode( $this->jsonEncode( $header ) );
-    }
-
-    /**
-     * @param $value
-     *
-     * @return string
-     */
-    protected function jsonEncode( $value ): string
-    {
-        return json_encode( $value, JSON_THROW_ON_ERROR, 512 );
-    }
-
-    /**
-     * @param array $payload
-     *
-     * @return string
-     */
-    protected function payloadEncode( array $payload ): string
-    {
-        return To::base64UrlEncode( $this->jsonEncode( $payload ) );
+        return $this->secret;
     }
 
     /**
@@ -389,12 +264,12 @@ class Builder
     }
 
     /**
-     * @param string $secret
-     * @param string $crypto
-     *
      * @return string
      */
-    public function token( string $secret, string $crypto = 'HS256' ): string
+    public function token(): string
     {
+        // b64 header sujet ALG
+        // b64 claim
+        // encode package
     }
 }

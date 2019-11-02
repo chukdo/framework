@@ -2,10 +2,8 @@
 
 namespace Chukdo\Jwt;
 
-use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Helper\Arr;
 use Chukdo\Helper\To;
-use iterable;
 
 /**
  * Json Web Token.
@@ -17,6 +15,8 @@ use iterable;
  */
 class Parser
 {
+    use TraitEncode;
+
     /**
      * @var array
      */
@@ -38,23 +38,9 @@ class Parser
     public function parse(): Builder
     {
         $tokenParts = $this->getTokensParts( $this->jwt );
-        $payload    = $this->payloadDecode( $tokenParts[ 'payload' ] ?? [] );
-        $builder    = new Builder();
-        $builder->setAll( $payload );
-        $builder->secret( $this->secret );
-
-        return $builder;
-    }
-
-    /**
-     * @return bool
-     */
-    public function signedToken(): bool
-    {
-        $tokenParts = $this->getTokensParts( $this->jwt );
 
         if ( Arr::empty( $tokenParts ) ) {
-            return false;
+            throw new JwtException( 'The token is not a valid JWT' );
         }
 
         $header    = $this->headerDecode( $tokenParts[ 'header' ] );
@@ -69,30 +55,34 @@ class Parser
         $aud  = (array)( $payload[ 'aud' ] ?? [] );
 
         if ( $signature !== $tokenParts[ 'signature' ] ) {
-            return false;
+            throw new JwtException( 'The JWT signature is not a valid' );
         }
 
         if ( $nbf && $time <= $nbf ) {
-            return false;
+            throw new JwtException( 'The JWT is not yet valid' );
         }
 
         if ( $exp && $time >= $exp ) {
-            return false;
+            throw new JwtException( 'The JWT has expired' );
         }
 
         if ( $this->claims[ 'jti' ] && $jti !== $this->claims[ 'jti' ] ) {
-            return false;
+            throw new JwtException( 'The JWT claim:jti is not a valid' );
         }
 
         if ( $this->claims[ 'iss' ] && $iss !== $this->claims[ 'iss' ] ) {
-            return false;
+            throw new JwtException( 'The JWT claim:iss is not a valid' );
         }
 
         if ( $this->claims[ 'aud' ] && !Arr::in( $this->claims[ 'aud' ], $aud ) ) {
-            return false;
+            throw new JwtException( 'The JWT claim:aud is not a valid' );
         }
 
-        return true;
+        $builder = new Builder();
+        $builder->setAll( $payload );
+        $builder->secret( $this->secret );
+
+        return $builder;
     }
 
     /**
@@ -103,6 +93,8 @@ class Parser
     public function token( string $jwt ): self
     {
         $this->jwt = $jwt;
+
+        return $this;
     }
 
     /**
@@ -113,6 +105,8 @@ class Parser
     public function secret( string $secret ): self
     {
         $this->secret = $secret;
+
+        return $this;
     }
 
     /**
@@ -152,16 +146,6 @@ class Parser
     }
 
     /**
-     * @param $value
-     *
-     * @return string
-     */
-    protected function jsonEncode( $value ): string
-    {
-        return json_encode( $value, JSON_THROW_ON_ERROR, 512 );
-    }
-
-    /**
      * @param string $value
      *
      * @return mixed
@@ -190,16 +174,6 @@ class Parser
     }
 
     /**
-     * @param array $header
-     *
-     * @return string
-     */
-    protected function headerEncode( array $header ): string
-    {
-        return To::base64UrlEncode( $this->jsonEncode( $header ) );
-    }
-
-    /**
      * @param string $header
      *
      * @return array
@@ -210,16 +184,6 @@ class Parser
     }
 
     /**
-     * @param array $payload
-     *
-     * @return string
-     */
-    protected function payloadEncode( array $payload ): string
-    {
-        return To::base64UrlEncode( $this->jsonEncode( $payload ) );
-    }
-
-    /**
      * @param string $payload
      *
      * @return array
@@ -227,26 +191,5 @@ class Parser
     protected function payloadDecode( string $payload ): array
     {
         return $this->jsonDecode( To::base64Decode( $payload ) );
-    }
-
-    /**
-     * @param array  $header
-     * @param array  $payload
-     * @param string $secret
-     *
-     * @return string|null
-     */
-    protected function signatureEncode( array $header, array $payload, string $secret ): ?string
-    {
-        $alg            = $header[ 'alg' ] ?? null;
-        $headerEncoded  = $this->headerEncode( $header );
-        $payLoadEncoded = $this->payloadEncode( $payload );
-
-        switch ( $alg ) {
-            case 'H256' :
-                return To::base64UrlEncode( hash_hmac( 'sha256', $headerEncoded . '.' . $payLoadEncoded, $secret, true ) );
-        }
-
-        return null;
     }
 }
