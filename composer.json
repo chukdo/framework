@@ -35,7 +35,10 @@
     "guzzlehttp/guzzle": "~6.0",
     "elasticsearch/elasticsearch": "~7.0",
     "league/climate": "^3.5",
-    "ext-libxml": "*"
+    "ext-libxml": "*",
+    "ext-gd": "*",
+    "ext-fileinfo": "*",
+    "ext-mbstring": "*"
   },
   "autoload": {
     "psr-4": {

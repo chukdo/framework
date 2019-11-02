@@ -30,7 +30,7 @@ final class Image
 			return self::loadImageFromString( $string );
 		}
 		
-		return false;
+		return null;
 	}
 	
 	/**
@@ -271,9 +271,10 @@ final class Image
 	{
 		$sw = $image[ 'w' ];
 		$sh = $image[ 'h' ];
-		/* Taille finale > taille initiale */
+		
+		/** Taille finale > taille initiale */
 		if ( $dx + $dw > $sw || $dy + $dh > $sh ) {
-			return false;
+			return null;
 		}
 		
 		return self::resampleImage( $image, $dx, $dy, $dw, $dh, $dw, $dh );

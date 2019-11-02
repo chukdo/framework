@@ -94,6 +94,44 @@ final class To
 	}
 	
 	/**
+	 * @param string $value
+	 *
+	 * @return string
+	 */
+	public static function base64Encode( string $value ): string
+	{
+		return base64_encode( $value );
+	}
+	
+	/**
+	 * @param string $value
+	 *
+	 * @return string|null
+	 */
+	public static function base64Decode( string $value ): ?string
+	{
+		return base64_decode( $value ) ?? null;
+	}
+	
+	/**
+	 * @param string $value
+	 *
+	 * @return string
+	 */
+	public static function base64UrlEncode( string $value ): string
+	{
+		return str_replace( [
+			                    '+',
+			                    '/',
+			                    '=',
+		                    ], [
+			                    '-',
+			                    '_',
+			                    '',
+		                    ], self::base64Encode( $value ) );
+	}
+	
+	/**
 	 * @param $value
 	 *
 	 * @return int

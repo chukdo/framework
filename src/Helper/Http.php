@@ -62,6 +62,7 @@ final class Http
 			'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
 		];
 		$ext       = Str::extension( $name );
+		
 		if ( array_key_exists( $ext, $mimeTypes ) ) {
 			return $mimeTypes[ $ext ];
 		}
@@ -97,11 +98,13 @@ final class Http
 			
 			return false;
 		};
+		
 		/** Browser & Version */
 		if ( !$is( 'firefox' ) && !$is( 'edge', 'msie' ) && !$is( 'msie' ) && !$is( 'trident', 'msie' ) &&
 		     !$is( 'opera' ) && !$is( 'opr', 'opera' ) && !$is( 'chromium', 'chrome' ) && !$is( 'chrome' ) ) {
 			$is( 'safari' );
 		}
+		
 		/** Platform */
 		if ( Str::contain( $ua, 'windows' ) ) {
 			$browser[ 'platform' ] = 'windows';
@@ -114,6 +117,7 @@ final class Http
 				}
 			}
 		}
+		
 		/** Mobile */
 		if ( Str::contain( $ua, 'ipad' ) || Str::contain( $ua, 'iphone' ) ) {
 			$browser[ 'mobile' ] = 'ios';

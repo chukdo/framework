@@ -54,6 +54,7 @@ final class Crypto
 		if ( Str::contain( $token, '%' ) ) {
 			$token = rawurldecode( $token );
 		}
+		
 		/** Hack decoding link ex. Outlook */
 		$token = str_replace( ' ', '+', $token );
 		$json  = json_decode( self::decrypt( $token, $salt ), false, 512, JSON_THROW_ON_ERROR );
@@ -93,18 +94,28 @@ final class Crypto
 	 * @return string
 	 * @throws Exception
 	 */
-	public static function generateCode( int $length, bool $readable = true ): string
+	public static function code( int $length, bool $readable = true ): string
 	{
 		$token        = '';
 		$codeAlphabet = $readable
 			? 'abcdefghjkmnpqrstuvwxyz123456789'
 			: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 		$max          = strlen( $codeAlphabet );
+		
 		for ( $i = 0; $i < $length; ++$i ) {
 			$token .= $codeAlphabet[ random_int( 0, $max - 1 ) ];
 		}
 		
 		return $token;
+	}
+	
+	/**
+	 * @return string
+	 * @throws Exception
+	 */
+	public static function secret(): string
+	{
+		return bin2hex( random_bytes( 32 ) );
 	}
 	
 	/**
@@ -120,6 +131,7 @@ final class Crypto
 		$file = crc32( $name );
 		$path = '';
 		$hash = str_split( hash( 'crc32', $file ), 2 );
+		
 		/** Hashlevel */
 		for ( $i = 0; $i < $hashlevel; ++$i ) {
 			$path .= $hash[ $i ] . '/';

@@ -3,6 +3,7 @@
 namespace Chukdo\Helper;
 
 use Chukdo\Bootstrap\AppException;
+use ZipArchive;
 
 /**
  * Classe Archive
@@ -31,22 +32,21 @@ final class Archive
 	{
 		$flags       = ord( substr( $data, 3, 1 ) );
 		$headerlen   = 10;
-		$extralen    = 0;
-		$filenamelen = 0;
+
 		if ( $flags & 4 ) {
 			$extralen  = unpack( 'v', substr( $data, 10, 2 ) );
 			$extralen  = $extralen[ 1 ];
 			$headerlen += 2 + $extralen;
 		}
-		/* Filename */
+		/** Filename */
 		if ( $flags & 8 ) {
 			$headerlen = strpos( $data, chr( 0 ), $headerlen ) + 1;
 		}
-		/* Comment */
+		/** Comment */
 		if ( $flags & 16 ) {
 			$headerlen = strpos( $data, chr( 0 ), $headerlen ) + 1;
 		}
-		/* CRC at end of file */
+		/** CRC at end of file */
 		if ( $flags & 2 ) {
 			$headerlen += 2;
 		}
@@ -106,35 +106,39 @@ final class Archive
 			ZIPARCHIVE::ER_REMOVE      => 'Can\'t remove file',
 			ZIPARCHIVE::ER_DELETED     => 'Entry has been deleted',
 		];
-		/* Creation repertoire */
+		
+		/** Creation repertoire */
 		mkdir( $path, 0777, true );
-		/* Erreur d'ouverture du fichier */
+		
+		/** Erreur d'ouverture du fichier */
 		if ( !is_resource( $open ) ) {
 			throw new AppException( sprintf( 'Zip File Function error: %s', $ziperror[ $open ] ) );
 		}
+		
 		while ( ( $read = zip_read( $open ) ) !== false ) {
-			/* Erreur d'ouverture du fichier */
+			/** Erreur d'ouverture du fichier */
 			if ( !is_resource( $read ) ) {
 				throw new AppException( sprintf( 'Zip File Function error: %s', $ziperror[ $read ] ) );
 			}
+			
 			$name = zip_entry_name( $read );
 			$dir  = trim( dirname( $name ), DIRECTORY_SEPARATOR ) . DIRECTORY_SEPARATOR;
 			$file = ( $root
 					? $path
 					: $path . $dir ) . basename( $name );
 			$size = zip_entry_filesize( $read );
-			/* Dossier */
+			
+			/** Dossier */
 			if ( substr( $name, -1 ) == '/' ) {
 				if ( !is_dir( $path . $dir ) ) {
 					mkdir( $path . $dir, 0777, true );
 				}
-				/* Fichier */
+				/** Fichier */
 			} else {
-				if ( !$root ) {
-					if ( !is_dir( $path . $dir ) ) {
-						mkdir( $path . $dir, 0777, true );
-					}
+				if ( !$root && !is_dir( $path . $dir ) ) {
+					mkdir( $path . $dir, 0777, true );
 				}
+				
 				if ( ( $fp = fopen( $file, 'wb' ) ) !== false ) {
 					while ( $size > 0 ) {
 						$block   = min( $size, 10240 );
@@ -147,7 +151,7 @@ final class Archive
 					fclose( $fp );
 					@chmod( $file, 0777 );
 					$ret[] = $file;
-					/* Error */
+					/** Error */
 				} else {
 					throw new AppException( sprintf( 'Zip File Function error: can\'t write file %s', $file ) );
 				}
