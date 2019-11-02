@@ -17,91 +17,87 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
  */
 Class Aggregate
 {
-	/**
-	 * @var Collection
-	 */
-	protected $collection;
-	
-	/**
-	 * @var array
-	 */
-	protected $options = [];
-	
-	/**
-	 * @var array
-	 */
-	protected $pipe = [];
-	
-	/**
-	 * Aggregate constructor.
-	 *
-	 * @param CollectionInterface $collection
-	 */
-	public function __construct( CollectionInterface $collection )
-	{
-		$this->collection = $collection;
-	}
-	
-	/**
-	 * @return PipelineStage
-	 */
-	public function stage(): PipelineStage
-	{
-		return $this->pipe[] = new PipelineStage();
-	}
-	
-	/**
-	 * @param bool $allowDiskUse
-	 * @param bool $bypassDocumentValidation
-	 *
-	 * @return JsonInterface
-	 */
-	public function all( bool $allowDiskUse = false, bool $bypassDocumentValidation = false ): JsonInterface
-	{
-		return new Json( $this->cursor( [
-			                                'allowDiskUse'             => $allowDiskUse,
-			                                'bypassDocumentValidation' => $bypassDocumentValidation,
-			                                'useCursor'                => true,
-		                                ] ) );
-	}
-	
-	/**
-	 * @param array $options
-	 *
-	 * @return Cursor
-	 */
-	public function cursor( array $options = [] ): Cursor
-	{
-		return new Cursor( $this->collection->client()
-		                                    ->aggregate( $this->projection(), $options ) );
-	}
-	
-	/**
-	 * @return array
-	 */
-	public function projection(): array
-	{
-		$projection = [];
-		
-		foreach ( $this->pipe as $stage ) {
-			foreach ( $stage->projection() as $k => $v ) {
-				$projection[][ $k ] = $v;
-			}
-		}
-		
-		return $projection;
-	}
-	
-	/**
-	 * @return JsonInterface
-	 */
-	public function explain(): JsonInterface
-	{
-		return new Json( new Cursor( $this->collection->client()
-		                                              ->aggregate( $this->projection(), [
-			                                              'explain'   => true,
-			                                              'useCursor' => true,
-		                                              ] ) ) );
-	}
-	
+    /**
+     * @var Collection
+     */
+    protected $collection;
+
+    /**
+     * @var array
+     */
+    protected $options = [];
+
+    /**
+     * @var array
+     */
+    protected $pipe = [];
+
+    /**
+     * Aggregate constructor.
+     *
+     * @param CollectionInterface $collection
+     */
+    public function __construct( CollectionInterface $collection )
+    {
+        $this->collection = $collection;
+    }
+
+    /**
+     * @return PipelineStage
+     */
+    public function stage(): PipelineStage
+    {
+        return $this->pipe[] = new PipelineStage();
+    }
+
+    /**
+     * @param bool $allowDiskUse
+     * @param bool $bypassDocumentValidation
+     *
+     * @return JsonInterface
+     */
+    public function all( bool $allowDiskUse = false, bool $bypassDocumentValidation = false ): JsonInterface
+    {
+        return new Json( $this->cursor( [ 'allowDiskUse'             => $allowDiskUse,
+                                          'bypassDocumentValidation' => $bypassDocumentValidation,
+                                          'useCursor'                => true, ] ) );
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return Cursor
+     */
+    public function cursor( array $options = [] ): Cursor
+    {
+        return new Cursor( $this->collection->client()
+                                            ->aggregate( $this->projection(), $options ) );
+    }
+
+    /**
+     * @return array
+     */
+    public function projection(): array
+    {
+        $projection = [];
+
+        foreach ( $this->pipe as $stage ) {
+            foreach ( $stage->projection() as $k => $v ) {
+                $projection[][ $k ] = $v;
+            }
+        }
+
+        return $projection;
+    }
+
+    /**
+     * @return JsonInterface
+     */
+    public function explain(): JsonInterface
+    {
+        return new Json( new Cursor( $this->collection->client()
+                                                      ->aggregate( $this->projection(), [ 'explain'   => true,
+                                                                                          'useCursor' => true, ] ) ) );
+    }
+
 }

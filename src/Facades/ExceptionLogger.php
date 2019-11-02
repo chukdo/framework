@@ -15,8 +15,8 @@ use Chukdo\Logger\Logger;
  */
 class ExceptionLogger extends Facade
 {
-	public static function name(): string
-	{
-		return 'ExceptionLogger';
-	}
+    public static function name(): string
+    {
+        return 'ExceptionLogger';
+    }
 }

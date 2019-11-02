@@ -12,8 +12,8 @@ namespace Chukdo\Facades;
  */
 class Storage extends Facade
 {
-	public static function name(): string
-	{
-		return \Chukdo\Storage\Storage::class;
-	}
+    public static function name(): string
+    {
+        return \Chukdo\Storage\Storage::class;
+    }
 }

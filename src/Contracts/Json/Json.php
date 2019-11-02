@@ -21,398 +21,398 @@ use Serializable;
  */
 interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
 {
-	/**
-	 * @return int
-	 */
-	public function count(): int;
-	
-	/**
-	 * @param $key
-	 *
-	 * @return bool
-	 */
-	public function offsetExists( $key ): bool;
-	
-	/**
-	 * @param mixed $key
-	 * @param null  $default
-	 *
-	 * @return mixed|null
-	 */
-	public function offsetGet( $key, $default = null );
-	
-	/**
-	 * @param mixed $key
-	 * @param mixed $value
-	 */
-	public function offsetSet( $key, $value );
-	
-	/**
-	 * @param mixed $key
-	 *
-	 * @return mixed|null
-	 */
-	public function offsetUnset( $key );
-	
-	/**
-	 * @param $key
-	 *
-	 * @return Json
-	 */
-	public function coll( $key ): JsonInterface;
-	
-	/**
-	 * @return $this
-	 */
-	public function all();
-	
-	/**
-	 * @return array
-	 */
-	public function getArrayCopy(): array;
-	
-	/**
-	 * @return bool
-	 */
-	public function isEmpty(): bool;
-	
-	/**
-	 * @return mixed
-	 */
-	public function getFirst();
-	
-	/**
-	 * @param int   $key
-	 * @param mixed $default
-	 *
-	 * @return mixed|null
-	 */
-	public function getIndex( int $key = 0, $default = null );
-	
-	/**
-	 * @param int $key
-	 *
-	 * @return Json
-	 */
-	public function getIndexJson( int $key = 0 ): JsonInterface;
-	
-	/**
-	 * @return mixed
-	 */
-	public function getLast();
-	
-	/**
-	 * @return mixed|null
-	 */
-	public function getKeyFirst();
-	
-	/**
-	 * @return mixed|null
-	 */
-	public function getKeyLast();
-	
-	/**
-	 * @param int  $index
-	 * @param null $default
-	 *
-	 * @return int|mixed|string|null
-	 */
-	public function getKeyIndex( int $index = 0, $default = null );
-	
-	/**
-	 * @param array $keys
-	 * @param null  $default
-	 *
-	 * @return mixed|null
-	 */
-	public function offsetGetFirstInList( array $keys, $default = null );
-	
-	/**
-	 * @param iterable|null $merge
-	 * @param bool|null     $overwrite
-	 *
-	 * @return Json
-	 */
-	public function merge( iterable $merge = null, bool $overwrite = null ): JsonInterface;
-	
-	/**
-	 * @param iterable|null $push
-	 * @param bool|null     $overwrite
-	 *
-	 * @return JsonInterface
-	 */
-	public function push( iterable $push = null, bool $overwrite = null ): JsonInterface;
-	
-	/**
-	 * @param Closure $closure
-	 *
-	 * @return Json
-	 */
-	public function filter( Closure $closure ): JsonInterface;
-	
-	/**
-	 * @param Closure $closure
-	 *
-	 * @return Json
-	 */
-	public function filterRecursive( Closure $closure ): JsonInterface;
-	
-	/**
-	 * @param mixed ...$offsets
-	 *
-	 * @return Json
-	 */
-	public function with( ...$offsets ): JsonInterface;
-	
-	/**
-	 * @param mixed ...$offsets
-	 *
-	 * @return Json
-	 */
-	public function without( ...$offsets ): JsonInterface;
-	
-	/**
-	 * @param iterable|null $merge
-	 * @param bool|null     $overwrite
-	 *
-	 * @return Json
-	 */
-	public function mergeRecursive( iterable $merge = null, bool $overwrite = null ): JsonInterface;
-	
-	/**
-	 * @return Json
-	 */
-	public function clean(): JsonInterface;
-	
-	/**
-	 * @param string $path
-	 * @param        $value
-	 *
-	 * @return Json
-	 */
-	public function addToSet( string $path, $value ): JsonInterface;
-	
-	/**
-	 * @return bool
-	 */
-	public function isArray(): bool;
-	
-	/**
-	 * @param $value
-	 *
-	 * @return bool
-	 */
-	public function in( $value ): bool;
-	
-	/**
-	 * @param Json $json
-	 *
-	 * @return Json
-	 */
-	public function intersect( JsonInterface $json ): JsonInterface;
-	
-	/**
-	 * @param Json $json
-	 *
-	 * @return Json
-	 */
-	public function diff( JsonInterface $json ): JsonInterface;
-	
-	/**
-	 * @param mixed $value
-	 *
-	 * @return Json
-	 */
-	public function append( $value ): JsonInterface;
-	
-	/**
-	 * @param mixed $value
-	 *
-	 * @return Json
-	 */
-	public function appendIfNoExist( $value ): JsonInterface;
-	
-	/**
-	 * @param string|null $path
-	 * @param null        $default
-	 *
-	 * @return mixed|null
-	 */
-	public function get( ?string $path, $default = null );
-	
-	/**
-	 * @param string|null $path
-	 *
-	 * @return Json
-	 */
-	public function getJson( ?string $path ): JsonInterface;
-	
-	/**
-	 * @param string $path
-	 * @param        $value
-	 *
-	 * @return Json
-	 */
-	public function set( string $path, $value ): JsonInterface;
-	
-	/**
-	 * @param       $key
-	 * @param mixed $value
-	 *
-	 * @return mixed
-	 */
-	public function offsetGetOrSet( $key, $value = null );
-	
-	/**
-	 * @param $value
-	 *
-	 * @return mixed
-	 */
-	public function indexOf( $value );
-	
-	/**
-	 * @param string $path
-	 *
-	 * @return mixed|null
-	 */
-	public function unset( string $path );
-	
-	/**
-	 * @param string $path
-	 *
-	 * @return JsonInterface
-	 */
-	public function unwind( string $path ): JsonInterface;
-	
-	/**
-	 * @return JsonInterface
-	 */
-	public function clone(): JsonInterface;
-	
-	/**
-	 * @param $data
-	 *
-	 * @return Json
-	 */
-	public function reset( $data = [] ): JsonInterface;
-	
-	/**
-	 * @return Json
-	 */
-	public function resetKeys(): JsonInterface;
-	
-	/**
-	 * @param string $path
-	 *
-	 * @return bool
-	 */
-	public function filled( string $path ): bool;
-	
-	/**
-	 * @param string $path
-	 *
-	 * @return bool
-	 */
-	public function exists( string $path ): bool;
-	
-	/**
-	 * @param bool $byKey
-	 *
-	 * @return Json
-	 */
-	public function sort( bool $byKey = false ): JsonInterface;
-	
-	/**
-	 * @param string $path
-	 * @param bool   $scalarResultOnly
-	 *
-	 * @return Json
-	 */
-	public function wildcard( string $path, bool $scalarResultOnly = false ): JsonInterface;
-	
-	/**
-	 * @param string|null $prefix
-	 *
-	 * @return Json
-	 */
-	public function to2d( string $prefix = null ): JsonInterface;
-	
-	/**
-	 * @param string|null $title
-	 * @param string|null $color
-	 *
-	 * @return string
-	 */
-	public function toHtml( string $title = null, string $color = null ): string;
-	
-	/**
-	 * @param string|null $title
-	 * @param string|null $color
-	 *
-	 * @return string
-	 */
-	public function toConsole( string $title = null, string $color = null ): string;
-	
-	/**
-	 * @return Xml
-	 */
-	public function toXml(): Xml;
-	
-	/**
-	 * @param mixed ...$param
-	 *
-	 * @return mixed
-	 */
-	public function to( ...$param );
-	
-	/**
-	 * @param mixed ...$param
-	 *
-	 * @return mixed
-	 */
-	public function is( ...$param );
-	
-	/**
-	 * @return array
-	 */
-	public function toArray(): array;
-	
-	/**
-	 * @return string
-	 */
-	public function __toString(): string;
-	
-	/**
-	 * @param bool $prettify
-	 *
-	 * @return string
-	 */
-	public function toJson( bool $prettify = false ): string;
-	
-	/**
-	 * @param string $key
-	 *
-	 * @return bool
-	 */
-	public function __isset( string $key ): bool;
-	
-	/**
-	 * @param string $key
-	 *
-	 * @return mixed|null
-	 */
-	public function __get( string $key );
-	
-	/**
-	 * @param string $key
-	 * @param        $value
-	 */
-	public function __set( string $key, $value ): void;
-	
-	/**
-	 * @param string $key
-	 *
-	 * @return bool
-	 */
-	public function __unset( string $key ): bool;
+    /**
+     * @return int
+     */
+    public function count(): int;
+
+    /**
+     * @param $key
+     *
+     * @return bool
+     */
+    public function offsetExists( $key ): bool;
+
+    /**
+     * @param mixed $key
+     * @param null  $default
+     *
+     * @return mixed|null
+     */
+    public function offsetGet( $key, $default = null );
+
+    /**
+     * @param mixed $key
+     * @param mixed $value
+     */
+    public function offsetSet( $key, $value );
+
+    /**
+     * @param mixed $key
+     *
+     * @return mixed|null
+     */
+    public function offsetUnset( $key );
+
+    /**
+     * @param $key
+     *
+     * @return Json
+     */
+    public function coll( $key ): JsonInterface;
+
+    /**
+     * @return $this
+     */
+    public function all();
+
+    /**
+     * @return array
+     */
+    public function getArrayCopy(): array;
+
+    /**
+     * @return bool
+     */
+    public function isEmpty(): bool;
+
+    /**
+     * @return mixed
+     */
+    public function getFirst();
+
+    /**
+     * @param int   $key
+     * @param mixed $default
+     *
+     * @return mixed|null
+     */
+    public function getIndex( int $key = 0, $default = null );
+
+    /**
+     * @param int $key
+     *
+     * @return Json
+     */
+    public function getIndexJson( int $key = 0 ): JsonInterface;
+
+    /**
+     * @return mixed
+     */
+    public function getLast();
+
+    /**
+     * @return mixed|null
+     */
+    public function getKeyFirst();
+
+    /**
+     * @return mixed|null
+     */
+    public function getKeyLast();
+
+    /**
+     * @param int  $index
+     * @param null $default
+     *
+     * @return int|mixed|string|null
+     */
+    public function getKeyIndex( int $index = 0, $default = null );
+
+    /**
+     * @param array $keys
+     * @param null  $default
+     *
+     * @return mixed|null
+     */
+    public function offsetGetFirstInList( array $keys, $default = null );
+
+    /**
+     * @param iterable|null $merge
+     * @param bool|null     $overwrite
+     *
+     * @return Json
+     */
+    public function merge( iterable $merge = null, bool $overwrite = null ): JsonInterface;
+
+    /**
+     * @param iterable|null $push
+     * @param bool|null     $overwrite
+     *
+     * @return JsonInterface
+     */
+    public function push( iterable $push = null, bool $overwrite = null ): JsonInterface;
+
+    /**
+     * @param Closure $closure
+     *
+     * @return Json
+     */
+    public function filter( Closure $closure ): JsonInterface;
+
+    /**
+     * @param Closure $closure
+     *
+     * @return Json
+     */
+    public function filterRecursive( Closure $closure ): JsonInterface;
+
+    /**
+     * @param mixed ...$offsets
+     *
+     * @return Json
+     */
+    public function with( ...$offsets ): JsonInterface;
+
+    /**
+     * @param mixed ...$offsets
+     *
+     * @return Json
+     */
+    public function without( ...$offsets ): JsonInterface;
+
+    /**
+     * @param iterable|null $merge
+     * @param bool|null     $overwrite
+     *
+     * @return Json
+     */
+    public function mergeRecursive( iterable $merge = null, bool $overwrite = null ): JsonInterface;
+
+    /**
+     * @return Json
+     */
+    public function clean(): JsonInterface;
+
+    /**
+     * @param string $path
+     * @param        $value
+     *
+     * @return Json
+     */
+    public function addToSet( string $path, $value ): JsonInterface;
+
+    /**
+     * @return bool
+     */
+    public function isArray(): bool;
+
+    /**
+     * @param $value
+     *
+     * @return bool
+     */
+    public function in( $value ): bool;
+
+    /**
+     * @param Json $json
+     *
+     * @return Json
+     */
+    public function intersect( JsonInterface $json ): JsonInterface;
+
+    /**
+     * @param Json $json
+     *
+     * @return Json
+     */
+    public function diff( JsonInterface $json ): JsonInterface;
+
+    /**
+     * @param mixed $value
+     *
+     * @return Json
+     */
+    public function append( $value ): JsonInterface;
+
+    /**
+     * @param mixed $value
+     *
+     * @return Json
+     */
+    public function appendIfNoExist( $value ): JsonInterface;
+
+    /**
+     * @param string|null $path
+     * @param null        $default
+     *
+     * @return mixed|null
+     */
+    public function get( ?string $path, $default = null );
+
+    /**
+     * @param string|null $path
+     *
+     * @return Json
+     */
+    public function getJson( ?string $path ): JsonInterface;
+
+    /**
+     * @param string $path
+     * @param        $value
+     *
+     * @return Json
+     */
+    public function set( string $path, $value ): JsonInterface;
+
+    /**
+     * @param       $key
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    public function offsetGetOrSet( $key, $value = null );
+
+    /**
+     * @param $value
+     *
+     * @return mixed
+     */
+    public function indexOf( $value );
+
+    /**
+     * @param string $path
+     *
+     * @return mixed|null
+     */
+    public function unset( string $path );
+
+    /**
+     * @param string $path
+     *
+     * @return JsonInterface
+     */
+    public function unwind( string $path ): JsonInterface;
+
+    /**
+     * @return JsonInterface
+     */
+    public function clone(): JsonInterface;
+
+    /**
+     * @param $data
+     *
+     * @return Json
+     */
+    public function reset( $data = [] ): JsonInterface;
+
+    /**
+     * @return Json
+     */
+    public function resetKeys(): JsonInterface;
+
+    /**
+     * @param string $path
+     *
+     * @return bool
+     */
+    public function filled( string $path ): bool;
+
+    /**
+     * @param string $path
+     *
+     * @return bool
+     */
+    public function exists( string $path ): bool;
+
+    /**
+     * @param bool $byKey
+     *
+     * @return Json
+     */
+    public function sort( bool $byKey = false ): JsonInterface;
+
+    /**
+     * @param string $path
+     * @param bool   $scalarResultOnly
+     *
+     * @return Json
+     */
+    public function wildcard( string $path, bool $scalarResultOnly = false ): JsonInterface;
+
+    /**
+     * @param string|null $prefix
+     *
+     * @return Json
+     */
+    public function to2d( string $prefix = null ): JsonInterface;
+
+    /**
+     * @param string|null $title
+     * @param string|null $color
+     *
+     * @return string
+     */
+    public function toHtml( string $title = null, string $color = null ): string;
+
+    /**
+     * @param string|null $title
+     * @param string|null $color
+     *
+     * @return string
+     */
+    public function toConsole( string $title = null, string $color = null ): string;
+
+    /**
+     * @return Xml
+     */
+    public function toXml(): Xml;
+
+    /**
+     * @param mixed ...$param
+     *
+     * @return mixed
+     */
+    public function to( ...$param );
+
+    /**
+     * @param mixed ...$param
+     *
+     * @return mixed
+     */
+    public function is( ...$param );
+
+    /**
+     * @return array
+     */
+    public function toArray(): array;
+
+    /**
+     * @return string
+     */
+    public function __toString(): string;
+
+    /**
+     * @param bool $prettify
+     *
+     * @return string
+     */
+    public function toJson( bool $prettify = false ): string;
+
+    /**
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function __isset( string $key ): bool;
+
+    /**
+     * @param string $key
+     *
+     * @return mixed|null
+     */
+    public function __get( string $key );
+
+    /**
+     * @param string $key
+     * @param        $value
+     */
+    public function __set( string $key, $value ): void;
+
+    /**
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function __unset( string $key ): bool;
 }

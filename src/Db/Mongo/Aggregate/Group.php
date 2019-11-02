@@ -15,28 +15,28 @@ use Chukdo\Helper\Arr;
  */
 Class Group extends Stage
 {
-	/**
-	 * @param $expression
-	 *
-	 * @return $this
-	 */
-	public function id( $expression ): self
-	{
-		$this->pipe[ '_id' ] = Expression::parseExpression( $expression );
-		
-		return $this;
-	}
-	
-	/**
-	 * @param string $field
-	 * @param        $expression
-	 *
-	 * @return $this
-	 */
-	public function field( string $field, $expression ): self
-	{
-		$this->pipe[ $field ] = Expression::parseExpression( $expression );
-		
-		return $this;
-	}
+    /**
+     * @param $expression
+     *
+     * @return $this
+     */
+    public function id( $expression ): self
+    {
+        $this->pipe[ '_id' ] = Expression::parseExpression( $expression );
+
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     * @param        $expression
+     *
+     * @return $this
+     */
+    public function field( string $field, $expression ): self
+    {
+        $this->pipe[ $field ] = Expression::parseExpression( $expression );
+
+        return $this;
+    }
 }

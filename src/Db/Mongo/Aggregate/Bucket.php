@@ -15,52 +15,52 @@ use Chukdo\Helper\Arr;
  */
 Class Bucket extends Stage
 {
-	/**
-	 * @param $expression
-	 *
-	 * @return $this
-	 */
-	public function groupBy( $expression ): self
-	{
-		$this->pipe[ 'groupBy' ] = Expression::parseExpression( $expression );
-		
-		return $this;
-	}
-	
-	/**
-	 * @param mixed ...$bounds
-	 *
-	 * @return $this
-	 */
-	public function boundaries( ...$bounds ): self
-	{
-		$this->pipe[ 'boundaries' ] = Arr::spreadArgs( $bounds );
-		
-		return $this;
-	}
-	
-	/**
-	 * @param $value
-	 *
-	 * @return $this
-	 */
-	public function default( $value ): self
-	{
-		$this->pipe[ 'default' ] = $value;
-		
-		return $this;
-	}
-	
-	/**
-	 * @param string $name
-	 * @param        $expression
-	 *
-	 * @return $this
-	 */
-	public function output( string $name, $expression ): self
-	{
-		$this->pipe[ 'output' ][ $name ] = Expression::parseExpression( $expression );
-		
-		return $this;
-	}
+    /**
+     * @param $expression
+     *
+     * @return $this
+     */
+    public function groupBy( $expression ): self
+    {
+        $this->pipe[ 'groupBy' ] = Expression::parseExpression( $expression );
+
+        return $this;
+    }
+
+    /**
+     * @param mixed ...$bounds
+     *
+     * @return $this
+     */
+    public function boundaries( ...$bounds ): self
+    {
+        $this->pipe[ 'boundaries' ] = Arr::spreadArgs( $bounds );
+
+        return $this;
+    }
+
+    /**
+     * @param $value
+     *
+     * @return $this
+     */
+    public function default( $value ): self
+    {
+        $this->pipe[ 'default' ] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @param        $expression
+     *
+     * @return $this
+     */
+    public function output( string $name, $expression ): self
+    {
+        $this->pipe[ 'output' ][ $name ] = Expression::parseExpression( $expression );
+
+        return $this;
+    }
 }

@@ -16,21 +16,21 @@ use Chukdo\Storage\Storage;
  */
 class Lang extends Conf
 {
-	/**
-	 * @param string $file
-	 *
-	 * @return JsonInterface
-	 */
-	public function loadFile( string $file ): JsonInterface
-	{
-		$storage = new Storage();
-		$name    = basename( $file, '.json' );
-		if ( $storage->exists( $file ) ) {
-			$load = new Conf( $storage->get( $file ) );
-			$this->merge( $load->to2d( $name ), true );
-			
-			return $this;
-		}
-		throw new AppException( sprintf( 'Lang file [%s] no exist', $file ) );
-	}
+    /**
+     * @param string $file
+     *
+     * @return JsonInterface
+     */
+    public function loadFile( string $file ): JsonInterface
+    {
+        $storage = new Storage();
+        $name    = basename( $file, '.json' );
+        if ( $storage->exists( $file ) ) {
+            $load = new Conf( $storage->get( $file ) );
+            $this->merge( $load->to2d( $name ), true );
+
+            return $this;
+        }
+        throw new AppException( sprintf( 'Lang file [%s] no exist', $file ) );
+    }
 }

@@ -13,13 +13,13 @@ namespace Chukdo\Db\Mongo\Aggregate;
  */
 Class Skip extends Stage
 {
-	/**
-	 * Sample constructor.
-	 *
-	 * @param int $skip
-	 */
-	public function set( int $skip )
-	{
-		$this->pipe = $skip;
-	}
+    /**
+     * Sample constructor.
+     *
+     * @param int $skip
+     */
+    public function set( int $skip )
+    {
+        $this->pipe = $skip;
+    }
 }

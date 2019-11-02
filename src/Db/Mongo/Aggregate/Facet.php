@@ -15,55 +15,55 @@ use Chukdo\Contracts\Db\Stage as StageInterface;
  */
 Class Facet implements StageInterface
 {
-	/**
-	 * @var array
-	 */
-	protected $pipe = [];
-	
-	/**
-	 * @var stageInterface
-	 */
-	protected $stage;
-	
-	/**
-	 * Match constructor.
-	 *
-	 * @param PipelineStage $stage
-	 */
-	public function __construct( PipelineStage $stage )
-	{
-		$this->stage = $stage;
-	}
-	
-	/**
-	 * @return PipelineStage
-	 */
-	public function stage(): PipelineStage
-	{
-		return $this->stage;
-	}
-	
-	/**
-	 * @param string $field
-	 *
-	 * @return FacetPipelineStage
-	 */
-	public function facetPipelineStage( string $field ): FacetPipelineStage
-	{
-		return $this->pipe[ $field ] = new FacetPipelineStage( $this->stage() );
-	}
-	
-	/**
-	 * @return array
-	 */
-	public function projection(): array
-	{
-		$projection = [];
-		
-		foreach ( $this->pipe as $key => $stage ) {
-			$projection[ $key ] = $stage->projection();
-		}
-		
-		return $projection;
-	}
+    /**
+     * @var array
+     */
+    protected $pipe = [];
+
+    /**
+     * @var stageInterface
+     */
+    protected $stage;
+
+    /**
+     * Match constructor.
+     *
+     * @param PipelineStage $stage
+     */
+    public function __construct( PipelineStage $stage )
+    {
+        $this->stage = $stage;
+    }
+
+    /**
+     * @param string $field
+     *
+     * @return FacetPipelineStage
+     */
+    public function facetPipelineStage( string $field ): FacetPipelineStage
+    {
+        return $this->pipe[ $field ] = new FacetPipelineStage( $this->stage() );
+    }
+
+    /**
+     * @return PipelineStage
+     */
+    public function stage(): PipelineStage
+    {
+        return $this->stage;
+    }
+
+    /**
+     * @return array
+     */
+    public function projection(): array
+    {
+        $projection = [];
+
+        foreach ( $this->pipe as $key => $stage ) {
+            $projection[ $key ] = $stage->projection();
+        }
+
+        return $projection;
+    }
 }

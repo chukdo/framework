@@ -13,51 +13,51 @@ namespace Chukdo\Db\Mongo\Aggregate;
  */
 Class Lookup extends Stage
 {
-	/**
-	 * @param string $collection
-	 *
-	 * @return $this
-	 */
-	public function from( string $collection ): self
-	{
-		$this->pipe[ 'from' ] = $collection;
-		
-		return $this;
-	}
-	
-	/**
-	 * @param string $field
-	 *
-	 * @return $this
-	 */
-	public function localField( string $field ): self
-	{
-		$this->pipe[ 'localField' ] = $field;
-		
-		return $this;
-	}
-	
-	/**
-	 * @param string $field
-	 *
-	 * @return $this
-	 */
-	public function foreignField( string $field ): self
-	{
-		$this->pipe[ 'foreignField' ] = $field;
-		
-		return $this;
-	}
-	
-	/**
-	 * @param string $field
-	 *
-	 * @return $this
-	 */
-	public function as( string $field ): self
-	{
-		$this->pipe[ 'as' ] = $field;
-		
-		return $this;
-	}
+    /**
+     * @param string $collection
+     *
+     * @return $this
+     */
+    public function from( string $collection ): self
+    {
+        $this->pipe[ 'from' ] = $collection;
+
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     *
+     * @return $this
+     */
+    public function localField( string $field ): self
+    {
+        $this->pipe[ 'localField' ] = $field;
+
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     *
+     * @return $this
+     */
+    public function foreignField( string $field ): self
+    {
+        $this->pipe[ 'foreignField' ] = $field;
+
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     *
+     * @return $this
+     */
+    public function as( string $field ): self
+    {
+        $this->pipe[ 'as' ] = $field;
+
+        return $this;
+    }
 }

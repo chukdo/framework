@@ -13,11 +13,11 @@ namespace Chukdo\Db\Mongo\Aggregate;
  */
 Class Count extends Stage
 {
-	/**
-	 * @param string $field
-	 */
-	public function set( string $field )
-	{
-		$this->pipe = $field;
-	}
+    /**
+     * @param string $field
+     */
+    public function set( string $field )
+    {
+        $this->pipe = $field;
+    }
 }

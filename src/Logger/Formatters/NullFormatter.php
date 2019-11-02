@@ -14,13 +14,13 @@ use Chukdo\Contracts\Logger\Formatter as FormatterInterface;
  */
 class NullFormatter implements FormatterInterface
 {
-	/**
-	 * @param array $record
-	 *
-	 * @return mixed
-	 */
-	public function formatRecord( array $record )
-	{
-		return $record;
-	}
+    /**
+     * @param array $record
+     *
+     * @return mixed
+     */
+    public function formatRecord( array $record )
+    {
+        return $record;
+    }
 }

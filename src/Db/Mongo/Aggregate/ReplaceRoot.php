@@ -13,11 +13,11 @@ namespace Chukdo\Db\Mongo\Aggregate;
  */
 Class ReplaceRoot extends Stage
 {
-	/**
-	 * @param $expression
-	 */
-	public function set( $expression )
-	{
-		$this->pipe = [ 'newRoot' => Expression::parseExpression( $expression ) ];
-	}
+    /**
+     * @param $expression
+     */
+    public function set( $expression )
+    {
+        $this->pipe = [ 'newRoot' => Expression::parseExpression( $expression ) ];
+    }
 }

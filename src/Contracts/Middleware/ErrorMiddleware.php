@@ -14,10 +14,10 @@ use Chukdo\Json\Message;
  */
 interface ErrorMiddleware extends Middleware
 {
-	/**
-	 * @param Message $errors
-	 *
-	 * @return ErrorMiddleware
-	 */
-	public function errorMessage( Message $errors ): self;
+    /**
+     * @param Message $errors
+     *
+     * @return ErrorMiddleware
+     */
+    public function errorMessage( Message $errors ): self;
 }

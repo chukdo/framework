@@ -13,11 +13,11 @@ namespace Chukdo\Db\Mongo\Aggregate;
  */
 Class SortByCount extends Stage
 {
-	/**
-	 * @param $expression
-	 */
-	public function set( $expression )
-	{
-		$this->pipe = Expression::parseExpression( $expression );
-	}
+    /**
+     * @param $expression
+     */
+    public function set( $expression )
+    {
+        $this->pipe = Expression::parseExpression( $expression );
+    }
 }

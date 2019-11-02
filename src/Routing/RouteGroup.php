@@ -15,91 +15,91 @@ use Closure;
  */
 class RouteGroup
 {
-	/**
-	 * @var Router
-	 */
-	protected $router;
-	
-	/**
-	 * @var RouteAttributes
-	 */
-	protected $attributes;
-	
-	/**
-	 * RouteGroup constructor.
-	 *
-	 * @param Router $router
-	 */
-	public function __construct( Router $router )
-	{
-		$this->router     = $router;
-		$this->attributes = new RouteAttributes();
-	}
-	
-	/**
-	 * @param array $middlewares
-	 *
-	 * @return RouteGroup
-	 */
-	public function middleware( array $middlewares ): self
-	{
-		$this->attributes()
-		     ->setMiddleware( $middlewares );
-		
-		return $this;
-	}
-	
-	/**
-	 * @return RouteAttributes
-	 */
-	public function attributes(): RouteAttributes
-	{
-		return $this->attributes;
-	}
-	
-	/**
-	 * @param array                         $validators
-	 * @param ErrorMiddlewareInterface|null $errorMiddleware
-	 *
-	 * @return RouteGroup
-	 */
-	public function validator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
-	{
-		$this->attributes()
-		     ->setValidator( $validators, $errorMiddleware );
-		
-		return $this;
-	}
-	
-	/**
-	 * @param string|null $prefix
-	 *
-	 * @return RouteGroup
-	 */
-	public function prefix( ?string $prefix ): self
-	{
-		$this->attributes()
-		     ->setPrefix( $prefix );
-		
-		return $this;
-	}
-	
-	/**
-	 * @param Closure $closure
-	 *
-	 * @return RouteGroup
-	 */
-	public function group( Closure $closure ): self
-	{
-		$attributes = $this->router->attributes()
-		                           ->get();
-		$this->router->attributes()
-		             ->add( $this->attributes()
-		                         ->get() );
-		( $closure )();
-		$this->router->attributes()
-		             ->set( $attributes );
-		
-		return $this;
-	}
+    /**
+     * @var Router
+     */
+    protected $router;
+
+    /**
+     * @var RouteAttributes
+     */
+    protected $attributes;
+
+    /**
+     * RouteGroup constructor.
+     *
+     * @param Router $router
+     */
+    public function __construct( Router $router )
+    {
+        $this->router     = $router;
+        $this->attributes = new RouteAttributes();
+    }
+
+    /**
+     * @param array $middlewares
+     *
+     * @return RouteGroup
+     */
+    public function middleware( array $middlewares ): self
+    {
+        $this->attributes()
+             ->setMiddleware( $middlewares );
+
+        return $this;
+    }
+
+    /**
+     * @return RouteAttributes
+     */
+    public function attributes(): RouteAttributes
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * @param array                         $validators
+     * @param ErrorMiddlewareInterface|null $errorMiddleware
+     *
+     * @return RouteGroup
+     */
+    public function validator( array $validators, ErrorMiddlewareInterface $errorMiddleware = null ): self
+    {
+        $this->attributes()
+             ->setValidator( $validators, $errorMiddleware );
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $prefix
+     *
+     * @return RouteGroup
+     */
+    public function prefix( ?string $prefix ): self
+    {
+        $this->attributes()
+             ->setPrefix( $prefix );
+
+        return $this;
+    }
+
+    /**
+     * @param Closure $closure
+     *
+     * @return RouteGroup
+     */
+    public function group( Closure $closure ): self
+    {
+        $attributes = $this->router->attributes()
+                                   ->get();
+        $this->router->attributes()
+                     ->add( $this->attributes()
+                                 ->get() );
+        ( $closure )();
+        $this->router->attributes()
+                     ->set( $attributes );
+
+        return $this;
+    }
 }

@@ -10,14 +10,14 @@ use MicrosoftAzure\Storage\Blob\BlobRestProxy;
 
 class ServiceLocatorServiceProvider extends ServiceProvider
 {
-	public function register(): void
-	{
-		$serviceLocator = ServiceLocator::getInstance();
-		$this->app->instance( ServiceLocator::class, $serviceLocator );
-		Stream::register( 'azure', AzureStream::class );
-		$serviceLocator->setService( 'azure', function ()
-		{
-			return BlobRestProxy::createBlobService( $this->app->conf( 'storage.azure.endpoint' ) );
-		} );
-	}
+    public function register(): void
+    {
+        $serviceLocator = ServiceLocator::getInstance();
+        $this->app->instance( ServiceLocator::class, $serviceLocator );
+        Stream::register( 'azure', AzureStream::class );
+        $serviceLocator->setService( 'azure', function()
+        {
+            return BlobRestProxy::createBlobService( $this->app->conf( 'storage.azure.endpoint' ) );
+        } );
+    }
 }

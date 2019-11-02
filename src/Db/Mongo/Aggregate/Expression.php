@@ -14,61 +14,61 @@ use Chukdo\Helper\Is;
  */
 Class Expression
 {
-	/**
-	 * @var string
-	 */
-	protected $name;
-	
-	/**
-	 * @var mixed
-	 */
-	protected $expression;
-	
-	/**
-	 * Expression constructor.
-	 *
-	 * @param string                  $name
-	 * @param Expression|string|array $expression
-	 */
-	public function __construct( string $name, $expression )
-	{
-		$this->name       = $name;
-		$this->expression = $expression;
-	}
-	
-	/**
-	 * @param Expression|string|array $expression
-	 *
-	 * @return string|array|null
-	 */
-	public static function parseExpression( $expression )
-	{
-		$parsed = null;
-		if ( $expression instanceof Expression ) {
-			$parsed = $expression->projection();
-		} else {
-			if ( Is::arr( $expression ) ) {
-				$parsed = [];
-				foreach ( $expression as $key => $exp ) {
-					$parsed[ $key ] = self::parseExpression( $exp );
-				}
-			} else {
-				if ( Is::string( $expression ) ) {
-					$parsed = '$' . $expression;
-				} else {
-					$parsed = $expression;
-				}
-			}
-		}
-		
-		return $parsed;
-	}
-	
-	/**
-	 * @return array
-	 */
-	public function projection(): array
-	{
-		return [ '$' . $this->name => $this->parseExpression( $this->expression ) ];
-	}
+    /**
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * @var mixed
+     */
+    protected $expression;
+
+    /**
+     * Expression constructor.
+     *
+     * @param string                  $name
+     * @param Expression|string|array $expression
+     */
+    public function __construct( string $name, $expression )
+    {
+        $this->name       = $name;
+        $this->expression = $expression;
+    }
+
+    /**
+     * @param Expression|string|array $expression
+     *
+     * @return string|array|null
+     */
+    public static function parseExpression( $expression )
+    {
+        $parsed = null;
+        if ( $expression instanceof Expression ) {
+            $parsed = $expression->projection();
+        } else {
+            if ( Is::arr( $expression ) ) {
+                $parsed = [];
+                foreach ( $expression as $key => $exp ) {
+                    $parsed[ $key ] = self::parseExpression( $exp );
+                }
+            } else {
+                if ( Is::string( $expression ) ) {
+                    $parsed = '$' . $expression;
+                } else {
+                    $parsed = $expression;
+                }
+            }
+        }
+
+        return $parsed;
+    }
+
+    /**
+     * @return array
+     */
+    public function projection(): array
+    {
+        return [ '$' . $this->name => $this->parseExpression( $this->expression ) ];
+    }
 }

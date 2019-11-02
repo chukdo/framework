@@ -15,8 +15,8 @@ use Chukdo\Db\Mongo\Server;
  */
 class Mongo extends Facade
 {
-	public static function name(): string
-	{
-		return Server::class;
-	}
+    public static function name(): string
+    {
+        return Server::class;
+    }
 }

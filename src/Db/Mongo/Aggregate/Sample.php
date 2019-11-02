@@ -13,11 +13,11 @@ namespace Chukdo\Db\Mongo\Aggregate;
  */
 Class Sample extends Stage
 {
-	/**
-	 * @param int $size
-	 */
-	public function set( int $size )
-	{
-		$this->pipe = $size;
-	}
+    /**
+     * @param int $size
+     */
+    public function set( int $size )
+    {
+        $this->pipe = $size;
+    }
 }

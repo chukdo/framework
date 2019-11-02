@@ -12,8 +12,8 @@ namespace Chukdo\Facades;
  */
 class Validator extends Facade
 {
-	public static function name(): string
-	{
-		return \Chukdo\Validation\Validator::class;
-	}
+    public static function name(): string
+    {
+        return \Chukdo\Validation\Validator::class;
+    }
 }

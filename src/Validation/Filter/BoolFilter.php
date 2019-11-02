@@ -15,39 +15,39 @@ use Chukdo\Helper\Str;
  */
 class BoolFilter implements FilterInterface
 {
-	/**
-	 * @return string
-	 */
-	public function name(): string
-	{
-		return 'bool';
-	}
-	
-	/**
-	 * @param array $attributes
-	 *
-	 * @return self
-	 */
-	public function attributes( array $attributes ): FilterInterface
-	{
-		return $this;
-	}
-	
-	/**
-	 * @param $input
-	 *
-	 * @return mixed
-	 */
-	public function filter( $input )
-	{
-		if ( $input === '0' ) {
-			return false;
-		} else {
-			if ( $input === '1' ) {
-				return true;
-			}
-		}
-		
-		return $input;
-	}
+    /**
+     * @return string
+     */
+    public function name(): string
+    {
+        return 'bool';
+    }
+
+    /**
+     * @param array $attributes
+     *
+     * @return self
+     */
+    public function attributes( array $attributes ): FilterInterface
+    {
+        return $this;
+    }
+
+    /**
+     * @param $input
+     *
+     * @return mixed
+     */
+    public function filter( $input )
+    {
+        if ( $input === '0' ) {
+            return false;
+        } else {
+            if ( $input === '1' ) {
+                return true;
+            }
+        }
+
+        return $input;
+    }
 }

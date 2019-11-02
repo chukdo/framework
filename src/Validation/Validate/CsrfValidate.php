@@ -15,40 +15,40 @@ use Chukdo\Helper\Crypto;
  */
 class CsrfValidate implements ValidateInterface
 {
-	/**
-	 * @var string
-	 */
-	protected $salt;
-	
-	/**
-	 * @return string
-	 */
-	public function name(): string
-	{
-		return 'csrf';
-	}
-	
-	/**
-	 * @param array $attributes
-	 *
-	 * @return self
-	 */
-	public function attributes( array $attributes ): ValidateInterface
-	{
-		foreach ( $attributes as $attr ) {
-			$this->salt = $attr;
-		}
-		
-		return $this;
-	}
-	
-	/**
-	 * @param $input
-	 *
-	 * @return bool
-	 */
-	public function validate( $input ): bool
-	{
-		return Crypto::decodeCsrf( $input, $this->salt );
-	}
+    /**
+     * @var string
+     */
+    protected $salt;
+
+    /**
+     * @return string
+     */
+    public function name(): string
+    {
+        return 'csrf';
+    }
+
+    /**
+     * @param array $attributes
+     *
+     * @return self
+     */
+    public function attributes( array $attributes ): ValidateInterface
+    {
+        foreach ( $attributes as $attr ) {
+            $this->salt = $attr;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param $input
+     *
+     * @return bool
+     */
+    public function validate( $input ): bool
+    {
+        return Crypto::decodeCsrf( $input, $this->salt );
+    }
 }

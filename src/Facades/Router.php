@@ -12,8 +12,8 @@ namespace Chukdo\Facades;
  */
 class Router extends Facade
 {
-	public static function name(): string
-	{
-		return \Chukdo\Routing\Router::class;
-	}
+    public static function name(): string
+    {
+        return \Chukdo\Routing\Router::class;
+    }
 }

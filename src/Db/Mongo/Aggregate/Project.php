@@ -13,16 +13,16 @@ namespace Chukdo\Db\Mongo\Aggregate;
  */
 Class Project extends Stage
 {
-	/**
-	 * @param string $field
-	 * @param bool   $visibility
-	 *
-	 * @return $this
-	 */
-	public function set( string $field, bool $visibility ): self
-	{
-		$this->pipe[ $field ] = (int) $visibility;
-		
-		return $this;
-	}
+    /**
+     * @param string $field
+     * @param bool   $visibility
+     *
+     * @return $this
+     */
+    public function set( string $field, bool $visibility ): self
+    {
+        $this->pipe[ $field ] = (int)$visibility;
+
+        return $this;
+    }
 }

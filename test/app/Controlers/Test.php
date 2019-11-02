@@ -8,8 +8,8 @@ use Chukdo\Http\Input;
 
 class test extends Controler
 {
-	public function index( Input $inputs, Response $response ): Response
-	{
-		return $response->content( 'TEST Controler: ' . (string) $inputs );
-	}
+    public function index( Input $inputs, Response $response ): Response
+    {
+        return $response->content( 'TEST Controler: ' . (string)$inputs );
+    }
 }

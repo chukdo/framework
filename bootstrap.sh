@@ -55,15 +55,15 @@ chown -R modelo:www-data /storage/www
 chmod -R 0777 /storage/www
 
 #creation page index.php
-echo '<?php phpinfo() ?>' > /storage/www/index.php
-echo '<?php echo "ok"; ?>' > /storage/www/lbazure.php
+echo '<?php phpinfo() ?>' >/storage/www/index.php
+echo '<?php echo "ok"; ?>' >/storage/www/lbazure.php
 
 # parametres apache security access
 echo '<Directory /storage/www/>
         Options FollowSymLinks
         AllowOverride None
         Require all granted
-</Directory>'  >> /etc/apache2/apache2.conf
+</Directory>' >>/etc/apache2/apache2.conf
 
 # parametres apache default vhost
 echo '<VirtualHost *:80>
@@ -79,12 +79,12 @@ echo '<VirtualHost *:80>
             AllowOverride None
             Require all granted
         </Directory>
-</VirtualHost>' > /etc/apache2/sites-available/framework.conf
+</VirtualHost>' >/etc/apache2/sites-available/framework.conf
 
 echo '<IfModule mod_alias.c>
       Alias /favicon.ico "/storage/www/framework/public/favicon.ico"
       </IfModule>
-' >> /etc/apache2/apache2.conf
+' >>/etc/apache2/apache2.conf
 echo '<IfModule mod_ssl.c>
       <VirtualHost *:443>
       ServerAdmin jp.domingo@gmail.com
@@ -103,7 +103,7 @@ echo '<IfModule mod_ssl.c>
       SSLCertificateFile /storage/www/cert/framework.crt
       SSLCertificateKeyFile /storage/www/cert/framework.key
       </VirtualHost>
-      </IfModule>' > /etc/apache2/sites-available/framework-ssl.conf
+      </IfModule>' >/etc/apache2/sites-available/framework-ssl.conf
 
 echo '# mongodb.conf
 storage:
@@ -119,7 +119,7 @@ net:
   bindIp: 0.0.0.0
 replication:
   replSetName: "rs0"
-' > /etc/mongod.conf
+' >/etc/mongod.conf
 
 #ssl
 openssl req \
@@ -131,7 +131,8 @@ openssl req \
 -out /storage/www/cert/framework.crt \
 -sha256 \
 -days 3650 \
--config <(cat <<EOF
+-config <(
+  cat <<EOF
 
 [ req ]
 prompt = no
@@ -172,6 +173,6 @@ systemctl enable elasticsearch
 update-rc.d elasticsearch enable
 service elasticsearch start
 
-# lancer mongo et faire rs.initiate() pour activer un replicat set à un noeud (essentiel pour les transactions)
+# lancer mongo et faire rs.initiate() pour activer un replicat set ÃƒÆ’Ã‚Â  un noeud (essentiel pour les transactions)
 # faire un php /storage/www/modelo/composer.phar update
 # lors de la premiere connexion doc.modelo.test/init.php (initialise les repertoires temporaires)

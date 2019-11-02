@@ -16,72 +16,72 @@ use Chukdo\Db\Mongo\TraitWhereOperation;
  */
 Class Match extends Stage
 {
-	use TraitWhereOperation;
-	
-	/**
-	 * @var array
-	 */
-	protected $where = [];
-	
-	/**
-	 * @var array
-	 */
-	protected $orWhere = [];
-	
-	/**
-	 * @param string $field
-	 * @param string $operator
-	 * @param null   $value
-	 * @param null   $value2
-	 *
-	 * @return Match
-	 */
-	public function where( string $field, string $operator, $value = null, $value2 = null ): Match
-	{
-		$this->where[ $field ] = $this->whereOperator( $field, $operator, $value, $value2 );
-		
-		return $this;
-	}
-	
-	/**
-	 * @param string $field
-	 * @param string $operator
-	 * @param null   $value
-	 * @param null   $value2
-	 *
-	 * @return Match
-	 */
-	public function orWhere( string $field, string $operator, $value = null, $value2 = null ): Match
-	{
-		$this->orWhere[ $field ] = $this->whereOperator( $field, $operator, $value, $value2 );
-		
-		return $this;
-	}
-	
-	/**
-	 * @return array
-	 */
-	public function projection(): array
-	{
-		$filter = [];
-		if ( !empty( $this->where ) ) {
-			$filter[ '$and' ] = [ $this->where ];
-		}
-		if ( !empty( $this->orWhere ) ) {
-			$filter[ '$or' ] = [ $this->orWhere ];
-		}
-		
-		return $filter;
-	}
-	
-	/**
-	 * @param $pipe
-	 *
-	 * @return StageInterface
-	 */
-	public function pipeStage( $pipe ): StageInterface
-	{
-		return $this->stage()
-		            ->pipeStage( $pipe );
-	}
+    use TraitWhereOperation;
+
+    /**
+     * @var array
+     */
+    protected $where = [];
+
+    /**
+     * @var array
+     */
+    protected $orWhere = [];
+
+    /**
+     * @param string $field
+     * @param string $operator
+     * @param null   $value
+     * @param null   $value2
+     *
+     * @return Match
+     */
+    public function where( string $field, string $operator, $value = null, $value2 = null ): Match
+    {
+        $this->where[ $field ] = $this->whereOperator( $field, $operator, $value, $value2 );
+
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     * @param string $operator
+     * @param null   $value
+     * @param null   $value2
+     *
+     * @return Match
+     */
+    public function orWhere( string $field, string $operator, $value = null, $value2 = null ): Match
+    {
+        $this->orWhere[ $field ] = $this->whereOperator( $field, $operator, $value, $value2 );
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function projection(): array
+    {
+        $filter = [];
+        if ( !empty( $this->where ) ) {
+            $filter[ '$and' ] = [ $this->where ];
+        }
+        if ( !empty( $this->orWhere ) ) {
+            $filter[ '$or' ] = [ $this->orWhere ];
+        }
+
+        return $filter;
+    }
+
+    /**
+     * @param $pipe
+     *
+     * @return StageInterface
+     */
+    public function pipeStage( $pipe ): StageInterface
+    {
+        return $this->stage()
+                    ->pipeStage( $pipe );
+    }
 }

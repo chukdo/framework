@@ -18,381 +18,367 @@ use Chukdo\Json\Json;
  */
 Class Write extends Where implements WriteInterface
 {
-	/**
-	 * @var Json
-	 */
-	protected $fields;
-	
-	/**
-	 * Write constructor.
-	 *
-	 * @param Collection $collection
-	 */
-	public function __construct( Collection $collection )
-	{
-		parent::__construct( $collection );
-		$this->fields = new Json();
-	}
-	
-	/**
-	 * @param iterable $values
-	 *
-	 * @return WriteInterface
-	 */
-	public function setAll( iterable $values ): WriteInterface
-	{
-		foreach ( $values as $field => $value ) {
-			$this->set( $field, $value );
-		}
-		
-		return $this;
-	}
-	
-	/**
-	 * @param string $field
-	 * @param        $value
-	 *
-	 * @return WriteInterface
-	 */
-	public function set( string $field, $value ): WriteInterface
-	{
-		$this->field( 'set', $field, $value );
-		
-		return $this;
-	}
-	
-	/**
-	 * @param string $field
-	 *
-	 * @return WriteInterface
-	 */
-	public function unset( string $field ): WriteInterface
-	{
-		$this->field( 'unset', $field, '' );
-		
-		return $this;
-	}
-	
-	/**
-	 * @param string $field
-	 * @param        $value
-	 *
-	 * @return WriteInterface
-	 */
-	public function push( string $field, $value ): WriteInterface
-	{
-		$this->field( 'push', $field, $value );
-		
-		return $this;
-	}
-	
-	/**
-	 * @param string $field
-	 * @param        $value
-	 *
-	 * @return WriteInterface
-	 */
-	public function addToSet( string $field, $value ): WriteInterface
-	{
-		return $this->field( 'addToSet', $field, $value );
-	}
-	
-	/**
-	 * @return array
-	 */
-	public function validatedUpdateFields(): array
-	{
-		$source = '';
-		$params = [];
-		foreach ( $this->fields() as $type => $field ) {
-			foreach ( (array) $field as $key => $value ) {
-				if ( $key === '_id' ) {
-					continue;
-				}
-				$hydrate                       = $this->hydrateUpdateFields( $type, $key, $value );
-				$source                        .= $hydrate[ 'source' ];
-				$params[ $hydrate[ 'param' ] ] = $value instanceof JsonInterface
-					? $value->toArray()
-					: $value;
-			}
-		}
-		
-		return [
-			'source' => $source,
-			'params' => $params,
-		];
-	}
-	
-	/**
-	 * @param string $field
-	 * @param        $value
-	 *
-	 * @return WriteInterface
-	 */
-	public function pull( string $field, $value ): WriteInterface
-	{
-		$this->field( 'pull', $field, $value );
-		
-		return $this;
-	}
-	
-	/**
-	 * @param string $field
-	 * @param int    $value
-	 *
-	 * @return WriteInterface
-	 */
-	public function inc( string $field, int $value ): WriteInterface
-	{
-		$this->field( 'inc', $field, $value );
-		
-		return $this;
-	}
-	
-	/**
-	 * @return int
-	 */
-	public function delete(): int
-	{
-		$command = $this->collection()
-		                ->client()
-		                ->deleteByQuery( $this->filter() );
-		
-		return (int) $command[ 'deleted' ];
-	}
-	
-	/**
-	 * @return JsonInterface
-	 */
-	public function fields(): JsonInterface
-	{
-		return $this->fields;
-	}
-	
-	/**
-	 * @return bool
-	 */
-	public function deleteOne(): bool
-	{
-		$command = $this->collection()
-		                ->client()
-		                ->deleteByQuery( $this->filter( [
-			                                                'size' => 1,
-		                                                ] ) );
-		
-		return $command[ 'deleted' ] === 1;
-	}
-	
-	/**
-	 * @return Record
-	 */
-	public function deleteOneAndGet(): Record
-	{
-		$get = $this->getOne();
-		if ( $get->count() > 0 ) {
-			$this->deleteOne();
-		}
-		
-		return $get;
-	}
-	
-	/**
-	 * @return int
-	 */
-	public function update(): int
-	{
-		$command = $this->collection()
-		                ->client()
-		                ->updateByQuery( $this->filter( [
-			                                                'body.script' => $this->validatedUpdateFields(),
-			                                                'conflicts'   => 'proceed',
-		                                                ] ) );
-		
-		return $command[ 'updated' ];
-	}
-	
-	/**
-	 * @return array
-	 */
-	public function validatedInsertFields(): array
-	{
-		return $this->fields()
-		            ->getJson( 'set' )
-		            ->toArray();
-	}
-	
-	/**
-	 * @return bool
-	 */
-	public function updateOne(): bool
-	{
-		$command = $this->collection()
-		                ->client()
-		                ->update( $this->filter( [
-			                                         'id'                => $this->getOne()
-			                                                                     ->id(),
-			                                         'body.script'       => $this->validatedUpdateFields(),
-			                                         'retry_on_conflict' => 3,
-		                                         ], false ) );
-		
-		return $command[ 'result' ] === 'updated';
-	}
-	
-	/**
-	 * @return Record
-	 */
-	public function updateOneAndGet(): Record
-	{
-		$get = $this->getOne();
-		$this->updateOne();
-		
-		return $get;
-	}
-	
-	/**
-	 * @return string|null
-	 */
-	public function updateOrInsert(): ?string
-	{
-		$id = $this->getOne()
-		           ->id();
-		if ( $id ) {
-			$this->updateOne();
-		} else {
-			$id = $this->insert();
-		}
-		
-		return $id;
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function insert(): string
-	{
-		$body = $this->validatedInsertFields();
-		$id   = $body[ '_id' ] ?? $this->collection()
-		                               ->id();
-		if ( isset( $body[ '_id' ] ) ) {
-			unset( $body[ '_id' ] );
-		}
-		$this->collection()
-		     ->client()
-		     ->index( $this->filter( [
-			                             'id'   => $id,
-			                             'body' => $body,
-		                             ], false ) );
-		
-		return $id;
-	}
-	
-	/**
-	 * @return WriteInterface
-	 */
-	public function resetFields(): WriteInterface
-	{
-		$this->fields = new Json();
-		
-		return $this;
-	}
-	
-	/**
-	 * @return WriteInterface
-	 */
-	public function resetWhere(): WriteInterface
-	{
-		$this->where = [];
-		
-		return $this;
-	}
-	
-	/**
-	 * @param string $keyword
-	 * @param string $field
-	 * @param        $value
-	 *
-	 * @return WriteInterface
-	 */
-	protected function field( string $keyword, string $field, $value ): WriteInterface
-	{
-		$this->fields->offsetGetOrSet( $keyword )
-		             ->offsetSet( $field, $this->filterValues( $field, $value ) );
-		
-		return $this;
-	}
-	
-	/**
-	 * @param $field
-	 * @param $value
-	 *
-	 * @return array|mixed
-	 */
-	protected function filterValues( $field, $value )
-	{
-		if ( Is::iterable( $value ) ) {
-			$values = [];
-			foreach ( $value as $k => $v ) {
-				$values[ $k ] = $this->filterValues( $k, $v );
-			}
-			$value = $values;
-		} else {
-			$value = Collection::filterIn( $field, $value );
-		}
-		
-		return $value;
-	}
-	
-	/**
-	 * @param $type
-	 * @param $key
-	 * @param $value
-	 *
-	 * @return array
-	 */
-	protected function hydrateUpdateFields( $type, $key, $value ): array
-	{
-		$source = '';
-		$param  = str_replace( '.', '_', $key );
-		switch ( $type ) {
-			case 'set' :
-				$source = 'ctx._source.' . $key . '=params.' . $param . ';';
-				break;
-			case 'unset' :
-				$source = 'ctx._source.remove(\'' . $key . '\');';
-				break;
-			case 'inc' :
-				$source = 'ctx._source.' . $key . '+=params.' . $param . ';';
-				break;
-			case 'push':
-				$source = 'ctx._source.' . $key . '.add(params.' . $param . ');';
-				break;
-			case 'pull':
-				$source = 'if(ctx._source.' . $key . '.indexOf(params.' . $param . ') >= 0) {ctx._source.' . $key .
-				          '.remove(ctx._source.' . $key . '.indexOf(params.' . $param . '))} ';
-				break;
-			case 'addToSet':
-				$source = 'if(ctx._source.' . $key . '.contains(params.' . $param .
-				          ')) {ctx.op = \'noop\'} else {ctx._source.' . $key . '.add(params.' . $param . ')} ';
-				break;
-			default:
-				$source = 'ctx.op = \'none\'';
-		}
-		
-		return [
-			'source' => $source,
-			'param'  => $param,
-		];
-	}
-	
-	/**
-	 * @return Record
-	 */
-	protected function getOne(): Record
-	{
-		$find = $this->collection()
-		             ->find()
-		             ->importFilter( $this->exportFilter() );
-		
-		return $find->one();
-	}
+    /**
+     * @var Json
+     */
+    protected $fields;
+
+    /**
+     * Write constructor.
+     *
+     * @param Collection $collection
+     */
+    public function __construct( Collection $collection )
+    {
+        parent::__construct( $collection );
+        $this->fields = new Json();
+    }
+
+    /**
+     * @param iterable $values
+     *
+     * @return WriteInterface
+     */
+    public function setAll( iterable $values ): WriteInterface
+    {
+        foreach ( $values as $field => $value ) {
+            $this->set( $field, $value );
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     * @param        $value
+     *
+     * @return WriteInterface
+     */
+    public function set( string $field, $value ): WriteInterface
+    {
+        $this->field( 'set', $field, $value );
+
+        return $this;
+    }
+
+    /**
+     * @param string $keyword
+     * @param string $field
+     * @param        $value
+     *
+     * @return WriteInterface
+     */
+    protected function field( string $keyword, string $field, $value ): WriteInterface
+    {
+        $this->fields->offsetGetOrSet( $keyword )
+                     ->offsetSet( $field, $this->filterValues( $field, $value ) );
+
+        return $this;
+    }
+
+    /**
+     * @param $field
+     * @param $value
+     *
+     * @return array|mixed
+     */
+    protected function filterValues( $field, $value )
+    {
+        if ( Is::iterable( $value ) ) {
+            $values = [];
+            foreach ( $value as $k => $v ) {
+                $values[ $k ] = $this->filterValues( $k, $v );
+            }
+            $value = $values;
+        } else {
+            $value = Collection::filterIn( $field, $value );
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param string $field
+     *
+     * @return WriteInterface
+     */
+    public function unset( string $field ): WriteInterface
+    {
+        $this->field( 'unset', $field, '' );
+
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     * @param        $value
+     *
+     * @return WriteInterface
+     */
+    public function push( string $field, $value ): WriteInterface
+    {
+        $this->field( 'push', $field, $value );
+
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     * @param        $value
+     *
+     * @return WriteInterface
+     */
+    public function addToSet( string $field, $value ): WriteInterface
+    {
+        return $this->field( 'addToSet', $field, $value );
+    }
+
+    /**
+     * @param string $field
+     * @param        $value
+     *
+     * @return WriteInterface
+     */
+    public function pull( string $field, $value ): WriteInterface
+    {
+        $this->field( 'pull', $field, $value );
+
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     * @param int    $value
+     *
+     * @return WriteInterface
+     */
+    public function inc( string $field, int $value ): WriteInterface
+    {
+        $this->field( 'inc', $field, $value );
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function delete(): int
+    {
+        $command = $this->collection()
+                        ->client()
+                        ->deleteByQuery( $this->filter() );
+
+        return (int)$command[ 'deleted' ];
+    }
+
+    /**
+     * @return Record
+     */
+    public function deleteOneAndGet(): Record
+    {
+        $get = $this->getOne();
+        if ( $get->count() > 0 ) {
+            $this->deleteOne();
+        }
+
+        return $get;
+    }
+
+    /**
+     * @return Record
+     */
+    protected function getOne(): Record
+    {
+        $find = $this->collection()
+                     ->find()
+                     ->importFilter( $this->exportFilter() );
+
+        return $find->one();
+    }
+
+    /**
+     * @return bool
+     */
+    public function deleteOne(): bool
+    {
+        $command = $this->collection()
+                        ->client()
+                        ->deleteByQuery( $this->filter( [ 'size' => 1, ] ) );
+
+        return $command[ 'deleted' ] === 1;
+    }
+
+    /**
+     * @return int
+     */
+    public function update(): int
+    {
+        $command = $this->collection()
+                        ->client()
+                        ->updateByQuery( $this->filter( [ 'body.script' => $this->validatedUpdateFields(),
+                                                          'conflicts'   => 'proceed', ] ) );
+
+        return $command[ 'updated' ];
+    }
+
+    /**
+     * @return array
+     */
+    public function validatedUpdateFields(): array
+    {
+        $source = '';
+        $params = [];
+        foreach ( $this->fields() as $type => $field ) {
+            foreach ( (array)$field as $key => $value ) {
+                if ( $key === '_id' ) {
+                    continue;
+                }
+                $hydrate                       = $this->hydrateUpdateFields( $type, $key, $value );
+                $source                        .= $hydrate[ 'source' ];
+                $params[ $hydrate[ 'param' ] ] = $value instanceof JsonInterface
+                    ? $value->toArray()
+                    : $value;
+            }
+        }
+
+        return [ 'source' => $source,
+                 'params' => $params, ];
+    }
+
+    /**
+     * @return JsonInterface
+     */
+    public function fields(): JsonInterface
+    {
+        return $this->fields;
+    }
+
+    /**
+     * @param $type
+     * @param $key
+     * @param $value
+     *
+     * @return array
+     */
+    protected function hydrateUpdateFields( $type, $key, $value ): array
+    {
+        $source = '';
+        $param  = str_replace( '.', '_', $key );
+        switch ( $type ) {
+            case 'set' :
+                $source = 'ctx._source.' . $key . '=params.' . $param . ';';
+                break;
+            case 'unset' :
+                $source = 'ctx._source.remove(\'' . $key . '\');';
+                break;
+            case 'inc' :
+                $source = 'ctx._source.' . $key . '+=params.' . $param . ';';
+                break;
+            case 'push':
+                $source = 'ctx._source.' . $key . '.add(params.' . $param . ');';
+                break;
+            case 'pull':
+                $source = 'if(ctx._source.' . $key . '.indexOf(params.' . $param . ') >= 0) {ctx._source.' . $key . '.remove(ctx._source.' . $key . '.indexOf(params.' . $param . '))} ';
+                break;
+            case 'addToSet':
+                $source = 'if(ctx._source.' . $key . '.contains(params.' . $param . ')) {ctx.op = \'noop\'} else {ctx._source.' . $key . '.add(params.' . $param . ')} ';
+                break;
+            default:
+                $source = 'ctx.op = \'none\'';
+        }
+
+        return [ 'source' => $source,
+                 'param'  => $param, ];
+    }
+
+    /**
+     * @return Record
+     */
+    public function updateOneAndGet(): Record
+    {
+        $get = $this->getOne();
+        $this->updateOne();
+
+        return $get;
+    }
+
+    /**
+     * @return bool
+     */
+    public function updateOne(): bool
+    {
+        $command = $this->collection()
+                        ->client()
+                        ->update( $this->filter( [ 'id'                => $this->getOne()
+                                                                               ->id(),
+                                                   'body.script'       => $this->validatedUpdateFields(),
+                                                   'retry_on_conflict' => 3, ], false ) );
+
+        return $command[ 'result' ] === 'updated';
+    }
+
+    /**
+     * @return string|null
+     */
+    public function updateOrInsert(): ?string
+    {
+        $id = $this->getOne()
+                   ->id();
+        if ( $id ) {
+            $this->updateOne();
+        } else {
+            $id = $this->insert();
+        }
+
+        return $id;
+    }
+
+    /**
+     * @return string
+     */
+    public function insert(): string
+    {
+        $body = $this->validatedInsertFields();
+        $id   = $body[ '_id' ] ?? $this->collection()
+                                       ->id();
+        if ( isset( $body[ '_id' ] ) ) {
+            unset( $body[ '_id' ] );
+        }
+        $this->collection()
+             ->client()
+             ->index( $this->filter( [ 'id'   => $id,
+                                       'body' => $body, ], false ) );
+
+        return $id;
+    }
+
+    /**
+     * @return array
+     */
+    public function validatedInsertFields(): array
+    {
+        return $this->fields()
+                    ->getJson( 'set' )
+                    ->toArray();
+    }
+
+    /**
+     * @return WriteInterface
+     */
+    public function resetFields(): WriteInterface
+    {
+        $this->fields = new Json();
+
+        return $this;
+    }
+
+    /**
+     * @return WriteInterface
+     */
+    public function resetWhere(): WriteInterface
+    {
+        $this->where = [];
+
+        return $this;
+    }
 }

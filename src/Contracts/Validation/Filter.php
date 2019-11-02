@@ -11,22 +11,22 @@ namespace Chukdo\Contracts\Validation;
  */
 interface Filter
 {
-	/**
-	 * @return string
-	 */
-	public function name(): string;
-	
-	/**
-	 * @param array $attributes
-	 *
-	 * @return self
-	 */
-	public function attributes( array $attributes ): Filter;
-	
-	/**
-	 * @param $input
-	 *
-	 * @return mixed
-	 */
-	public function filter( $input );
+    /**
+     * @return string
+     */
+    public function name(): string;
+
+    /**
+     * @param array $attributes
+     *
+     * @return self
+     */
+    public function attributes( array $attributes ): Filter;
+
+    /**
+     * @param $input
+     *
+     * @return mixed
+     */
+    public function filter( $input );
 }

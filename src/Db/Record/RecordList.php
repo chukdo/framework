@@ -16,50 +16,50 @@ use Chukdo\Json\Json;
  */
 Class RecordList extends Json
 {
-	/**
-	 * @var CollectionInterface
-	 */
-	protected $collection;
-	
-	/**
-	 * @var bool
-	 */
-	protected $idAsKey = false;
-	
-	/**
-	 * RecordList constructor.
-	 *
-	 * @param CollectionInterface $collection
-	 * @param JsonInterface       $json
-	 * @param bool                $idAsKey
-	 */
-	public function __construct( CollectionInterface $collection, JsonInterface $json, bool $idAsKey = false )
-	{
-		$this->collection = $collection;
-		$this->idAsKey    = $idAsKey;
-		parent::__construct( [], false );
-		foreach ( $json as $k => $v ) {
-			if ( $idAsKey ) {
-				$this->offsetSet( (string) $v->offsetGet( '_id' ), $v );
-			} else {
-				$this->append( $v );
-			}
-		}
-	}
-	
-	public function offsetSet( $key, $value ): JsonInterface
-	{
-		parent::offsetSet( $key, $this->collection()
-		                              ->record( $value ) );
-		
-		return $this;
-	}
-	
-	/**
-	 * @return CollectionInterface
-	 */
-	public function collection(): CollectionInterface
-	{
-		return $this->collection;
-	}
+    /**
+     * @var CollectionInterface
+     */
+    protected $collection;
+
+    /**
+     * @var bool
+     */
+    protected $idAsKey = false;
+
+    /**
+     * RecordList constructor.
+     *
+     * @param CollectionInterface $collection
+     * @param JsonInterface       $json
+     * @param bool                $idAsKey
+     */
+    public function __construct( CollectionInterface $collection, JsonInterface $json, bool $idAsKey = false )
+    {
+        $this->collection = $collection;
+        $this->idAsKey    = $idAsKey;
+        parent::__construct( [], false );
+        foreach ( $json as $k => $v ) {
+            if ( $idAsKey ) {
+                $this->offsetSet( (string)$v->offsetGet( '_id' ), $v );
+            } else {
+                $this->append( $v );
+            }
+        }
+    }
+
+    public function offsetSet( $key, $value ): JsonInterface
+    {
+        parent::offsetSet( $key, $this->collection()
+                                      ->record( $value ) );
+
+        return $this;
+    }
+
+    /**
+     * @return CollectionInterface
+     */
+    public function collection(): CollectionInterface
+    {
+        return $this->collection;
+    }
 }

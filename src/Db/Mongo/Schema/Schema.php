@@ -19,164 +19,154 @@ use Chukdo\Json\Json;
  */
 class Schema implements SchemaInterface
 {
-	/**
-	 * @var Collection
-	 */
-	protected $collection;
-	
-	/**
-	 * @var Property
-	 */
-	protected $property;
-	
-	/**
-	 * Schema constructor.
-	 *
-	 * @param Collection $collection
-	 */
-	public function __construct( Collection $collection )
-	{
-		$this->collection = $collection;
-		$db               = $collection->database();
-		$json             = $db->server()
-		                       ->command( [
-			                                  'listCollections' => 1,
-			                                  'filter'          => [ 'name' => $collection->name() ],
-		                                  ], $db->name() );
-		$this->property   = new Property( $json->getJson( '0.options.validator.$jsonSchema' )
-		                                       ->toArray() );
-	}
-	
-	/**
-	 * @return CollectionInterface
-	 */
-	public function collection(): CollectionInterface
-	{
-		return $this->collection;
-	}
-	
-	/**
-	 * @return bool
-	 */
-	public function drop(): bool
-	{
-		$schema = [
-			'validator'        => [
-				'$jsonSchema' => [ 'bsonType' => 'object' ],
-			],
-			'validationLevel'  => 'strict',
-			'validationAction' => 'error',
-		];
-		$save   = new Json( $this->collection()
-		                         ->database()
-		                         ->client()
-		                         ->modifyCollection( $this->collection()
-		                                                  ->name(), $schema ) );
-		if ( $save->offsetGet( 'ok' ) === 1 ) {
-			$this->property = new Property();
-			
-			return true;
-		}
-		
-		return false;
-	}
-	
-	/**
-	 * @param string $name
-	 *
-	 * @return PropertyInterface|null
-	 */
-	public function get( string $name ): ?PropertyInterface
-	{
-		return $this->property()
-		            ->get( $name );
-	}
-	
-	/**
-	 * @param string $name
-	 *
-	 * @return SchemaInterface
-	 */
-	public function unset( string $name ): SchemaInterface
-	{
-		$this->property()
-		     ->unset( $name );
-		
-		return $this;
-	}
-	
-	/**
-	 * @param array $properties
-	 *
-	 * @return SchemaInterface
-	 */
-	public function setAll( array $properties ): SchemaInterface
-	{
-		$this->property()
-		     ->setAll( $properties );
-		
-		return $this;
-	}
-	
-	/**
-	 * @param string $name
-	 * @param null   $type
-	 * @param array  $options
-	 *
-	 * @return SchemaInterface
-	 */
-	public function set( string $name, $type = null, array $options = [] ): SchemaInterface
-	{
-		$this->property()
-		     ->set( $name, $type, $options );
-		
-		return $this;
-	}
-	
-	/**
-	 * @return Property
-	 */
-	public function property(): PropertyInterface
-	{
-		return $this->property;
-	}
-	
-	/**
-	 * @return JsonInterface
-	 */
-	public function properties(): JsonInterface
-	{
-		return $this->property()
-		            ->properties();
-	}
-	
-	/**
-	 * @return bool
-	 */
-	public function save(): bool
-	{
-		$schema = [
-			'validator'        => [
-				'$jsonSchema' => $this->toArray(),
-			],
-			'validationLevel'  => 'strict',
-			'validationAction' => 'error',
-		];
-		$save   = new Json( $this->collection()
-		                         ->database()
-		                         ->client()
-		                         ->modifyCollection( $this->collection()
-		                                                  ->name(), $schema ) );
-		
-		return $save->offsetGet( 'ok' ) === 1;
-	}
-	
-	/**
-	 * @return array
-	 */
-	public function toArray(): array
-	{
-		return $this->property()
-		            ->toArray();
-	}
+    /**
+     * @var Collection
+     */
+    protected $collection;
+
+    /**
+     * @var Property
+     */
+    protected $property;
+
+    /**
+     * Schema constructor.
+     *
+     * @param Collection $collection
+     */
+    public function __construct( Collection $collection )
+    {
+        $this->collection = $collection;
+        $db               = $collection->database();
+        $json             = $db->server()
+                               ->command( [ 'listCollections' => 1,
+                                            'filter'          => [ 'name' => $collection->name() ], ], $db->name() );
+        $this->property   = new Property( $json->getJson( '0.options.validator.$jsonSchema' )
+                                               ->toArray() );
+    }
+
+    /**
+     * @return bool
+     */
+    public function drop(): bool
+    {
+        $schema = [ 'validator'        => [ '$jsonSchema' => [ 'bsonType' => 'object' ], ],
+                    'validationLevel'  => 'strict',
+                    'validationAction' => 'error', ];
+        $save   = new Json( $this->collection()
+                                 ->database()
+                                 ->client()
+                                 ->modifyCollection( $this->collection()
+                                                          ->name(), $schema ) );
+        if ( $save->offsetGet( 'ok' ) === 1 ) {
+            $this->property = new Property();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return CollectionInterface
+     */
+    public function collection(): CollectionInterface
+    {
+        return $this->collection;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return PropertyInterface|null
+     */
+    public function get( string $name ): ?PropertyInterface
+    {
+        return $this->property()
+                    ->get( $name );
+    }
+
+    /**
+     * @return Property
+     */
+    public function property(): PropertyInterface
+    {
+        return $this->property;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return SchemaInterface
+     */
+    public function unset( string $name ): SchemaInterface
+    {
+        $this->property()
+             ->unset( $name );
+
+        return $this;
+    }
+
+    /**
+     * @param array $properties
+     *
+     * @return SchemaInterface
+     */
+    public function setAll( array $properties ): SchemaInterface
+    {
+        $this->property()
+             ->setAll( $properties );
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @param null   $type
+     * @param array  $options
+     *
+     * @return SchemaInterface
+     */
+    public function set( string $name, $type = null, array $options = [] ): SchemaInterface
+    {
+        $this->property()
+             ->set( $name, $type, $options );
+
+        return $this;
+    }
+
+    /**
+     * @return JsonInterface
+     */
+    public function properties(): JsonInterface
+    {
+        return $this->property()
+                    ->properties();
+    }
+
+    /**
+     * @return bool
+     */
+    public function save(): bool
+    {
+        $schema = [ 'validator'        => [ '$jsonSchema' => $this->toArray(), ],
+                    'validationLevel'  => 'strict',
+                    'validationAction' => 'error', ];
+        $save   = new Json( $this->collection()
+                                 ->database()
+                                 ->client()
+                                 ->modifyCollection( $this->collection()
+                                                          ->name(), $schema ) );
+
+        return $save->offsetGet( 'ok' ) === 1;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return $this->property()
+                    ->toArray();
+    }
 }

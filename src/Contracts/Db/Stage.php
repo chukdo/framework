@@ -14,13 +14,13 @@ use Chukdo\Db\Mongo\Aggregate\PipelineStage;
  */
 interface Stage
 {
-	/**
-	 * @return mixed
-	 */
-	public function projection();
-	
-	/**
-	 * @return PipelineStage
-	 */
-	public function stage(): PipelineStage;
+    /**
+     * @return mixed
+     */
+    public function projection();
+
+    /**
+     * @return PipelineStage
+     */
+    public function stage(): PipelineStage;
 }

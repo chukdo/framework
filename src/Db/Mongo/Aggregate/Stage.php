@@ -15,53 +15,53 @@ use Chukdo\Contracts\Db\Stage as StageInterface;
  */
 Class Stage implements StageInterface
 {
-	use TraitPipelineStage;
-	
-	/**
-	 * @var array
-	 */
-	protected $pipe = [];
-	
-	/**
-	 * @var stageInterface
-	 */
-	protected $stage;
-	
-	/**
-	 * Stage constructor.
-	 *
-	 * @param PipelineStage $stage
-	 */
-	public function __construct( PipelineStage $stage )
-	{
-		$this->stage = $stage;
-	}
-	
-	/**
-	 * @return PipelineStage
-	 */
-	public function stage(): PipelineStage
-	{
-		return $this->stage;
-	}
-	
-	/**
-	 * @return array|mixed
-	 */
-	public function projection()
-	{
-		return $this->pipe;
-	}
-	
-	/**
-	 * @param $pipe
-	 *
-	 * @return StageInterface
-	 */
-	public function pipeStage( $pipe ): StageInterface
-	{
-		return $this->stage()
-		            ->stage()
-		            ->pipeStage( $pipe );
-	}
+    use TraitPipelineStage;
+
+    /**
+     * @var array
+     */
+    protected $pipe = [];
+
+    /**
+     * @var stageInterface
+     */
+    protected $stage;
+
+    /**
+     * Stage constructor.
+     *
+     * @param PipelineStage $stage
+     */
+    public function __construct( PipelineStage $stage )
+    {
+        $this->stage = $stage;
+    }
+
+    /**
+     * @return array|mixed
+     */
+    public function projection()
+    {
+        return $this->pipe;
+    }
+
+    /**
+     * @param $pipe
+     *
+     * @return StageInterface
+     */
+    public function pipeStage( $pipe ): StageInterface
+    {
+        return $this->stage()
+                    ->stage()
+                    ->pipeStage( $pipe );
+    }
+
+    /**
+     * @return PipelineStage
+     */
+    public function stage(): PipelineStage
+    {
+        return $this->stage;
+    }
 }

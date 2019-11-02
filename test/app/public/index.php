@@ -2,9 +2,9 @@
 
 function dd( $data )
 {
-	echo '<pre>';
-	print_r( $data );
-	exit;
+    echo '<pre>';
+    print_r( $data );
+    exit;
 }
 
 /** Namespaces */
@@ -30,14 +30,12 @@ $app->lang()
     ->loadDir( __DIR__ . '/../Lang/' . \Chukdo\Helper\HttpRequest::tld() );
 
 /** Service APP register */
-$app->registerServices( [
-	                        Providers\AppServiceProvider::class,
-	                        Providers\ServiceLocatorServiceProvider::class,
-	                        Providers\LoggerHandlerServiceProvider::class,
-	                        Providers\ExceptionLoggerServiceProvider::class,
-	                        Providers\ValidatorServiceProvider::class,
-	                        Providers\MongoServiceProvider::class,
-                        ] );
+$app->registerServices( [ Providers\AppServiceProvider::class,
+                          Providers\ServiceLocatorServiceProvider::class,
+                          Providers\LoggerHandlerServiceProvider::class,
+                          Providers\ExceptionLoggerServiceProvider::class,
+                          Providers\ValidatorServiceProvider::class,
+                          Providers\MongoServiceProvider::class, ] );
 
 /**$schema  = $db->dropCollection( 'test' )
  * ->createCollection( 'test' )
@@ -251,13 +249,11 @@ $ag->stage()
    ->sortByCount( 'tags' )
    ->facet( 'categorizedByPrice' )
    ->where( 'price', 'exists' )
-   ->bucket( 'price', [
-	   0,
-	   150,
-	   200,
-	   300,
-	   400,
-   ] )
+   ->bucket( 'price', [ 0,
+                        150,
+                        200,
+                        300,
+                        400, ] )
    ->default( 'Other' )
    ->output( 'count', Expr::sum( 1 ) )
    ->output( 'titles', Expr::push( 'title' ) )
@@ -341,32 +337,26 @@ $contrat = Mongo::collection( 'contrat' );
 $app->dd( $contrat->find()
                   ->without( '_id' )
                   ->with( '_agence', '_modele', 'reference', 'history.id', 'history._version' )
-                  ->link( '_agence', [
-	                  'agence',
-	                  'cp',
-	                  'ville',
-	                  'date_created',
-	                  'date_modified',
-                  ] )
+                  ->link( '_agence', [ 'agence',
+                                       'cp',
+                                       'ville',
+                                       'date_created',
+                                       'date_modified', ] )
                   ->limit( 4 )
                   ->where( 'version', '=', '2' )
                   ->where( 'state', '=', '1' )
-	          //->where('history', 'size', 4)
-	              ->where( 'history._version', '=', '5a3c37db3fcd9e16e21fe0b5' )
+              //->where('history', 'size', 4)
+                  ->where( 'history._version', '=', '5a3c37db3fcd9e16e21fe0b5' )
                   ->all()
                   ->toHtml() );
 
 Response::header( 'X-test', 'test header' );
 View::setDefaultFolder( __DIR__ . '/../Views/' )
     ->loadFunction( new Basic() )
-    ->render( 'test', [
-	    'title' => 'chukdo test',
-	    'list'  => [
-		    'c',
-		    'h',
-		    'u',
-		    'k',
-		    'd',
-		    'o',
-	    ],
-    ] );
+    ->render( 'test', [ 'title' => 'chukdo test',
+                        'list'  => [ 'c',
+                                     'h',
+                                     'u',
+                                     'k',
+                                     'd',
+                                     'o', ], ] );

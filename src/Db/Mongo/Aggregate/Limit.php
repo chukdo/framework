@@ -13,11 +13,11 @@ namespace Chukdo\Db\Mongo\Aggregate;
  */
 Class Limit extends Stage
 {
-	/**
-	 * @param int $limit
-	 */
-	public function set( int $limit )
-	{
-		$this->pipe = $limit;
-	}
+    /**
+     * @param int $limit
+     */
+    public function set( int $limit )
+    {
+        $this->pipe = $limit;
+    }
 }

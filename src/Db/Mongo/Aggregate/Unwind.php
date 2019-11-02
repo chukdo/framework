@@ -13,11 +13,11 @@ namespace Chukdo\Db\Mongo\Aggregate;
  */
 Class Unwind extends Stage
 {
-	/**
-	 * @param string $field
-	 */
-	public function set( string $field )
-	{
-		$this->pipe = '$' . $field;
-	}
+    /**
+     * @param string $field
+     */
+    public function set( string $field )
+    {
+        $this->pipe = '$' . $field;
+    }
 }

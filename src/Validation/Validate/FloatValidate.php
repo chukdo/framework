@@ -14,47 +14,47 @@ use Chukdo\Contracts\Validation\Validate as ValidateInterface;
  */
 class FloatValidate implements ValidateInterface
 {
-	/**
-	 * @var int
-	 */
-	protected $min = 0;
-	
-	/**
-	 * @var int
-	 */
-	protected $max = 10000000;
-	
-	/**
-	 * @return string
-	 */
-	public function name(): string
-	{
-		return 'int';
-	}
-	
-	/**
-	 * @param array $attributes
-	 *
-	 * @return self
-	 */
-	public function attributes( array $attributes ): ValidateInterface
-	{
-		$attributes = array_pad( $attributes, 2, 0 );
-		$this->min  = $attributes[ 0 ];
-		$this->max  = $attributes[ 1 ]
-			?: $attributes[ 0 ]
-				?: 10000000;
-		
-		return $this;
-	}
-	
-	/**
-	 * @param $input
-	 *
-	 * @return bool
-	 */
-	public function validate( $input ): bool
-	{
-		return is_float( $input ) && $input >= $this->min && $input <= $this->max;
-	}
+    /**
+     * @var int
+     */
+    protected $min = 0;
+
+    /**
+     * @var int
+     */
+    protected $max = 10000000;
+
+    /**
+     * @return string
+     */
+    public function name(): string
+    {
+        return 'int';
+    }
+
+    /**
+     * @param array $attributes
+     *
+     * @return self
+     */
+    public function attributes( array $attributes ): ValidateInterface
+    {
+        $attributes = array_pad( $attributes, 2, 0 );
+        $this->min  = $attributes[ 0 ];
+        $this->max  = $attributes[ 1 ]
+            ?: $attributes[ 0 ]
+                ?: 10000000;
+
+        return $this;
+    }
+
+    /**
+     * @param $input
+     *
+     * @return bool
+     */
+    public function validate( $input ): bool
+    {
+        return is_float( $input ) && $input >= $this->min && $input <= $this->max;
+    }
 }

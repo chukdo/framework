@@ -12,8 +12,8 @@ namespace Chukdo\Facades;
  */
 class App extends Facade
 {
-	public static function name(): string
-	{
-		return \Chukdo\Bootstrap\App::class;
-	}
+    public static function name(): string
+    {
+        return \Chukdo\Bootstrap\App::class;
+    }
 }

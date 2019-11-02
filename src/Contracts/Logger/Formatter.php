@@ -11,12 +11,12 @@ namespace Chukdo\Contracts\Logger;
  */
 interface Formatter
 {
-	/**
-	 * Formatte un enregistrement.
-	 *
-	 * @param array $record
-	 *
-	 * @return mixed
-	 */
-	public function formatRecord( array $record );
+    /**
+     * Formatte un enregistrement.
+     *
+     * @param array $record
+     *
+     * @return mixed
+     */
+    public function formatRecord( array $record );
 }

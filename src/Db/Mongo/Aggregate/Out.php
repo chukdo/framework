@@ -13,11 +13,11 @@ namespace Chukdo\Db\Mongo\Aggregate;
  */
 Class Out extends Stage
 {
-	/**
-	 * @param string $collection
-	 */
-	public function set( string $collection )
-	{
-		$this->pipe = $collection;
-	}
+    /**
+     * @param string $collection
+     */
+    public function set( string $collection )
+    {
+        $this->pipe = $collection;
+    }
 }

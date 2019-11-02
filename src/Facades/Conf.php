@@ -12,8 +12,8 @@ namespace Chukdo\Facades;
  */
 class Conf extends Facade
 {
-	public static function name(): string
-	{
-		return \Chukdo\Conf\Conf::class;
-	}
+    public static function name(): string
+    {
+        return \Chukdo\Conf\Conf::class;
+    }
 }

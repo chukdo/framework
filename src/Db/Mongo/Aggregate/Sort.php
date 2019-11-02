@@ -13,18 +13,18 @@ namespace Chukdo\Db\Mongo\Aggregate;
  */
 Class Sort extends Stage
 {
-	/**
-	 * @param string $field
-	 * @param int    $sort
-	 *
-	 * @return $this
-	 */
-	public function sort( string $field, int $sort = SORT_ASC ): self
-	{
-		$this->pipe[ $field ] = $sort === SORT_ASC
-			? 1
-			: -1;
-		
-		return $this;
-	}
+    /**
+     * @param string $field
+     * @param int    $sort
+     *
+     * @return $this
+     */
+    public function sort( string $field, int $sort = SORT_ASC ): self
+    {
+        $this->pipe[ $field ] = $sort === SORT_ASC
+            ? 1
+            : -1;
+
+        return $this;
+    }
 }

@@ -14,61 +14,61 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
  */
 interface Database
 {
-	/**
-	 * @return mixed
-	 */
-	public function client();
-	
-	/**
-	 * @return Server
-	 */
-	public function server(): Server;
-	
-	/**
-	 * @return string|null
-	 */
-	public function name(): ?string;
-	
-	/**
-	 * @return JsonInterface
-	 */
-	public function info(): JsonInterface;
-	
-	/**
-	 * @return bool
-	 */
-	public function drop(): bool;
-	
-	/**
-	 * @return JsonInterface
-	 */
-	public function collections(): JsonInterface;
-	
-	/**
-	 * @param string $collection
-	 *
-	 * @return Collection
-	 */
-	public function collection( string $collection ): Collection;
-	
-	/**
-	 * @param string $collection
-	 *
-	 * @return Collection
-	 */
-	public function createCollection( string $collection ): Collection;
-	
-	/**
-	 * @param string $collection
-	 *
-	 * @return bool
-	 */
-	public function collectionExist( string $collection ): bool;
-	
-	/**
-	 * @param string $collection
-	 *
-	 * @return Database
-	 */
-	public function dropCollection( string $collection ): Database;
+    /**
+     * @return mixed
+     */
+    public function client();
+
+    /**
+     * @return Server
+     */
+    public function server(): Server;
+
+    /**
+     * @return string|null
+     */
+    public function name(): ?string;
+
+    /**
+     * @return JsonInterface
+     */
+    public function info(): JsonInterface;
+
+    /**
+     * @return bool
+     */
+    public function drop(): bool;
+
+    /**
+     * @return JsonInterface
+     */
+    public function collections(): JsonInterface;
+
+    /**
+     * @param string $collection
+     *
+     * @return Collection
+     */
+    public function collection( string $collection ): Collection;
+
+    /**
+     * @param string $collection
+     *
+     * @return Collection
+     */
+    public function createCollection( string $collection ): Collection;
+
+    /**
+     * @param string $collection
+     *
+     * @return bool
+     */
+    public function collectionExist( string $collection ): bool;
+
+    /**
+     * @param string $collection
+     *
+     * @return Database
+     */
+    public function dropCollection( string $collection ): Database;
 }

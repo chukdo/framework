@@ -16,40 +16,39 @@ use Throwable;
  */
 class ExceptionHandler implements Handler
 {
-	/**
-	 * @var App
-	 */
-	protected $app;
-	
-	/**
-	 * ExceptionHandler constructor.
-	 *
-	 * @param App $app
-	 */
-	public function __construct( App $app )
-	{
-		$this->app = $app;
-	}
-	
-	/**
-	 * @param Throwable $e
-	 */
-	public function render( Throwable $e ): void
-	{
-		$message = new ExceptionMessage( $e, $this->app->env() );
-		die( $message->render() );
-	}
-	
-	/**
-	 * @param Throwable $e
-	 */
-	public function report( Throwable $e ): void
-	{
-		try {
-			$this->app->make( 'ExceptionLogger' )
-			          ->emergency( '#' . $e->getCode() . ' ' . $e->getMessage() . ' ' . $e->getFile() . '(' .
-			                       $e->getLine() . ')' );
-		} catch ( Throwable $e ) {
-		}
-	}
+    /**
+     * @var App
+     */
+    protected $app;
+
+    /**
+     * ExceptionHandler constructor.
+     *
+     * @param App $app
+     */
+    public function __construct( App $app )
+    {
+        $this->app = $app;
+    }
+
+    /**
+     * @param Throwable $e
+     */
+    public function render( Throwable $e ): void
+    {
+        $message = new ExceptionMessage( $e, $this->app->env() );
+        die( $message->render() );
+    }
+
+    /**
+     * @param Throwable $e
+     */
+    public function report( Throwable $e ): void
+    {
+        try {
+            $this->app->make( 'ExceptionLogger' )
+                      ->emergency( '#' . $e->getCode() . ' ' . $e->getMessage() . ' ' . $e->getFile() . '(' . $e->getLine() . ')' );
+        } catch ( Throwable $e ) {
+        }
+    }
 }

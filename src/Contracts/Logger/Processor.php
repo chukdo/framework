@@ -11,12 +11,12 @@ namespace Chukdo\Contracts\Logger;
  */
 interface Processor
 {
-	/**
-	 * Modifie / ajoute des données à un enregistrement.
-	 *
-	 * @param array $record
-	 *
-	 * @return array
-	 */
-	public function processRecord( array $record ): array;
+    /**
+     * Modifie / ajoute des données à un enregistrement.
+     *
+     * @param array $record
+     *
+     * @return array
+     */
+    public function processRecord( array $record ): array;
 }

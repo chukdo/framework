@@ -11,32 +11,32 @@ namespace Chukdo\Bootstrap;
  */
 abstract class ServiceProvider
 {
-	/**
-	 * @var App
-	 */
-	protected $app;
-	
-	/**
-	 * ServiceProvider constructor.
-	 *
-	 * @param App $app
-	 */
-	public function __construct( App $app )
-	{
-		$this->app = $app;
-	}
-	
-	/**
-	 * @param string $name
-	 * @param string $alias
-	 */
-	public function setClassAlias( string $name, string $alias ): void
-	{
-		class_alias( $name, $alias );
-	}
-	
-	/**
-	 * @return mixed
-	 */
-	abstract public function register(): void;
+    /**
+     * @var App
+     */
+    protected $app;
+
+    /**
+     * ServiceProvider constructor.
+     *
+     * @param App $app
+     */
+    public function __construct( App $app )
+    {
+        $this->app = $app;
+    }
+
+    /**
+     * @param string $name
+     * @param string $alias
+     */
+    public function setClassAlias( string $name, string $alias ): void
+    {
+        class_alias( $name, $alias );
+    }
+
+    /**
+     * @return mixed
+     */
+    abstract public function register(): void;
 }

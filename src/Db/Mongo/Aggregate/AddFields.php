@@ -13,16 +13,16 @@ namespace Chukdo\Db\Mongo\Aggregate;
  */
 Class AddFields extends Stage
 {
-	/**
-	 * @param string $field
-	 * @param        $expression
-	 *
-	 * @return AddFields
-	 */
-	public function set( string $field, $expression ): self
-	{
-		$this->pipe[ $field ] = Expression::parseExpression( $expression );
-		
-		return $this;
-	}
+    /**
+     * @param string $field
+     * @param        $expression
+     *
+     * @return AddFields
+     */
+    public function set( string $field, $expression ): self
+    {
+        $this->pipe[ $field ] = Expression::parseExpression( $expression );
+
+        return $this;
+    }
 }
