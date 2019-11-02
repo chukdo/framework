@@ -173,6 +173,6 @@ systemctl enable elasticsearch
 update-rc.d elasticsearch enable
 service elasticsearch start
 
-# lancer mongo et faire rs.initiate() pour activer un replicat set ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â  un noeud (essentiel pour les transactions)
+# lancer mongo et faire rs.initiate() pour activer un replicat set ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â  un noeud (essentiel pour les transactions)
 # faire un php /storage/www/modelo/composer.phar update
 # lors de la premiere connexion doc.modelo.test/init.php (initialise les repertoires temporaires)

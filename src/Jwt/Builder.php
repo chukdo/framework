@@ -36,6 +36,29 @@ class Builder
                             'jti', ];
 
     /**
+     * @var string
+     */
+    protected $alg = 'H256';
+
+    /**
+     * @param string $alg
+     *
+     * @return $this
+     */
+    public function alg( string $alg ): self
+    {
+        $this->alg = $alg;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAlg(): string
+    {
+        return $this->alg;
+    }
+
+    /**
      * @param string $secret
      *
      * @return $this
