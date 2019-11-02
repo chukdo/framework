@@ -21,10 +21,8 @@ use MongoDB\Driver\ReadPreference;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Find implements FindInterface
+Class Find extends Where implements FindInterface
 {
-	use TraitWhere;
-	
 	/**
 	 * @var array
 	 */

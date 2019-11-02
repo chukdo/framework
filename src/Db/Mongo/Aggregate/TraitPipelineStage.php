@@ -161,6 +161,20 @@ trait TraitPipelineStage
 	}
 	
 	/**
+	 * @param string $field
+	 * @param string $operator
+	 * @param null   $value
+	 * @param null   $value2
+	 *
+	 * @return Match
+	 */
+	public function orWhere( string $field, string $operator, $value = null, $value2 = null ): Match
+	{
+		return $this->pipeStage( 'match' )
+		            ->where( $field, $operator, $value, $value2 );
+	}
+	
+	/**
 	 * @param string $collection
 	 * @param string $on
 	 *

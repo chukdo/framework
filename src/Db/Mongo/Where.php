@@ -1,20 +1,20 @@
 <?php
 
-namespace Chukdo\Db\Mongo\Aggregate;
+namespace Chukdo\Db\Mongo;
 
-use Chukdo\Contracts\Db\Stage as StageInterface;
-use Chukdo\Db\Mongo\TraitWhereOperation;
+use MongoDB\BSON\Regex;
+use Chukdo\Contracts\Db\Find as FindInterface;
+use Chukdo\Contracts\Db\Write as WriteInterface;
 
 /**
- * Server Match.
- * https://docs.mongodb.com/manual/reference/operator/aggregation/match/
+ * Class Where.
  *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Match extends Stage
+Abstract Class Where
 {
 	use TraitWhereOperation;
 	
@@ -34,9 +34,9 @@ Class Match extends Stage
 	 * @param null   $value
 	 * @param null   $value2
 	 *
-	 * @return Match
+	 * @return FindInterface|WriteInterface|object
 	 */
-	public function where( string $field, string $operator, $value = null, $value2 = null ): Match
+	public function where( string $field, string $operator, $value = null, $value2 = null )
 	{
 		$this->where[ $field ] = $this->whereOperator( $field, $operator, $value, $value2 );
 		
@@ -49,9 +49,9 @@ Class Match extends Stage
 	 * @param null   $value
 	 * @param null   $value2
 	 *
-	 * @return Match
+	 * @return FindInterface|WriteInterface|object
 	 */
-	public function orWhere( string $field, string $operator, $value = null, $value2 = null ): Match
+	public function orWhere( string $field, string $operator, $value = null, $value2 = null )
 	{
 		$this->orWhere[ $field ] = $this->whereOperator( $field, $operator, $value, $value2 );
 		
@@ -61,7 +61,7 @@ Class Match extends Stage
 	/**
 	 * @return array
 	 */
-	public function projection(): array
+	public function filter(): array
 	{
 		$filter = [];
 		if ( !empty( $this->where ) ) {
@@ -72,16 +72,5 @@ Class Match extends Stage
 		}
 		
 		return $filter;
-	}
-	
-	/**
-	 * @param $pipe
-	 *
-	 * @return StageInterface
-	 */
-	public function pipeStage( $pipe ): StageInterface
-	{
-		return $this->stage()
-		            ->pipeStage( $pipe );
 	}
 }

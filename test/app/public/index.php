@@ -223,51 +223,49 @@ $time = time();
 
 $mongo = new ServerMongo();
 
+/**
+ * $db         = $mongo->database( 'foncia' );
+ * $collection = $db->collection( 'esign' );
+ *
+ * $ag  = new Aggregate( $collection );
+ * $agp = $ag->stage();
+ * $agp->where( '_date_created', '>=', DateTime::createFromFormat( 'd/m/y', '01/01/19' ) )
+ * ->where( 'state', '=', '3' )
+ * ->group( [
+ * 'month' => Expr::month( '_date_created' ),
+ * 'year'  => Expr::year( '_date_created' ),
+ * ] )
+ * ->field( 'totalSigners', Expr::sum( Expr::size( 'user' ) ) )
+ * ->sort( '_id', SORT_ASC );
+ * echo $ag->all()
+ * ->toHtml();
+ * exit;
+ */
 $db         = $mongo->database( 'test' );
 $collection = $db->collection( 'artwork' );
 
 $ag = new Aggregate( $collection );
-
-$agp = $ag->stage()
-          ->facet( 'categorizedByTags' )
-          ->unwind( 'tag' )
-          ->sortByCount( 'tags' )
-          ->facet( 'categorizedByPrice' )
-          ->where( 'price', 'exists' )
-          ->bucket( 'price', [
-	          0,
-	          150,
-	          200,
-	          300,
-	          400,
-          ] )
-          ->default( 'Other' )
-          ->output( 'count', Expr::sum( 1 ) )
-          ->output( 'titles', Expr::push( 'title' ) )
-
-          ->facet( 'categorizedByYears(Auto)' )
-          ->bucketAuto( 'year', 4 )
-          ->stage();
+$ag->stage()
+   ->facet( 'categorizedByTags' )
+   ->unwind( 'tag' )
+   ->sortByCount( 'tags' )
+   ->facet( 'categorizedByPrice' )
+   ->where( 'price', 'exists' )
+   ->bucket( 'price', [
+	   0,
+	   150,
+	   200,
+	   300,
+	   400,
+   ] )
+   ->default( 'Other' )
+   ->output( 'count', Expr::sum( 1 ) )
+   ->output( 'titles', Expr::push( 'title' ) )
+   ->facet( 'categorizedByYears(Auto)' )
+   ->bucketAuto( 'year', 4 );
 echo '<pre>';
 print_r( $ag->projection() );
 
-echo $ag->all()
-        ->toHtml();
-exit;
-
-$db         = $mongo->database( 'foncia' );
-$collection = $db->collection( 'esign' );
-
-$ag  = new Aggregate( $collection );
-$agp = $ag->stage();
-$agp->where( '_date_created', '>=', DateTime::createFromFormat( 'd/m/y', '01/01/19' ) )
-    ->where( 'state', '=', '3' );
-$agp->group( [
-	             'month' => Expr::month( '_date_created' ),
-	             'year'  => Expr::year( '_date_created' ),
-             ] )
-    ->field( 'totalSigners', Expr::sum( Expr::size( 'user' ) ) );
-$agp->sort( '_id', SORT_ASC );
 echo $ag->all()
         ->toHtml();
 exit;

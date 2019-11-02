@@ -8,7 +8,7 @@ use Chukdo\Contracts\Db\Write as WriteInterface;
 use Chukdo\Json\Json;
 
 /**
- * Server TraitWhere.
+ * Server Where.
  *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo
@@ -90,7 +90,7 @@ Abstract Class Where
 		if ( !isset( $this->where[ $keyword ] ) ) {
 			$this->where[ $keyword ] = [];
 		}
-		$this->where[ $keyword ][] = $this->subQuery( $field, $operator, $value, $value2 );
+		$this->where[ $keyword ][] = $this->whereOperator( $field, $operator, $value, $value2 );
 		
 		return $this;
 	}
@@ -120,7 +120,7 @@ Abstract Class Where
 		if ( !isset( $this->where[ $keyword ] ) ) {
 			$this->where[ $keyword ] = [];
 		}
-		$this->where[ $keyword ][] = $this->subQuery( $field, $operator, $value, $value2 );
+		$this->where[ $keyword ][] = $this->whereOperator( $field, $operator, $value, $value2 );
 		
 		return $this;
 	}
@@ -156,7 +156,7 @@ Abstract Class Where
 	 *
 	 * @return array
 	 */
-	protected function subQuery( string $field, string $operator, $value = null, $value2 = null ): array
+	protected function whereOperator( string $field, string $operator, $value = null, $value2 = null ): array
 	{
 		switch ( $operator ) {
 			case '==' :
