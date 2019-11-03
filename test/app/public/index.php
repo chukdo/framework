@@ -215,6 +215,24 @@ die( 'ok' );
 use \Chukdo\Db\Mongo\Aggregate\Expr;
 use \Chukdo\Db\Mongo\Aggregate\Aggregate;
 
+$jwt = new \Chukdo\Jwt\Parser();
+$jwt->parse( 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJpc3MiOiJ0b21ldG95b3UifQ.jyRVgWHoTg4ibapkzxQlOLCqgQtqgRPBiCKfNFmbGNE' );
+
+$jwt->issuer( 'tometoyou' );
+
+if ( $jwt->signed( 'test' ) ) {
+    echo( 'SIGNED' );
+} else {
+    die ( $jwt->error() );
+}
+
+echo $jwt->builder()
+         ->claims()
+         ->toHtml();
+echo $jwt->builder()
+         ->all()
+         ->toHtml();
+exit;
 ini_set( 'memory_limit', '256M' );
 set_time_limit( 3000 );
 $time = time();

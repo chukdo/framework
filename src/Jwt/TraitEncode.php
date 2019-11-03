@@ -28,7 +28,7 @@ trait TraitEncode
         $payLoadEncoded = $this->payloadEncode( $payload );
 
         switch ( $alg ) {
-            case 'H256' :
+            case 'HS256' :
                 return To::base64UrlEncode( hash_hmac( 'sha256', $headerEncoded . '.' . $payLoadEncoded, $secret, true ) );
         }
 

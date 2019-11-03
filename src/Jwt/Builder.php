@@ -5,7 +5,6 @@ namespace Chukdo\Jwt;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Json\Json;
 use Chukdo\Helper\Arr;
-use iterable;
 
 /**
  * Json Web Token.
@@ -25,56 +24,19 @@ class Builder
     protected $claims = [];
 
     /**
-     * @var string
+     * @var array
      */
-    protected $secret;
+    protected $headers = [ 'typ' => 'JWT' ];
 
+    /**
+     * @var array
+     */
     protected $keywords = [ 'iss',
                             'iat',
                             'aud',
                             'nbf',
-                            'jti', ];
-
-    /**
-     * @var string
-     */
-    protected $alg = 'H256';
-
-    /**
-     * @param string $alg
-     *
-     * @return $this
-     */
-    public function alg( string $alg ): self
-    {
-        $this->alg = $alg;
-    }
-
-    /**
-     * @return string
-     */
-    public function getAlg(): string
-    {
-        return $this->alg;
-    }
-
-    /**
-     * @param string $secret
-     *
-     * @return $this
-     */
-    public function secret( string $secret ): self
-    {
-        $this->secret = $secret;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSecret(): string
-    {
-        return $this->secret;
-    }
+                            'jti',
+                            'sub' ];
 
     /**
      * @param iterable $values
@@ -121,6 +83,26 @@ class Builder
     public function getIssuer(): ?string
     {
         return $this->claims[ 'iss' ] ?? null;
+    }
+
+    /**
+     * @param string $subject
+     *
+     * @return $this
+     */
+    public function subject( string $subject ): self
+    {
+        $this->claims[ 'sub' ] = $subject;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSubject(): ?string
+    {
+        return $this->claims[ 'sub' ] ?? null;
     }
 
     /**
@@ -237,34 +219,30 @@ class Builder
     }
 
     /**
-     * @param string $role
-     *
-     * @return $this
+     * @return JsonInterface
      */
-    public function role( string $role ): self
+    public function claims(): JsonInterface
     {
-        $this->claims[ 'rol' ] = $role;
-    }
+        $all = [];
 
-    /**
-     * @param string $client
-     *
-     * @return $this
-     */
-    public function client( string $client ): self
-    {
-        $this->claims[ 'clt' ] = $client;
+        foreach ( $this->claims as $key => $value ) {
+            if ( Arr::in( $key, $this->keywords ) ) {
+                $all[ $key ] = $value;
+            }
+        }
+
+        return new Json( $all );
     }
 
     /**
      * @return JsonInterface
      */
-    public function getAll(): JsonInterface
+    public function all(): JsonInterface
     {
         $all = [];
 
         foreach ( $this->claims as $key => $value ) {
-            if ( $this->get( $key ) ) {
+            if ( !Arr::in( $key, $this->keywords ) ) {
                 $all[ $key ] = $value;
             }
         }
@@ -287,12 +265,64 @@ class Builder
     }
 
     /**
+     * @param string $key
+     * @param        $value
+     *
+     * @return $this
+     */
+    public function header( string $key, $value ): self
+    {
+        $this->headers[ $key ] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param iterable $headers
+     *
+     * @return $this
+     */
+    public function headers( iterable $headers ): self
+    {
+        foreach ( $headers as $key => $value ) {
+            $this->header( $key, $value );
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return mixed|null
+     */
+    public function getHeader( string $key )
+    {
+        return $this->headers[ $key ] ?? null;
+    }
+
+    /**
+     * @return JsonInterface
+     */
+    public function getHeaders(): JsonInterface
+    {
+        return new Json( $this->headers );
+    }
+
+    /**
+     * @param string $secret
+     * @param string $alg
+     *
      * @return string
      */
-    public function token(): string
+    public function token( string $secret, string $alg = 'HS256' ): string
     {
-        // b64 header sujet ALG
-        // b64 claim
-        // encode package
+        $this->header( 'alg', $alg );
+
+        $headerEncoded  = $this->headerEncode( $this->headers );
+        $payloadEncoded = $this->payloadEncode( $this->claims );
+        $signature      = $this->signatureEncode( $this->headers, $this->claims, $secret );
+
+        return $headerEncoded . '.' . $payloadEncoded . '.' . $signature;
     }
 }

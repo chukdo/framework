@@ -2,6 +2,8 @@
 
 namespace Chukdo\Jwt;
 
+use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\Json\Json;
 use Chukdo\Helper\Arr;
 use Chukdo\Helper\To;
 
@@ -20,79 +22,44 @@ class Parser
     /**
      * @var array
      */
+    protected $header = [];
+
+    /**
+     * @var array
+     */
+    protected $payload = [];
+
+    /**
+     * @var string|null
+     */
+    protected $signature = null;
+
+    /**
+     * @var array
+     */
     protected $claims = [];
 
     /**
-     * @var string
+     * @var string|null
      */
-    protected $secret;
-
-    /**
-     * @var string
-     */
-    protected $jwt;
-
-    /**
-     * @return Builder
-     */
-    public function parse(): Builder
-    {
-        $tokenParts = $this->getTokensParts( $this->jwt );
-
-        if ( Arr::empty( $tokenParts ) ) {
-            throw new JwtException( 'The token is not a valid JWT' );
-        }
-
-        $header    = $this->headerDecode( $tokenParts[ 'header' ] );
-        $payload   = $this->payloadDecode( $tokenParts[ 'payload' ] );
-        $signature = $this->signatureEncode( $header, $payload, $this->secret );
-
-        $time = time();
-        $nbf  = $payload[ 'nbf' ] ?? null;
-        $exp  = $payload[ 'exp' ] ?? null;
-        $iss  = $payload[ 'iss' ] ?? null;
-        $jti  = $payload[ 'jti' ] ?? null;
-        $aud  = (array)( $payload[ 'aud' ] ?? [] );
-
-        if ( $signature !== $tokenParts[ 'signature' ] ) {
-            throw new JwtException( 'The JWT signature is not a valid' );
-        }
-
-        if ( $nbf && $time <= $nbf ) {
-            throw new JwtException( 'The JWT is not yet valid' );
-        }
-
-        if ( $exp && $time >= $exp ) {
-            throw new JwtException( 'The JWT has expired' );
-        }
-
-        if ( $this->claims[ 'jti' ] && $jti !== $this->claims[ 'jti' ] ) {
-            throw new JwtException( 'The JWT claim:jti is not a valid' );
-        }
-
-        if ( $this->claims[ 'iss' ] && $iss !== $this->claims[ 'iss' ] ) {
-            throw new JwtException( 'The JWT claim:iss is not a valid' );
-        }
-
-        if ( $this->claims[ 'aud' ] && !Arr::in( $this->claims[ 'aud' ], $aud ) ) {
-            throw new JwtException( 'The JWT claim:aud is not a valid' );
-        }
-
-        $builder = new Builder();
-        $builder->setAll( $payload );
-        $builder->secret( $this->secret );
-
-        return $builder;
-    }
+    protected $err = null;
 
     /**
      * @param string $jwt
      *
      * @return $this
      */
-    public function token( string $jwt ): self
+    public function parse( string $jwt ): self
     {
-        $this->jwt = $jwt;
+        $tokenParts = $this->getTokensParts( $jwt );
+
+        if ( Arr::empty( $tokenParts ) ) {
+            return $this;
+        }
+
+        $this->header    = $this->headerDecode( $tokenParts[ 'header' ] );
+        $this->payload   = $this->payloadDecode( $tokenParts[ 'payload' ] );
+        $this->signature = $tokenParts[ 'signature' ];
 
         return $this;
     }
@@ -100,13 +67,90 @@ class Parser
     /**
      * @param string $secret
      *
-     * @return $this
+     * @return bool
      */
-    public function secret( string $secret ): self
+    public function signed( string $secret ): bool
     {
-        $this->secret = $secret;
+        $time      = time();
+        $signature = $this->signatureEncode( $this->header, $this->payload, $secret );
+        $nbf       = $this->payload[ 'nbf' ] ?? null;
+        $exp       = $this->payload[ 'exp' ] ?? null;
+        $iss       = $this->payload[ 'iss' ] ?? null;
+        $jti       = $this->payload[ 'jti' ] ?? null;
+        $aud       = (array)( $this->payload[ 'aud' ] ?? [] );
 
-        return $this;
+        if ( $signature !== $this->signature ) {
+            $this->err = 'The JWT signature is not a valid';
+            return false;
+        }
+
+        if ( $nbf && $time <= $nbf ) {
+            $this->err = 'The JWT is not yet valid';
+            return false;
+        }
+
+        if ( $exp && $time >= $exp ) {
+            $this->err = 'The JWT has expired';
+            return false;
+        }
+
+        if ( isset( $this->claims[ 'jti' ] ) && $jti !== $this->claims[ 'jti' ] ) {
+            $this->err = 'The JWT claim:jti is not a valid';
+            return false;
+        }
+
+        if ( isset( $this->claims[ 'iss' ] ) && $iss !== $this->claims[ 'iss' ] ) {
+            $this->err = 'The JWT claim:iss is not a valid';
+            return false;
+        }
+
+        if ( isset( $this->claims[ 'aud' ] ) && !Arr::in( $this->claims[ 'aud' ], $aud ) ) {
+            $this->err = 'The JWT claim:aud is not a valid';
+            return false;
+        }
+
+        return true;
+    }
+
+    public function builder(): Builder
+    {
+        $builder = new Builder();
+        $builder->headers( $this->header )
+                ->setAll( $this->payload );
+
+        return $builder;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function error(): ?string
+    {
+        return $this->err;
+    }
+
+    /**
+     * @return JsonInterface
+     */
+    public function header(): JsonInterface
+    {
+        return new Json( $this->header );
+    }
+
+    /**
+     * @return JsonInterface
+     */
+    public function payload(): JsonInterface
+    {
+        return new Json( $this->payload );
+    }
+
+    /**
+     * @return string|null
+     */
+    public function signature(): ?string
+    {
+        return $this->signature;
     }
 
     /**
