@@ -220,7 +220,7 @@ $jwt->parse( 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwib
 
 $jwt->issuer( 'tometoyou' );
 
-if ( $jwt->signed( 'test' ) ) {
+if ( $jwt->hasValidToken( 'test' ) ) {
     echo( 'SIGNED' );
 } else {
     die ( $jwt->error() );
@@ -230,8 +230,7 @@ echo $jwt->builder()
          ->claims()
          ->toHtml();
 echo $jwt->builder()
-         ->all()
-         ->toHtml();
+         ->token( 'test' );
 exit;
 ini_set( 'memory_limit', '256M' );
 set_time_limit( 3000 );

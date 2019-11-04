@@ -201,7 +201,7 @@ class Builder
      *
      * @return $this
      */
-    public function validAt( int $time = 3600, bool $relative = true ): self
+    public function startAt( int $time = 3600, bool $relative = true ): self
     {
         $this->claims[ 'nbf' ] = ( $relative
                 ? time()
@@ -310,14 +310,18 @@ class Builder
     }
 
     /**
-     * @param string $secret
-     * @param string $alg
+     * @param string      $secret
+     * @param string|null $alg
      *
      * @return string
      */
-    public function token( string $secret, string $alg = 'HS256' ): string
+    public function token( string $secret, string $alg = null ): string
     {
-        $this->header( 'alg', $alg );
+        if ( !$this->getHeader( 'alg' ) ) {
+            $this->header( 'alg', $alg ?? 'HS256' );
+        }
+
+        ksort( $this->headers );
 
         $headerEncoded  = $this->headerEncode( $this->headers );
         $payloadEncoded = $this->payloadEncode( $this->claims );

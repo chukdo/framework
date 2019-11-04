@@ -65,51 +65,112 @@ class Parser
     }
 
     /**
-     * @param string $secret
+     * @param string   $secret
+     * @param int|null $time
      *
      * @return bool
      */
-    public function signed( string $secret ): bool
+    public function hasValidToken( string $secret, int $time = null ): bool
     {
-        $time      = time();
-        $signature = $this->signatureEncode( $this->header, $this->payload, $secret );
-        $nbf       = $this->payload[ 'nbf' ] ?? null;
-        $exp       = $this->payload[ 'exp' ] ?? null;
-        $iss       = $this->payload[ 'iss' ] ?? null;
-        $jti       = $this->payload[ 'jti' ] ?? null;
-        $aud       = (array)( $this->payload[ 'aud' ] ?? [] );
-
-        if ( $signature !== $this->signature ) {
+        if ( !$this->hasValidSignature( $secret ) ) {
             $this->err = 'The JWT signature is not a valid';
             return false;
         }
 
-        if ( $nbf && $time <= $nbf ) {
+        if ( !$this->hasValidStart( $time ) ) {
             $this->err = 'The JWT is not yet valid';
             return false;
         }
 
-        if ( $exp && $time >= $exp ) {
+        if ( !$this->hasValidExpired( $time ) ) {
             $this->err = 'The JWT has expired';
             return false;
         }
 
-        if ( isset( $this->claims[ 'jti' ] ) && $jti !== $this->claims[ 'jti' ] ) {
+        if ( !$this->hasValidId() ) {
             $this->err = 'The JWT claim:jti is not a valid';
             return false;
         }
 
-        if ( isset( $this->claims[ 'iss' ] ) && $iss !== $this->claims[ 'iss' ] ) {
+        if ( !$this->hasValidIssuer() ) {
             $this->err = 'The JWT claim:iss is not a valid';
             return false;
         }
 
-        if ( isset( $this->claims[ 'aud' ] ) && !Arr::in( $this->claims[ 'aud' ], $aud ) ) {
+        if ( !$this->hasValidAudience() ) {
             $this->err = 'The JWT claim:aud is not a valid';
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * @param string $secret
+     *
+     * @return bool
+     */
+    public function hasValidSignature( string $secret ): bool
+    {
+        $signature = $this->signatureEncode( $this->header, $this->payload, $secret );
+
+        return !( $signature !== $this->signature );
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasValidIssuer(): bool
+    {
+        $iss = $this->payload[ 'iss' ] ?? null;
+
+        return !( isset( $this->claims[ 'iss' ] ) && $iss !== $this->claims[ 'iss' ] );
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasValidAudience(): bool
+    {
+        $aud = $this->payload[ 'aud' ] ?? null;
+
+        return !( isset( $this->claims[ 'aud' ] ) && $aud !== $this->claims[ 'aud' ] );
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasValidId(): bool
+    {
+        $jti = $this->payload[ 'jti' ] ?? null;
+
+        return !( isset( $this->claims[ 'jti' ] ) && $jti !== $this->claims[ 'jti' ] );
+    }
+
+    /**
+     * @param int|null $time
+     *
+     * @return bool
+     */
+    public function hasValidStart( int $time = null ): bool
+    {
+        $nbf  = $this->payload[ 'nbf' ] ?? null;
+        $time = $time ?? time();
+
+        return !( $nbf && $time >= $nbf );
+    }
+
+    /**
+     * @param int|null $time
+     *
+     * @return bool
+     */
+    public function hasValidExpired( int $time = null ): bool
+    {
+        $exp  = $this->payload[ 'exp' ] ?? null;
+        $time = $time ?? time();
+
+        return !( $exp && $time >= $exp );
     }
 
     public function builder(): Builder
