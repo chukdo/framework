@@ -216,9 +216,9 @@ use \Chukdo\Db\Mongo\Aggregate\Expr;
 use \Chukdo\Db\Mongo\Aggregate\Aggregate;
 
 $jwt = new \Chukdo\Jwt\Parser();
-$jwt->parse( 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJpc3MiOiJ0b21ldG95b3UifQ.jyRVgWHoTg4ibapkzxQlOLCqgQtqgRPBiCKfNFmbGNE' );
+$jwt->parse( 'eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.NYceoIj7r9twJqsmk46Aq2Iy5SvJwLMixTWJWZBUrm5m8krRhbSGG9juMKfpDA1v' );
 
-$jwt->issuer( 'tometoyou' );
+//$jwt->issuer( 'tometoyou' );
 
 if ( $jwt->hasValidToken( 'test' ) ) {
     echo( 'SIGNED' );

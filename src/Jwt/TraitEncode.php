@@ -30,6 +30,10 @@ trait TraitEncode
         switch ( $alg ) {
             case 'HS256' :
                 return To::base64UrlEncode( hash_hmac( 'sha256', $headerEncoded . '.' . $payLoadEncoded, $secret, true ) );
+            case 'HS384' :
+                return To::base64UrlEncode( hash_hmac( 'sha384', $headerEncoded . '.' . $payLoadEncoded, $secret, true ) );
+            case 'HS512' :
+                return To::base64UrlEncode( hash_hmac( 'sha512', $headerEncoded . '.' . $payLoadEncoded, $secret, true ) );
         }
 
         return null;
