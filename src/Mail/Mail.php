@@ -2,6 +2,9 @@
 
 namespace Chukdo\Mail;
 
+use Chukdo\Contracts\Mail\Transport as TransportInterface;
+use Chukdo\Helper\Str;
+
 /**
  * Mail.
  *
@@ -103,14 +106,11 @@ class Mail
     protected $pixel;
 
     /**
-     * Constructeur
-     * Defini les boundary
+     * Mail constructor.
      *
-     * @param object $transport trasnport mail ex. smtp
-     *
-     * @return void
+     * @param TransportInterface $transport
      */
-    public function __construct( $transport )
+    public function __construct( TransportInterface $transport )
     {
         $this->transport = $transport;
         $this->mboundary = uniqid( '', true );
@@ -119,24 +119,20 @@ class Mail
     }
 
     /**
-     * Retourne le transport de message
-     *
-     * @return object $transport trasnport mail ex. smtp
+     * @return TransportInterface
      */
-    public function getTransport()
+    public function transport(): TransportInterface
     {
         return $this->transport;
     }
 
     /**
-     * Ajoute un mail en copie
+     * @param string      $mail
+     * @param string|null $name
      *
-     * @param string $mail mail
-     * @param string $name nom associé au mail
-     *
-     * @return object $this
+     * @return $this
      */
-    public function addCc( $mail, $name = false )
+    public function addCc( string $mail, string $name = null ): self
     {
         $this->to[] = $mail;
         $mail       = $this->qMail( $mail, $name );
@@ -150,14 +146,12 @@ class Mail
     }
 
     /**
-     * Qualifie un entete mail
+     * @param string      $mail
+     * @param string|null $name
      *
-     * @param string $mail mail
-     * @param string $name nom associé
-     *
-     * @return string message
+     * @return string
      */
-    public function qMail( $mail, $name = false )
+    public function qMail( string $mail, string $name = null ): string
     {
         return $name
             ? "\"$name\" <$mail>"
@@ -165,14 +159,12 @@ class Mail
     }
 
     /**
-     * Ajoute un entete personalisé
+     * @param string $name
+     * @param string $value
      *
-     * @param string $name  nom de l'entete
-     * @param string $value valeur associée
-     *
-     * @return object $this
+     * @return $this
      */
-    public function addHeader( $name, $value )
+    public function addHeader( string $name, string $value ): self
     {
         $this->headers[ strtolower( $name ) ] = $value;
 
@@ -180,16 +172,14 @@ class Mail
     }
 
     /**
-     * Ajoute un mail en copie caché
+     * @param string      $mail
+     * @param string|null $name
      *
-     * @param string $mail mail
-     * @param string $name nom associé au mail
-     *
-     * @return object $this
+     * @return $this
      */
-    public function addBcc( $mail, $name = false )
+    public function addBcc( string $mail, string $name = null ): self
     {
-        if ( in_array( $mail, $this->to ) ) {
+        if ( in_array( $mail, $this->to, true ) ) {
             return $this;
         }
 
@@ -205,16 +195,14 @@ class Mail
     }
 
     /**
-     * Ajoute un fichier
+     * @param string      $file
+     * @param string|null $name
+     * @param bool        $attachment
+     * @param string      $encoding
      *
-     * @param string $file       chemin du fichier
-     * @param bool   $attachment attaché ou inline
-     * @param string $name       nom du fichier si $attachment = false ou non du CID si $attachment = true
-     * @param string $encoding   encodage du fichier 7bit, 8bit, base64, quoted-printable, binary
-     *
-     * @return object $this
+     * @return $this
      */
-    public function addFile( $file, $name = false, $attachment = true, $encoding = 'base64' )
+    public function addFile( string $file, string $name = null, bool $attachment = true, string $encoding = 'base64' ): self
     {
         if ( file_exists( $file ) ) {
             if ( !$name ) {
@@ -224,7 +212,7 @@ class Mail
             $content     = $this->encode( file_get_contents( $file ), $encoding );
             $disposition = $attachment
                 ? "attachment; filename=\"$name\""
-                : "inline;";
+                : 'inline;';
             $type        = 'application/octet-stream';
 
             $fi = finfo_open( FILEINFO_MIME_TYPE );
@@ -247,14 +235,12 @@ class Mail
     }
 
     /**
-     * Encode une donnée
-     *
-     * @param string $data     donnée à encoder
-     * @param string $encoding encodage du fichier 7bit, 8bit, base64, quoted-printable, binary
+     * @param string $data
+     * @param string $encoding
      *
      * @return string
      */
-    protected function encode( $data, $encoding = '8bit' )
+    protected function encode( string $data, string $encoding = '8bit' ): string
     {
         $encoding = str_replace( [ ' ',
                                    '_' ], '-', strtolower( $encoding ) );
@@ -276,14 +262,12 @@ class Mail
     }
 
     /**
-     * Ajoute un mail en destinataire
+     * @param string      $mail
+     * @param string|null $name
      *
-     * @param string $mail mail
-     * @param string $name nom associé au mail
-     *
-     * @return object $this
+     * @return $this
      */
-    public function addTo( $mail, $name = false )
+    public function addTo( string $mail, string $name = null ): self
     {
         $this->to[] = $mail;
         $mail       = $this->qMail( $mail, $name );
@@ -297,14 +281,12 @@ class Mail
     }
 
     /**
-     * Defini le mail de l'envoyeur
+     * @param string      $mail
+     * @param string|null $name
      *
-     * @param string $mail mail
-     * @param string $name nom associé au mail
-     *
-     * @return object $this
+     * @return $this
      */
-    public function setFrom( $mail, $name = false )
+    public function setFrom( string $mail, string $name = null ): self
     {
         $this->from = $mail;
         $this->addHeader( 'from', $this->qMail( $mail, $name ) );
@@ -313,14 +295,12 @@ class Mail
     }
 
     /**
-     * Defini le mail de reponse
+     * @param string      $mail
+     * @param string|null $name
      *
-     * @param string $mail mail
-     * @param string $name nom associé au mail
-     *
-     * @return object $this
+     * @return $this
      */
-    public function setReplyTo( $mail, $name = false )
+    public function setReplyTo( string $mail, string $name = null ): self
     {
         $this->replyto = $mail;
         $this->addHeader( 'reply_to', $this->qMail( $mail, $name ) );
@@ -329,13 +309,11 @@ class Mail
     }
 
     /**
-     * Defini le sujet du mail
-     *
      * @param string $subject
      *
-     * @return object $this
+     * @return $this
      */
-    public function setSubject( $subject )
+    public function setSubject( string $subject ): self
     {
         $this->subject = $subject;
         $this->addHeader( 'subject', '=?utf-8?B?' . base64_encode( $subject ) . '?=' );
@@ -344,13 +322,11 @@ class Mail
     }
 
     /**
-     * Défini le charset pour les contenu HTML et Text
-     *
      * @param string $charset
      *
-     * @return object $this
+     * @return $this
      */
-    public function setCharset( $charset )
+    public function setCharset( string $charset ): self
     {
         $this->charset = $charset;
 
@@ -358,11 +334,9 @@ class Mail
     }
 
     /**
-     * Envoi le mail
-     *
-     * @return bool true si l'operation reussi false sinon
+     * @return bool
      */
-    public function sendMail()
+    public function sendMail(): bool
     {
         if ( $this->log ) {
             $data = array_merge( $this->log[ 'data' ], [ 'subject'  => $this->subject,
@@ -379,11 +353,9 @@ class Mail
     }
 
     /**
-     * Genere le corps du mail à envoyer
-     *
-     * @return string message
+     * @return string
      */
-    public function message()
+    public function message(): string
     {
         if ( count( $this->files ) ) {
             $message = '';
@@ -391,15 +363,11 @@ class Mail
             if ( $this->text && $this->html ) {
                 $message .= $this->openMixedBoundary() . $this->messageAlternative();
 
-            } else {
-                if ( $this->html ) {
-                    $message .= $this->openMixedBoundary() . $this->messageHtml();
+            } elseif ( $this->html ) {
+                $message .= $this->openMixedBoundary() . $this->messageHtml();
 
-                } else {
-                    if ( $this->text ) {
-                        $message .= $this->openMixedBoundary() . $this->messageText();
-                    }
-                }
+            } elseif ( $this->text ) {
+                $message .= $this->openMixedBoundary() . $this->messageText();
             }
 
             foreach ( $this->files as $file ) {
@@ -410,29 +378,37 @@ class Mail
 
             return $message;
 
-        } else {
-            if ( $this->text && $this->html ) {
-                return $this->messageAlternative( false );
+        }
 
-            } else {
-                if ( $this->html ) {
-                    return $this->messageText( false );
+        if ( $this->text && $this->html ) {
+            return $this->messageAlternative( false );
 
-                } else {
-                    if ( $this->text ) {
-                        return $this->messageText( false );
-                    }
-                }
-            }
+        }
+
+        if ( $this->html ) {
+            return $this->messageText( false );
+
+        }
+
+        if ( $this->text ) {
+            return $this->messageText( false );
         }
     }
 
-    public function openMixedBoundary()
+    /**
+     * @return string
+     */
+    public function openMixedBoundary(): string
     {
         return "\r\n--$this->mboundary\r\n";
     }
 
-    public function messageAlternative( $mime = true )
+    /**
+     * @param bool $mime
+     *
+     * @return string
+     */
+    public function messageAlternative( bool $mime = true ): string
     {
         $message = '';
 
@@ -446,14 +422,12 @@ class Mail
     }
 
     /**
-     * Retourne un mime-type
+     * @param string      $type
+     * @param string|null $encoding
      *
-     * @param string $type
-     * @param string $encoding encodage du fichier 7bit, 8bit, base64, quoted-printable, binary
-     *
-     * @return string
+     * @return string|null
      */
-    protected function mime( $type, $encoding = false )
+    protected function mime( string $type, string $encoding = null ): ?string
     {
         $encoding = str_replace( [ ' ',
                                    '_' ], '-', strtolower( $encoding ) );
@@ -463,20 +437,31 @@ class Mail
                       'text'        => "Content-Type: text/plain; charset=$this->charset" . $this->newLine() . "Content-Transfer-Encoding: $encoding" . $this->newLine(),
                       'html'        => "Content-Type: text/html; charset=$this->charset" . $this->newLine() . "Content-Transfer-Encoding: $encoding" . $this->newLine() ];
 
-        return $mime[ $type ];
+        return $mime[ $type ] ?? null;
     }
 
-    public function newLine()
+    /**
+     * @return string
+     */
+    public function newLine(): string
     {
         return "\r\n";
     }
 
-    public function openAlternativeBoundary()
+    /**
+     * @return string
+     */
+    public function openAlternativeBoundary(): string
     {
         return "\r\n--$this->aboundary\r\n";
     }
 
-    public function messageText( $mime = true )
+    /**
+     * @param bool $mime
+     *
+     * @return string
+     */
+    public function messageText( bool $mime = true ): string
     {
         $message = '';
 
@@ -489,20 +474,21 @@ class Mail
         return $message;
     }
 
-    public function getText()
+    /**
+     * @return string
+     */
+    public function getText(): string
     {
         return $this->text;
     }
 
     /**
-     * Ajoute du texte au corps du message (concatenation)
-     *
      * @param string $text
-     * @param string $encoding encodage du fichier 7bit, 8bit, base64, quoted-printable, binary
+     * @param string $encoding
      *
-     * @return object $this
+     * @return $this
      */
-    public function setText( $text, $encoding = '8bit' )
+    public function setText( string $text, string $encoding = '8bit' ): self
     {
         $this->text    = $text;
         $this->textEnc = $encoding;
@@ -510,7 +496,12 @@ class Mail
         return $this;
     }
 
-    public function messageHtml( $mime = true )
+    /**
+     * @param bool $mime
+     *
+     * @return string
+     */
+    public function messageHtml( bool $mime = true ): string
     {
         $html    = '';
         $message = '';
@@ -537,7 +528,10 @@ class Mail
         return $message;
     }
 
-    public function getHtml()
+    /**
+     * @return string
+     */
+    public function getHtml(): string
     {
         $html = $this->html;
 
@@ -549,20 +543,19 @@ class Mail
     }
 
     /**
-     * Defini le code Html au corps du message
+     * @param string $html
+     * @param string $encoding
      *
-     * @param string $text
-     * @param string $encoding encodage du fichier 7bit, 8bit, base64, quoted-printable, binary
-     *
-     * @return object $this
+     * @return $this
      */
-    public function setHtml( $html, $encoding = '8bit' )
+    public function setHtml( string $html, string $encoding = '8bit' ): self
     {
         /** Extraction des images en base64 */
-        $images = helper_data::match( '/(data:image\/[^\'")]+)/i', $html, true );
+        $images = Str::matchAll( '/(data:image\/[^\'")]+)/i', $html );
 
         foreach ( $images as $image ) {
-            list( $mime, $content ) = helper_data::match( '/data:([^;]+);base64,(.*)/', $image );
+            [ $mime,
+              $content ] = Str::match( '/data:([^;]+);base64,(.*)/', $image );
             $name = md5( $content );
 
             $html = str_replace( "data:$mime;base64,$content", 'cid:' . $name, $html );
@@ -576,31 +569,19 @@ class Mail
     }
 
     /**
-     * Ajoute un fichier en base64
-     *
-     * @param string $content contenu en base64
-     * @param string $name    nom du fichier si $attachment = true ou nom du CID si $attachment = false
-     * @param bool   $type    attaché ou inline
-     *
-     * @return object $this
+     * @return string
      */
-    public function inlineImage( $content, $name, $type )
-    {
-        $this->inlineImages[ $name ] = [ 'content'     => trim( chunk_split( $content ) ),
-                                         'name'        => $name,
-                                         'type'        => $type,
-                                         'disposition' => 'inline;',
-                                         'encoding'    => 'base64' ];
-
-        return $this;
-    }
-
-    public function openRelatedBoundary()
+    public function openRelatedBoundary(): string
     {
         return "\r\n--$this->rboundary\r\n";
     }
 
-    public function messageFile( $file )
+    /**
+     * @param $file
+     *
+     * @return string
+     */
+    public function messageFile( $file ): string
     {
         $content     = $file[ 'content' ];
         $name        = $file[ 'name' ];
@@ -611,29 +592,36 @@ class Mail
         return "Content-Type: $type; name=\"$name\"" . $this->newLine() . "Content-Transfer-Encoding: $encoding" . $this->newLine() . "Content-ID: <$name>" . $this->newLine() . "Content-Description: $name" . $this->newLine() . "Content-Disposition: $disposition" . $this->newLine() . $this->newLine() . $content . $this->newLine();
     }
 
-    public function closeRelatedBoundary()
+    /**
+     * @return string
+     */
+    public function closeRelatedBoundary(): string
     {
         return "\r\n--$this->rboundary--\r\n";
     }
 
-    public function closeAlternativeBoundary()
+    /**
+     * @return string
+     */
+    public function closeAlternativeBoundary(): string
     {
         return "\r\n--$this->aboundary--\r\n";
     }
 
-    public function closeMixedBoundary()
+    /**
+     * @return string
+     */
+    public function closeMixedBoundary(): string
     {
         return "\r\n--$this->mboundary--\r\n";
     }
 
     /**
-     * Genere les entetes du mail à envoyer
-     *
-     * @return string headers
+     * @return string
      */
-    public function headers()
+    public function headers(): string
     {
-        $headers = "MIME-Version: 1.0" . $this->newLine();
+        $headers = 'MIME-Version: 1.0' . $this->newLine();
 
         foreach ( $this->headers as $key => $value ) {
             $headers .= $this->qHeader( $key ) . ': ' . $value . $this->newLine();
@@ -642,36 +630,46 @@ class Mail
         if ( count( $this->files ) ) {
             $headers .= $this->mime( 'mixed' );
 
-        } else {
-            if ( $this->text && $this->html ) {
-                $headers .= $this->mime( 'alternative' );
+        } elseif ( $this->text && $this->html ) {
+            $headers .= $this->mime( 'alternative' );
 
-            } else {
-                if ( $this->html ) {
-                    $headers .= $this->mime( 'html', $this->htmlEnc );
+        } elseif ( $this->html ) {
+            $headers .= $this->mime( 'html', $this->htmlEnc );
 
-                } else {
-                    if ( $this->text ) {
-                        $headers .= $this->mime( 'text', $this->textEnc );
-                    }
-                }
-            }
+        } elseif ( $this->text ) {
+            $headers .= $this->mime( 'text', $this->textEnc );
         }
 
         return $headers . $this->newLine();
     }
 
     /**
-     * Qualifie le nom d'un entete
-     *
      * @param string $name
      *
      * @return string
      */
-    public function qHeader( $name )
+    public function qHeader( string $name ): string
     {
         return str_replace( ' ', '-', ucwords( str_replace( [ '-',
                                                               '_' ], ' ', strtolower( $name ) ) ) );
+    }
+
+    /**
+     * @param string $content
+     * @param string $name
+     * @param bool   $type
+     *
+     * @return $this
+     */
+    public function inlineImage( string $content, string $name, bool $type ): self
+    {
+        $this->inlineImages[ $name ] = [ 'content'     => trim( chunk_split( $content ) ),
+                                         'name'        => $name,
+                                         'type'        => $type,
+                                         'disposition' => 'inline;',
+                                         'encoding'    => 'base64' ];
+
+        return $this;
     }
 
     /**
@@ -682,7 +680,7 @@ class Mail
      *
      * @return $this
      */
-    public function log( $storage, $data )
+    public function log( $storage, array $data ): self
     {
         $this->log = [ 'storage' => $storage,
                        'data'    => $data ];
@@ -692,15 +690,17 @@ class Mail
 
     /**
      * @param $url
+     *
+     * @return $this
      */
-    public function pixel( $url )
+    public function pixel( $url ): self
     {
         $this->pixel = $url;
+
+        return $this;
     }
 
     /**
-     * Renvoi le mail à envoyer sous la forme d'une chaine de caractere
-     *
      * @return string
      */
     public function __toString()

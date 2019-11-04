@@ -13,12 +13,12 @@ interface Transport
 {
     /**
      * @param string $from
-     * @param string $to
+     * @param array  $to
      * @param string $message
      * @param string $headers
      * @param string $host
      *
      * @return bool
      */
-    public function sendMail( string $from, string $to, string $message, string $headers, string $host = 'localhost' ): bool;
+    public function sendMail( string $from, array $to, string $message, string $headers, string $host = 'localhost' ): bool;
 }

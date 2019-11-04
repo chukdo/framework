@@ -65,6 +65,54 @@ class Parser
     }
 
     /**
+     * @param string $jwt
+     *
+     * @return array
+     */
+    protected function getTokensParts( string $jwt ): array
+    {
+        $tokenParts = explode( '.', $jwt );
+
+        if ( count( $tokenParts ) !== 3 ) {
+            return [];
+        }
+
+        return [ 'header'    => $tokenParts[ 0 ],
+                 'payload'   => $tokenParts[ 1 ],
+                 'signature' => $tokenParts[ 2 ], ];
+    }
+
+    /**
+     * @param string $header
+     *
+     * @return array
+     */
+    protected function headerDecode( string $header ): array
+    {
+        return $this->jsonDecode( To::base64Decode( $header ) );
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return mixed
+     */
+    protected function jsonDecode( string $value )
+    {
+        return json_decode( $value, true, 512, JSON_THROW_ON_ERROR );
+    }
+
+    /**
+     * @param string $payload
+     *
+     * @return array
+     */
+    protected function payloadDecode( string $payload ): array
+    {
+        return $this->jsonDecode( To::base64Decode( $payload ) );
+    }
+
+    /**
      * @param string   $secret
      * @param int|null $time
      *
@@ -118,36 +166,6 @@ class Parser
     }
 
     /**
-     * @return bool
-     */
-    public function hasValidIssuer(): bool
-    {
-        $iss = $this->payload[ 'iss' ] ?? null;
-
-        return !( isset( $this->claims[ 'iss' ] ) && $iss !== $this->claims[ 'iss' ] );
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasValidAudience(): bool
-    {
-        $aud = $this->payload[ 'aud' ] ?? null;
-
-        return !( isset( $this->claims[ 'aud' ] ) && $aud !== $this->claims[ 'aud' ] );
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasValidId(): bool
-    {
-        $jti = $this->payload[ 'jti' ] ?? null;
-
-        return !( isset( $this->claims[ 'jti' ] ) && $jti !== $this->claims[ 'jti' ] );
-    }
-
-    /**
      * @param int|null $time
      *
      * @return bool
@@ -171,6 +189,36 @@ class Parser
         $time = $time ?? time();
 
         return !( $exp && $time >= $exp );
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasValidId(): bool
+    {
+        $jti = $this->payload[ 'jti' ] ?? null;
+
+        return !( isset( $this->claims[ 'jti' ] ) && $jti !== $this->claims[ 'jti' ] );
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasValidIssuer(): bool
+    {
+        $iss = $this->payload[ 'iss' ] ?? null;
+
+        return !( isset( $this->claims[ 'iss' ] ) && $iss !== $this->claims[ 'iss' ] );
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasValidAudience(): bool
+    {
+        $aud = $this->payload[ 'aud' ] ?? null;
+
+        return !( isset( $this->claims[ 'aud' ] ) && $aud !== $this->claims[ 'aud' ] );
     }
 
     public function builder(): Builder
@@ -248,53 +296,5 @@ class Parser
         $this->claims[ 'jti' ] = $id;
 
         return $this;
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return mixed
-     */
-    protected function jsonDecode( string $value )
-    {
-        return json_decode( $value, true, 512, JSON_THROW_ON_ERROR );
-    }
-
-    /**
-     * @param string $jwt
-     *
-     * @return array
-     */
-    protected function getTokensParts( string $jwt ): array
-    {
-        $tokenParts = explode( '.', $jwt );
-
-        if ( count( $tokenParts ) !== 3 ) {
-            return [];
-        }
-
-        return [ 'header'    => $tokenParts[ 0 ],
-                 'payload'   => $tokenParts[ 1 ],
-                 'signature' => $tokenParts[ 2 ], ];
-    }
-
-    /**
-     * @param string $header
-     *
-     * @return array
-     */
-    protected function headerDecode( string $header ): array
-    {
-        return $this->jsonDecode( To::base64Decode( $header ) );
-    }
-
-    /**
-     * @param string $payload
-     *
-     * @return array
-     */
-    protected function payloadDecode( string $payload ): array
-    {
-        return $this->jsonDecode( To::base64Decode( $payload ) );
     }
 }

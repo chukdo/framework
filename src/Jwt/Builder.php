@@ -265,19 +265,6 @@ class Builder
     }
 
     /**
-     * @param string $key
-     * @param        $value
-     *
-     * @return $this
-     */
-    public function header( string $key, $value ): self
-    {
-        $this->headers[ $key ] = $value;
-
-        return $this;
-    }
-
-    /**
      * @param iterable $headers
      *
      * @return $this
@@ -293,12 +280,15 @@ class Builder
 
     /**
      * @param string $key
+     * @param        $value
      *
-     * @return mixed|null
+     * @return $this
      */
-    public function getHeader( string $key )
+    public function header( string $key, $value ): self
     {
-        return $this->headers[ $key ] ?? null;
+        $this->headers[ $key ] = $value;
+
+        return $this;
     }
 
     /**
@@ -328,5 +318,15 @@ class Builder
         $signature      = $this->signatureEncode( $this->headers, $this->claims, $secret );
 
         return $headerEncoded . '.' . $payloadEncoded . '.' . $signature;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return mixed|null
+     */
+    public function getHeader( string $key )
+    {
+        return $this->headers[ $key ] ?? null;
     }
 }

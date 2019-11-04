@@ -98,19 +98,19 @@ class Smtp implements TransportInterface
     }
 
     /**
-     * @param string $from
-     * @param string $to
-     * @param string $message
-     * @param string $headers
-     * @param string $host
+     * @param string      $from
+     * @param array       $to
+     * @param string      $message
+     * @param string      $headers
+     * @param string|null $host
      *
      * @return bool
      */
-    public function sendMail( string $from, string $to, string $message, string $headers, string $host = 'localhost' ): bool
+    public function sendMail( string $from, array $to, string $message, string $headers, string $host = null ): bool
     {
         $c = true;
 
-        if ( $this->hello( $host ) ) {
+        if ( $this->hello( $host ?? 'localhost' ) ) {
             if ( ( $this->dsn[ 'scheme' ] === 'tls' ) && !$this->starttls() ) {
                 $c = false;
             }
