@@ -2,6 +2,8 @@
 
 namespace Chukdo\Mail;
 
+use Chukdo\Contracts\Mail\Transport as TransportInterface;
+
 /**
  * SMTP.
  *
@@ -10,7 +12,7 @@ namespace Chukdo\Mail;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class Smtp
+class Smtp implements TransportInterface
 {
     /**
      * History Log
@@ -226,9 +228,9 @@ class Smtp
     public function data( string $data, string $headers ): bool
     {
         if ( $this->write( 'DATA' ) === 354 ) {
-            $headers = explode( "\n", trim( $headers ) );
+            $headerList = explode( "\n", trim( $headers ) );
 
-            foreach ( $headers as $header ) {
+            foreach ( $headerList as $header ) {
                 $this->write( $header . "\r\n", false );
             }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Chukdo\Contracts\Logger;
+namespace Chukdo\Contracts\Mail;
 /**
  * Interface des formatteurs.
  *
@@ -9,14 +9,16 @@ namespace Chukdo\Contracts\Logger;
  * @since         08/01/2019
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-interface Formatter
+interface Transport
 {
     /**
-     * Formatte un enregistrement.
+     * @param string $from
+     * @param string $to
+     * @param string $message
+     * @param string $headers
+     * @param string $host
      *
-     * @param array $record
-     *
-     * @return mixed
+     * @return bool
      */
-    public function sendMail( array $record );
+    public function sendMail( string $from, string $to, string $message, string $headers, string $host = 'localhost' ): bool;
 }
