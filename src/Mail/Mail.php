@@ -96,11 +96,6 @@ class Mail
     protected $transport;
 
     /**
-     * @var array
-     */
-    protected $log = [];
-
-    /**
      * @param string
      */
     protected $pixel;
@@ -338,24 +333,25 @@ class Mail
      */
     public function sendMail(): bool
     {
-        if ( $this->log ) {
-            $data = array_merge( $this->log[ 'data' ], [ 'subject'  => $this->subject,
-                                                         'text'     => $this->text,
-                                                         'mailfrom' => $this->from,
-                                                         'mailto'   => $this->to,
-                                                         'replyto'  => $this->replyto ] );
-
-            $this->addHeader( 'x-modelo-client', app::gc( 'db/mongo/database' ) );
-            $this->addHeader( 'x-modelo-message-id', (string)$this->log[ 'storage' ]->saveLog( $data ) );
-        }
-
         return $this->transport->sendMail( $this->from, $this->to, $this->message(), $this->headers() );
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function message(): string
+    public function log(): array
+    {
+        return [ 'subject'  => $this->subject,
+                 'text'     => $this->text,
+                 'mailfrom' => $this->from,
+                 'mailto'   => $this->to,
+                 'replyto'  => $this->replyto ];
+    }
+
+    /**
+     * @return string|null
+     */
+    public function message(): ?string
     {
         if ( count( $this->files ) ) {
             $message = '';
@@ -393,6 +389,8 @@ class Mail
         if ( $this->text ) {
             return $this->messageText( false );
         }
+
+        return null;
     }
 
     /**
@@ -536,7 +534,7 @@ class Mail
         $html = $this->html;
 
         if ( $pixel = $this->pixel ) {
-            $html = str_replace( '</body>', '<img src="' . $pixel . '" height="1" width="1" /></body>', $html );
+            $html = str_replace( '</body>', '<img alt="pix" src="' . $pixel . '" height="1" width="1" /></body>', $html );
         }
 
         return $html;
@@ -668,22 +666,6 @@ class Mail
                                          'type'        => $type,
                                          'disposition' => 'inline;',
                                          'encoding'    => 'base64' ];
-
-        return $this;
-    }
-
-    /**
-     * Informations à logger
-     *
-     * @param object $storage Object ayant une fonction saveLog
-     * @param array  $data    Données à logger
-     *
-     * @return $this
-     */
-    public function log( $storage, array $data ): self
-    {
-        $this->log = [ 'storage' => $storage,
-                       'data'    => $data ];
 
         return $this;
     }
