@@ -45,4 +45,6 @@ Router::any( '/', function( $inputs, $response )
 
 Router::any( '/info', '\App\Controlers\Info@index' );
 
+Router::any( '/info', '\App\Controlers\Callback@index' );
+
 $r = Router::route();
