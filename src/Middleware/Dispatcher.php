@@ -55,10 +55,9 @@ class Dispatcher
     public function attribute( string $name, $value = null )
     {
         if ( $value === null ) {
-            return isset( $this->attributes[ $name ] )
-                ? $this->attributes[ $name ]
-                : null;
+            return $this->attributes[ $name ] ?? null;
         }
+
         $this->attributes[ $name ] = $value;
     }
 
@@ -92,7 +91,7 @@ class Dispatcher
     public function pipe( $middleware ): self
     {
         if ( is_string( $middleware ) ) {
-            if ( substr( $middleware, 0, 1 ) == '@' ) {
+            if ( strpos( $middleware, '@' ) === 0 ) {
 
                 try {
                     $confMiddleware = $this->request()
@@ -126,8 +125,10 @@ class Dispatcher
     public function handle(): Response
     {
         $middleware = $this->middleware();
+
         $this->index++;
-        if ( is_null( $middleware ) ) {
+
+        if ( $middleware === null ) {
             return $this->response;
         }
 
@@ -135,14 +136,10 @@ class Dispatcher
     }
 
     /**
-     * @return callable|null
+     * @return MiddlewareInterface|null
      */
-    private function middleware()
+    private function middleware(): ?MiddlewareInterface
     {
-        if ( isset( $this->middlewares[ $this->index ] ) ) {
-            return $this->middlewares[ $this->index ];
-        }
-
-        return null;
+        return $this->middlewares[ $this->index ] ?? null;
     }
 }

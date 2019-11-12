@@ -4,6 +4,7 @@ namespace Chukdo\Routing;
 
 use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
 use Chukdo\Contracts\Middleware\Middleware as MiddlewareInterface;
+use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
 use Chukdo\Http\Request;
 use Chukdo\Http\Response;
@@ -130,19 +131,7 @@ class Route
      */
     public function match(): bool
     {
-        if ( $this->matchMethod() ) {
-            if ( $this->matchScheme() ) {
-                if ( $this->matchDomain() ) {
-                    if ( $this->matchSubDomain() ) {
-                        if ( $this->matchPath() ) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-
-        return false;
+        return $this->matchMethod() && $this->matchScheme() && $this->matchDomain() && $this->matchSubDomain() && $this->matchPath();
     }
 
     /**
@@ -258,6 +247,7 @@ class Route
                                           ->getSubDomain();
         $routeSubDomain   = $this->uri()
                                  ->getSubDomain();
+
         if ( $routeSubDomain === null || $requestSubDomain === $routeSubDomain ) {
             return true;
         }
@@ -318,9 +308,16 @@ class Route
     {
         $dispatcher = new Dispatcher( $this->request, $response );
         $dispatcher->pipe( $this->appMiddleware );
-        $dispatcher->pipe( new ValidatorMiddleware( $this->attributes()
-                                                         ->getValidator(), $this->attributes()
-                                                                                ->getErrorMiddleware() ) );
+
+        $validators = $this->attributes()
+                           ->getValidator();
+        $errors     = $this->attributes()
+                           ->getErrorMiddleware();
+
+        if ( !Is::empty( $validators ) ) {
+            $dispatcher->pipe( new ValidatorMiddleware( $validators, $errors ) );
+        }
+
         foreach ( $this->attributes()
                        ->getMiddleware() as $middleware ) {
             $dispatcher->pipe( $middleware );

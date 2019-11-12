@@ -6,10 +6,11 @@ use Chukdo\Http\Controler;
 use Chukdo\Http\Response;
 use Chukdo\Http\Input;
 
-class test extends Controler
+class Info extends Controler
 {
     public function index( Input $inputs, Response $response ): Response
     {
-        return $response->content( 'TEST Controler: ' . (string)$inputs );
+        return $response->header( 'X-Info', 'ok' )
+                        ->content( 'Info Controler: ' . (string)$inputs );
     }
 }

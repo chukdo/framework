@@ -83,9 +83,12 @@ class Rule
     protected function parseRule( string $rule ): void
     {
         $rules = explode( '|', $rule );
-        foreach ( $rules as $rule ) {
-            list( $rule, $attrs ) = $this->parseAttributes( $rule );
-            switch ( $rule ) {
+
+        foreach ( $rules as $ruleItem ) {
+            [ $ruleName,
+              $attrs ] = $this->parseAttributes( $ruleItem );
+
+            switch ( $ruleName ) {
                 case 'form':
                     $this->isForm = true;
                     break;
@@ -101,7 +104,7 @@ class Rule
                                     'max'   => $attrs->get( 1, $attrs->get( 0, 10000 ) ), ];
                     break;
                 default:
-                    $this->rules[ $rule ] = (array)$attrs;
+                    $this->rules[ $ruleName ] = (array)$attrs;
             }
         }
     }
@@ -113,12 +116,14 @@ class Rule
      */
     protected function parseAttributes( string $rule ): array
     {
-        list( $rule, $attrs ) = Str::explode( ':', $rule, 2 );
+        [ $rule,
+          $attrs ] = Str::explode( ':', $rule, 2 );
         $json = new Json( Str::explode( ',', $attrs ) );
-        /* Recherche d'attributs faisant référence à un chemin de configuration (commence par @) */
+
+        /** Recherche d'attributs faisant référence à un chemin de configuration (commence par @) */
         $filter = $json->filter( function( $k, $v )
         {
-            $isConf = substr( $v, 0, 1 ) == '@';
+            $isConf = strpos( $v, '@' ) === 0;
             $conf   = substr( $v, 1 );
             if ( $isConf ) {
                 return $this->validator->request()
@@ -134,17 +139,13 @@ class Rule
 
     /**
      * @return bool
-     * @throws ServiceException
-     * @throws ReflectionException
      */
     public function validate(): bool
     {
-        if ( $this->inputRequired() ) {
-            if ( $this->inputScalarOrArray() ) {
-                $this->inputFilters();
+        if ( $this->inputRequired() && $this->inputScalarOrArray() ) {
+            $this->inputFilters();
 
-                return $this->validateRule();
-            }
+            return $this->validateRule();
         }
 
         return false;
@@ -152,17 +153,13 @@ class Rule
 
     /**
      * @return bool
-     * @throws ServiceException
-     * @throws ReflectionException
      */
     protected function inputRequired(): bool
     {
-        if ( $this->input() === null ) {
-            if ( $this->isRequired ) {
-                $this->error( 'required' );
+        if ( $this->isRequired && ( $this->input() === null ) ) {
+            $this->error( 'required' );
 
-                return false;
-            }
+            return false;
         }
 
         return true;
@@ -178,7 +175,8 @@ class Rule
                               ->wildcard( $this->path, true )
             : $this->validator->inputs()
                               ->get( $this->path );
-        /* Recherche dans file */
+
+        /** Recherche dans file */
         if ( $input === null ) {
             $input = $this->validator->inputs()
                                      ->file( $this->path );
@@ -190,9 +188,6 @@ class Rule
     /**
      * @param string      $key
      * @param string|null $path
-     *
-     * @throws ServiceException
-     * @throws ReflectionException
      */
     protected function error( string $key, string $path = null ): void
     {
@@ -209,28 +204,25 @@ class Rule
 
     /**
      * @return bool
-     * @throws ServiceException
-     * @throws ReflectionException
      */
     protected function inputScalarOrArray(): bool
     {
         $input = $this->input();
-        if ( $this->type[ 'array' ] ) {
-            if ( $input instanceof InputInterface ) {
+
+        if ( $input instanceof InputInterface ) {
+            if ( $this->type[ 'array' ] ) {
                 $countInput = count( $input->toSimpleArray() );
+
                 if ( $countInput >= $this->type[ 'min' ] && $countInput <= $this->type[ 'max' ] ) {
                     return true;
                 }
+
+                $this->error( 'array' );
+            } else {
+                $this->error( 'scalar' );
             }
-            $this->error( 'array' );
 
             return false;
-        } else {
-            if ( $input instanceof InputInterface ) {
-                $this->error( 'scalar' );
-
-                return false;
-            }
         }
 
         return true;
@@ -256,7 +248,7 @@ class Rule
     {
         $input = $this->input();
         if ( $input instanceof InputInterface ) {
-            $inputs = $input->filterRecursive( function( $k, $v ) use ( $filter )
+            $inputs = $input->filterRecursive( static function( $k, $v ) use ( $filter )
             {
                 return $filter->filter( $v );
             } );
@@ -270,8 +262,6 @@ class Rule
 
     /**
      * @return bool
-     * @throws ServiceException
-     * @throws ReflectionException
      */
     protected function validateRule(): bool
     {
@@ -291,12 +281,11 @@ class Rule
      * @param string            $name
      *
      * @return bool
-     * @throws ServiceException
-     * @throws ReflectionException
      */
     protected function validateInput( ValidateInterface $validate, string $name ): bool
     {
         $input = $this->input();
+
         if ( $input instanceof InputInterface ) {
             return $this->validateArray( $validate, $name );
         }
@@ -309,26 +298,23 @@ class Rule
      * @param string            $name
      *
      * @return bool
-     * @throws ServiceException
-     * @throws ReflectionException
      */
     protected function validateArray( ValidateInterface $validate, string $name ): bool
     {
         $validated = true;
         $input     = $this->input();
+
         foreach ( $input->toSimpleArray() as $k => $v ) {
             if ( $validate->validate( $v ) ) {
                 $this->validator->validated()
                                 ->set( $k, $v );
+            } elseif ( $this->isForm ) {
+                $this->error( $name, $k );
+                $validated .= false;
             } else {
-                if ( $this->isForm ) {
-                    $this->error( $name, $k );
-                    $validated .= false;
-                } else {
-                    $this->error( $name );
-                    $validated .= false;
-                    break;
-                }
+                $this->error( $name );
+                $validated .= false;
+                break;
             }
         }
 
@@ -340,13 +326,12 @@ class Rule
      * @param string            $name
      *
      * @return bool
-     * @throws ServiceException
-     * @throws ReflectionException
      */
     protected function validateScalar( ValidateInterface $validate, string $name ): bool
     {
         $validated = true;
         $input     = $this->input();
+
         if ( $validate->validate( $input ) ) {
             $this->validator->validated()
                             ->set( $this->path, $input );

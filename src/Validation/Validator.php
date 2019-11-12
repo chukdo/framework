@@ -63,7 +63,7 @@ class Validator
     public function __construct( Request $request )
     {
         $this->request   = $request;
-        $this->error     = new Message( 'error', $request->render() );
+        $this->error     = new Message( 'error' );
         $this->validated = new Input( [] );
         $this->inputs    = $request->inputs();
     }
@@ -178,11 +178,7 @@ class Validator
      */
     public function filter( string $filter ): ?FilterInterface
     {
-        if ( isset( $this->filters[ $filter ] ) ) {
-            return $this->filters[ $filter ];
-        }
-
-        return null;
+        return $this->filters[ $filter ] ?? null;
     }
 
     /**
@@ -200,11 +196,7 @@ class Validator
      */
     public function validator( string $validator ): ?ValidateInterface
     {
-        if ( isset( $this->validators[ $validator ] ) ) {
-            return $this->validators[ $validator ];
-        }
-
-        return null;
+        return $this->validators[ $validator ] ?? null;
     }
 
     /**
@@ -243,8 +235,6 @@ class Validator
      * @param string $key
      *
      * @return string
-     * @throws ServiceException
-     * @throws ReflectionException
      */
     public function message( string $key ): string
     {

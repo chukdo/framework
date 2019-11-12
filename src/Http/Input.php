@@ -26,6 +26,7 @@ class Input extends Json implements InputInterface
     public function __construct( $data = null )
     {
         $data = $data ?? HttpRequest::all();
+
         /** Trim all input */
         array_walk_recursive( $data, function( &$v, $k )
         {
@@ -33,6 +34,7 @@ class Input extends Json implements InputInterface
                 $v = trim( $v );
             }
         } );
+
         parent::__construct( $data );
     }
 

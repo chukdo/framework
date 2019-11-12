@@ -4,6 +4,7 @@ namespace Chukdo\Routing;
 
 use Chukdo\Bootstrap\ServiceException;
 use Chukdo\Contracts\Middleware\ErrorMiddleware as ErrorMiddlewareInterface;
+use Chukdo\Helper\Is;
 use Chukdo\Http\Response;
 use Chukdo\Middleware\ClosureMiddleware;
 use Chukdo\Middleware\ControlerMiddleware;
@@ -141,14 +142,15 @@ class Router
     {
         if ( $closure instanceof Closure ) {
             $appMiddleware = new ClosureMiddleware( $closure );
+
+        } elseif ( Is::string( $closure ) ) {
+            $appMiddleware = new ControlerMiddleware( $closure );
+
         } else {
-            if ( is_string( $closure ) ) {
-                $appMiddleware = new ControlerMiddleware( $closure );
-            } else {
-                throw new RouteException( 'Router stack need a Closure or a String' );
-            }
+            throw new RouteException( 'Router stack need a Closure or a String controler@action' );
         }
         $route = new Route( $method, $uri, $this->request, $appMiddleware );
+
         $route->attributes()
               ->set( $this->attributes()
                           ->get() );

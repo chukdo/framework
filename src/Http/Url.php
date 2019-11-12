@@ -223,7 +223,9 @@ class Url
     {
         $subDomains = $this->getSubDomains();
 
-        return reset( $subDomains );
+        return empty( $subDomains )
+            ? null
+            : $subDomains[ 0 ];
     }
 
     /**

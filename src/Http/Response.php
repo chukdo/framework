@@ -329,22 +329,25 @@ class Response
     protected function sendContentResponse(): self
     {
         $content = $this->content;
+
         if ( Str::contain( HttpRequest::server( 'HTTP_ACCEPT_ENCODING' ), 'deflate' ) ) {
             $this->header->setHeader( 'Content-Encoding', 'deflate' );
             $content = gzdeflate( $this->content );
-        } else {
-            if ( Str::contain( HttpRequest::server( 'HTTP_ACCEPT_ENCODING' ), 'gzip' ) ) {
-                $this->header->setHeader( 'Content-Encoding', 'gzip' );
-                $content = gzencode( $this->content );
-            }
+
+        } elseif ( Str::contain( HttpRequest::server( 'HTTP_ACCEPT_ENCODING' ), 'gzip' ) ) {
+            $this->header->setHeader( 'Content-Encoding', 'gzip' );
+            $content = gzencode( $this->content );
         }
+
         if ( $this->header->getHeader( 'Transfer-Encoding' ) === 'chunked' ) {
             $this->sendHeaderResponse();
+
             foreach ( str_split( $content, 4096 ) as $c ) {
                 $l = dechex( strlen( $c ) );
                 echo "$l\r\n$c\r\n";
             }
             echo "0\r\n";
+
         } else {
             $this->header->setHeader( 'Content-Length', strlen( $content ) );
             $this->sendHeaderResponse();

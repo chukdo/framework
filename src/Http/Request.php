@@ -86,8 +86,6 @@ class Request
      * @param null   $default
      *
      * @return string|null
-     * @throws ReflectionException
-     * @throws ServiceException
      */
     public function conf( string $key, $default = null ): ?string
     {
@@ -100,8 +98,6 @@ class Request
      * @param null   $default
      *
      * @return string|null
-     * @throws ReflectionException
-     * @throws ServiceException
      */
     public function lang( string $key, $default = null ): ?string
     {
@@ -118,7 +114,7 @@ class Request
      */
     public function validate( array $rules ): Validator
     {
-        $validator = $this->app->make( 'Chukdo\Validation\Validator' );
+        $validator = $this->app->make( Validator::class );
         $validator->registerRules( $rules );
         $validator->validate();
 

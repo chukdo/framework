@@ -27,9 +27,11 @@ class Conf extends Json
     {
         $storage = new Storage();
         $files   = $storage->files( $dir, '/\.json$/' );
-        if ( count( $files ) == 0 ) {
+
+        if ( count( $files ) === 0 ) {
             throw new AppException( sprintf( 'Conf dir [%s] has no files', $dir ) );
         }
+
         foreach ( $files as $file ) {
             if ( !$this->loadFile( $file ) ) {
                 throw new AppException( sprintf( 'Conf file [%s] no exist', $file ) );
@@ -47,8 +49,9 @@ class Conf extends Json
     public function loadFile( string $file ): JsonInterface
     {
         $storage = new Storage();
+
         if ( $storage->exists( $file ) ) {
-            $load = new Conf( $storage->get( $file ) );
+            $load = new self( $storage->get( $file ) );
             $this->merge( $load->to2d(), true );
 
             return $this;
@@ -68,7 +71,9 @@ class Conf extends Json
         $path    = rtrim( $path, '/' ) . '/';
         $env     = trim( $env, '/' );
         $channel = trim( $channel, '/' );
+
         $this->loadFile( $path . 'default.json' );
+
         try {
             if ( $env ) {
                 $this->loadFile( $path . $env . '.json' );

@@ -126,7 +126,15 @@ class Template
         return $this->view()
                     ->getResponseHandler()
                     ->header( 'Content-Type', 'text/html; charset=utf-8' )
-                    ->content( $this->__toString() )
+                    ->content( (string)$this );
+    }
+
+    /**
+     * @return Response
+     */
+    public function send(): Response
+    {
+        return $this->render()
                     ->send();
     }
 
@@ -146,6 +154,6 @@ class Template
         ob_start();
         include $this->file;
 
-        return ob_get_clean();
+        return (string)ob_get_clean();
     }
 }

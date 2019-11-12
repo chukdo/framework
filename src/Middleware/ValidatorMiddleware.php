@@ -47,6 +47,7 @@ class ValidatorMiddleware implements MiddlewareInterface
             return ( $this->errorMiddleware ?? new ErrorMiddleware() )->errorMessage( $validate->errors() )
                                                                       ->process( $dispatcher );
         }
+
         $dispatcher->attribute( 'inputs', $validate->validated() );
 
         return $dispatcher->handle();
