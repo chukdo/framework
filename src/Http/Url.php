@@ -51,23 +51,23 @@ class Url
      */
     public function parseUrl( string $url ): Url
     {
-        $mergeUrl = [ 'scheme'   => 'file',
-                      'host'     => '',
-                      'port'     => '',
-                      'user'     => '',
-                      'pass'     => '',
-                      'path'     => '',
-                      'query'    => '',
-                      'fragment' => '', ];
-        $url      = Arr::merge( $mergeUrl, (array)parse_url( $url ) );
-        $this->setScheme( $url[ 'scheme' ] )
-             ->setHost( $url[ 'host' ] )
-             ->setPort( $url[ 'port' ] )
-             ->setUser( $url[ 'user' ] )
-             ->setPass( $url[ 'pass' ] )
-             ->setPath( $url[ 'path' ] )
-             ->setQuery( $url[ 'query' ] )
-             ->SetFragment( $url[ 'fragment' ] );
+        $mergeUrl  = [ 'scheme'   => 'file',
+                       'host'     => '',
+                       'port'     => '',
+                       'user'     => '',
+                       'pass'     => '',
+                       'path'     => '',
+                       'query'    => '',
+                       'fragment' => '', ];
+        $urlMerged = Arr::merge( $mergeUrl, (array)parse_url( $url ) );
+        $this->setScheme( $urlMerged[ 'scheme' ] )
+             ->setHost( $urlMerged[ 'host' ] )
+             ->setPort( $urlMerged[ 'port' ] )
+             ->setUser( $urlMerged[ 'user' ] )
+             ->setPass( $urlMerged[ 'pass' ] )
+             ->setPath( $urlMerged[ 'path' ] )
+             ->setQuery( $urlMerged[ 'query' ] )
+             ->SetFragment( $urlMerged[ 'fragment' ] );
 
         return $this;
     }
