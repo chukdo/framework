@@ -3,7 +3,7 @@
 namespace Chukdo\Contracts\Oauth2;
 
 /**
- * Interface Oatuh2 provider
+ * Interface Oauth2 provider
  *
  * @version       1.0.0
  * @copyright     licence MIT, Copyright (C) 2019 Domingo

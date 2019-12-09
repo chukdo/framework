@@ -3,6 +3,7 @@
 /** Namespaces */
 
 use \Chukdo\Facades\Request;
+use \Chukdo\Http\Input;
 use \Chukdo\Facades\Response;
 use \Chukdo\Facades\View;
 use \Chukdo\Facades\Router;

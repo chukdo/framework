@@ -67,7 +67,7 @@ abstract Class AbstractClient
     protected $scope = [];
 
     /**
-     * @return string
+     * @return string 
      */
     public function getGrantType(): string
     {
@@ -149,7 +149,9 @@ abstract Class AbstractClient
     }
 
     /**
-     * @return string
+     * @return stringp
+     *
+     *
      */
     public function getScopeDefault(): string
     {
