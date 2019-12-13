@@ -170,7 +170,7 @@ Class Collection implements CollectionInterface
                         ->database( $newDatabase )
                         ->collection( $newCollection );
         }
-        throw new MongoException( sprintf( 'Impossible de renommer la collection [%s] vers [%s]', $old, $new ) );
+        throw new MongoException( sprintf( 'Can\'t rename collection [%s] to [%s]', $old, $new ) );
     }
 
     /**

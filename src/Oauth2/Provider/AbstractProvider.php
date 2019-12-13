@@ -1,10 +1,12 @@
 <?php
 
-namespace Chukdo\Oauth2\Client;
+namespace Chukdo\Oauth2\Provider;
 
+use Chukdo\Contracts\Oauth2\Provider as ProviderInterface;
 use Chukdo\Helper\Arr;
+use Chukdo\Helper\Url;
 
-abstract Class AbstractClient
+abstract Class AbstractProvider implements ProviderInterface
 {
     /**
      * @var string
@@ -67,9 +69,73 @@ abstract Class AbstractClient
     protected $scope = [];
 
     /**
-     * @return string 
+     * @var string
      */
-    public function getGrantType(): string
+    protected $keywordState;
+
+    /**
+     * @return string
+     */
+    public function getAuthorizationUrl(): string
+    {
+        $client_id     = $this->getClientId();
+        $redirect_url  = $this->getRedirectUri();
+        $response_type = 'code';
+        $scope         = $this->getScope();
+        $state         = $this->getState();
+
+        // pas de client id => err
+        // pas ...
+        // ...
+
+        Url::build();
+
+        $url = $this->getUrlAuthorize() . '?';
+
+        //scope
+        //state
+
+        //client_id
+        //redirect_uri
+
+        //reponse_type = code || token
+
+
+        return $url;
+    }
+
+    /**
+     * @param string $keyword
+     *
+     * @return ProviderInterface
+     */
+    public function setKeywordState( string $keyword ): ProviderInterface
+    {
+        $this->keywordState = $keyword;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getKeywordState(): ?string
+    {
+        return $this->keywordState;
+    }
+
+    /**
+     * @return string
+     */
+    public function getState(): string
+    {
+        return hash_hmac( 'sha256', $this->getClientId(), $this->keywordState, true );
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getGrantType(): ?string
     {
         return $this->grantType;
     }
@@ -77,9 +143,9 @@ abstract Class AbstractClient
     /**
      * @param string $grantType
      *
-     * @return $this
+     * @return ProviderInterface
      */
-    public function setGrantType( string $grantType ): self
+    public function setGrantType( string $grantType ): ProviderInterface
     {
         $this->grantType = $grantType;
 
@@ -87,9 +153,9 @@ abstract Class AbstractClient
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getUser(): string
+    public function getUser(): ?string
     {
         return $this->user;
     }
@@ -97,9 +163,9 @@ abstract Class AbstractClient
     /**
      * @param string $user
      *
-     * @return $this
+     * @return ProviderInterface
      */
-    public function setUser( string $user ): self
+    public function setUser( string $user ): ProviderInterface
     {
         $this->user = $user;
 
@@ -107,9 +173,9 @@ abstract Class AbstractClient
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getPassword(): string
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -117,9 +183,9 @@ abstract Class AbstractClient
     /**
      * @param string $password
      *
-     * @return $this
+     * @return ProviderInterface
      */
-    public function setPassword( string $password ): self
+    public function setPassword( string $password ): ProviderInterface
     {
         $this->password = $password;
 
@@ -139,9 +205,9 @@ abstract Class AbstractClient
     /**
      * @param mixed ...$scopes
      *
-     * @return $this
+     * @return ProviderInterface
      */
-    public function setScope( ...$scopes ): self
+    public function setScope( ...$scopes ): ProviderInterface
     {
         $this->scope = Arr::merge( $this->scope, Arr::spreadArgs( $scopes ) );
 
@@ -149,7 +215,7 @@ abstract Class AbstractClient
     }
 
     /**
-     * @return stringp
+     * @return string
      *
      *
      */
@@ -161,9 +227,9 @@ abstract Class AbstractClient
     /**
      * @param string $scopeDefault
      *
-     * @return $this
+     * @return ProviderInterface
      */
-    public function setScopeDefault( string $scopeDefault ): self
+    public function setScopeDefault( string $scopeDefault ): ProviderInterface
     {
         $this->scopeDefault = $scopeDefault;
 
@@ -181,9 +247,9 @@ abstract Class AbstractClient
     /**
      * @param string $scopeSeparator
      *
-     * @return $this
+     * @return ProviderInterface
      */
-    public function setScopeSeparator( string $scopeSeparator ): self
+    public function setScopeSeparator( string $scopeSeparator ): ProviderInterface
     {
         $this->scopeSeparator = $scopeSeparator;
 
@@ -191,9 +257,9 @@ abstract Class AbstractClient
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getClientId(): string
+    public function getClientId(): ?string
     {
         return $this->clientId;
     }
@@ -201,9 +267,9 @@ abstract Class AbstractClient
     /**
      * @param string $clientId
      *
-     * @return $this
+     * @return ProviderInterface
      */
-    public function setClientId( string $clientId ): self
+    public function setClientId( string $clientId ): ProviderInterface
     {
         $this->clientId = $clientId;
 
@@ -211,9 +277,9 @@ abstract Class AbstractClient
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getClientSecret(): string
+    public function getClientSecret(): ?string
     {
         return $this->clientSecret;
     }
@@ -221,9 +287,9 @@ abstract Class AbstractClient
     /**
      * @param string $clientSecret
      *
-     * @return $this
+     * @return ProviderInterface
      */
-    public function setClientSecret( string $clientSecret ): self
+    public function setClientSecret( string $clientSecret ): ProviderInterface
     {
         $this->clientSecret = $clientSecret;
 
@@ -231,9 +297,9 @@ abstract Class AbstractClient
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getRedirectUri(): string
+    public function getRedirectUri(): ?string
     {
         return $this->redirectUri;
     }
@@ -241,9 +307,9 @@ abstract Class AbstractClient
     /**
      * @param string $redirectUri
      *
-     * @return $this
+     * @return ProviderInterface
      */
-    public function setRedirectUri( string $redirectUri ): self
+    public function setRedirectUri( string $redirectUri ): ProviderInterface
     {
         $this->redirectUri = $redirectUri;
 
@@ -251,9 +317,9 @@ abstract Class AbstractClient
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getUrlAuthorize(): string
+    public function getUrlAuthorize(): ?string
     {
         return $this->urlAuthorize;
     }
@@ -261,9 +327,9 @@ abstract Class AbstractClient
     /**
      * @param string $urlAuthorize
      *
-     * @return $this
+     * @return ProviderInterface
      */
-    public function setUrlAuthorize( string $urlAuthorize ): self
+    public function setUrlAuthorize( string $urlAuthorize ): ProviderInterface
     {
         $this->urlAuthorize = $urlAuthorize;
 
@@ -271,9 +337,9 @@ abstract Class AbstractClient
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getUrlAccessToken(): string
+    public function getUrlAccessToken(): ?string
     {
         return $this->urlAccessToken;
     }
@@ -281,9 +347,9 @@ abstract Class AbstractClient
     /**
      * @param string $urlAccessToken
      *
-     * @return $this
+     * @return ProviderInterface
      */
-    public function setUrlAccessToken( string $urlAccessToken ): self
+    public function setUrlAccessToken( string $urlAccessToken ): ProviderInterface
     {
         $this->urlAccessToken = $urlAccessToken;
 
@@ -291,9 +357,9 @@ abstract Class AbstractClient
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getUrlResourceOwner(): string
+    public function getUrlResourceOwner(): ?string
     {
         return $this->urlResourceOwner;
     }
@@ -301,9 +367,9 @@ abstract Class AbstractClient
     /**
      * @param string $urlResourceOwner
      *
-     * @return $this
+     * @return ProviderInterface
      */
-    public function setUrlResourceOwner( string $urlResourceOwner ): self
+    public function setUrlResourceOwner( string $urlResourceOwner ): ProviderInterface
     {
         $this->urlResourceOwner = $urlResourceOwner;
 

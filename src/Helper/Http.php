@@ -1,6 +1,8 @@
 <?php
 
 namespace Chukdo\Helper;
+use Chukdo\Http\Url;
+
 /**
  * Gestion des messages HTTP.
  *
@@ -76,10 +78,10 @@ final class Http
     public static function browser( string $ua = null ): array
     {
         $browser          = [ 'platform' => null,
-                              'browser'  => null,
-                              'mobile'   => null,
-                              'version'  => null,
-                              'bot'      => null, ];
+                              'browser' => null,
+                              'mobile'  => null,
+                              'version' => null,
+                              'bot'     => null, ];
         $ua               = strtolower( $ua );
         $browser[ 'bot' ] = Str::match( '/baiduspider|googlebot|yandexbot|bingbot|lynx|wget|curl/', $ua );
         $is               = function( $contain, $name = false ) use ( $ua, &$browser )

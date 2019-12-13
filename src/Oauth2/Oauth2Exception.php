@@ -1,6 +1,6 @@
 <?php
 
-namespace Chukdo\Jwt;
+namespace Chukdo\Oauth2;
 
 use Chukdo\Bootstrap\AppException;
 
@@ -12,6 +12,6 @@ use Chukdo\Bootstrap\AppException;
  * @since         08/01/2019
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-class JwtException extends AppException
+class Oauth2Exception extends AppException
 {
 }
