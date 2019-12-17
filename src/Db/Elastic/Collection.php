@@ -35,12 +35,12 @@ Class Collection implements CollectionInterface
     /**
      * @var Database
      */
-    protected $database;
+    protected Database $database;
 
     /**
      * @var string
      */
-    protected $collection;
+    protected string $collection;
 
     /**
      * Collection constructor.

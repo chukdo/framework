@@ -22,22 +22,22 @@ class Response
     /**
      * @param Header $header
      */
-    protected $header;
+    protected Header $header;
 
     /**
      * @param string
      */
-    protected $content = null;
+    protected ?string $content;
 
     /**
      * @param string $file
      */
-    protected $file = null;
+    protected ?string $file;
 
     /**
      * @param bool $deleteFileAfterSend
      */
-    protected $deleteFileAfterSend = false;
+    protected bool $deleteFileAfterSend = false;
 
     /**
      * @return Response
@@ -167,8 +167,8 @@ class Response
      */
     public function download( string $file, string $name = null, string $type = null ): self
     {
-        $name       = $name ?? basename( $file );
-        $type       = $type ?? Http::mimeContentType( $name );
+        $name       ??= basename( $file );
+        $type       ??= Http::mimeContentType( $name );
         $this->file = $file;
         $this->header->setHeader( 'Content-Disposition', 'attachment; filename="' . $name . '"' )
                      ->setHeader( 'Content-Type', $type );
@@ -185,8 +185,8 @@ class Response
      */
     public function file( string $file, string $name = null, string $type = null ): self
     {
-        $name       = $name ?? basename( $file );
-        $type       = $type ?? Http::mimeContentType( $name );
+        $name       ??= basename( $file );
+        $type       ??= Http::mimeContentType( $name );
         $this->file = $file;
         $this->header->setHeader( 'Content-Disposition', 'inline; filename="' . $name . '"' )
                      ->setHeader( 'Content-Type', $type );

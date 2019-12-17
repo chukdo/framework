@@ -21,67 +21,67 @@ class Collect
     /**
      * @var iterable
      */
-    protected $data;
+    protected iterable $data;
 
     /**
      * @var array
      */
-    protected $collection = [];
+    protected array $collection = [];
 
     /**
      * @var array
      */
-    protected $with = [];
+    protected array $with = [];
 
     /**
      * @var array
      */
-    protected $without = [];
+    protected array $without = [];
 
     /**
      * @var array
      */
-    protected $unwind = [];
+    protected array $unwind = [];
 
     /**
      * @var array
      */
-    protected $group = [];
+    protected array $group = [];
 
     /**
      * @var array
      */
-    protected $sum = [];
+    protected array $sum = [];
 
     /**
      * @var array
      */
-    protected $sumCache = [];
+    protected array $sumCache = [];
 
     /**
      * @var array
      */
-    protected $filter = [];
+    protected array $filter = [];
 
     /**
      * @var array
      */
-    protected $sort = [];
+    protected array $sort = [];
 
     /**
      * @var array
      */
-    protected $filterRecursive = [];
+    protected array $filterRecursive = [];
 
     /**
      * @var array
      */
-    protected $where = [];
+    protected array $where = [];
 
     /**
      * @var array
      */
-    protected $match = [];
+    protected array $match = [];
 
     /**
      * Collect constructor.
@@ -318,124 +318,77 @@ class Collect
 
         switch ( $operator ) {
             case '=' :
-                $closure = static function( $v, $value )
-                {
-                    return $v === $value
-                        ? $v
-                        : null;
-                };
+                $closure = fn( $v, $value ) => $v === $value
+                    ? $v
+                    : null;
                 break;
             case '!=' :
-                $closure = static function( $v, $value )
-                {
-                    return $v !== $value
-                        ? $v
-                        : null;
-                };
+                $closure = fn( $v, $value ) => $v !== $value
+                    ? $v
+                    : null;
                 break;
             case '>' :
-                $closure = static function( $v, $value )
-                {
-                    return $v > $value
-                        ? $v
-                        : null;
-                };
+                $closure = fn( $v, $value ) => $v > $value
+                    ? $v
+                    : null;
                 break;
             case '>=':
-                $closure = static function( $v, $value )
-                {
-                    return $v >= $value
-                        ? $v
-                        : null;
-                };
+                $closure = fn( $v, $value ) => $v >= $value
+                    ? $v
+                    : null;
                 break;
             case '<':
-                $closure = static function( $v, $value )
-                {
-                    return $v < $value
-                        ? $v
-                        : null;
-                };
+                $closure = fn( $v, $value ) => $v < $value
+                    ? $v
+                    : null;
                 break;
             case '<=':
-                $closure = static function( $v, $value )
-                {
-                    return $v <= $value
-                        ? $v
-                        : null;
-                };
+                $closure = fn( $v, $value ) => $v <= $value
+                    ? $v
+                    : null;
                 break;
             case '<>' :
-                $closure = static function( $v, $value, $value2 )
-                {
-                    return $v < $value && $v > $value2
-                        ? $v
-                        : null;
-                };
+                $closure = fn( $v, $value, $value2 ) => $v < $value && $v > $value2
+                    ? $v
+                    : null;
                 break;
             case '<=>' :
-                $closure = static function( $v, $value, $value2 )
-                {
-                    return $v <= $value && $v >= $value2
-                        ? $v
-                        : null;
-                };
+                $closure = fn( $v, $value, $value2 ) => $v <= $value && $v >= $value2
+                    ? $v
+                    : null;
                 break;
             case 'in':
-                $closure = static function( $v, $value )
-                {
-                    return Arr::in( $v, (array)$value )
-                        ? $v
-                        : null;
-                };
+                $closure = fn( $v, $value ) => Arr::in( $v, (array)$value )
+                    ? $v
+                    : null;
                 break;
             case '!in':
-                $closure = static function( $v, $value )
-                {
-                    return !Arr::in( $v, (array)$value )
-                        ? $v
-                        : null;
-                };
+                $closure = fn( $v, $value ) => !Arr::in( $v, (array)$value )
+                    ? $v
+                    : null;
                 break;
             case 'type':
-                $closure = static function( $v, $value )
-                {
-                    return Str::type( $v ) === $value
-                        ? $v
-                        : null;
-                };
+                $closure = fn( $v, $value ) => Str::type( $v ) === $value
+                    ? $v
+                    : null;
                 break;
             case '%':
-                $closure = static function( $v, $value, $value2 )
-                {
-                    return $v % $value === $value2
-                        ? $v
-                        : null;
-                };
+                $closure = fn( $v, $value, $value2 ) => $v % $value === $value2
+                    ? $v
+                    : null;
                 break;
             case 'size':
-                $closure = static function( $v, $value )
-                {
-                    return count( (array)$v ) === $value
-                        ? $v
-                        : null;
-                };
+                $closure = fn( $v, $value ) => count( (array)$v ) === $value
+                    ? $v
+                    : null;
                 break;
             case 'exist':
-                $closure = static function( $v )
-                {
-                    return $v
-                        ? $v
-                        : null;
-                };
+                $closure = fn( $v, $value ) => $v
+                    ?: null;
                 break;
             case 'regex':
-                $closure = static function( $v, $value, $value2 )
-                {
-                    return Str::match( '/' . $value . '/' . ( $value2 ?? 'i' ), $v )
-                        ? $v
-                        : null;
-                };
+                $closure = fn( $v, $value, $value2 ) => Str::match( '/' . $value . '/' . ( $value2 ?? 'i' ), $v )
+                    ?: null;
                 break;
             case 'match':
                 $closure = static function( $v, $value )

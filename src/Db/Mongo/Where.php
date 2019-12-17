@@ -21,12 +21,12 @@ Abstract Class Where
     /**
      * @var array
      */
-    protected $where = [];
+    protected array $where = [];
 
     /**
      * @var array
      */
-    protected $orWhere = [];
+    protected array $orWhere = [];
 
     /**
      * @param string $field

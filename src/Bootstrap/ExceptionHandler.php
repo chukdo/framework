@@ -3,7 +3,6 @@
 namespace Chukdo\Bootstrap;
 
 use Chukdo\Contracts\Exception\Handler;
-use Chukdo\Helper\HttpRequest;
 use Throwable;
 
 /**
@@ -19,7 +18,7 @@ class ExceptionHandler implements Handler
     /**
      * @var App
      */
-    protected $app;
+    protected App $app;
 
     /**
      * ExceptionHandler constructor.
@@ -36,8 +35,9 @@ class ExceptionHandler implements Handler
      */
     public function render( Throwable $e ): void
     {
-        $message = new ExceptionMessage( $e, $this->app->env() );
-        die( $message->render() );
+        $message = new ExceptionMessage( $e, (int)$this->app->env() );
+        $message->render();
+        exit;
     }
 
     /**

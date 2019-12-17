@@ -18,29 +18,35 @@ class Url
     /**
      * @var array
      */
-    protected $url = [ 'scheme'   => 'file',
-                       'host'     => '',
-                       'port'     => '',
-                       'user'     => '',
-                       'pass'     => '',
-                       'dir'      => '',
-                       'file'     => '',
-                       'input'    => [],
-                       'fragment' => '', ];
+    protected array $url = [ 'scheme'   => 'file',
+                             'host'     => '',
+                             'port'     => '',
+                             'user'     => '',
+                             'pass'     => '',
+                             'dir'      => '',
+                             'file'     => '',
+                             'input'    => [],
+                             'fragment' => '', ];
 
     /**
      * Url constructor.
      *
      * @param string|null $url
+     * @param iterable    $params
      * @param string|null $defaultScheme
      */
-    public function __construct( string $url = null, string $defaultScheme = null )
+    public function __construct( string $url = null, iterable $params = [], string $defaultScheme = null )
     {
         if ( $url ) {
             if ( $defaultScheme && !Str::match( '/^[a-z0-9]+:\/\//', $url ) ) {
                 $url = $defaultScheme . '://' . $url;
             }
+
             $this->parseUrl( $url );
+
+            foreach ( $params as $key => $value ) {
+                $this->setInput( $key, $value );
+            }
         }
     }
 

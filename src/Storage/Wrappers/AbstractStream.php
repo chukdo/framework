@@ -19,27 +19,27 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     /**
      * @var Url
      */
-    protected $url = null;
+    protected ?Url $url = null;
 
     /**
      * @var string
      */
-    protected $mode = null;
+    protected ?string $mode = null;
 
     /**
      * @var int
      */
-    protected $tell = 0;
+    protected int $tell = 0;
 
     /**
      * @var bool
      */
-    protected $eof = false;
+    protected bool $eof = false;
 
     /**
      * @var array
      */
-    protected $dir;
+    protected array $dir = [];
 
     /**
      * @return mixed
@@ -189,7 +189,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
      */
     protected function setMode( string $mode ): void
     {
-        /* On ne tient pas compte du flag B(inary) */
+        /** On ne tient pas compte du flag B(inary) */
         $this->mode = str_replace( 'b', '', $mode );
     }
 
@@ -447,7 +447,8 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     {
         $this->setUrl( $pathFrom );
         $urlTo = new Url( $pathTo );
-        /* Changement de host = Error */
+
+        /** Changement de host = Error */
         if ( $this->getHost() != $urlTo->getHost() ) {
             return false;
         }

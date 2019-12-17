@@ -18,12 +18,12 @@ Class Facet implements StageInterface
     /**
      * @var array
      */
-    protected $pipe = [];
+    protected array $pipe = [];
 
     /**
-     * @var stageInterface
+     * @var PipelineStage
      */
-    protected $stage;
+    protected PipelineStage $stage;
 
     /**
      * Match constructor.

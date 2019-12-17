@@ -72,9 +72,9 @@ interface Property
     public function properties(): JsonInterface;
 
     /**
-     * @return string|null
+     * @return array|string|null
      */
-    public function type(): ?string;
+    public function type();
 
     /**
      * @return string|null

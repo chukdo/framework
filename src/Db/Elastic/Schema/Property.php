@@ -22,12 +22,12 @@ class Property implements PropertyInterface
     /**
      * @var Json
      */
-    protected $property;
+    protected Json $property;
 
     /**
      * @var string|null
      */
-    protected $name = null;
+    protected ?string $name;
 
     /**
      * Property constructor.
@@ -147,6 +147,7 @@ class Property implements PropertyInterface
             return $this->properties()
                         ->offsetGet( $name );
         }
+
         $arr       = new Iterate( Str::split( $name, '.' ) );
         $firstPath = $arr->getFirstAndRemove();
         $endPath   = $arr->join( '.' );
@@ -211,12 +212,9 @@ class Property implements PropertyInterface
      */
     public function toArray(): array
     {
-        return $this->property->filterRecursive( static function( $k, $v )
-        {
-            return $v instanceof Property
-                ? $v->toArray()
-                : $v;
-        } )
+        return $this->property->filterRecursive( fn( $k, $v ) => $v instanceof Property
+            ? $v->toArray()
+            : $v )
                               ->toArray();
     }
 

@@ -16,7 +16,7 @@ Class FacetPipelineStage extends PipelineStage
     /**
      * @var PipelineStage
      */
-    protected $stage;
+    protected PipelineStage $stage;
 
     /**
      * Match constructor.

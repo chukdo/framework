@@ -3,11 +3,9 @@
 namespace Chukdo\Db\Mongo;
 
 use Chukdo\Helper\Arr;
-use Chukdo\Json\Json;
 use MongoDB\Driver\Cursor as MongoDbCursor;
 use Iterator;
 use IteratorIterator;
-use Traversable;
 
 /**
  * Mongodb cursor.
@@ -22,30 +20,30 @@ class Stream implements Iterator
     /**
      * @var Collection
      */
-    protected $collection;
+    protected Collection $collection;
 
     /**
      * @var Find
      */
-    protected $find;
+    protected Find $find;
 
     /**
      * @var MongoDbCursor
      */
-    protected $cursor;
+    protected MongoDbCursor $cursor;
 
     /**
-     * @var Iterator
+     * @var IteratorIterator
      */
-    protected $iterator;
+    protected IteratorIterator $iterator;
 
     /**
      * Cursor constructor.
      *
-     * @param Collection  $collection
-     * @param Traversable $cursor
+     * @param Collection    $collection
+     * @param MongoDbCursor $cursor
      */
-    public function __construct( Collection $collection, Traversable $cursor )
+    public function __construct( Collection $collection, MongoDbCursor $cursor )
     {
         $this->collection = $collection;
         $this->cursor     = $cursor;
@@ -75,12 +73,8 @@ class Stream implements Iterator
     {
         $current    = $this->iterator->current();
         $collection = $this->collection;
-        $callback   = static function( $v ) use ( $collection )
-        {
-            return $collection->filterOut( null, $v );
-        };
 
-        return Arr::filterRecursive( $current, $callback );
+        return Arr::filterRecursive( $current, fn( $v ) => Collection::filterOut( null, $v ) );
     }
 
     /**

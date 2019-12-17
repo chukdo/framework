@@ -31,18 +31,14 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
 class Node implements IteratorAggregate
 {
     /**
-     * Noeud XML.
-     *
-     * @param object $node DOMElement
+     * @var DOMElement
      */
-    protected $node = null;
+    protected DOMElement $node;
 
     /**
-     * XPath.
-     *
-     * @param object $xpath DOMXPath
+     * @var DOMXPath|null
      */
-    protected $xpath = false;
+    protected ?DOMXPath $xpath = null;
 
     /**
      * Node constructor.
@@ -1065,7 +1061,7 @@ class Node implements IteratorAggregate
      */
     public function toArray( string $default = 'item', $value = null ): array
     {
-        $value = $value ?? $this;
+        $value ??= $this;
         $array = [];
         foreach ( $value->childs() as $k => $child ) {
             $name  = $child->name() === $default

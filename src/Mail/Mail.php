@@ -18,87 +18,87 @@ class Mail
     /**
      * @var array
      */
-    protected $headers = [];
+    protected array $headers = [];
 
     /**
      * @var array
      */
-    protected $files = [];
+    protected array $files = [];
 
     /**
      * @var array
      */
-    protected $inlineImages = [];
+    protected array $inlineImages = [];
 
     /**
      * @var string
      */
-    protected $from;
+    protected string $from;
 
     /**
      * @var string
      */
-    protected $replyto;
+    protected string $replyto;
 
     /**
      * @var array
      */
-    protected $to = [];
+    protected array $to = [];
 
     /**
      * @var string
      */
-    protected $charset = 'UTF-8';
+    protected string $charset = 'UTF-8';
 
     /**
      * @var string
      */
-    protected $subject = '';
+    protected string $subject = '';
 
     /**
      * @var string
      */
-    protected $text;
+    protected string $text;
 
     /**
      * @var string
      */
-    protected $textEnc = '8bit';
+    protected string $textEnc = '8bit';
 
     /**
      * @var string
      */
-    protected $html;
+    protected string $html;
 
     /**
      * @var string
      */
-    protected $htmlEnc = 'base64';
+    protected string $htmlEnc = 'base64';
 
     /**
      * @var string
      */
-    protected $mboundary;
+    protected string $mboundary;
 
     /**
      * @var string
      */
-    protected $aboundary;
+    protected string $aboundary;
 
     /**
      * @var string
      */
-    protected $rboundary;
+    protected string $rboundary;
 
     /**
-     * @param object
+     * @param TransportInterface
      */
-    protected $transport;
+    protected TransportInterface $transport;
 
     /**
      * @param string
      */
-    protected $pixel;
+    protected string $pixel;
 
     /**
      * Mail constructor.

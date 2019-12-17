@@ -12,27 +12,27 @@ class Dispatcher
     /**
      * @var array
      */
-    private $middlewares = [];
+    private array $middlewares = [];
 
     /**
      * @var array
      */
-    private $attributes = [];
+    private array $attributes = [];
 
     /**
      * @var int
      */
-    private $index = 0;
+    private int $index = 0;
 
     /**
      * @var Request
      */
-    private $request;
+    private Request $request;
 
     /**
      * @var Response
      */
-    private $response;
+    private Response $response;
 
     /**
      * Dispatcher constructor.

@@ -23,32 +23,32 @@ Class Link
     /**
      * @var DatabaseInterface
      */
-    protected $database;
+    protected DatabaseInterface $database;
 
     /**
      * @var CollectionInterface
      */
-    protected $collection;
+    protected CollectionInterface $collection;
 
     /**
      * @var string
      */
-    protected $field = null;
+    protected string $field;
 
     /**
      * @var string
      */
-    protected $linked = null;
+    protected ?string $linked;
 
     /**
      * @var array
      */
-    protected $with = [];
+    protected array $with = [];
 
     /**
      * @var array
      */
-    protected $without = [];
+    protected array $without = [];
 
     /**
      * Link constructor.

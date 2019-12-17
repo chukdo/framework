@@ -24,7 +24,7 @@ class Validator
     /**
      * @var Property
      */
-    protected $property;
+    protected Property $property;
 
     /**
      * Validator constructor.
@@ -44,7 +44,7 @@ class Validator
     public function validateDataToInsert( $data ): array
     {
         $json = new Json( $data );
-        if ( $this->property->count() == 0 ) {
+        if ( $this->property->count() === 0 ) {
             return $json->toArray();
         }
 
@@ -61,7 +61,7 @@ class Validator
     protected function validateObject( $json, bool $insert = true )
     {
         if ( !( $json instanceof Json ) ) {
-            throw new MongoException( sprintf( "The field [%s] must be a object", $this->property->name() ) );
+            throw new MongoException( sprintf( 'The field [%s] must be a object', $this->property->name() ) );
         }
         /** Insert */
         if ( $insert ) {
@@ -71,11 +71,12 @@ class Validator
                     $json->offsetSet( $key, $validator->validateType( $get, true ) );
                 } else {
                     if ( $this->property->isRequired( $key ) ) {
-                        throw new MongoException( sprintf( "The field [%s] is required", $key ) );
+                        throw new MongoException( sprintf( 'The field [%s] is required', $key ) );
                     }
                 }
             }
-        } /** Update */ else {
+            /** Update */
+        } else {
             foreach ( $json as $key => $value ) {
                 if ( $property = $this->property->get( $key ) ) {
                     $validator = new Validator( $property );
@@ -96,13 +97,14 @@ class Validator
     public function validateType( $data, bool $insert = true )
     {
         $type = $this->property->type();
+
         if ( Is::arr( $type ) ) {
             $count = count( $type );
             foreach ( $type as $i => $t ) {
                 try {
                     return $this->validateProperty( $t, $data, $insert );
                 } catch ( MongoException $e ) {
-                    if ( $i == $count ) {
+                    if ( $i === $count ) {
                         throw $e;
                     }
                 }
@@ -156,10 +158,11 @@ class Validator
                 break;
             default :
                 $enum = $this->property->list();
+
                 if ( $enum ) {
                     $validatedData = $this->validateList( $data );
                 } else {
-                    throw new MongoException( sprintf( "The field [%s] must be a valid type not [%s]", $this->property->name(), $this->property->type() ) );
+                    throw new MongoException( sprintf( 'The field [%s] must be a valid type not [%s]', $this->property->name(), $this->property->type() ) );
                 }
         }
 
@@ -175,12 +178,13 @@ class Validator
     {
         if ( $data instanceof ObjectId ) {
             return $data;
-        } else {
-            if ( Is::string( $data ) ) {
-                return new ObjectId( $data );
-            }
         }
-        throw new MongoException( sprintf( "The field [%s] must be a objectId", $this->property->name() ) );
+
+        if ( Is::string( $data ) ) {
+            return new ObjectId( $data );
+        }
+
+        throw new MongoException( sprintf( 'The field [%s] must be a objectId', $this->property->name() ) );
     }
 
     /**
@@ -188,17 +192,17 @@ class Validator
      *
      * @return string
      */
-    protected function validateString( $data )
+    protected function validateString( $data ): string
     {
         if ( !Is::scalar( $data ) ) {
-            throw new MongoException( sprintf( "The field [%s] must be a string", $this->property->name() ) );
+            throw new MongoException( sprintf( 'The field [%s] must be a string', $this->property->name() ) );
         }
+
         $data    = (string)$data;
         $pattern = $this->property->pattern();
-        if ( $pattern ) {
-            if ( !Str::match( '/' . $pattern . '/i', $data ) ) {
-                throw new MongoException( sprintf( "The field [%s] must be a string with pattern [%s]", $this->property->name(), $pattern ) );
-            }
+
+        if ( $pattern && !Str::match( '/' . $pattern . '/i', $data ) ) {
+            throw new MongoException( sprintf( 'The field [%s] must be a string with pattern [%s]', $this->property->name(), $pattern ) );
         }
 
         return $data;
@@ -209,11 +213,12 @@ class Validator
      *
      * @return int
      */
-    protected function validateInt( $data )
+    protected function validateInt( $data ): int
     {
         if ( !Is::scalar( $data ) ) {
-            throw new MongoException( sprintf( "The field [%s] must be a int", $this->property->name() ) );
+            throw new MongoException( sprintf( 'The field [%s] must be a int', $this->property->name() ) );
         }
+
         $data = (int)$data;
         $this->checkMin( $data );
         $this->checkMax( $data );
@@ -224,24 +229,20 @@ class Validator
     /**
      * @param $data
      */
-    protected function checkMin( $data )
+    protected function checkMin( $data ): void
     {
-        if ( $min = $this->property->min() ) {
-            if ( $data < $min ) {
-                throw new MongoException( sprintf( "The field [%s] must be greater than [%s]", $this->property->name(), $min ) );
-            }
+        if ( ( $min = $this->property->min() ) && $data < $min ) {
+            throw new MongoException( sprintf( 'The field [%s] must be greater than [%s]', $this->property->name(), $min ) );
         }
     }
 
     /**
      * @param $data
      */
-    protected function checkMax( $data )
+    protected function checkMax( $data ): void
     {
-        if ( $max = $this->property->max() ) {
-            if ( $data > $max ) {
-                throw new MongoException( sprintf( "The field [%s] must be lower than [%s]", $this->property->name(), $max ) );
-            }
+        if ( ( $max = $this->property->max() ) && $data > $max ) {
+            throw new MongoException( sprintf( 'The field [%s] must be lower than [%s]', $this->property->name(), $max ) );
         }
     }
 
@@ -250,11 +251,12 @@ class Validator
      *
      * @return float
      */
-    protected function validateFloat( $data )
+    protected function validateFloat( $data ): float
     {
         if ( !Is::scalar( $data ) ) {
-            throw new MongoException( sprintf( "The field [%s] must be a float", $this->property->name() ) );
+            throw new MongoException( sprintf( 'The field [%s] must be a float', $this->property->name() ) );
         }
+
         $data = (float)$data;
         $this->checkMin( $data );
         $this->checkMax( $data );
@@ -267,11 +269,12 @@ class Validator
      *
      * @return bool
      */
-    protected function validateBool( $data )
+    protected function validateBool( $data ): bool
     {
         if ( !Is::scalar( $data ) ) {
-            throw new MongoException( sprintf( "The field [%s] must be a bool", $this->property->name() ) );
+            throw new MongoException( sprintf( 'The field [%s] must be a bool', $this->property->name() ) );
         }
+
         $data = (bool)$data;
 
         return $data;
@@ -282,20 +285,21 @@ class Validator
      *
      * @return UTCDateTime
      */
-    protected function validateDate( $data )
+    protected function validateDate( $data ): UTCDateTime
     {
         if ( $data instanceof UTCDateTime ) {
             return $data;
-        } else {
-            if ( $data instanceof DateTime ) {
-                return new UTCDateTime( $data->getTimestamp() );
-            } else {
-                if ( Is::scalar( $data ) ) {
-                    return new UTCDateTime( (int)$data );
-                }
-            }
         }
-        throw new MongoException( sprintf( "The field [%s] must be a date", $this->property->name() ) );
+
+        if ( $data instanceof DateTime ) {
+            return new UTCDateTime( $data->getTimestamp() );
+        }
+
+        if ( Is::scalar( $data ) ) {
+            return new UTCDateTime( (int)$data );
+        }
+
+        throw new MongoException( sprintf( 'The field [%s] must be a date', $this->property->name() ) );
     }
 
     /**
@@ -303,20 +307,21 @@ class Validator
      *
      * @return Timestamp
      */
-    protected function validateTimestamp( $data )
+    protected function validateTimestamp( $data ): Timestamp
     {
         if ( $data instanceof Timestamp ) {
             return $data;
-        } else {
-            if ( $data instanceof DateTime ) {
-                return new Timestamp( $data->getTimestamp(), 1 );
-            } else {
-                if ( Is::scalar( $data ) ) {
-                    return new Timestamp( (int)$data, 1 );
-                }
-            }
         }
-        throw new MongoException( sprintf( "The field [%s] must be a timestamp", $this->property->name() ) );
+
+        if ( $data instanceof DateTime ) {
+            return new Timestamp( $data->getTimestamp(), 1 );
+        }
+
+        if ( Is::scalar( $data ) ) {
+            return new Timestamp( (int)$data, 1 );
+        }
+
+        throw new MongoException( sprintf( 'The field [%s] must be a timestamp', $this->property->name() ) );
     }
 
     /**
@@ -327,8 +332,9 @@ class Validator
     protected function validateList( $data )
     {
         $list = $this->property->list();
+
         if ( !Is::scalar( $data ) || !$list->in( $data ) ) {
-            throw new MongoException( sprintf( "The field [%s] must be a element of list [%s]", $this->property->name(), implode( ',', $list->toArray() ) ) );
+            throw new MongoException( sprintf( 'The field [%s] must be a element of list [%s]', $this->property->name(), implode( ',', $list->toArray() ) ) );
         }
 
         return $data;
@@ -344,21 +350,22 @@ class Validator
     {
         if ( $insert ) {
             if ( !( $data instanceof Json ) ) {
-                throw new MongoException( sprintf( "The field [%s] must be a array", $this->property->name() ) );
+                throw new MongoException( sprintf( 'The field [%s] must be a array', $this->property->name() ) );
             }
+
             $this->checkMinItems( $data );
             $this->checkMaxItems( $data );
+
             if ( $items = $this->property->items() ) {
                 $validator = new Validator( $items );
+
                 foreach ( $data as $key => $value ) {
                     $data->offsetSet( $key, $validator->validateType( $value, true ) );
                 }
             }
-        } else {
-            if ( $items = $this->property->items() ) {
-                $validator = new Validator( $items );
-                $data      = $validator->validateType( $data, false );
-            }
+        } elseif ( $items = $this->property->items() ) {
+            $validator = new Validator( $items );
+            $data      = $validator->validateType( $data, false );
         }
 
         return $data;
@@ -367,12 +374,10 @@ class Validator
     /**
      * @param Json $data
      */
-    protected function checkMinItems( Json $data )
+    protected function checkMinItems( Json $data ): void
     {
-        if ( $min = $this->property->minItems() ) {
-            if ( $data->count() < $min ) {
-                throw new MongoException( sprintf( "The field [%s] must have more than [%s] items", $this->property->name(), $min ) );
-            }
+        if ( ( $min = $this->property->minItems() ) && $data->count() < $min ) {
+            throw new MongoException( sprintf( 'The field [%s] must have more than [%s] items', $this->property->name(), $min ) );
         }
     }
 
@@ -381,10 +386,8 @@ class Validator
      */
     protected function checkMaxItems( Json $data )
     {
-        if ( $max = $this->property->maxItems() ) {
-            if ( $data->count() > $max ) {
-                throw new MongoException( sprintf( "The field [%s] must have less than [%s] items", $this->property->name(), $max ) );
-            }
+        if ( ( $max = $this->property->maxItems() ) && $data->count() > $max ) {
+            throw new MongoException( sprintf( 'The field [%s] must have less than [%s] items', $this->property->name(), $max ) );
         }
     }
 
@@ -397,7 +400,8 @@ class Validator
     {
         $json = new Json( $data );
         $json->offsetUnset( '_id' );
-        if ( $this->property->count() == 0 ) {
+
+        if ( $this->property->count() === 0 ) {
             return $json->toArray();
         }
 

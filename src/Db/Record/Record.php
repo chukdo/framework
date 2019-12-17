@@ -2,7 +2,8 @@
 
 namespace Chukdo\Db\Record;
 
-use Chukdo\Db\Elastic\ElasticException;
+use Chukdo\DB\Mongo\Collection;
+use Chukdo\Db\Mongo\RecordException;
 use Exception;
 use DateTime;
 use Chukdo\Json\Json;
@@ -22,12 +23,12 @@ Class Record extends Json
     /**
      * @var CollectionInterface
      */
-    protected $collection;
+    protected CollectionInterface $collection;
 
     /**
-     * @var mixed|null
+     * @var string|null
      */
-    protected $id = null;
+    protected ?string $id;
 
     /**
      * Record constructor.
@@ -38,12 +39,10 @@ Class Record extends Json
     public function __construct( CollectionInterface $collection, $data = null )
     {
         $json             = new Json( $data );
-        $filtered         = $json->filterRecursive( static function( $k, $v ) use ( $collection )
-        {
-            return $collection->filterOut( $k, $v );
-        } );
+        $filtered         = $json->filterRecursive( fn( $k, $v ) => Collection::filterOut( $k, $v ) );
         $this->collection = $collection;
         $this->id         = $filtered->offsetUnset( '_id' );
+
         parent::__construct( $filtered, false );
     }
 
@@ -60,7 +59,7 @@ Class Record extends Json
 
             return $this;
         }
-        throw new ElasticException( 'No ID to delete Record' );
+        throw new RecordException( 'No ID to delete Record' );
     }
 
     /**
@@ -101,7 +100,7 @@ Class Record extends Json
 
             return $this;
         }
-        throw new ElasticException( 'No ID to move Record' );
+        throw new RecordException( 'No ID to move Record' );
     }
 
     /**
@@ -139,12 +138,9 @@ Class Record extends Json
     public function record(): JsonInterface
     {
 
-        return $this->filterRecursive( static function( $k, $v )
-        {
-            return $v instanceof Record
-                ? null
-                : $v;
-        } );
+        return $this->filterRecursive( fn( $k, $v ) => $v instanceof Record
+            ? null
+            : $v );
     }
 
     /**

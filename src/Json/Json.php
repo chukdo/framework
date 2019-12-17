@@ -26,7 +26,7 @@ class Json extends ArrayObject implements JsonInterface
     /**
      * @var bool $strict
      */
-    protected $strict = true;
+    protected bool $strict = true;
 
     /**
      * Json constructor.

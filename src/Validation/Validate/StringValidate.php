@@ -17,12 +17,12 @@ class StringValidate implements ValidateInterface
     /**
      * @var int
      */
-    protected $min = 0;
+    protected int $min = 0;
 
     /**
      * @var int
      */
-    protected $max = 10000000;
+    protected int $max = 10000000;
 
     /**
      * @return string

@@ -23,19 +23,19 @@ class App extends Service
      *
      * @var array
      */
-    protected static $aliases = [];
+    protected static array $aliases = [];
 
     /**
      * Tableau des ecouteurs de resolution.
      *
      * @var array
      */
-    protected $resolving = [];
+    protected array $resolving = [];
 
     /**
      * @var string
      */
-    protected $channel = '';
+    protected string $channel = '';
 
     /**
      * Constructeur
@@ -44,9 +44,9 @@ class App extends Service
     public function __construct()
     {
         parent::__construct();
-        $this->instance( '\Chukdo\Bootstrap\App', $this );
-        $this->instance( '\Chukdo\Conf\Conf', new Conf() );
-        $this->instance( '\Chukdo\Conf\Lang', new Lang() );
+        $this->instance( App::class, $this );
+        $this->instance( Conf::class, new Conf() );
+        $this->instance( Lang::class, new Lang() );
     }
 
     /**
@@ -54,10 +54,10 @@ class App extends Service
      */
     public function dd( $data )
     {
-        if ( is_null( $data ) ) {
+        if ( $data === null ) {
             die( 'Null' );
         }
-        die( php_sapi_name() == 'cli'
+        die( PHP_SAPI === 'cli'
             ? To::text( $data )
             : To::html( $data, null, null, true ) );
     }
@@ -89,7 +89,7 @@ class App extends Service
      */
     public function channel( string $channel = null ): string
     {
-        if ( $channel != null ) {
+        if ( $channel !== null ) {
             $this->channel = $channel;
         }
 
@@ -101,7 +101,7 @@ class App extends Service
      */
     public function conf(): Conf
     {
-        return $this->getInstance( 'Chukdo\Conf\Conf' );
+        return $this->getInstance( Conf::class );
     }
 
     /**
@@ -117,7 +117,7 @@ class App extends Service
         $alias      = $this->getAlias( $name );
         $bindObject = parent::make( $alias );
         $this->resolve( $alias, $bindObject );
-        if ( $bindInstance == true ) {
+        if ( $bindInstance === true ) {
             $this->instance( $name, $bindObject );
         }
 
@@ -131,9 +131,7 @@ class App extends Service
      */
     public function getAlias( string $name ): string
     {
-        return isset( self::$aliases[ $name ] )
-            ? self::$aliases[ $name ]
-            : $name;
+        return self::$aliases[ $name ] ?? $name;
     }
 
     /**

@@ -25,21 +25,21 @@ class Service implements ArrayAccess
      *
      * @var array
      */
-    protected $bindings = [];
+    protected array $bindings = [];
 
     /**
      * Tableau des singletons.
      *
      * @var array
      */
-    protected $singletons = [];
+    protected array $singletons = [];
 
     /**
      * Tableau des instances.
      *
      * @var array
      */
-    protected $instances = [];
+    protected array $instances = [];
 
     /**
      * Service constructor.
@@ -108,13 +108,19 @@ class Service implements ArrayAccess
      */
     public function offsetExists( $key ): bool
     {
-        return isset( $this->bindings[ $key ] )
-            ? true
-            : isset( $this->instances[ $key ] )
-                ? true
-                : isset( $this->singletons[ $key ] )
-                    ? true
-                    : false;
+        if ( isset( $this->bindings[ $key ] ) ) {
+            return true;
+        }
+
+        if ( isset( $this->instances[ $key ] ) ) {
+            return true;
+        }
+
+        if ( isset( $this->singletons[ $key ] ) ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -140,12 +146,12 @@ class Service implements ArrayAccess
     {
         if ( $instance = $this->getInstance( $name ) ) {
             return $instance;
-        } else {
-            if ( $singleton = $this->getSingleton( $name ) ) {
-                $this->instance( $name, $closure = $this->getClosure( $name ) );
+        }
 
-                return $closure;
-            }
+        if ( $singleton = $this->getSingleton( $name ) ) {
+            $this->instance( $name, $closure = $this->getClosure( $name ) );
+
+            return $closure;
         }
 
         return $this->getClosure( $name );
@@ -162,9 +168,7 @@ class Service implements ArrayAccess
     {
         $name = $this->formatNameSpace( $name );
 
-        return isset( $this->instances[ $name ] )
-            ? $this->instances[ $name ]
-            : null;
+        return $this->instances[ $name ] ?? null;
     }
 
     /**
@@ -178,9 +182,7 @@ class Service implements ArrayAccess
     {
         $name = $this->formatNameSpace( $name );
 
-        return isset( $this->singletons[ $name ] )
-            ? $this->singletons[ $name ]
-            : null;
+        return $this->singletons[ $name ] ?? null;
     }
 
     /**
@@ -213,19 +215,18 @@ class Service implements ArrayAccess
     {
         $bind = $this->getBind( $name )
             ?: $this->getSingleton( $name );
+
         if ( $bind ) {
             if ( $bind instanceof Closure ) {
                 return $bind();
-            } else {
-                if ( is_string( $bind ) ) {
-                    return $this->getClosure( $bind );
-                } else {
-                    if ( is_array( $bind ) ) {
-                        if ( array_key_exists( 'class', $bind ) && array_key_exists( 'args', $bind ) ) {
-                            return $this->resolveService( $bind[ 'class' ], $bind[ 'args' ] );
-                        }
-                    }
-                }
+            }
+
+            if ( is_string( $bind ) ) {
+                return $this->getClosure( $bind );
+            }
+
+            if ( is_array( $bind ) && array_key_exists( 'class', $bind ) && array_key_exists( 'args', $bind ) ) {
+                return $this->resolveService( $bind[ 'class' ], $bind[ 'args' ] );
             }
         }
 
@@ -278,15 +279,15 @@ class Service implements ArrayAccess
      */
     private function resolveServiceArg( string $arg )
     {
-        $firstPart = substr( $arg, 0, 1 );
+        $firstPart = $arg[ 0 ];
         $lastPart  = substr( $arg, 1 );
-        if ( $firstPart == '&' ) {
+        if ( $firstPart === '&' ) {
             return $this->make( $lastPart );
-        } else {
-            if ( $firstPart == '@' ) {
-                return $this->conf()
-                            ->offsetGet( $lastPart );
-            }
+        }
+
+        if ( $firstPart === '@' ) {
+            return $this->conf()
+                        ->offsetGet( $lastPart );
         }
 
         return $arg;
@@ -316,10 +317,12 @@ class Service implements ArrayAccess
             throw new ServiceException( sprintf( "[%s] is not a class", $class ) );
         }
         $constructor = $reflector->getConstructor();
+
         /** pas de constructeur donc pas de parametres à gerer */
-        if ( is_null( $constructor ) ) {
+        if ( $constructor === null ) {
             return new $class();
         }
+
         $args = empty( $args )
             ? $this->resolveArgs( $constructor )
             : $args;
@@ -338,6 +341,7 @@ class Service implements ArrayAccess
     {
         $args       = [];
         $parameters = $constructor->getParameters();
+
         foreach ( $parameters as $parameter ) {
             $args[] = $this->resolveArg( $parameter );
         }
@@ -356,14 +360,17 @@ class Service implements ArrayAccess
     {
         $name  = $parameter->getName();
         $class = $parameter->getClass();
+
         /** Le parametre est un objet on cherche à le resoudre  */
         if ( $cname = $parameter->getClass() ) {
             return $this->make( $cname->name );
-        } /** Le parametre a une valeur par defaut que l'on injecte */ else {
-            if ( $parameter->isDefaultValueAvailable() ) {
-                return $parameter->getDefaultValue();
-            }
         }
+
+        /** Le parametre a une valeur par defaut que l'on injecte */
+        if ( $parameter->isDefaultValueAvailable() ) {
+            return $parameter->getDefaultValue();
+        }
+
         /** On ne peut pas injecter le parametre, cela genere une exception     */
         throw new ServiceException( sprintf( "Unable to resolve [%s] on class [%s].", $name, $class ) );
     }

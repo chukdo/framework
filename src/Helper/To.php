@@ -337,9 +337,9 @@ final class To
     {
         $html  = '';
         $style = 'border-spacing:0;border-collapse:collapse;font-family:Arial;width:100%;word-break:break-word;border-radius:3px;overflow:hidden;';
-        $title = $title ?? ( $type
-                ? Str::type( $value )
-                : null );
+        $title ??= ( $type
+            ? Str::type( $value )
+            : null );
         if ( $title ) {
             $color = $color
                 ?: '#333';

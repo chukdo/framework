@@ -21,17 +21,17 @@ abstract class AbstractHandler implements HandlerInterface
     /**
      * @var FormatterInterface
      */
-    protected $formatter;
+    protected FormatterInterface $formatter;
 
     /**
      * @var array
      */
-    protected $levels = [];
+    protected array $levels = [];
 
     /**
      * @var array
      */
-    protected $processors = [];
+    protected array $processors = [];
 
     /**
      * Constructeur.

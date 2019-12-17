@@ -23,44 +23,44 @@ class Rule
     /**
      * @var string
      */
-    protected $path;
+    protected string $path;
 
     /**
      * @var string
      */
-    protected $name;
+    protected string $name;
 
     /**
      * @var Validator
      */
-    protected $validator;
+    protected Validator $validator;
 
     /**
      * @var string
      */
-    protected $label;
+    protected string $label;
 
     /**
      * @var array
      */
-    protected $type = [ 'array' => false,
-                        'min'   => 0,
-                        'max'   => 10000, ];
+    protected array $type = [ 'array' => false,
+                              'min'   => 0,
+                              'max'   => 10000, ];
 
     /**
      * @var bool
      */
-    protected $isRequired = false;
+    protected bool $isRequired = false;
 
     /**
      * @var bool
      */
-    protected $isForm = false;
+    protected bool $isForm = false;
 
     /**
      * @var array
      */
-    protected $rules = [];
+    protected array $rules = [];
 
     /**
      * Rule constructor.
@@ -125,6 +125,7 @@ class Rule
         {
             $isConf = strpos( $v, '@' ) === 0;
             $conf   = substr( $v, 1 );
+
             if ( $isConf ) {
                 return $this->validator->request()
                                        ->conf( $conf );
@@ -248,10 +249,7 @@ class Rule
     {
         $input = $this->input();
         if ( $input instanceof InputInterface ) {
-            $inputs = $input->filterRecursive( static function( $k, $v ) use ( $filter )
-            {
-                return $filter->filter( $v );
-            } );
+            $inputs = $input->filterRecursive( fn( $k, $v ) => $filter->filter( $v ) );
             $this->validator->inputs()
                             ->mergeRecursive( $inputs, true );
         } else {

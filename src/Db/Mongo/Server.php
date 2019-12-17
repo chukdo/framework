@@ -24,17 +24,17 @@ Class Server implements ServerInterface
     /**
      * @var string|null
      */
-    protected $dsn = null;
+    protected ?string $dsn = null;
 
     /**
      * @var Manager
      */
-    protected $client;
+    protected Manager $client;
 
     /**
      * @var string|null
      */
-    protected $database = null;
+    protected ?string $database;
 
     /**
      * Server constructor.
@@ -150,14 +150,9 @@ Class Server implements ServerInterface
     {
         $status = $this->command( [ 'serverStatus' => 1 ] )
                        ->getIndexJson( '0' )
-                       ->filter( static function( $k, $v )
-                       {
-                           if ( is_scalar( $v ) ) {
-                               return $v;
-                           }
-
-                           return false;
-                       } )
+                       ->filter( fn( $k, $v ) => is_scalar( $v )
+                           ? $v
+                           : false )
                        ->clean();
 
         return $status;
@@ -179,14 +174,9 @@ Class Server implements ServerInterface
     {
         $status = $this->command( [ 'replSetGetStatus' => 1 ] )
                        ->getIndexJson( '0' )
-                       ->filter( static function( $k, $v )
-                       {
-                           if ( is_scalar( $v ) ) {
-                               return $v;
-                           }
-
-                           return false;
-                       } )
+                       ->filter( fn( $k, $v ) => is_scalar( $v )
+                           ? $v
+                           : false )
                        ->clean();
 
         return $status;

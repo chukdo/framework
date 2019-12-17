@@ -18,12 +18,12 @@ class FileValidate implements ValidateInterface
     /**
      * @var int|null
      */
-    protected $maxFileSize = null;
+    protected ?int $maxFileSize = null;
 
     /**
      * @var string|null
      */
-    protected $allowedMimeTypes = null;
+    protected ?string $allowedMimeTypes = null;
 
     /**
      * @return string

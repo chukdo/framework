@@ -23,37 +23,37 @@ class Validator
     /**
      * @var Request
      */
-    protected $request;
+    protected Request $request;
 
     /**
      * @var Input
      */
-    protected $inputs;
+    protected Input $inputs;
 
     /**
      * @var Input
      */
-    protected $validated;
+    protected Input $validated;
 
     /**
      * @var Message
      */
-    protected $error;
+    protected Message $error;
 
     /**
      * @var array
      */
-    protected $rules = [];
+    protected array $rules = [];
 
     /**
      * @var array
      */
-    protected $validators = [];
+    protected array $validators = [];
 
     /**
      * @var array
      */
-    protected $filters = [];
+    protected array $filters = [];
 
     /**
      * Validator constructor.

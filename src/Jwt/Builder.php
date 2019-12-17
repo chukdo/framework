@@ -21,22 +21,22 @@ class Builder
     /**
      * @var array
      */
-    protected $claims = [];
+    protected array $claims = [];
 
     /**
      * @var array
      */
-    protected $headers = [ 'typ' => 'JWT' ];
+    protected array $headers = [ 'typ' => 'JWT' ];
 
     /**
      * @var array
      */
-    protected $keywords = [ 'iss',
-                            'iat',
-                            'aud',
-                            'nbf',
-                            'jti',
-                            'sub' ];
+    protected array $keywords = [ 'iss',
+                                  'iat',
+                                  'aud',
+                                  'nbf',
+                                  'jti',
+                                  'sub' ];
 
     /**
      * @param iterable $values

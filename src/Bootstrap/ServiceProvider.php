@@ -14,7 +14,7 @@ abstract class ServiceProvider
     /**
      * @var App
      */
-    protected $app;
+    protected App $app;
 
     /**
      * ServiceProvider constructor.

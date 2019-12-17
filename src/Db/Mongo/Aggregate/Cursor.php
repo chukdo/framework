@@ -6,7 +6,6 @@ use Chukdo\Helper\Arr;
 use MongoDB\Driver\Cursor as MongoDbCursor;
 use Iterator;
 use IteratorIterator;
-use Traversable;
 
 /**
  * Mongodb cursor.
@@ -21,19 +20,19 @@ class Cursor implements Iterator
     /**
      * @var MongoDbCursor
      */
-    protected $cursor;
+    protected MongoDbCursor $cursor;
 
     /**
-     * @var Iterator
+     * @var IteratorIterator
      */
-    protected $iterator;
+    protected IteratorIterator $iterator;
 
     /**
      * Cursor constructor.
      *
-     * @param Traversable $cursor
+     * @param MongoDbCursor $cursor
      */
-    public function __construct( Traversable $cursor )
+    public function __construct( MongoDbCursor $cursor )
     {
         $this->cursor = $cursor;
         $this->cursor->setTypeMap( [ 'root'     => 'array',

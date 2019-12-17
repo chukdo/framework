@@ -26,20 +26,20 @@ class ExceptionMessage
     /**
      * @var array
      */
-    protected $message = [];
+    protected array $message = [];
 
     /**
      * @var int
      */
-    protected $env;
+    protected int $env = 0;
 
     /**
      * ExceptionMessage constructor.
      *
      * @param Throwable $e
-     * @param string    $env
+     * @param int       $env
      */
-    public function __construct( Throwable $e, string $env = '0' )
+    public function __construct( Throwable $e, int $env = 0 )
     {
         $this->env = $env;
         $backTrace = [];
@@ -83,7 +83,7 @@ class ExceptionMessage
         for ( $i = -7; $i < 3; ++$i ) {
             try {
                 $spl->seek( $line + $i );
-                $code .= ( $line + $i + 1 ) . ( $i == -1
+                $code .= ( $line + $i + 1 ) . ( $i === -1
                         ? '> '
                         : ': ' ) . $spl->current() . "\n";
             } catch ( Throwable $e ) {
@@ -103,8 +103,9 @@ class ExceptionMessage
     {
         $render   = HttpRequest::render();
         $response = new Response();
-        /* Dev mode */
-        if ( $this->env != 0 ) {
+
+        /** Dev mode */
+        if ( $this->env !== 0 ) {
             $this->message = [ 'Error' => 'Error happened' ];
         }
         switch ( $render ) {

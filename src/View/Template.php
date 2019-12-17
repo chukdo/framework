@@ -17,19 +17,19 @@ use Chukdo\Json\Json;
 class Template
 {
     /**
-     * @var string
+     * @var string|null
      */
-    protected $file = '';
+    protected ?string $file = null;
 
     /**
      * @var Json
      */
-    protected $data;
+    protected Json $data;
 
     /**
      * @var View
      */
-    protected $view;
+    protected View $view;
 
     /**
      * Template constructor.
@@ -42,9 +42,11 @@ class Template
     {
         $path       = $view->path( $template );
         $this->data = new Json();
+
         if ( !$path[ 'exists' ] ) {
             throw new ViewException( sprintf( 'Template file [%s] does not exist', $template ) );
         }
+
         $this->data( $view->getData() )
              ->data( $view->getData( $template ) )
              ->data( $data );

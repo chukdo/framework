@@ -4,104 +4,194 @@ namespace Chukdo\Oauth2\Provider;
 
 use Chukdo\Contracts\Oauth2\Provider as ProviderInterface;
 use Chukdo\Helper\Arr;
-use Chukdo\Helper\Url;
+use Chukdo\Http\Url;
+use Chukdo\Json\Json;
+use Chukdo\Oauth2\Oauth2Exception;
+use GuzzleHttp\Client;
 
 abstract Class AbstractProvider implements ProviderInterface
 {
     /**
      * @var string
      */
-    protected $clientId;
+    protected string $clientId;
 
     /**
      * @var string
      */
-    protected $clientSecret;
+    protected string $clientSecret;
 
     /**
      * @var string
      */
-    protected $redirectUri;
+    protected string $redirectUri;
 
     /**
      * @var string
      */
-    protected $urlAuthorize;
+    protected string $urlAuthorize;
 
     /**
      * @var string
      */
-    protected $urlAccessToken;
+    protected string $urlAccessToken;
 
     /**
      * @var string
      */
-    protected $urlResourceOwner;
+    protected string $urlResourceOwner;
 
     /**
      * @var string
      */
-    protected $grantType;
+    protected string $grantType;
 
     /**
      * @var string
      */
-    protected $user;
+    protected string $user;
 
     /**
      * @var string
      */
-    protected $password;
+    protected string $password;
 
     /**
      * @var string
      */
-    protected $scopeSeparator = ',';
+    protected string $scopeSeparator = ',';
 
     /**
      * @var string
      */
-    protected $scopeDefault = '';
+    protected string $scopeDefault = '';
 
     /**
      * @var array
      */
-    protected $scope = [];
+    protected array $scope = [];
 
     /**
      * @var string
      */
-    protected $keywordState;
+    protected string $keywordState;
 
     /**
      * @return string
      */
     public function getAuthorizationUrl(): string
     {
-        $client_id     = $this->getClientId();
-        $redirect_url  = $this->getRedirectUri();
-        $response_type = 'code';
-        $scope         = $this->getScope();
-        $state         = $this->getState();
+        $url = new Url( $this->getUrlAuthorize(), [ 'client_id'     => $this->getClientId(),
+                                                    'redirect_uri'  => $this->getRedirectUri(),
+                                                    'response_type' => 'code',
+                                                    'scope'         => $this->getScope(),
+                                                    'state'         => $this->getState() ] );
 
-        // pas de client id => err
-        // pas ...
-        // ...
+        return $url->buildUrl();
+    }
 
-        Url::build();
+    /**
+     * @param string $grantType code|password|client|implicit (utile uniquement en JS)
+     * @param array  $options
+     * @param string $method
+     *
+     * @return Json
+     */
+    public function getToken( string $grantType, array $options = [], string $method = 'POST' ): Json
+    {
+        $client = new Client();
+        $res    = $client->request( $method, $this->getTokenUrl( $grantType, $options ) );
 
-        $url = $this->getUrlAuthorize() . '?';
-
-        //scope
-        //state
-
-        //client_id
-        //redirect_uri
-
-        //reponse_type = code || token
+        echo 'code: ' . $res->getStatusCode();
+        var_dump( $res->getBody() );
+        exit;
+        $token = new Json();
 
 
-        return $url;
+        return $token;
+    }
+
+    /**
+     * @param string $grantType
+     * @param array  $options
+     *
+     * @return string
+     */
+    protected function getTokenUrl( string $grantType, array $options = [] ): string
+    {
+        $url = new Url( $this->getUrlAccessToken(), [ 'client_id'     => $this->getClientId(),
+                                                      'client_secret' => $this->getClientSecret() ] );
+
+        switch ( $grantType ) {
+            case 'code' :
+                if ( !isset( $options[ 'code' ] ) ) {
+                    throw new Oauth2Exception( 'Access Token Url need a option [code]' );
+                }
+
+                $this->setTokenUrlInputsFromCode( $url, $options[ 'code' ] );
+                break;
+            case 'password' :
+                if ( !isset( $options[ 'username' ], $options[ 'password' ] ) ) {
+                    throw new Oauth2Exception( 'Access Token Url need a option [username] and [password]' );
+                }
+
+                $this->setTokenUrlInputsFromPassword( $url, $options[ 'username' ], $options[ 'password' ] );
+                break;
+            case 'client' :
+                $this->setTokenUrlInputsFromClient( $url );
+                break;
+            case 'implicit' :
+                $this->setTokenUrlInputsFromImplicit( $url );
+                break;
+            default :
+                throw new Oauth2Exception( sprintf( 'Grant Type [%s] is unknow', $grantType ) );
+        }
+
+        return $url->buildUrl();
+    }
+
+    /**
+     * @param Url    $url
+     * @param string $code
+     */
+    protected function setTokenUrlInputsFromCode( Url $url, string $code ): void
+    {
+        $url->setInput( 'redirect_uri', $this->getRedirectUri() )
+            ->setInput( 'grant_type', 'authorization_code' )
+            ->setInput( 'code', $code );
+    }
+
+    /**
+     * @param Url    $url
+     * @param string $username
+     * @param string $password
+     */
+    protected function setTokenUrlInputsFromPassword( Url $url, string $username, string $password ): void
+    {
+        $url->setInput( 'redirect_uri', $this->getRedirectUri() )
+            ->setInput( 'grant_type', 'password' )
+            ->setInput( 'username', $username )
+            ->setInput( 'password', $password );
+    }
+
+    /**
+     * @param Url $url
+     */
+    protected function setTokenUrlInputsFromClient( Url $url ): void
+    {
+        $url->setInput( 'grant_type', 'client_credentials' )
+            ->setInput( 'scope', $this->getScope() );
+    }
+
+    /**
+     * @param Url $url
+     */
+    protected function setTokenUrlInputsFromImplicit( Url $url ): void
+    {
+        $url->setInput( 'redirect_uri', $this->getRedirectUri() )
+            ->setInput( 'response_type', 'token' )
+            ->setInput( 'scope', $this->getState() )
+            ->setInput( 'scope', $this->getScope() );
     }
 
     /**
@@ -117,11 +207,21 @@ abstract Class AbstractProvider implements ProviderInterface
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getKeywordState(): ?string
+    public function getKeywordState(): string
     {
-        return $this->keywordState;
+        return $this->keywordState ?? md5( $this->getClientId() . $this->getRedirectUri() );
+    }
+
+    /**
+     * @param string $state
+     *
+     * @return bool
+     */
+    public function checkState( string $state ): bool
+    {
+        return $state === $this->getState();
     }
 
     /**
@@ -129,14 +229,18 @@ abstract Class AbstractProvider implements ProviderInterface
      */
     public function getState(): string
     {
-        return hash_hmac( 'sha256', $this->getClientId(), $this->keywordState, true );
+        return hash_hmac( 'sha256', $this->getClientId(), $this->getKeywordState() );
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getGrantType(): ?string
+    public function getGrantType(): string
     {
+        if ( $this->grantType === null ) {
+            throw new Oauth2Exception( 'GrantType not defined' );
+        }
+
         return $this->grantType;
     }
 
@@ -153,10 +257,14 @@ abstract Class AbstractProvider implements ProviderInterface
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getUser(): ?string
+    public function getUser(): string
     {
+        if ( $this->user === null ) {
+            throw new Oauth2Exception( 'User not defined' );
+        }
+
         return $this->user;
     }
 
@@ -173,10 +281,14 @@ abstract Class AbstractProvider implements ProviderInterface
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getPassword(): ?string
+    public function getPassword(): string
     {
+        if ( $this->password === null ) {
+            throw new Oauth2Exception( 'User not defined' );
+        }
+
         return $this->password;
     }
 
@@ -257,10 +369,14 @@ abstract Class AbstractProvider implements ProviderInterface
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getClientId(): ?string
+    public function getClientId(): string
     {
+        if ( $this->clientId === null ) {
+            throw new Oauth2Exception( 'ClientId not defined' );
+        }
+
         return $this->clientId;
     }
 
@@ -277,10 +393,14 @@ abstract Class AbstractProvider implements ProviderInterface
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getClientSecret(): ?string
+    public function getClientSecret(): string
     {
+        if ( $this->clientSecret === null ) {
+            throw new Oauth2Exception( 'ClientSecret not defined' );
+        }
+
         return $this->clientSecret;
     }
 
@@ -299,8 +419,12 @@ abstract Class AbstractProvider implements ProviderInterface
     /**
      * @return string|null
      */
-    public function getRedirectUri(): ?string
+    public function getRedirectUri(): string
     {
+        if ( $this->redirectUri === null ) {
+            throw new Oauth2Exception( 'RedirectUri not defined' );
+        }
+
         return $this->redirectUri;
     }
 
@@ -317,10 +441,14 @@ abstract Class AbstractProvider implements ProviderInterface
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getUrlAuthorize(): ?string
+    public function getUrlAuthorize(): string
     {
+        if ( $this->urlAuthorize === null ) {
+            throw new Oauth2Exception( 'UrlAuthorize not defined' );
+        }
+
         return $this->urlAuthorize;
     }
 
@@ -337,10 +465,14 @@ abstract Class AbstractProvider implements ProviderInterface
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getUrlAccessToken(): ?string
+    public function getUrlAccessToken(): string
     {
+        if ( $this->urlAccessToken === null ) {
+            throw new Oauth2Exception( 'urlAccessToken not defined' );
+        }
+
         return $this->urlAccessToken;
     }
 
@@ -359,8 +491,12 @@ abstract Class AbstractProvider implements ProviderInterface
     /**
      * @return string|null
      */
-    public function getUrlResourceOwner(): ?string
+    public function getUrlResourceOwner(): string
     {
+        if ( $this->urlResourceOwner === null ) {
+            throw new Oauth2Exception( 'urlResourceOwner not defined' );
+        }
+
         return $this->urlResourceOwner;
     }
 

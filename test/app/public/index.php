@@ -35,8 +35,8 @@ Router::any( '/', function( $inputs, $response )
     return View::setDefaultFolder( __DIR__ . '/../Views/' )
                ->setResponseHandler( $response )
                ->loadFunction( new Basic() )
-               ->render( 'test', [ 'title' => 'chukdo test 2',
-                                   'list'  => [ 'c',
+               ->render( 'test', [ 'title' => 'Test',
+                                   'list'  => [ '<a href="/oauth2/authorize">Check dropbox access</a>',
                                                 'h',
                                                 'u',
                                                 'k',
@@ -44,8 +44,7 @@ Router::any( '/', function( $inputs, $response )
                                                 'o', ], ] );
 } );
 
-Router::any( '/info', '\App\Controlers\Info@index' );
-
-Router::any( '/info', '\App\Controlers\Callback@index' );
+Router::any( '/oauth2/authorize', '\App\Controlers\Oauth2@authorize' );
+Router::any( '/oauth2/callback', '\App\Controlers\Oauth2@callback' );
 
 $r = Router::route();

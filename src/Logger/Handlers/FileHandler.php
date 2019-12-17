@@ -1,6 +1,7 @@
 <?php
 
 namespace Chukdo\Logger\Handlers;
+
 /**
  * Gestionnaire des logs pour fichier.
  *
@@ -14,7 +15,7 @@ class FileHandler extends AbstractHandler
     /**
      * @var string
      */
-    protected $file;
+    protected string $file;
 
     /**
      * FileHandler constructor.
@@ -42,7 +43,7 @@ class FileHandler extends AbstractHandler
      */
     public function write( $record ): bool
     {
-        $fp = fopen( $this->file, 'a' );
+        $fp = fopen( $this->file, 'ab' );
         $r  = fwrite( $fp, $record . "\n" );
         fclose( $fp );
 

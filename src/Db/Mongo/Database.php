@@ -22,12 +22,12 @@ Class Database implements DatabaseInterface
     /**
      * @var Server
      */
-    protected $server;
+    protected Server $server;
 
     /**
      * @var MongoDbDatabase
      */
-    protected $client;
+    protected MongoDbDatabase $client;
 
     /**
      * Database constructor.
@@ -155,19 +155,12 @@ Class Database implements DatabaseInterface
      */
     public function info(): JsonInterface
     {
-        $stats = $this->server()
-                      ->command( [ 'dbStats' => 1 ], $this->name() )
-                      ->getIndexJson( 0 )
-                      ->filter( function( $k, $v )
-                      {
-                          if ( is_scalar( $v ) ) {
-                              return $v;
-                          }
-
-                          return false;
-                      } )
-                      ->clean();
-
-        return $stats;
+        return $this->server()
+                    ->command( [ 'dbStats' => 1 ], $this->name() )
+                    ->getIndexJson( 0 )
+                    ->filter( fn( $k, $v ) => is_scalar( $v )
+                        ? $v
+                        : false )
+                    ->clean();
     }
 }

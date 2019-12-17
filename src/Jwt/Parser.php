@@ -22,27 +22,27 @@ class Parser
     /**
      * @var array
      */
-    protected $header = [];
+    protected array $header = [];
 
     /**
      * @var array
      */
-    protected $payload = [];
+    protected array $payload = [];
 
     /**
      * @var string|null
      */
-    protected $signature = null;
+    protected ?string $signature = null;
 
     /**
      * @var array
      */
-    protected $claims = [];
+    protected array $claims = [];
 
     /**
      * @var string|null
      */
-    protected $err = null;
+    protected ?string $err = null;
 
     /**
      * @param string $jwt
@@ -173,7 +173,7 @@ class Parser
     public function hasValidStart( int $time = null ): bool
     {
         $nbf  = $this->payload[ 'nbf' ] ?? null;
-        $time = $time ?? time();
+        $time ??= time();
 
         return !( $nbf && $time >= $nbf );
     }
@@ -186,7 +186,7 @@ class Parser
     public function hasValidExpired( int $time = null ): bool
     {
         $exp  = $this->payload[ 'exp' ] ?? null;
-        $time = $time ?? time();
+        $time ??= time();
 
         return !( $exp && $time >= $exp );
     }

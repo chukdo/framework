@@ -35,12 +35,12 @@ Class Collection implements CollectionInterface
     /**
      * @var Database
      */
-    protected $database;
+    protected Database $database;
 
     /**
      * @var MongoDbCollection
      */
-    protected $client;
+    protected MongoDbCollection $client;
 
     /**
      * Collection constructor.
@@ -212,14 +212,9 @@ Class Collection implements CollectionInterface
                        ->server()
                        ->command( [ 'collStats' => $name ], $dbName )
                        ->getIndexJson( 0 )
-                       ->filter( static function( $k, $v )
-                       {
-                           if ( is_scalar( $v ) ) {
-                               return $v;
-                           }
-
-                           return false;
-                       } )
+                       ->filter( fn( $k, $v ) => is_scalar( $v )
+                           ? $v
+                           : false )
                        ->clean();
 
         return $stats;

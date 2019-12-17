@@ -26,22 +26,22 @@ class Request
     /**
      * @var App
      */
-    protected $app;
+    protected App $app;
 
     /**
      * @param Input
      */
-    protected $inputs;
+    protected Input $inputs;
 
     /**
      * @param Header
      */
-    protected $header;
+    protected Header $header;
 
     /**
      * @param Url
      */
-    protected $url;
+    protected Url $url;
 
     /**
      * Request constructor.

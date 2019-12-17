@@ -19,47 +19,47 @@ class Logger implements LoggerInterface
     /**
      * RFC 5424.
      */
-    const DEBUG     = 100;
-    const INFO      = 200;
-    const NOTICE    = 250;
-    const WARNING   = 300;
-    const ERROR     = 400;
-    const CRITICAL  = 500;
-    const ALERT     = 550;
-    const EMERGENCY = 600;
+    public const DEBUG     = 100;
+    public const INFO      = 200;
+    public const NOTICE    = 250;
+    public const WARNING   = 300;
+    public const ERROR     = 400;
+    public const CRITICAL  = 500;
+    public const ALERT     = 550;
+    public const EMERGENCY = 600;
 
     /**
      * RFC 5424.
      *
      * @var array
      */
-    public static $levels = [ 100 => 'Debug',
-                              200 => 'Info',
-                              250 => 'Notice',
-                              300 => 'Warning',
-                              400 => 'Error',
-                              500 => 'Critical',
-                              550 => 'Alert',
-                              600 => 'Emergency', ];
+    public static array $levels = [ 100 => 'Debug',
+                                    200 => 'Info',
+                                    250 => 'Notice',
+                                    300 => 'Warning',
+                                    400 => 'Error',
+                                    500 => 'Critical',
+                                    550 => 'Alert',
+                                    600 => 'Emergency', ];
 
     /**
      * @var string
      */
-    protected $name;
+    protected string $name;
 
     /**
      * Pile des gestionnaires de logs.
      *
      * @var array
      */
-    protected $handlers = [];
+    protected array $handlers = [];
 
     /**
      * Processeurs de modifications des enregistrements.
      *
      * @var array
      */
-    protected $processors = [];
+    protected array $processors = [];
 
     /**
      * Constructeur

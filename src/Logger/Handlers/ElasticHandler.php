@@ -3,6 +3,7 @@
 namespace Chukdo\Logger\Handlers;
 
 use Chukdo\Logger\Formatters\NullFormatter;
+use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
 
 /**
@@ -16,14 +17,14 @@ use Elasticsearch\ClientBuilder;
 class ElasticHandler extends AbstractHandler
 {
     /**
-     * @var ClientBuilder
+     * @var Client|null
      */
-    protected $elastic;
+    protected ?Client $elastic;
 
     /**
      * @var string
      */
-    private $dsn;
+    private ?string $dsn;
 
     /**
      * ElasticHandler constructor.

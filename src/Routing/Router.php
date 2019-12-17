@@ -26,32 +26,32 @@ class Router
     /**
      * @var App
      */
-    protected $app;
+    protected App $app;
 
     /**
      * @var Request
      */
-    protected $request;
+    protected Request $request;
 
     /**
      * @var Response
      */
-    protected $response;
+    protected Response $response;
 
     /**
      * @var array
      */
-    protected $stack = [];
+    protected array $stack = [];
 
     /**
      * @var RouteAttributes
      */
-    protected $attributes;
+    protected RouteAttributes $attributes;
 
     /**
      * @var Closure
      */
-    protected $fallback = null;
+    protected Closure $fallback;
 
     /**
      * Router constructor.

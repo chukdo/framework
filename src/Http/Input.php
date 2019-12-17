@@ -25,10 +25,10 @@ class Input extends Json implements InputInterface
      */
     public function __construct( $data = null )
     {
-        $data = $data ?? HttpRequest::all();
+        $data ??= HttpRequest::all();
 
         /** Trim all input */
-        array_walk_recursive( $data, function( &$v, $k )
+        array_walk_recursive( $data, static function( &$v, $k )
         {
             if ( is_scalar( $v ) ) {
                 $v = trim( $v );

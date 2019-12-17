@@ -21,7 +21,7 @@ Class Write extends Where implements WriteInterface
     /**
      * @var Json
      */
-    protected $fields;
+    protected Json $fields;
 
     /**
      * Write constructor.

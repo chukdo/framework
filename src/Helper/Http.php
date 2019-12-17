@@ -84,7 +84,7 @@ final class Http
                               'bot'     => null, ];
         $ua               = strtolower( $ua );
         $browser[ 'bot' ] = Str::match( '/baiduspider|googlebot|yandexbot|bingbot|lynx|wget|curl/', $ua );
-        $is               = function( $contain, $name = false ) use ( $ua, &$browser )
+        $is = static function( $contain, $name = false ) use ( $ua, &$browser )
         {
             if ( Str::contain( $ua, $contain ) ) {
                 $browser[ 'browser' ] = $name
@@ -105,23 +105,20 @@ final class Http
         /** Platform */
         if ( Str::contain( $ua, 'windows' ) ) {
             $browser[ 'platform' ] = 'windows';
-        } else {
-            if ( Str::contain( $ua, 'linux' ) ) {
-                $browser[ 'platform' ] = 'linux';
-            } else {
-                if ( Str::contain( $ua, 'mac' ) ) {
-                    $browser[ 'platform' ] = 'osx';
-                }
-            }
+
+        } elseif ( Str::contain( $ua, 'linux' ) ) {
+            $browser[ 'platform' ] = 'linux';
+
+        } elseif ( Str::contain( $ua, 'mac' ) ) {
+            $browser[ 'platform' ] = 'osx';
         }
 
         /** Mobile */
         if ( Str::contain( $ua, 'ipad' ) || Str::contain( $ua, 'iphone' ) ) {
             $browser[ 'mobile' ] = 'ios';
-        } else {
-            if ( Str::contain( $ua, 'android' ) ) {
-                $browser[ 'mobile' ] = 'android';
-            }
+
+        } elseif ( Str::contain( $ua, 'android' ) ) {
+            $browser[ 'mobile' ] = 'android';
         }
 
         return $browser;

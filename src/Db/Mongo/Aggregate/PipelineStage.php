@@ -19,7 +19,7 @@ Class PipelineStage implements StageInterface
     /**
      * @var array
      */
-    protected $pipe = [];
+    protected array $pipe = [];
 
     /**
      * @return $this

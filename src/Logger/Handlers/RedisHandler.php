@@ -16,14 +16,14 @@ use Exception;
 class RedisHandler extends AbstractHandler
 {
     /**
-     * @var object
+     * @var RedisInterface|null
      */
-    protected $redis;
+    protected ?RedisInterface $redis;
 
     /**
      * @var string
      */
-    protected $key;
+    protected ?string $key;
 
     /**
      * RedisHandler constructor.

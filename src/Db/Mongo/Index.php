@@ -11,12 +11,12 @@ Class Index
     /**
      * @var Collection
      */
-    protected $collection;
+    protected Collection $collection;
 
     /**
      * @var array
      */
-    protected $index;
+    protected array $index;
 
     /**
      * Index constructor.

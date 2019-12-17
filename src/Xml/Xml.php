@@ -17,18 +17,14 @@ use Throwable;
 class Xml extends Node
 {
     /**
-     * Document XML.
-     *
-     * @param object DOMDocument
+     * @var DOMDocument
      */
-    protected $xml;
+    protected DOMDocument $xml;
 
     /**
-     * Buffer de linearisation.
-     *
-     * @param string
+     * @var string
      */
-    private $buffer;
+    private string $buffer;
 
     /**
      * Xml constructor.

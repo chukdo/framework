@@ -20,7 +20,7 @@ class HandleExceptions
     /**
      * @var App
      */
-    protected $app;
+    protected App $app;
 
     /**
      * HandleExceptions constructor.

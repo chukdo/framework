@@ -17,9 +17,9 @@ use League\CLImate\CLImate;
 class Message extends Json
 {
     /**
-     * @var
+     * @var string
      */
-    protected $name;
+    protected string $name;
 
     /**
      * Message constructor.

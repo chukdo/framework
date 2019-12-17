@@ -13,12 +13,12 @@ class ValidatorMiddleware implements MiddlewareInterface
     /**
      * @var array
      */
-    protected $validators = [];
+    protected array $validators = [];
 
     /**
      * @var ErrorMiddlewareInterface
      */
-    protected $errorMiddleware = null;
+    protected ?ErrorMiddlewareInterface $errorMiddleware;
 
     /**
      * ValidatorMiddleware constructor.

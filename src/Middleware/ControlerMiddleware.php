@@ -10,12 +10,12 @@ class ControlerMiddleware implements MiddlewareInterface
     /**
      * @var string
      */
-    protected $controler = '';
+    protected string $controler;
 
     /**
      * @var string
      */
-    protected $action = '';
+    protected string $action;
 
     /**
      * ControlerMiddleware constructor.

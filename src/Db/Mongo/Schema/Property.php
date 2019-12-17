@@ -23,12 +23,12 @@ class Property implements PropertyInterface
     /**
      * @var Json
      */
-    protected $property;
+    protected Json $property;
 
     /**
      * @var string|null
      */
-    protected $name = null;
+    protected ?string $name;
 
     /**
      * Property constructor.
@@ -82,9 +82,9 @@ class Property implements PropertyInterface
     /**
      * @param array $value
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function setProperties( array $value ): PropertyInterface
+    public function setProperties( array $value ): Property
     {
         $properties = $this->property->offsetGetOrSet( 'properties' );
         foreach ( $value as $k => $v ) {
@@ -97,9 +97,9 @@ class Property implements PropertyInterface
     /**
      * @param $value
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function setType( $value ): PropertyInterface
+    public function setType( $value ): Property
     {
         /** Intercompatiblité propriété Mongo|Elastic */
         if ( $value === 'keyword' || $value === 'text' ) {
@@ -113,9 +113,9 @@ class Property implements PropertyInterface
     /**
      * @param string $value
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function setDescription( string $value ): PropertyInterface
+    public function setDescription( string $value ): Property
     {
         $this->property->offsetSet( 'description', $value );
 
@@ -125,9 +125,9 @@ class Property implements PropertyInterface
     /**
      * @param string $value
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function setPattern( string $value ): PropertyInterface
+    public function setPattern( string $value ): Property
     {
         $this->property->offsetSet( 'pattern', $value );
 
@@ -137,9 +137,9 @@ class Property implements PropertyInterface
     /**
      * @param int $value
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function setMin( int $value ): PropertyInterface
+    public function setMin( int $value ): Property
     {
         $this->property->offsetSet( 'minimum', $value );
 
@@ -149,9 +149,9 @@ class Property implements PropertyInterface
     /**
      * @param int $value
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function setMax( int $value ): PropertyInterface
+    public function setMax( int $value ): Property
     {
         $this->property->offsetSet( 'maximum', $value );
 
@@ -161,9 +161,9 @@ class Property implements PropertyInterface
     /**
      * @param mixed ...$values
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function setList( ...$values ): PropertyInterface
+    public function setList( ...$values ): Property
     {
         $list = $this->list();
         foreach ( $values as $value ) {
@@ -186,9 +186,9 @@ class Property implements PropertyInterface
     /**
      * @param int $value
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function setMinItems( int $value ): PropertyInterface
+    public function setMinItems( int $value ): Property
     {
         $this->property->offsetSet( 'minItems', $value );
 
@@ -198,9 +198,9 @@ class Property implements PropertyInterface
     /**
      * @param int $value
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function setMaxItems( int $value ): PropertyInterface
+    public function setMaxItems( int $value ): Property
     {
         $this->property->offsetSet( 'maxItems', $value );
 
@@ -210,9 +210,9 @@ class Property implements PropertyInterface
     /**
      * @param array $value
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function setItems( array $value ): PropertyInterface
+    public function setItems( array $value ): Property
     {
         $this->property->offsetSet( 'items', new Property( $value, 'items' ) );
 
@@ -222,9 +222,9 @@ class Property implements PropertyInterface
     /**
      * @param mixed ...$fields
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function setRequired( ...$fields ): PropertyInterface
+    public function setRequired( ...$fields ): Property
     {
         $required = $this->required();
         foreach ( Arr::spreadArgs( $fields ) as $field ) {
@@ -255,9 +255,9 @@ class Property implements PropertyInterface
     /**
      * @param bool $value
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function setUniqueItems( bool $value ): PropertyInterface
+    public function setUniqueItems( bool $value ): Property
     {
         $this->property->offsetSet( 'uniqueItems', $value );
 
@@ -272,7 +272,7 @@ class Property implements PropertyInterface
     public function isRequired( string $field = null ): bool
     {
         foreach ( $this->required() as $required ) {
-            if ( $required == $field ) {
+            if ( $required === $field ) {
                 return true;
             }
         }
@@ -283,9 +283,9 @@ class Property implements PropertyInterface
     /**
      * @param mixed ...$values
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function unsetList( ...$values ): PropertyInterface
+    public function unsetList( ...$values ): Property
     {
         $list = $this->list();
         foreach ( $values as $value ) {
@@ -300,9 +300,9 @@ class Property implements PropertyInterface
     }
 
     /**
-     * @return PropertyInterface
+     * @return Property
      */
-    public function resetList(): PropertyInterface
+    public function resetList(): Property
     {
         $this->property->offsetSet( 'enum', [] );
 
@@ -312,9 +312,9 @@ class Property implements PropertyInterface
     /**
      * @param mixed ...$fields
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function unsetRequired( ...$fields ): PropertyInterface
+    public function unsetRequired( ...$fields ): Property
     {
         $required = $this->required();
         foreach ( $fields as $field ) {
@@ -330,9 +330,9 @@ class Property implements PropertyInterface
     }
 
     /**
-     * @return PropertyInterface
+     * @return Property
      */
-    public function resetRequired(): PropertyInterface
+    public function resetRequired(): Property
     {
         $this->property->offsetSet( 'required', [] );
 
@@ -340,9 +340,9 @@ class Property implements PropertyInterface
     }
 
     /**
-     * @return PropertyInterface|null
+     * @return Property|null
      */
-    public function items(): ?PropertyInterface
+    public function items(): ?Property
     {
         return $this->property->offsetGet( 'items' );
     }
@@ -350,20 +350,21 @@ class Property implements PropertyInterface
     /**
      * @param string $name
      *
-     * @return PropertyInterface|null
+     * @return Property|null
      */
-    public function get( string $name ): ?PropertyInterface
+    public function get( string $name ): ?Property
     {
         if ( Str::notContain( $name, '.' ) ) {
             return $this->properties()
                         ->offsetGet( $name );
         }
+
         $arr       = new Iterate( Str::split( $name, '.' ) );
         $firstPath = $arr->getFirstAndRemove();
         $endPath   = $arr->join( '.' );
         $get       = $this->properties()
                           ->offsetGet( $firstPath );
-        if ( $get instanceof PropertyInterface ) {
+        if ( $get instanceof self ) {
             return $get->get( $endPath );
         }
 
@@ -381,9 +382,9 @@ class Property implements PropertyInterface
     /**
      * @param array $properties
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function setAll( array $properties ): PropertyInterface
+    public function setAll( array $properties ): Property
     {
         foreach ( $properties as $name => $type ) {
             $this->set( $name, $type );
@@ -397,9 +398,9 @@ class Property implements PropertyInterface
      * @param null   $type
      * @param array  $options
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function set( string $name, $type = null, array $options = [] ): PropertyInterface
+    public function set( string $name, $type = null, array $options = [] ): Property
     {
         $property = new Property( $options, $name );
         if ( Is::string( $type ) ) {
@@ -422,13 +423,9 @@ class Property implements PropertyInterface
      */
     public function toArray(): array
     {
-        return $this->property->filterRecursive( static function( $k, $v )
-        {
-            return $v instanceof Property
-                ? $v->toArray()
-                : $v;
-        } )
-                              ->toArray();
+        return $this->property->filterRecursive( fn($k, $v) => $v instanceof Property
+            ? $v->toArray()
+            : $v )->toArray();
     }
 
     /**
@@ -440,9 +437,9 @@ class Property implements PropertyInterface
     }
 
     /**
-     * @return string|null
+     * @return array|string|null
      */
-    public function type(): ?string
+    public function type()
     {
         return $this->property->offsetGet( 'bsonType' );
     }
@@ -450,9 +447,9 @@ class Property implements PropertyInterface
     /**
      * @param string $name
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function unset( string $name ): PropertyInterface
+    public function unset( string $name ): Property
     {
         $this->properties()
              ->offsetUnset( $name );

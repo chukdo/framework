@@ -22,12 +22,12 @@ class Schema implements SchemaInterface
     /**
      * @var Collection
      */
-    protected $collection;
+    protected Collection $collection;
 
     /**
      * @var Property
      */
-    protected $property;
+    protected Property $property;
 
     /**
      * Schema constructor.

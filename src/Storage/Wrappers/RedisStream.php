@@ -17,7 +17,7 @@ class RedisStream extends AbstractStream
     /**
      * @var object StreamInterface
      */
-    protected $stream;
+    protected object $stream;
 
     /**
      * Retourne le contenu du fichier.

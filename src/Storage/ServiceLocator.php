@@ -18,12 +18,12 @@ class ServiceLocator extends Singleton
     /**
      * @var array
      */
-    private $cache = [];
+    private array $cache = [];
 
     /**
      * @var array
      */
-    private $resources = [];
+    private array $resources = [];
 
     /**
      * Ajoute un service à l'annuaire.

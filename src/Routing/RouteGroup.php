@@ -18,12 +18,12 @@ class RouteGroup
     /**
      * @var Router
      */
-    protected $router;
+    protected Router $router;
 
     /**
      * @var RouteAttributes
      */
-    protected $attributes;
+    protected RouteAttributes $attributes;
 
     /**
      * RouteGroup constructor.

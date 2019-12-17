@@ -10,9 +10,9 @@ use Chukdo\Json\Message;
 class ErrorMiddleware implements ErrorMiddlewareInterface
 {
     /**
-     * @var ErrorMiddlewareInterface
+     * @var Message
      */
-    protected $errors = null;
+    protected Message $errors;
 
     /**
      * @param Message $errors

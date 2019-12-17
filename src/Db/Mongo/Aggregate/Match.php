@@ -21,18 +21,18 @@ Class Match extends Stage
     /**
      * @var array
      */
-    protected $where = [];
+    protected array $where = [];
 
     /**
      * @var array
      */
-    protected $orWhere = [];
+    protected array $orWhere = [];
 
     /**
-     * @param string $field
-     * @param string $operator
-     * @param null   $value
-     * @param null   $value2
+     * @param string     $field
+     * @param string     $operator
+     * @param mixed|null $value
+     * @param mixed|null $value2
      *
      * @return Match
      */
@@ -44,10 +44,10 @@ Class Match extends Stage
     }
 
     /**
-     * @param string $field
-     * @param string $operator
-     * @param null   $value
-     * @param null   $value2
+     * @param string     $field
+     * @param string     $operator
+     * @param mixed|null $value
+     * @param mixed|null $value2
      *
      * @return Match
      */

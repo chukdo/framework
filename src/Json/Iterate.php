@@ -17,12 +17,12 @@ class Iterate implements Iterator
     /**
      * @var array
      */
-    protected $arr = [];
+    protected array $arr = [];
 
     /**
      * @var int
      */
-    protected $offset = 0;
+    protected int $offset = 0;
 
     /**
      * Iterate constructor.

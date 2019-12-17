@@ -18,11 +18,17 @@ class AzureStream extends AbstractStream
     /**
      * @var object StreamInterface
      */
-    protected $stream;
+    protected object $stream;
 
-    private $streamContent = null;
+    /**
+     * @var string|null
+     */
+    private ?string $streamContent = null;
 
-    private $streamLenght = 0;
+    /**
+     * @var int
+     */
+    private int $streamLenght = 0;
 
     /**
      * Retourne une portion du contenu du fichier.
@@ -35,7 +41,7 @@ class AzureStream extends AbstractStream
      */
     public function streamGetRange( int $offset, int $length ): ?string
     {
-        if ( $this->streamContent == null ) {
+        if ( $this->streamContent === null ) {
             $this->streamGet();
         }
         if ( $offset >= $this->streamLenght ) {
@@ -53,7 +59,7 @@ class AzureStream extends AbstractStream
      */
     public function streamGet()
     {
-        if ( $this->streamContent == null ) {
+        if ( $this->streamContent === null ) {
             $this->streamContent = stream_get_contents( $this->getStream()
                                                              ->getBlob( $this->getHost(), $this->getPath() )
                                                              ->getContentStream() );

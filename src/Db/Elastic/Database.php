@@ -24,17 +24,17 @@ Class Database implements DatabaseInterface
     /**
      * @var Server
      */
-    protected $server;
+    protected Server $server;
 
     /**
      * @var Client
      */
-    protected $client;
+    protected Client $client;
 
     /**
      * @var string|null
      */
-    protected $database = null;
+    protected ?string $database = null;
 
     /**
      * Database constructor.

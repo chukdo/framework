@@ -16,7 +16,7 @@ class Event
      *
      * @param array $listeners
      */
-    protected $listeners = [];
+    protected array $listeners = [];
 
     /**
      * Vide un Evenement (Ecouteur).

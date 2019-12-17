@@ -18,22 +18,22 @@ class RouteAttributes
     /**
      * @var string
      */
-    protected $prefix = '';
+    protected string $prefix;
 
     /**
      * @var ErrorMiddlewareInterface
      */
-    protected $errorMiddleware = null;
+    protected ?ErrorMiddlewareInterface $errorMiddleware;
 
     /**
      * @var array
      */
-    protected $validators = [];
+    protected array $validators = [];
 
     /**
      * @var array
      */
-    protected $middlewares = [];
+    protected array $middlewares = [];
 
     /**
      * RouteAttributes constructor.

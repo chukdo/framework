@@ -11,7 +11,7 @@ class ClosureMiddleware implements MiddlewareInterface
     /**
      * @var Closure
      */
-    protected $closure;
+    protected Closure $closure;
 
     /**
      * ClosureMiddleware constructor.

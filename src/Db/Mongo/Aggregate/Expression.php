@@ -17,10 +17,10 @@ Class Expression
     /**
      * @var string
      */
-    protected $name;
+    protected string $name;
 
     /**
-     * @var mixed
+     * @var Expression|string|array
      */
     protected $expression;
 

@@ -26,28 +26,28 @@ class Redis implements RedisInterface
      *
      * @var int
      */
-    protected $pointer = 0;
+    protected int $pointer = 0;
 
     /**
      * Pile de stockage SCAN.
      *
      * @var array
      */
-    protected $stack = [];
+    protected array $stack = [];
 
     /**
      * Arguements par defaut pour le SCAN.
      *
      * @var array
      */
-    protected $args = [];
+    protected array $args = [];
 
     /**
      * type de SCAN (SCAN, HSCAN, SSCAN).
      *
      * @var string
      */
-    protected $type = null;
+    protected ?string $type = null;
 
     /**
      * Redis constructor.
@@ -59,14 +59,14 @@ class Redis implements RedisInterface
      */
     public function __construct( string $dsn = null, int $timeout = null )
     {
-        $dsn        = parse_url( $dsn ?? 'redis://127.0.0.1:6379' );
-        $host       = $dsn[ 'host' ];
-        $port       = $dsn[ 'port' ];
+        $urlParsed  = parse_url( $dsn ?? 'redis://127.0.0.1:6379' );
+        $host       = $urlParsed[ 'host' ];
+        $port       = $urlParsed[ 'port' ];
         $this->sock = fsockopen( $host, $port, $errno, $errstr, $timeout ?? 5 );
         if ( $this->sock === null ) {
             throw new RedisException( "[$errno $errstr]" );
         }
-        if ( isset( $dsn[ 'pass' ] ) && !$this->__call( 'AUTH', [ $dsn[ 'pass' ] ] ) ) {
+        if ( isset( $urlParsed[ 'pass' ] ) && !$this->__call( 'AUTH', [ $urlParsed[ 'pass' ] ] ) ) {
             throw new RedisException( 'Wrong password' );
         }
         $this->setTypeIterator( 'scan' );
@@ -101,6 +101,7 @@ class Redis implements RedisInterface
         $length = mb_strlen( $c );
         for ( $written = 0; $written < $length; $written += $fwrite ) {
             $fwrite = fwrite( $this->sock, mb_substr( $c, $written ) );
+
             if ( $fwrite === false || $fwrite <= 0 ) {
                 throw new RedisException( 'Stream write error' );
             }
@@ -117,6 +118,7 @@ class Redis implements RedisInterface
     public function command( array $args ): string
     {
         $c = '*' . count( $args ) . "\r\n";
+
         foreach ( $args as $arg ) {
             $c .= '$' . mb_strlen( $arg ) . "\r\n" . $arg . "\r\n";
         }

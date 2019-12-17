@@ -18,19 +18,19 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
 Class Aggregate
 {
     /**
-     * @var Collection
+     * @var CollectionInterface
      */
-    protected $collection;
+    protected CollectionInterface $collection;
 
     /**
      * @var array
      */
-    protected $options = [];
+    protected array $options = [];
 
     /**
      * @var array
      */
-    protected $pipe = [];
+    protected array $pipe = [];
 
     /**
      * Aggregate constructor.

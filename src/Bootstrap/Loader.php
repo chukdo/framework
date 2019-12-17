@@ -16,14 +16,14 @@ class Loader
      *
      * @var array
      */
-    private $log = [];
+    private array $log = [];
 
     /**
      * Namespaces.
      *
      * @var array
      */
-    private $namespaces = [];
+    private array $namespaces = [];
 
     /**
      * Constructeur

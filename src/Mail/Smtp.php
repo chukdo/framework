@@ -19,7 +19,7 @@ class Smtp implements TransportInterface
      *
      * @param array $log
      */
-    public $log = [];
+    public array $log = [];
     /**
      * Socket
      *
@@ -31,7 +31,7 @@ class Smtp implements TransportInterface
      *
      * @param array $dsn
      */
-    protected $dsn = [];
+    protected array $dsn = [];
 
     /**
      * Smtp constructor.

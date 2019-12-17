@@ -18,7 +18,7 @@ class CsrfValidate implements ValidateInterface
     /**
      * @var string
      */
-    protected $salt;
+    protected string $salt;
 
     /**
      * @return string

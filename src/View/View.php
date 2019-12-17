@@ -20,32 +20,32 @@ class View
     /**
      * @var Response
      */
-    protected $response;
+    protected Response $response;
 
     /**
      * @var array
      */
-    protected $folders = [];
+    protected array $folders = [];
 
     /**
      * @var string
      */
-    protected $defaultFolder = null;
+    protected ?string $defaultFolder = null;
 
     /**
      * @var array
      */
-    protected $sharedData = [];
+    protected array $sharedData = [];
 
     /**
      * @var array
      */
-    protected $sharedTemplateData = [];
+    protected array $sharedTemplateData = [];
 
     /**
      * @var array
      */
-    protected $functions = [];
+    protected array $functions = [];
 
     /**
      * View constructor.

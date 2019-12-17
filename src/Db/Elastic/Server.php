@@ -23,17 +23,17 @@ Class Server implements ServerInterface
     /**
      * @var string|null
      */
-    protected $dsn = null;
+    protected ?string $dsn = null;
 
     /**
-     * @var ClientBuilder
+     * @var Client
      */
-    protected $client;
+    protected Client $client;
 
     /**
      * @var string|null
      */
-    protected $database = null;
+    protected ?string $database = null;
 
     /**
      * Server constructor.

@@ -33,7 +33,7 @@ apt-get update
 apt-get upgrade -y
 
 #APACHE PHP..
-apt-get install -y apt-transport-https elasticsearch mongodb-org certbot python3-pip awscli xfonts-75dpi xfonts-base whois openssl htop zip unzip software-properties-common libimage-exiftool-perl poppler-utils apache2 git-all libapache2-mod-php7.3 php7.3 php7.3-curl php7.3-soap php7.3-json php7.3-gd php-pear php7.3-dev php7.3-zip php7.3-mbstring php7.3-xml php-imagick php7.3-tidy php-mongodb
+apt-get install -y apt-transport-https elasticsearch mongodb-org certbot python3-pip awscli xfonts-75dpi xfonts-base whois openssl htop zip unzip software-properties-common libimage-exiftool-perl poppler-utils apache2 git-all libonig4 php7.4-cli php7.4-common php7.4-opcache php7.4-readline libapache2-mod-php7.4 php7.4 php7.4-curl php7.4-soap php7.4-json php7.4-gd php-pear php7.4-dev php7.4-zip php7.4-mbstring php7.4-xml php-imagick php7.4-tidy php-mongodb
 
 #certbot dns route53
 pip3 install certbot-dns-route53
@@ -157,7 +157,7 @@ curl -sS https://getcomposer.org/installer -o composer-setup.php
 php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 
 # active parametres apache
-a2enmod php7.3
+a2enmod php7.4
 a2enmod ssl
 a2enmod rewrite
 a2enmod headers

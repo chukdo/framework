@@ -17,22 +17,22 @@ class FileUploaded
     /**
      * @var string|null
      */
-    protected $name = null;
+    protected ?string $name = null;
 
     /**
      * @var int|null
      */
-    protected $maxFileSize = null;
+    protected ?int $maxFileSize = null;
 
     /**
      * @var string|null
      */
-    protected $allowedMimeTypes = null;
+    protected ?string $allowedMimeTypes = null;
 
     /**
      * @var array
      */
-    protected $uploadedFile = [];
+    protected array $uploadedFile = [];
 
     /**
      * FileUploaded constructor.
@@ -44,6 +44,7 @@ class FileUploaded
     public function __construct( string $name, string $allowedMimeTypes = null, int $maxFileSize = null )
     {
         $uploadedFiles = $this->normalizeUploadedFiles();
+
         if ( isset( $uploadedFiles[ $name ] ) ) {
             $this->name         = $name;
             $this->uploadedFile = $uploadedFiles[ $name ];

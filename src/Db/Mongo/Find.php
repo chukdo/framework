@@ -26,42 +26,42 @@ Class Find extends Where implements FindInterface
     /**
      * @var array
      */
-    protected $projection = [];
+    protected array $projection = [];
 
     /**
      * @var array
      */
-    protected $options = [];
+    protected array $options = [];
 
     /**
      * @var array
      */
-    protected $link = [];
+    protected array $link = [];
 
     /**
      * @var array
      */
-    protected $sort = [];
+    protected array $sort = [];
 
     /**
      * @var int
      */
-    protected $skip = 0;
+    protected int $skip = 0;
 
     /**
      * @var int
      */
-    protected $limit = 0;
+    protected int $limit = 0;
 
     /**
      * @var bool
      */
-    protected $hiddenId = false;
+    protected bool $hiddenId = false;
 
     /**
      * @var Collection
      */
-    protected $collection;
+    protected Collection $collection;
 
     /**
      * Find constructor.

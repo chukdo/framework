@@ -9,7 +9,6 @@ use Chukdo\Helper\Str;
 use Chukdo\Http\Request;
 use Chukdo\Http\Response;
 use Chukdo\Http\Url;
-use Chukdo\Middleware\ClosureMiddleware;
 use Chukdo\Middleware\Dispatcher;
 use Chukdo\Middleware\ValidatorMiddleware;
 
@@ -26,32 +25,32 @@ class Route
     /**
      * @var string
      */
-    protected $method;
+    protected string $method;
 
     /**
-     * @var string
+     * @var Url
      */
-    protected $uri;
+    protected Url $uri;
 
     /**
      * @var Request
      */
-    protected $request;
+    protected Request $request;
 
     /**
-     * @var ClosureMiddleware
+     * @var MiddlewareInterface
      */
-    protected $appMiddleware;
+    protected MiddlewareInterface $appMiddleware;
 
     /**
      * @var array
      */
-    protected $wheres = [];
+    protected array $wheres = [];
 
     /**
      * @var RouteAttributes
      */
-    protected $attributes;
+    protected RouteAttributes $attributes;
 
     /**
      * Route constructor.

@@ -19,12 +19,12 @@ Class RecordList extends Json
     /**
      * @var CollectionInterface
      */
-    protected $collection;
+    protected CollectionInterface $collection;
 
     /**
      * @var bool
      */
-    protected $idAsKey = false;
+    protected bool $idAsKey = false;
 
     /**
      * RecordList constructor.

@@ -20,12 +20,12 @@ Abstract Class Where
     /**
      * @var Collection
      */
-    protected $collection;
+    protected Collection $collection;
 
     /**
      * @var array
      */
-    protected $where = [];
+    protected array $where = [];
 
     /**
      * Find constructor.
