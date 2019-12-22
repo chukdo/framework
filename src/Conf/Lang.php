@@ -3,7 +3,6 @@
 namespace Chukdo\Conf;
 
 use Chukdo\Bootstrap\AppException;
-use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Storage\Storage;
 
 /**
@@ -19,18 +18,20 @@ class Lang extends Conf
     /**
      * @param string $file
      *
-     * @return JsonInterface
+     * @return $this
      */
-    public function loadFile( string $file ): JsonInterface
+    public function loadFile( string $file ): self
     {
         $storage = new Storage();
         $name    = basename( $file, '.json' );
+
         if ( $storage->exists( $file ) ) {
             $load = new Conf( $storage->get( $file ) );
             $this->merge( $load->to2d( $name ), true );
 
             return $this;
         }
+
         throw new AppException( sprintf( 'Lang file [%s] no exist', $file ) );
     }
 }

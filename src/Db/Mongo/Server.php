@@ -6,10 +6,7 @@ use Chukdo\Json\Json;
 use MongoDB\Driver\Manager;
 use MongoDB\Driver\Command;
 use MongoDB\Driver\Exception\Exception;
-use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Contracts\Db\Server as ServerInterface;
-use Chukdo\Contracts\Db\Database as DatabaseInterface;
-use Chukdo\Contracts\Db\Collection as CollectionInterface;
 
 /**
  * Server Server.
@@ -81,9 +78,9 @@ Class Server implements ServerInterface
      * @param array       $args
      * @param string|null $db
      *
-     * @return JsonInterface
+     * @return Json
      */
-    public function command( array $args, string $db = null ): JsonInterface
+    public function command( array $args, string $db = null ): Json
     {
         try {
             return new Json( $this->client()
@@ -106,9 +103,9 @@ Class Server implements ServerInterface
      * @param string      $collection
      * @param string|null $database
      *
-     * @return CollectionInterface
+     * @return Collection
      */
-    public function collection( string $collection, string $database = null ): CollectionInterface
+    public function collection( string $collection, string $database = null ): Collection
     {
         return $this->database( $database )
                     ->collection( $collection );
@@ -117,18 +114,18 @@ Class Server implements ServerInterface
     /**
      * @param string|null $database
      *
-     * @return DatabaseInterface
+     * @return Database
      */
-    public function database( string $database = null ): DatabaseInterface
+    public function database( string $database = null ): Database
     {
         return new Database( $this, $database
             ?: $this->database );
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function databases(): JsonInterface
+    public function databases(): Json
     {
         return $this->command( [ 'listDatabases' => 1 ] )
                     ->wildcard( '0.databases.*.name' );
@@ -144,9 +141,9 @@ Class Server implements ServerInterface
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function status(): JsonInterface
+    public function status(): Json
     {
         $status = $this->command( [ 'serverStatus' => 1 ] )
                        ->getIndexJson( '0' )
@@ -168,9 +165,9 @@ Class Server implements ServerInterface
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function ReplicatSetStatus(): JsonInterface
+    public function ReplicatSetStatus(): Json
     {
         $status = $this->command( [ 'replSetGetStatus' => 1 ] )
                        ->getIndexJson( '0' )

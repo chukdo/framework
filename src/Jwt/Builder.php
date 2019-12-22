@@ -2,7 +2,6 @@
 
 namespace Chukdo\Jwt;
 
-use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Json\Json;
 use Chukdo\Helper\Arr;
 
@@ -219,9 +218,9 @@ class Builder
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function claims(): JsonInterface
+    public function claims(): Json
     {
         $all = [];
 
@@ -235,9 +234,9 @@ class Builder
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function all(): JsonInterface
+    public function all(): Json
     {
         $all = [];
 
@@ -292,9 +291,9 @@ class Builder
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function getHeaders(): JsonInterface
+    public function getHeaders(): Json
     {
         return new Json( $this->headers );
     }

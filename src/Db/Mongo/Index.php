@@ -29,9 +29,9 @@ Class Index
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function get(): JsonInterface
+    public function get(): Json
     {
         $indexes = new Json();
         foreach ( $this->collection()

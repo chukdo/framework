@@ -2,15 +2,11 @@
 
 Namespace Chukdo\DB\Mongo;
 
-use Chukdo\Contracts\Db\Schema as SchemaInterface;
-use Chukdo\Contracts\Db\Write as WriteInterface;
-use Chukdo\Contracts\Db\Find as FindInterface;
-use Chukdo\Contracts\Db\Database as DatabaseInterface;
 use Chukdo\Contracts\Db\Collection as CollectionInterface;
-use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Db\Record\Record;
 use Chukdo\Db\Mongo\Aggregate\Aggregate;
 use Chukdo\Db\Mongo\Schema\Schema;
+use Chukdo\Json\Json;
 use Chukdo\Helper\Str;
 use Chukdo\Helper\Is;
 use MongoDB\Collection as MongoDbCollection;
@@ -149,9 +145,9 @@ Class Collection implements CollectionInterface
      * @param string      $collection
      * @param string|null $database
      *
-     * @return CollectionInterface
+     * @return Collection
      */
-    public function rename( string $collection, string $database = null ): CollectionInterface
+    public function rename( string $collection, string $database = null ): Collection
     {
         $oldDatabase   = $this->database()
                               ->name();
@@ -176,7 +172,7 @@ Class Collection implements CollectionInterface
     /**
      * @return Database
      */
-    public function database(): DatabaseInterface
+    public function database(): Database
     {
         return $this->database;
     }
@@ -195,35 +191,33 @@ Class Collection implements CollectionInterface
     /**
      * @return Find
      */
-    public function find(): FindInterface
+    public function find(): Find
     {
         return new Find( $this );
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function info(): JsonInterface
+    public function info(): Json
     {
         $name   = $this->name();
         $dbName = $this->database()
                        ->name();
-        $stats  = $this->database()
-                       ->server()
-                       ->command( [ 'collStats' => $name ], $dbName )
-                       ->getIndexJson( 0 )
-                       ->filter( fn( $k, $v ) => is_scalar( $v )
-                           ? $v
-                           : false )
-                       ->clean();
-
-        return $stats;
+        return $this->database()
+                    ->server()
+                    ->command( [ 'collStats' => $name ], $dbName )
+                    ->getIndexJson( 0 )
+                    ->filter( fn( $k, $v ) => is_scalar( $v )
+                        ? $v
+                        : false )
+                    ->clean();
     }
 
     /**
      * @return Schema
      */
-    public function schema(): SchemaInterface
+    public function schema(): Schema
     {
         return new Schema( $this );
     }
@@ -231,7 +225,7 @@ Class Collection implements CollectionInterface
     /**
      * @return Write
      */
-    public function write(): WriteInterface
+    public function write(): Write
     {
         return new Write( $this );
     }

@@ -8,10 +8,8 @@ use Chukdo\Helper\Str;
 use Chukdo\Helper\HttpRequest;
 use Chukdo\Validation\Validator;
 use Chukdo\Storage\FileUploaded;
-use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Bootstrap\ServiceException;
 use ReflectionException;
-use Chukdo\Http\Input;
 
 /**
  * Gestion de requete HTTP entrante.
@@ -154,9 +152,9 @@ class Request
     /**
      * @param mixed ...$offsets
      *
-     * @return JsonInterface
+     * @return Input
      */
-    public function with( ...$offsets ): JsonInterface
+    public function with( ...$offsets ): Input
     {
         return $this->inputs->with( $offsets );
     }
@@ -164,9 +162,9 @@ class Request
     /**
      * @param mixed ...$offsets
      *
-     * @return JsonInterface
+     * @return Input
      */
-    public function without( ...$offsets ): JsonInterface
+    public function without( ...$offsets ): Input
     {
         return $this->inputs->without( $offsets );
     }
@@ -194,9 +192,9 @@ class Request
     /**
      * @param string $path
      *
-     * @return JsonInterface
+     * @return Input
      */
-    public function wildcard( string $path ): JsonInterface
+    public function wildcard( string $path ): Input
     {
         return $this->inputs->wildcard( $path );
     }

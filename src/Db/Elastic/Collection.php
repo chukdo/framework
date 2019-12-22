@@ -7,12 +7,7 @@ use Chukdo\Db\Elastic\Schema\Schema;
 use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
-use Chukdo\Contracts\Json\Json as JsonInterface;
-use Chukdo\Contracts\Db\Database as DatabaseInterface;
 use Chukdo\Contracts\Db\Collection as CollectionInterface;
-use Chukdo\Contracts\Db\Schema as SchemaInterface;
-use Chukdo\Contracts\Db\Find as FindInterface;
-use Chukdo\Contracts\Db\Write as WriteInterface;
 use Chukdo\Db\Record\Record;
 use DateTime;
 use Elasticsearch\Client;
@@ -129,9 +124,9 @@ Class Collection implements CollectionInterface
      * @param string|null $database
      * @param Schema|null $schema
      *
-     * @return CollectionInterface
+     * @return Collection
      */
-    public function rename( string $collection, string $database = null, Schema $schema = null ): CollectionInterface
+    public function rename( string $collection, string $database = null, Schema $schema = null ): Collection
     {
         $database      = $database ?? $this->database()
                                            ->name();
@@ -156,9 +151,9 @@ Class Collection implements CollectionInterface
     }
 
     /**
-     * @return DatabaseInterface
+     * @return Database
      */
-    public function database(): DatabaseInterface
+    public function database(): Database
     {
         return $this->database;
     }
@@ -175,7 +170,7 @@ Class Collection implements CollectionInterface
     /**
      * @return Schema
      */
-    public function schema(): SchemaInterface
+    public function schema(): Schema
     {
         return new Schema( $this );
     }
@@ -210,15 +205,15 @@ Class Collection implements CollectionInterface
     /**
      * @return Find
      */
-    public function find(): FindInterface
+    public function find(): Find
     {
         return new Find( $this );
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function info(): JsonInterface
+    public function info(): Json
     {
         $stats = new Json( $this->client()
                                 ->indices()
@@ -230,7 +225,7 @@ Class Collection implements CollectionInterface
     /**
      * @return Write
      */
-    public function write(): WriteInterface
+    public function write(): Write
     {
         return new Write( $this );
     }

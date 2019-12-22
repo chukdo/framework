@@ -3,7 +3,6 @@
 namespace Chukdo\Helper;
 
 use Chukdo\Json\Json;
-use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
  * Classe Str
@@ -138,7 +137,7 @@ final class Str
      *
      * @return Json
      */
-    public static function matchAll( string $pattern, string $value ): JsonInterface
+    public static function matchAll( string $pattern, string $value ): Json
     {
         $match   = new Json();
         $matches = [];

@@ -8,7 +8,6 @@ use Chukdo\Helper\Str;
 use Chukdo\Json\Iterate;
 use Chukdo\Helper\Arr;
 use Chukdo\Json\Json;
-use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
  * Server Schema properties.
@@ -36,7 +35,7 @@ class Property implements PropertyInterface
      * @param array       $property
      * @param string|null $name
      */
-    public function __construct( Array $property = [], string $name = null )
+    public function __construct( array $property = [], string $name = null )
     {
         $this->name     = $name;
         $this->property = new Json();
@@ -176,9 +175,9 @@ class Property implements PropertyInterface
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function list(): JsonInterface
+    public function list(): Json
     {
         return $this->property->offsetGetOrSet( 'enum' );
     }
@@ -237,9 +236,9 @@ class Property implements PropertyInterface
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function required(): JsonInterface
+    public function required(): Json
     {
         return $this->property->offsetGetOrSet( 'required' );
     }
@@ -372,9 +371,9 @@ class Property implements PropertyInterface
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function properties(): JsonInterface
+    public function properties(): Json
     {
         return $this->property->offsetGetOrSet( 'properties' );
     }

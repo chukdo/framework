@@ -5,7 +5,6 @@ namespace Chukdo\Http;
 use Chukdo\Helper\Arr;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
-use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
  * Gestion des entetes HTTP.
@@ -208,9 +207,9 @@ class Header
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function getCacheControl(): JsonInterface
+    public function getCacheControl(): Json
     {
         $cache = new Json( [ 'max'        => 0,
                              'revalidate' => false,
@@ -416,17 +415,17 @@ class Header
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function getHeaders(): JsonInterface
+    public function getHeaders(): Json
     {
         return $this->header;
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function getCookies(): JsonInterface
+    public function getCookies(): Json
     {
         $cookies = new Json();
         foreach ( $this->cookie as $name => $cookie ) {

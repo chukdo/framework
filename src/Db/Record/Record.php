@@ -133,9 +133,9 @@ Class Record extends Json
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function record(): JsonInterface
+    public function record(): Json
     {
 
         return $this->filterRecursive( fn( $k, $v ) => $v instanceof Record

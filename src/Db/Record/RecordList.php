@@ -35,9 +35,11 @@ Class RecordList extends Json
      */
     public function __construct( CollectionInterface $collection, JsonInterface $json, bool $idAsKey = false )
     {
+        parent::__construct( [], false );
+
         $this->collection = $collection;
         $this->idAsKey    = $idAsKey;
-        parent::__construct( [], false );
+
         foreach ( $json as $k => $v ) {
             if ( $idAsKey ) {
                 $this->offsetSet( (string)$v->offsetGet( '_id' ), $v );
@@ -47,7 +49,13 @@ Class RecordList extends Json
         }
     }
 
-    public function offsetSet( $key, $value ): JsonInterface
+    /**
+     * @param mixed $key
+     * @param mixed $value
+     *
+     * @return $this
+     */
+    public function offsetSet( $key, $value ): self
     {
         parent::offsetSet( $key, $this->collection()
                                       ->record( $value ) );

@@ -168,9 +168,9 @@ Class Link
     /**
      * @param array $ids
      *
-     * @return JsonInterface
+     * @return RecordList
      */
-    protected function findIds( array $ids ): JsonInterface
+    protected function findIds( array $ids ): RecordList
     {
         $find = $this->collection->Find();
 

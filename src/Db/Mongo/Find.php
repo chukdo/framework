@@ -295,9 +295,9 @@ Class Find extends Where implements FindInterface
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function explain(): JsonInterface
+    public function explain(): Json
     {
         $explain = $this->collection()
                         ->database()

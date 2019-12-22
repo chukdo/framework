@@ -2,10 +2,8 @@
 
 namespace Chukdo\Db\Mongo\Aggregate;
 
-use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\DB\Mongo\Collection;
 use Chukdo\Json\Json;
-use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
  * Aggregate.
@@ -18,9 +16,9 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
 Class Aggregate
 {
     /**
-     * @var CollectionInterface
+     * @var Collection
      */
-    protected CollectionInterface $collection;
+    protected Collection $collection;
 
     /**
      * @var array
@@ -35,9 +33,9 @@ Class Aggregate
     /**
      * Aggregate constructor.
      *
-     * @param CollectionInterface $collection
+     * @param Collection $collection
      */
-    public function __construct( CollectionInterface $collection )
+    public function __construct( Collection $collection )
     {
         $this->collection = $collection;
     }
@@ -54,9 +52,9 @@ Class Aggregate
      * @param bool $allowDiskUse
      * @param bool $bypassDocumentValidation
      *
-     * @return JsonInterface
+     * @return Json
      */
-    public function all( bool $allowDiskUse = false, bool $bypassDocumentValidation = false ): JsonInterface
+    public function all( bool $allowDiskUse = false, bool $bypassDocumentValidation = false ): Json
     {
         return new Json( $this->cursor( [ 'allowDiskUse'             => $allowDiskUse,
                                           'bypassDocumentValidation' => $bypassDocumentValidation,
@@ -91,9 +89,9 @@ Class Aggregate
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function explain(): JsonInterface
+    public function explain(): Json
     {
         return new Json( new Cursor( $this->collection->client()
                                                       ->aggregate( $this->projection(), [ 'explain'   => true,

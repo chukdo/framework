@@ -164,9 +164,9 @@ Class Find extends Where implements FindInterface
     /**
      * @param array $find
      *
-     * @return JsonInterface
+     * @return Json
      */
-    protected function hits( array $find ): JsonInterface
+    protected function hits( array $find ): Json
     {
         $hits = new Json();
         foreach ( $find as $hit ) {
@@ -199,9 +199,9 @@ Class Find extends Where implements FindInterface
      * @param string|null            $linked
      * @param DatabaseInterface|null $database
      *
-     * @return FindInterface
+     * @return Find
      */
-    public function link( string $field, array $with = [], array $without = [], string $linked = null, DatabaseInterface $database = null ): FindInterface
+    public function link( string $field, array $with = [], array $without = [], string $linked = null, DatabaseInterface $database = null ): Find
     {
         $link         = new Link( $database ?? $this->collection()
                                                     ->database(), $field );
@@ -209,15 +209,15 @@ Class Find extends Where implements FindInterface
                              ->without( $without )
                              ->setLinkedName( $linked );
 
-        return $this;
+        return self;
     }
 
     /**
      * @param mixed ...$fields
      *
-     * @return Find
+     * @return $this
      */
-    public function with( ...$fields ): FindInterface
+    public function with( ...$fields ): self
     {
         $fields = Arr::spreadArgs( $fields );
         foreach ( $fields as $field ) {
@@ -230,9 +230,9 @@ Class Find extends Where implements FindInterface
     /**
      * @param mixed ...$fields
      *
-     * @return Find
+     * @return $this
      */
-    public function without( ...$fields ): FindInterface
+    public function without( ...$fields ): self
     {
         $fields = Arr::spreadArgs( $fields );
         foreach ( $fields as $field ) {
@@ -246,9 +246,9 @@ Class Find extends Where implements FindInterface
      * @param string $field
      * @param int    $sort
      *
-     * @return FindInterface
+     * @return $this
      */
-    public function sort( string $field, int $sort = SORT_ASC ): FindInterface
+    public function sort( string $field, int $sort = SORT_ASC ): self
     {
         $this->sort[] = $field . ':' . ( SORT_ASC
                 ? 'asc'
@@ -260,9 +260,9 @@ Class Find extends Where implements FindInterface
     /**
      * @param int $skip
      *
-     * @return Find
+     * @return $this
      */
-    public function skip( int $skip ): FindInterface
+    public function skip( int $skip ): self
     {
         $this->skip = $skip;
 
@@ -272,9 +272,9 @@ Class Find extends Where implements FindInterface
     /**
      * @param int $limit
      *
-     * @return Find
+     * @return $this
      */
-    public function limit( int $limit ): FindInterface
+    public function limit( int $limit ): self
     {
         $this->limit = $limit;
 

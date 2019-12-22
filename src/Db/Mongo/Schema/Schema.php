@@ -2,9 +2,7 @@
 
 namespace Chukdo\Db\Mongo\Schema;
 
-use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\Contracts\Db\Schema as SchemaInterface;
-use Chukdo\Contracts\Db\Property as PropertyInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\DB\Mongo\Collection;
 use Chukdo\Json\Json;
@@ -68,9 +66,9 @@ class Schema implements SchemaInterface
     }
 
     /**
-     * @return CollectionInterface
+     * @return Collection
      */
-    public function collection(): CollectionInterface
+    public function collection(): Collection
     {
         return $this->collection;
     }
@@ -78,9 +76,9 @@ class Schema implements SchemaInterface
     /**
      * @param string $name
      *
-     * @return PropertyInterface|null
+     * @return Property|null
      */
-    public function get( string $name ): ?PropertyInterface
+    public function get( string $name ): ?Property
     {
         return $this->property()
                     ->get( $name );
@@ -89,7 +87,7 @@ class Schema implements SchemaInterface
     /**
      * @return Property
      */
-    public function property(): PropertyInterface
+    public function property(): Property
     {
         return $this->property;
     }
@@ -97,9 +95,9 @@ class Schema implements SchemaInterface
     /**
      * @param string $name
      *
-     * @return SchemaInterface
+     * @return $this
      */
-    public function unset( string $name ): SchemaInterface
+    public function unset( string $name ): self
     {
         $this->property()
              ->unset( $name );
@@ -110,9 +108,9 @@ class Schema implements SchemaInterface
     /**
      * @param array $properties
      *
-     * @return SchemaInterface
+     * @return $this
      */
-    public function setAll( array $properties ): SchemaInterface
+    public function setAll( array $properties ): self
     {
         $this->property()
              ->setAll( $properties );
@@ -125,9 +123,9 @@ class Schema implements SchemaInterface
      * @param null   $type
      * @param array  $options
      *
-     * @return SchemaInterface
+     * @return $this
      */
-    public function set( string $name, $type = null, array $options = [] ): SchemaInterface
+    public function set( string $name, $type = null, array $options = [] ): self
     {
         $this->property()
              ->set( $name, $type, $options );
@@ -136,9 +134,9 @@ class Schema implements SchemaInterface
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function properties(): JsonInterface
+    public function properties(): Json
     {
         return $this->property()
                     ->properties();

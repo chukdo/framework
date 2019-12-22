@@ -7,7 +7,6 @@ use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Iterate;
 use Chukdo\Json\Json;
-use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
  * Server Schema properties.
@@ -63,9 +62,9 @@ class Property implements PropertyInterface
     /**
      * @param array $value
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function setProperties( array $value ): PropertyInterface
+    public function setProperties( array $value ): Property
     {
         $properties = $this->property->offsetGetOrSet( 'properties' );
         foreach ( $value as $k => $v ) {
@@ -81,9 +80,9 @@ class Property implements PropertyInterface
      *
      * @param string $value
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function setType( $value ): PropertyInterface
+    public function setType( $value ): Property
     {
         /** Intercompatiblité propriété Mongo|Elastic */
         if ( $value === 'string' ) {
@@ -98,9 +97,9 @@ class Property implements PropertyInterface
      * https://www.elastic.co/guide/en/elasticsearch/reference/current/copy-to.html
      * @param string $value
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function setCopyTo( $value ): PropertyInterface
+    public function setCopyTo( $value ): Property
     {
         $this->property->offsetSet( 'copy_to', (array)$value );
 
@@ -111,9 +110,9 @@ class Property implements PropertyInterface
      * https://www.elastic.co/guide/en/elasticsearch/reference/current/analyzer.html
      * @param string $value
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function setAnalyser( string $value ): PropertyInterface
+    public function setAnalyser( string $value ): Property
     {
         $this->property->offsetSet( 'analyser', $value );
 
@@ -124,9 +123,9 @@ class Property implements PropertyInterface
      * https://www.elastic.co/guide/en/elasticsearch/reference/current/multi-fields.html
      * @param array $value
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function setFields( array $value ): PropertyInterface
+    public function setFields( array $value ): Property
     {
         $properties = $this->property->offsetGetOrSet( 'fields' );
         foreach ( $value as $k => $v ) {
@@ -139,9 +138,9 @@ class Property implements PropertyInterface
     /**
      * @param string $name
      *
-     * @return PropertyInterface|null
+     * @return Property|null
      */
-    public function get( string $name ): ?PropertyInterface
+    public function get( string $name ): ?Property
     {
         if ( Str::notContain( $name, '.' ) ) {
             return $this->properties()
@@ -153,7 +152,7 @@ class Property implements PropertyInterface
         $endPath   = $arr->join( '.' );
         $get       = $this->properties()
                           ->offsetGet( $firstPath );
-        if ( $get instanceof PropertyInterface ) {
+        if ( $get instanceof self ) {
             return $get->get( $endPath );
         }
 
@@ -161,9 +160,9 @@ class Property implements PropertyInterface
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function properties(): JsonInterface
+    public function properties(): Json
     {
         return $this->property->offsetGetOrSet( 'properties' );
     }
@@ -171,9 +170,9 @@ class Property implements PropertyInterface
     /**
      * @param array $properties
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function setAll( array $properties ): PropertyInterface
+    public function setAll( array $properties ): Property
     {
         foreach ( $properties as $name => $type ) {
             $this->set( $name, $type );
@@ -187,9 +186,9 @@ class Property implements PropertyInterface
      * @param null   $type
      * @param array  $options
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function set( string $name, $type = null, array $options = [] ): PropertyInterface
+    public function set( string $name, $type = null, array $options = [] ): Property
     {
         $property = new Property( $options, $name );
         if ( Is::string( $type ) ) {
@@ -237,9 +236,9 @@ class Property implements PropertyInterface
     /**
      * @param string $name
      *
-     * @return PropertyInterface
+     * @return Property
      */
-    public function unset( string $name ): PropertyInterface
+    public function unset( string $name ): Property
     {
         $this->properties()
              ->offsetUnset( $name );
@@ -256,9 +255,9 @@ class Property implements PropertyInterface
     }
 
     /**
-     * @return PropertyInterface|null
+     * @return Property|null
      */
-    public function fields(): ?PropertyInterface
+    public function fields(): ?Property
     {
         return $this->property->offsetGet( 'fields' );
     }

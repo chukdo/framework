@@ -21,9 +21,9 @@ class Conf extends Json
     /**
      * @param string $dir
      *
-     * @return JsonInterface
+     * @return $this
      */
-    public function loadDir( string $dir ): JsonInterface
+    public function loadDir( string $dir ): self
     {
         $storage = new Storage();
         $files   = $storage->files( $dir, '/\.json$/' );
@@ -44,9 +44,9 @@ class Conf extends Json
     /**
      * @param string $file
      *
-     * @return JsonInterface
+     * @return $this
      */
-    public function loadFile( string $file ): JsonInterface
+    public function loadFile( string $file ): self
     {
         $storage = new Storage();
 
@@ -56,6 +56,7 @@ class Conf extends Json
 
             return $this;
         }
+
         throw new AppException( sprintf( 'Conf file [%s] no exist', $file ) );
     }
 
@@ -64,9 +65,9 @@ class Conf extends Json
      * @param string|null $env
      * @param string|null $channel
      *
-     * @return JsonInterface
+     * @return $this
      */
-    public function loadDefault( string $path, string $env = null, string $channel = null ): JsonInterface
+    public function loadDefault( string $path, string $env = null, string $channel = null ): self
     {
         $path    = rtrim( $path, '/' ) . '/';
         $env     = trim( $env, '/' );

@@ -2,7 +2,6 @@
 
 namespace Chukdo\Jwt;
 
-use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Json\Json;
 use Chukdo\Helper\Arr;
 use Chukdo\Helper\To;
@@ -239,17 +238,17 @@ class Parser
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function header(): JsonInterface
+    public function header(): Json
     {
         return new Json( $this->header );
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function payload(): JsonInterface
+    public function payload(): Json
     {
         return new Json( $this->payload );
     }

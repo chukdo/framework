@@ -5,10 +5,7 @@ Namespace Chukdo\DB\Elastic;
 use Chukdo\Json\Json;
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
-use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Contracts\Db\Server as ServerInterface;
-use Chukdo\Contracts\Db\Database as DatabaseInterface;
-use Chukdo\Contracts\Db\Collection as CollectionInterface;
 
 /**
  * Server Server.
@@ -58,9 +55,9 @@ Class Server implements ServerInterface
      * @param array       $args
      * @param string|null $db
      *
-     * @return JsonInterface
+     * @return Json
      */
-    public function command( array $args, string $db = null ): JsonInterface
+    public function command( array $args, string $db = null ): Json
     {
         throw new ElasticException( 'elasticsearch Command no exist' );
     }
@@ -91,9 +88,9 @@ Class Server implements ServerInterface
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function databases(): JsonInterface
+    public function databases(): Json
     {
         $databases = new Json();
         foreach ( $this->client()
@@ -115,9 +112,9 @@ Class Server implements ServerInterface
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function status(): JsonInterface
+    public function status(): Json
     {
         return new Json( $this->client()
                               ->info() );
@@ -129,7 +126,7 @@ Class Server implements ServerInterface
      *
      * @return Collection
      */
-    public function collection( string $collection, string $database = null ): CollectionInterface
+    public function collection( string $collection, string $database = null ): Collection
     {
         return $this->database( $database )
                     ->collection( $collection );
@@ -140,7 +137,7 @@ Class Server implements ServerInterface
      *
      * @return Database
      */
-    public function database( string $database = null ): DatabaseInterface
+    public function database( string $database = null ): Database
     {
         return new Database( $this, $database ?? $this->database );
     }

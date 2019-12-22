@@ -2,7 +2,6 @@
 
 namespace Chukdo\Db\Mongo;
 
-use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\Db\Record\Record;
 use Chukdo\Contracts\Db\Write as WriteInterface;
 use Chukdo\Db\Mongo\Schema\Validator;
@@ -12,7 +11,6 @@ use Chukdo\Json\Json;
 use MongoDB\BSON\Regex;
 use MongoDB\Driver\Session as MongoSession;
 use MongoDB\Operation\FindOneAndUpdate;
-use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
  * Server Write.
@@ -111,9 +109,9 @@ Class Write extends Where implements WriteInterface
     }
 
     /**
-     * @return CollectionInterface|Collection
+     * @return Collection
      */
-    public function collection(): CollectionInterface
+    public function collection(): Collection
     {
         return $this->collection;
     }
@@ -186,9 +184,9 @@ Class Write extends Where implements WriteInterface
     /**
      * @param iterable $values
      *
-     * @return WriteInterface
+     * @return $this
      */
-    public function setAll( iterable $values ): WriteInterface
+    public function setAll( iterable $values ): self
     {
         foreach ( $values as $field => $value ) {
             $this->set( $field, $value );
@@ -201,9 +199,9 @@ Class Write extends Where implements WriteInterface
      * @param string $field
      * @param        $value
      *
-     * @return WriteInterface
+     * @return $this
      */
-    public function set( string $field, $value ): WriteInterface
+    public function set( string $field, $value ): self
     {
         return $this->field( 'set', $field, $value );
     }
@@ -213,9 +211,9 @@ Class Write extends Where implements WriteInterface
      * @param string $field
      * @param        $value
      *
-     * @return WriteInterface
+     * @return $this
      */
-    protected function field( string $keyword, string $field, $value ): WriteInterface
+    protected function field( string $keyword, string $field, $value ): self
     {
         $this->fields->offsetGetOrSet( '$' . $keyword )
                      ->offsetSet( $field, $this->filterValues( $field, $value ) );
@@ -292,9 +290,9 @@ Class Write extends Where implements WriteInterface
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function fields(): JsonInterface
+    public function fields(): Json
     {
         return $this->fields;
     }
@@ -345,9 +343,9 @@ Class Write extends Where implements WriteInterface
      * @param string $field
      * @param        $value
      *
-     * @return WriteInterface
+     * @return $this
      */
-    public function addToSet( string $field, $value ): WriteInterface
+    public function addToSet( string $field, $value ): self
     {
         return $this->field( 'addToSet', $field, $value );
     }
@@ -356,9 +354,9 @@ Class Write extends Where implements WriteInterface
      * @param string $field
      * @param        $value
      *
-     * @return WriteInterface
+     * @return $this
      */
-    public function pull( string $field, $value ): WriteInterface
+    public function pull( string $field, $value ): self
     {
         return $this->field( 'pull', $field, $value );
     }
@@ -367,9 +365,9 @@ Class Write extends Where implements WriteInterface
      * @param string $field
      * @param        $value
      *
-     * @return WriteInterface
+     * @return $this
      */
-    public function push( string $field, $value ): WriteInterface
+    public function push( string $field, $value ): self
     {
         return $this->field( 'push', $field, $value );
     }
@@ -378,9 +376,9 @@ Class Write extends Where implements WriteInterface
      * @param string $field
      * @param int    $value
      *
-     * @return WriteInterface
+     * @return $this
      */
-    public function inc( string $field, int $value ): WriteInterface
+    public function inc( string $field, int $value ): self
     {
         return $this->field( 'inc', $field, $value );
     }
@@ -388,9 +386,9 @@ Class Write extends Where implements WriteInterface
     /**
      * @param string $field
      *
-     * @return WriteInterface
+     * @return $this
      */
-    public function unset( string $field ): WriteInterface
+    public function unset( string $field ): self
     {
         return $this->field( 'unset', $field, '' );
     }
@@ -401,9 +399,9 @@ Class Write extends Where implements WriteInterface
      * @param        $value
      * @param null   $value2
      *
-     * @return WriteInterface
+     * @return $this
      */
-    public function pullAll( string $field, string $operator, $value, $value2 = null ): WriteInterface
+    public function pullAll( string $field, string $operator, $value, $value2 = null ): self
     {
         switch ( $operator ) {
             case '=' :
@@ -454,9 +452,9 @@ Class Write extends Where implements WriteInterface
     }
 
     /**
-     * @return WriteInterface
+     * @return $this
      */
-    public function commitTransaction(): WriteInterface
+    public function commitTransaction(): self
     {
         $this->session()
              ->commitTransaction();
@@ -465,9 +463,9 @@ Class Write extends Where implements WriteInterface
     }
 
     /**
-     * @return WriteInterface
+     * @return $this
      */
-    public function abortTransaction(): WriteInterface
+    public function abortTransaction(): self
     {
         $this->session()
              ->abortTransaction();
@@ -476,9 +474,9 @@ Class Write extends Where implements WriteInterface
     }
 
     /**
-     * @return WriteInterface
+     * @return $this
      */
-    public function bypassValidation(): WriteInterface
+    public function bypassValidation(): self
     {
         $this->options[ 'bypassDocumentValidation' ] = true;
 
@@ -488,9 +486,9 @@ Class Write extends Where implements WriteInterface
     /**
      * @param string $field
      *
-     * @return WriteInterface
+     * @return $this
      */
-    public function pop( string $field ): WriteInterface
+    public function pop( string $field ): self
     {
         return $this->field( 'pop', $field, 1 );
     }
@@ -498,9 +496,9 @@ Class Write extends Where implements WriteInterface
     /**
      * @param string $field
      *
-     * @return WriteInterface
+     * @return $this
      */
-    public function shift( string $field ): WriteInterface
+    public function shift( string $field ): self
     {
         return $this->field( 'pop', $field, -1 );
     }
@@ -509,9 +507,9 @@ Class Write extends Where implements WriteInterface
      * @param string $field
      * @param array  $values
      *
-     * @return WriteInterface
+     * @return $this
      */
-    public function addToSetAll( string $field, array $values ): WriteInterface
+    public function addToSetAll( string $field, array $values ): self
     {
         return $this->field( 'addToSet', $field, [ '$each' => $values, ] );
     }
@@ -524,9 +522,9 @@ Class Write extends Where implements WriteInterface
      * @param string|null $orderby
      * @param int         $sort
      *
-     * @return WriteInterface
+     * @return $this
      */
-    public function pushAll( string $field, array $values, int $position = null, int $slice = null, string $orderby = null, int $sort = SORT_ASC ): WriteInterface
+    public function pushAll( string $field, array $values, int $position = null, int $slice = null, string $orderby = null, int $sort = SORT_ASC ): self
     {
         $value = [ '$each' => $values, ];
         if ( $position !== null ) {
@@ -548,9 +546,9 @@ Class Write extends Where implements WriteInterface
      * @param string $field
      * @param        $value
      *
-     * @return WriteInterface
+     * @return $this
      */
-    public function setOnInsert( string $field, $value ): WriteInterface
+    public function setOnInsert( string $field, $value ): self
     {
         return $this->field( 'setOnInsert', $field, $value );
     }
@@ -559,9 +557,9 @@ Class Write extends Where implements WriteInterface
      * @param string $field
      * @param        $value
      *
-     * @return WriteInterface
+     * @return $this
      */
-    public function min( string $field, $value ): WriteInterface
+    public function min( string $field, $value ): self
     {
         return $this->field( 'min', $field, $value );
     }
@@ -570,9 +568,9 @@ Class Write extends Where implements WriteInterface
      * @param string $field
      * @param        $value
      *
-     * @return WriteInterface
+     * @return $this
      */
-    public function max( string $field, $value ): WriteInterface
+    public function max( string $field, $value ): self
     {
         return $this->field( 'max', $field, $value );
     }
@@ -581,9 +579,9 @@ Class Write extends Where implements WriteInterface
      * @param string $field
      * @param int    $value
      *
-     * @return WriteInterface
+     * @return $this
      */
-    public function mul( string $field, int $value ): WriteInterface
+    public function mul( string $field, int $value ): self
     {
         return $this->field( 'mul', $field, $value );
     }
@@ -592,17 +590,17 @@ Class Write extends Where implements WriteInterface
      * @param string $oldName
      * @param string $newName
      *
-     * @return WriteInterface
+     * @return $this
      */
-    public function rename( string $oldName, string $newName ): WriteInterface
+    public function rename( string $oldName, string $newName ): self
     {
         return $this->field( 'rename', $oldName, $newName );
     }
 
     /**
-     * @return WriteInterface
+     * @return $this
      */
-    public function resetFields(): WriteInterface
+    public function resetFields(): self
     {
         $this->fields = new Json();
 
@@ -610,9 +608,9 @@ Class Write extends Where implements WriteInterface
     }
 
     /**
-     * @return WriteInterface
+     * @return $this
      */
-    public function resetWhere(): WriteInterface
+    public function resetWhere(): self
     {
         $this->where   = [];
         $this->orWhere = [];

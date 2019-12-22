@@ -5,10 +5,7 @@ Namespace Chukdo\DB\Elastic;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
 use Elasticsearch\Client;
-use Chukdo\Contracts\Json\Json as JsonInterface;
-use Chukdo\Contracts\Db\Server as ServerInterface;
 use Chukdo\Contracts\Db\Database as DatabaseInterface;
-use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Throwable;
 
 /**
@@ -34,7 +31,7 @@ Class Database implements DatabaseInterface
     /**
      * @var string|null
      */
-    protected ?string $database = null;
+    protected ?string $database;
 
     /**
      * Database constructor.
@@ -50,9 +47,9 @@ Class Database implements DatabaseInterface
     }
 
     /**
-     * @return ServerInterface
+     * @return Server
      */
-    public function server(): ServerInterface
+    public function server(): Server
     {
         return $this->server;
     }
@@ -72,9 +69,9 @@ Class Database implements DatabaseInterface
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function collections(): JsonInterface
+    public function collections(): Json
     {
         $list    = new Json();
         $indices = $this->client()
@@ -108,9 +105,9 @@ Class Database implements DatabaseInterface
     /**
      * @param string $collection
      *
-     * @return CollectionInterface
+     * @return Collection
      */
-    public function collection( string $collection ): CollectionInterface
+    public function collection( string $collection ): Collection
     {
         return new Collection( $this, $collection );
     }
@@ -118,9 +115,9 @@ Class Database implements DatabaseInterface
     /**
      * @param string $collection
      *
-     * @return CollectionInterface
+     * @return Collection
      */
-    public function createCollection( string $collection ): CollectionInterface
+    public function createCollection( string $collection ): Collection
     {
         if ( !$this->collectionExist( $collection ) ) {
             $this->client()
@@ -150,9 +147,9 @@ Class Database implements DatabaseInterface
     /**
      * @param string $collection
      *
-     * @return DatabaseInterface
+     * @return $this
      */
-    public function dropCollection( string $collection ): DatabaseInterface
+    public function dropCollection( string $collection ): self
     {
         try {
             $this->client()
@@ -175,16 +172,16 @@ Class Database implements DatabaseInterface
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function info(): JsonInterface
+    public function info(): Json
     {
         $info  = new Json();
         $stats = new Json( $this->client()
                                 ->indices()
                                 ->stats( [ 'index' => '*' ] ) );
         foreach ( $stats->offsetGet( 'indices' ) as $key => $indice ) {
-            if ( $indice instanceof JsonInterface && Str::startWith( $key, $this->name() ) ) {
+            if ( $indice instanceof Json && Str::startWith( $key, $this->name() ) ) {
                 $info->offsetSet( $key, $indice->offsetGet( 'total' ) );
             }
         }

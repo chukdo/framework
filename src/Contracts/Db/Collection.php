@@ -2,7 +2,7 @@
 
 namespace Chukdo\Contracts\Db;
 
-use Chukdo\Contracts\Json\Json as JsonInterface;
+use Chukdo\Json\Json;
 use Chukdo\Db\Record\Record;
 
 /**
@@ -42,9 +42,9 @@ interface Collection
     public function name(): string;
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function info(): JsonInterface;
+    public function info(): Json;
 
     /**
      * @return Database

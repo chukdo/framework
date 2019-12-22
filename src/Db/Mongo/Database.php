@@ -4,10 +4,7 @@ Namespace Chukdo\DB\Mongo;
 
 use Chukdo\Json\Json;
 use MongoDB\Database as MongoDbDatabase;
-use Chukdo\Contracts\Json\Json as JsonInterface;
-use Chukdo\Contracts\Db\Server as ServerInterface;
 use Chukdo\Contracts\Db\Database as DatabaseInterface;
-use Chukdo\Contracts\Db\Collection as CollectionInterface;
 
 /**
  * Server Server Database.
@@ -52,9 +49,9 @@ Class Database implements DatabaseInterface
     }
 
     /**
-     * @return ServerInterface
+     * @return Server
      */
-    public function server(): ServerInterface
+    public function server(): Server
     {
         return $this->server;
     }
@@ -79,9 +76,9 @@ Class Database implements DatabaseInterface
     /**
      * @param string $collection
      *
-     * @return DatabaseInterface
+     * @return Database
      */
-    public function dropCollection( string $collection ): DatabaseInterface
+    public function dropCollection( string $collection ): Database
     {
         $this->client()
              ->dropCollection( $collection );
@@ -92,9 +89,9 @@ Class Database implements DatabaseInterface
     /**
      * @param string $collection
      *
-     * @return CollectionInterface
+     * @return Collection
      */
-    public function createCollection( string $collection ): CollectionInterface
+    public function createCollection( string $collection ): Collection
     {
         if ( !$this->collectionExist( $collection ) ) {
             $this->client()
@@ -116,9 +113,9 @@ Class Database implements DatabaseInterface
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function collections(): JsonInterface
+    public function collections(): Json
     {
         $list = new Json();
         foreach ( $this->client()
@@ -132,9 +129,9 @@ Class Database implements DatabaseInterface
     /**
      * @param string $collection
      *
-     * @return CollectionInterface
+     * @return Collection
      */
-    public function collection( string $collection ): CollectionInterface
+    public function collection( string $collection ): Collection
     {
         return new Collection( $this, $collection );
     }
@@ -151,9 +148,9 @@ Class Database implements DatabaseInterface
     }
 
     /**
-     * @return JsonInterface
+     * @return Json
      */
-    public function info(): JsonInterface
+    public function info(): Json
     {
         return $this->server()
                     ->command( [ 'dbStats' => 1 ], $this->name() )
