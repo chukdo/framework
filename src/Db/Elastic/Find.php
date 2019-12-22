@@ -7,7 +7,6 @@ use Chukdo\Helper\Arr;
 use Chukdo\Json\Json;
 use Chukdo\Contracts\Db\Database as DatabaseInterface;
 use Chukdo\Contracts\Db\Find as FindInterface;
-use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Db\Record\RecordList;
 use Chukdo\Db\Record\Record;
 

@@ -3,7 +3,6 @@
 namespace Chukdo\Db\Mongo;
 
 use Chukdo\Json\Json;
-use Chukdo\Contracts\Json\Json as JsonInterface;
 use Exception;
 
 Class Index

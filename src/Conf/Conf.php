@@ -4,7 +4,6 @@ namespace Chukdo\Conf;
 
 use Throwable;
 use Chukdo\Bootstrap\AppException;
-use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Json\Json;
 use Chukdo\Storage\Storage;
 

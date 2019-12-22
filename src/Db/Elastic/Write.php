@@ -3,7 +3,6 @@
 namespace Chukdo\Db\Elastic;
 
 use Chukdo\Contracts\Db\Write as WriteInterface;
-use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\DB\Record\Record;
 use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
@@ -235,7 +234,7 @@ Class Write extends Where implements WriteInterface
                 }
                 $hydrate                       = $this->hydrateUpdateFields( $type, $key, $value );
                 $source                        .= $hydrate[ 'source' ];
-                $params[ $hydrate[ 'param' ] ] = $value instanceof JsonInterface
+                $params[ $hydrate[ 'param' ] ] = $value instanceof Json
                     ? $value->toArray()
                     : $value;
             }

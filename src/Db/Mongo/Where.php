@@ -2,10 +2,6 @@
 
 namespace Chukdo\Db\Mongo;
 
-use MongoDB\BSON\Regex;
-use Chukdo\Contracts\Db\Find as FindInterface;
-use Chukdo\Contracts\Db\Write as WriteInterface;
-
 /**
  * Class Where.
  *
@@ -34,7 +30,7 @@ Abstract Class Where
      * @param null   $value
      * @param null   $value2
      *
-     * @return FindInterface|WriteInterface|object
+     * @return Find|Write|object
      */
     public function where( string $field, string $operator, $value = null, $value2 = null )
     {
@@ -49,7 +45,7 @@ Abstract Class Where
      * @param null   $value
      * @param null   $value2
      *
-     * @return FindInterface|WriteInterface|object
+     * @return Find|Write|object
      */
     public function orWhere( string $field, string $operator, $value = null, $value2 = null )
     {

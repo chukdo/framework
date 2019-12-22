@@ -2,9 +2,6 @@
 
 namespace Chukdo\Db\Elastic;
 
-use Chukdo\Contracts\Db\Collection as CollectionInterface;
-use Chukdo\Contracts\Db\Find as FindInterface;
-use Chukdo\Contracts\Db\Write as WriteInterface;
 use Chukdo\Json\Json;
 
 /**
@@ -48,7 +45,7 @@ Abstract Class Where
     /**
      * @param array $where
      *
-     * @return FindInterface|WriteInterface|object
+     * @return Find|Write|object
      */
     public function importFilter( array $where )
     {
@@ -63,7 +60,7 @@ Abstract Class Where
      * @param null   $value
      * @param null   $value2
      *
-     * @return FindInterface|WriteInterface|object
+     * @return Find|Write|object
      */
     public function where( string $field, string $operator, $value = null, $value2 = null )
     {
@@ -159,7 +156,7 @@ Abstract Class Where
      * @param null   $value
      * @param null   $value2
      *
-     * @return FindInterface|WriteInterface|object
+     * @return Find|Write|object
      */
     public function orWhere( string $field, string $operator, $value = null, $value2 = null )
     {
@@ -205,9 +202,9 @@ Abstract Class Where
     }
 
     /**
-     * @return CollectionInterface|Collection
+     * @return Collection
      */
-    public function collection(): CollectionInterface
+    public function collection(): Collection
     {
         return $this->collection;
     }

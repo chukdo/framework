@@ -8,7 +8,6 @@ use Exception;
 use DateTime;
 use Chukdo\Json\Json;
 use Chukdo\Contracts\Db\Collection as CollectionInterface;
-use Chukdo\Contracts\Json\Json as JsonInterface;
 
 /**
  * Server Record.

@@ -3,8 +3,6 @@
 namespace Chukdo\Db\Mongo;
 
 use MongoDB\BSON\Regex;
-use Chukdo\Contracts\Db\Find as FindInterface;
-use Chukdo\Contracts\Db\Write as WriteInterface;
 
 /**
  * Trait TraitWhereOperation.
