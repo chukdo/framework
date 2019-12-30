@@ -102,7 +102,7 @@ class Rule
                                     'max'   => $attrs->get( 1, $attrs->get( 0, 10000 ) ), ];
                     break;
                 default:
-                    $this->rules[ $ruleName ] = (array)$attrs;
+                    $this->rules[ $ruleName ] = (array) $attrs;
             }
         }
     }
@@ -194,7 +194,8 @@ class Rule
             if ( !Str::contain( $this->path, '*' ) ) {
                 $path = $this->path . '.' . $path;
             }
-        } else {
+        }
+        else {
             $path = $this->path;
         }
         $this->validator->errors()
@@ -217,7 +218,8 @@ class Rule
                 }
 
                 $this->error( 'array' );
-            } else {
+            }
+            else {
                 $this->error( 'scalar' );
             }
 
@@ -250,7 +252,8 @@ class Rule
             $inputs = $input->filterRecursive( fn( $k, $v ) => $filter->filter( $v ) );
             $this->validator->inputs()
                             ->mergeRecursive( $inputs, true );
-        } else {
+        }
+        else {
             $this->validator->inputs()
                             ->set( $this->path, $filter->filter( $input ) );
         }
@@ -304,10 +307,12 @@ class Rule
             if ( $validate->validate( $v ) ) {
                 $this->validator->validated()
                                 ->set( $k, $v );
-            } elseif ( $this->isForm ) {
+            }
+            elseif ( $this->isForm ) {
                 $this->error( $name, $k );
                 $validated .= false;
-            } else {
+            }
+            else {
                 $this->error( $name );
                 $validated .= false;
                 break;
@@ -331,7 +336,8 @@ class Rule
         if ( $validate->validate( $input ) ) {
             $this->validator->validated()
                             ->set( $this->path, $input );
-        } else {
+        }
+        else {
             $this->error( $name );
             $validated .= false;
         }

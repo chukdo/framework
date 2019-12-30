@@ -11,7 +11,8 @@ class Contrat extends Record
     {
         if ( Is::arr( $ref ) ) {
             $this->offsetSet( 'reference', implode( '|', $ref ) );
-        } else {
+        }
+        else {
             $this->offsetSet( 'reference', $ref );
         }
     }

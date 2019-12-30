@@ -10,6 +10,6 @@ class Callback extends Controler
 {
     public function index( Input $inputs, Response $response ): Response
     {
-        return $response->content( 'TEST Controler: ' . (string)$inputs );
+        return $response->content( 'TEST Controler: ' . (string) $inputs );
     }
 }

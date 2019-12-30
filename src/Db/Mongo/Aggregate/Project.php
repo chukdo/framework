@@ -21,7 +21,7 @@ Class Project extends Stage
      */
     public function set( string $field, bool $visibility ): self
     {
-        $this->pipe[ $field ] = (int)$visibility;
+        $this->pipe[ $field ] = (int) $visibility;
 
         return $this;
     }

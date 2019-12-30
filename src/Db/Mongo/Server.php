@@ -85,7 +85,8 @@ Class Server implements ServerInterface
         try {
             return new Json( $this->client()
                                   ->executeCommand( $db ?? 'admin', new Command( $args ) ) );
-        } catch ( Exception $e ) {
+        }
+        catch ( Exception $e ) {
         }
 
         return new Json();

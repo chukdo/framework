@@ -46,7 +46,7 @@ abstract class AbstractHandler implements HandlerInterface
      */
     public function setLevels( $levels ): void
     {
-        $this->levels = (array)$levels;
+        $this->levels = (array) $levels;
     }
 
     /**

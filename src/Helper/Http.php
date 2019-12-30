@@ -1,6 +1,7 @@
 <?php
 
 namespace Chukdo\Helper;
+
 use Chukdo\Http\Url;
 
 /**
@@ -78,13 +79,13 @@ final class Http
     public static function browser( string $ua = null ): array
     {
         $browser          = [ 'platform' => null,
-                              'browser' => null,
-                              'mobile'  => null,
-                              'version' => null,
-                              'bot'     => null, ];
+                              'browser'  => null,
+                              'mobile'   => null,
+                              'version'  => null,
+                              'bot'      => null, ];
         $ua               = strtolower( $ua );
         $browser[ 'bot' ] = Str::match( '/baiduspider|googlebot|yandexbot|bingbot|lynx|wget|curl/', $ua );
-        $is = static function( $contain, $name = false ) use ( $ua, &$browser )
+        $is               = static function( $contain, $name = false ) use ( $ua, &$browser )
         {
             if ( Str::contain( $ua, $contain ) ) {
                 $browser[ 'browser' ] = $name
@@ -106,10 +107,12 @@ final class Http
         if ( Str::contain( $ua, 'windows' ) ) {
             $browser[ 'platform' ] = 'windows';
 
-        } elseif ( Str::contain( $ua, 'linux' ) ) {
+        }
+        elseif ( Str::contain( $ua, 'linux' ) ) {
             $browser[ 'platform' ] = 'linux';
 
-        } elseif ( Str::contain( $ua, 'mac' ) ) {
+        }
+        elseif ( Str::contain( $ua, 'mac' ) ) {
             $browser[ 'platform' ] = 'osx';
         }
 
@@ -117,7 +120,8 @@ final class Http
         if ( Str::contain( $ua, 'ipad' ) || Str::contain( $ua, 'iphone' ) ) {
             $browser[ 'mobile' ] = 'ios';
 
-        } elseif ( Str::contain( $ua, 'android' ) ) {
+        }
+        elseif ( Str::contain( $ua, 'android' ) ) {
             $browser[ 'mobile' ] = 'android';
         }
 

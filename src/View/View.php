@@ -142,7 +142,8 @@ class View
                 $r[ 'file' ]   = $this->folders[ $folder ] . '/' . $name . '.html';
                 $r[ 'exists' ] = file_exists( $r[ 'file' ] );
             }
-        } else {
+        }
+        else {
             $r[ 'name' ] = $folder;
             if ( $this->defaultFolder ) {
                 $r[ 'file' ]   = $this->defaultFolder . '/' . $folder . '.html';
@@ -163,8 +164,9 @@ class View
     {
         if ( $templates === null ) {
             $this->sharedData = $data;
-        } else {
-            foreach ( (array)$templates as $template ) {
+        }
+        else {
+            foreach ( (array) $templates as $template ) {
                 $this->sharedTemplateData[ $template ] = $data;
             }
         }
@@ -250,7 +252,7 @@ class View
      */
     public function renderToString( string $template, iterable $data = null ): string
     {
-        return (string)$this->make( $template, $data );
+        return (string) $this->make( $template, $data );
     }
 
     /**

@@ -216,7 +216,7 @@ class Logger implements LoggerInterface
     {
         $handle = 0;
         foreach ( $this->handlers as $handler ) {
-            $handle += (int)$handler->handle( $record );
+            $handle += (int) $handler->handle( $record );
         }
 
         return $handle > 0;

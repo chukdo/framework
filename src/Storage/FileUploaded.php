@@ -50,7 +50,8 @@ class FileUploaded
             $this->uploadedFile = $uploadedFiles[ $name ];
             $this->setMaxFileSize( $maxFileSize );
             $this->setAllowedMimeTypes( $allowedMimeTypes );
-        } else {
+        }
+        else {
             throw new FileUploadedException( sprintf( 'Uploaded file [%s] does not exist', $name ) );
         }
     }
@@ -67,7 +68,8 @@ class FileUploaded
                     foreach ( self::__normalizeUploadedFiles( $value ) as $nName => $nValue ) {
                         $uploadedFiles[ $name . '.' . $nName ][ $type ] = $nValue;
                     }
-                } else {
+                }
+                else {
                     $uploadedFiles[ $name ][ $type ] = $value;
                 }
             }
@@ -89,7 +91,8 @@ class FileUploaded
                 foreach ( self::__normalizeUploadedFiles( $v ) as $_k => $_v ) {
                     $uploadedFiles[ $k . '.' . $_k ] = $_v;
                 }
-            } else {
+            }
+            else {
                 $uploadedFiles[ $k ] = $v;
             }
         }
@@ -126,7 +129,7 @@ class FileUploaded
      */
     public function name(): string
     {
-        return (string)$this->uploadedFile[ 'name' ];
+        return (string) $this->uploadedFile[ 'name' ];
     }
 
     /**
@@ -142,7 +145,7 @@ class FileUploaded
      */
     public function error(): string
     {
-        return (string)$this->uploadedFile[ 'error' ];
+        return (string) $this->uploadedFile[ 'error' ];
     }
 
     /**
@@ -155,7 +158,8 @@ class FileUploaded
         if ( $this->isValid() ) {
             if ( move_uploaded_file( $this->path(), $path ) ) {
                 return true;
-            } else {
+            }
+            else {
                 throw new FileUploadedException( sprintf( 'Can\'t store uploaded file [%s] to [%s]', $this->name, $path ) );
             }
         }
@@ -187,7 +191,7 @@ class FileUploaded
      */
     public function size(): int
     {
-        return (int)$this->uploadedFile[ 'size' ];
+        return (int) $this->uploadedFile[ 'size' ];
     }
 
     /**
@@ -213,7 +217,7 @@ class FileUploaded
      */
     public function mimeType(): string
     {
-        return (string)$this->uploadedFile[ 'type' ];
+        return (string) $this->uploadedFile[ 'type' ];
     }
 
     /**
@@ -221,6 +225,6 @@ class FileUploaded
      */
     public function path(): string
     {
-        return (string)$this->uploadedFile[ 'tmp_name' ];
+        return (string) $this->uploadedFile[ 'tmp_name' ];
     }
 }

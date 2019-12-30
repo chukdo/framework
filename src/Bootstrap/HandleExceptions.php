@@ -93,7 +93,8 @@ class HandleExceptions
         $exceptionHandler = $this->getExceptionHandler();
         try {
             $exceptionHandler->report( $e );
-        } catch ( Throwable $e ) {
+        }
+        catch ( Throwable $e ) {
         }
         $exceptionHandler->render( $e );
     }

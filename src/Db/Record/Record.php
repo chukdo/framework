@@ -110,7 +110,9 @@ Class Record extends Json
         /** Insert */
         if ( $this->id() === null ) {
             $this->insert();
-        } /** Update */ else {
+        }
+        /** Update */
+        else {
             $this->update();
         }
 

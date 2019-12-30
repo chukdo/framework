@@ -46,16 +46,19 @@ Class Expression
         $parsed = null;
         if ( $expression instanceof Expression ) {
             $parsed = $expression->projection();
-        } else {
+        }
+        else {
             if ( Is::arr( $expression ) ) {
                 $parsed = [];
                 foreach ( $expression as $key => $exp ) {
                     $parsed[ $key ] = self::parseExpression( $exp );
                 }
-            } else {
+            }
+            else {
                 if ( Is::string( $expression ) ) {
                     $parsed = '$' . $expression;
-                } else {
+                }
+                else {
                     $parsed = $expression;
                 }
             }

@@ -11,6 +11,6 @@ class Info extends Controler
     public function index( Input $inputs, Response $response ): Response
     {
         return $response->header( 'X-Info', 'ok' )
-                        ->content( 'Info Controler: ' . (string)$inputs );
+                        ->content( 'Info Controler: ' . (string) $inputs );
     }
 }

@@ -138,7 +138,8 @@ final class Arr
         foreach ( $array as &$value ) {
             if ( Is::arr( $value ) ) {
                 $value = self::filterRecursive( $value, $callback );
-            } else {
+            }
+            else {
                 $value = $callback( $value );
             }
         }
@@ -232,11 +233,13 @@ final class Arr
 
         if ( $get === null ) {
             self::set( $array, $path, [ $value ] );
-        } else {
+        }
+        else {
             if ( Is::arr( $get ) ) {
                 $get[] = $value;
                 self::set( $array, $path, $get );
-            } else {
+            }
+            else {
                 self::set( $array, $path, [ $get,
                                             $value, ] );
             }

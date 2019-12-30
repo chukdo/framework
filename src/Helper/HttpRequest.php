@@ -168,7 +168,7 @@ final class HttpRequest
      */
     public static function cookies(): array
     {
-        return (array)self::server( 'HTTP_COOKIE' );
+        return (array) self::server( 'HTTP_COOKIE' );
     }
 
     /**

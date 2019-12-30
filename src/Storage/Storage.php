@@ -39,7 +39,8 @@ class Storage
                 $full = $directory . '/' . $file;
                 if ( is_dir( $full ) ) {
                     $this->deleteDirectory( $full );
-                } else {
+                }
+                else {
                     $this->delete( $full );
                 }
             }
@@ -149,7 +150,7 @@ class Storage
      */
     public function put( string $file, string $content ): bool
     {
-        return (bool)file_put_contents( $file, $content );
+        return (bool) file_put_contents( $file, $content );
     }
 
     /**

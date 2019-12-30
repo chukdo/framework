@@ -38,7 +38,8 @@
     "ext-libxml": "*",
     "ext-gd": "*",
     "ext-fileinfo": "*",
-    "ext-mbstring": "*"
+    "ext-mbstring": "*",
+    "ext-curl": "*"
   },
   "autoload": {
     "psr-4": {

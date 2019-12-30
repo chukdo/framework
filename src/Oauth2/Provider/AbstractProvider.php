@@ -100,7 +100,14 @@ abstract Class AbstractProvider implements ProviderInterface
     public function getToken( string $grantType, array $options = [], string $method = 'POST' ): Json
     {
         $client = new Client();
-        $res    = $client->request( $method, $this->getTokenUrl( $grantType, $options ) );
+        $url    = $this->getTokenUrl( $grantType, $options );
+
+        if ( $method === 'POST' ) {
+            $res = $client->post( $url->buildUri(), $url->getInputs() );
+        }
+        else {
+            $res = $client->get( $url->buildUrl() );
+        }
 
         echo 'code: ' . $res->getStatusCode();
         var_dump( $res->getBody() );
@@ -115,9 +122,9 @@ abstract Class AbstractProvider implements ProviderInterface
      * @param string $grantType
      * @param array  $options
      *
-     * @return string
+     * @return Url
      */
-    protected function getTokenUrl( string $grantType, array $options = [] ): string
+    protected function getTokenUrl( string $grantType, array $options = [] ): Url
     {
         $url = new Url( $this->getUrlAccessToken(), [ 'client_id'     => $this->getClientId(),
                                                       'client_secret' => $this->getClientSecret() ] );
@@ -147,7 +154,7 @@ abstract Class AbstractProvider implements ProviderInterface
                 throw new Oauth2Exception( sprintf( 'Grant Type [%s] is unknow', $grantType ) );
         }
 
-        return $url->buildUrl();
+        return $url;
     }
 
     /**

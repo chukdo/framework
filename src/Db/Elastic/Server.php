@@ -107,8 +107,8 @@ Class Server implements ServerInterface
      */
     public function version(): string
     {
-        return (string)$this->status()
-                            ->get( 'version.number' );
+        return (string) $this->status()
+                             ->get( 'version.number' );
     }
 
     /**

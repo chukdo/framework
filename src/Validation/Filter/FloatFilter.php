@@ -47,7 +47,7 @@ class FloatFilter implements FilterInterface
             }
             $input = str_replace( ',', '.', $input );
 
-            return (float)$input;
+            return (float) $input;
         }
 
         return $input;

@@ -41,7 +41,7 @@ class Property implements PropertyInterface
         foreach ( $property as $key => $value ) {
             switch ( $key ) {
                 case 'properties' :
-                    $this->setProperties( (array)$value );
+                    $this->setProperties( (array) $value );
                     break;
                 case 'type' :
                     $this->setType( $value );
@@ -68,7 +68,7 @@ class Property implements PropertyInterface
     {
         $properties = $this->property->offsetGetOrSet( 'properties' );
         foreach ( $value as $k => $v ) {
-            $properties->offsetSet( $k, new Property( (array)$v, $k ) );
+            $properties->offsetSet( $k, new Property( (array) $v, $k ) );
         }
 
         return $this;
@@ -101,7 +101,7 @@ class Property implements PropertyInterface
      */
     public function setCopyTo( $value ): Property
     {
-        $this->property->offsetSet( 'copy_to', (array)$value );
+        $this->property->offsetSet( 'copy_to', (array) $value );
 
         return $this;
     }
@@ -129,7 +129,7 @@ class Property implements PropertyInterface
     {
         $properties = $this->property->offsetGetOrSet( 'fields' );
         foreach ( $value as $k => $v ) {
-            $properties->offsetSet( $k, new Property( (array)$v, $k ) );
+            $properties->offsetSet( $k, new Property( (array) $v, $k ) );
         }
 
         return $this;
@@ -193,7 +193,8 @@ class Property implements PropertyInterface
         $property = new Property( $options, $name );
         if ( Is::string( $type ) ) {
             $property->setType( $type );
-        } else {
+        }
+        else {
             if ( Is::arr( $type ) ) {
                 foreach ( $type as $k => $v ) {
                     $property->set( $k, $v );

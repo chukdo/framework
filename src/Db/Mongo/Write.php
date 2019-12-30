@@ -121,10 +121,10 @@ Class Write extends Where implements WriteInterface
      */
     public function delete(): int
     {
-        return (int)$this->collection()
-                         ->client()
-                         ->deleteMany( $this->filter(), $this->options() )
-                         ->getDeletedCount();
+        return (int) $this->collection()
+                          ->client()
+                          ->deleteMany( $this->filter(), $this->options() )
+                          ->getDeletedCount();
     }
 
     /**
@@ -140,10 +140,10 @@ Class Write extends Where implements WriteInterface
      */
     public function deleteOne(): bool
     {
-        return (bool)$this->collection()
-                          ->client()
-                          ->deleteOne( $this->filter(), $this->options() )
-                          ->getDeletedCount();
+        return (bool) $this->collection()
+                           ->client()
+                           ->deleteOne( $this->filter(), $this->options() )
+                           ->getDeletedCount();
     }
 
     /**
@@ -162,10 +162,10 @@ Class Write extends Where implements WriteInterface
      */
     public function insert(): string
     {
-        return (string)$this->collection()
-                            ->client()
-                            ->insertOne( $this->validatedInsertFields(), $this->options() )
-                            ->getInsertedId();
+        return (string) $this->collection()
+                             ->client()
+                             ->insertOne( $this->validatedInsertFields(), $this->options() )
+                             ->getInsertedId();
     }
 
     /**
@@ -235,7 +235,8 @@ Class Write extends Where implements WriteInterface
                 $values[ $k ] = $this->filterValues( $k, $v );
             }
             $value = $values;
-        } else {
+        }
+        else {
             $value = Collection::filterIn( $field, $value );
         }
 
@@ -247,10 +248,10 @@ Class Write extends Where implements WriteInterface
      */
     public function update(): int
     {
-        return (int)$this->collection()
-                         ->client()
-                         ->updateMany( $this->filter(), $this->validatedUpdateFields(), $this->options() )
-                         ->getModifiedCount();
+        return (int) $this->collection()
+                          ->client()
+                          ->updateMany( $this->filter(), $this->validatedUpdateFields(), $this->options() )
+                          ->getModifiedCount();
     }
 
     /**
@@ -274,14 +275,16 @@ Class Write extends Where implements WriteInterface
         if ( $push ) {
             if ( $each = $push->offsetGet( '$each' ) ) {
                 $push->offsetSet( '$each', $validator->validateDataToUpdate( $each ) );
-            } else {
+            }
+            else {
                 $fields->offsetSet( '$push', $validator->validateDataToUpdate( $push ) );
             }
         }
         if ( $addToSet ) {
             if ( $each = $addToSet->offsetGet( '$each' ) ) {
                 $addToSet->offsetSet( '$each', $validator->validateDataToUpdate( $each ) );
-            } else {
+            }
+            else {
                 $fields->offsetSet( '$addToSet', $validator->validateDataToUpdate( $addToSet ) );
             }
         }
@@ -304,10 +307,10 @@ Class Write extends Where implements WriteInterface
     {
         $options = Arr::merge( [ 'upsert' => true, ], $this->options() );
 
-        return (string)$this->collection()
-                            ->client()
-                            ->updateOne( $this->filter(), $this->validatedUpdateFields(), $options )
-                            ->getUpsertedId();
+        return (string) $this->collection()
+                             ->client()
+                             ->updateOne( $this->filter(), $this->validatedUpdateFields(), $options )
+                             ->getUpsertedId();
     }
 
     /**
@@ -315,10 +318,10 @@ Class Write extends Where implements WriteInterface
      */
     public function updateOne(): bool
     {
-        return (bool)$this->collection()
-                          ->client()
-                          ->updateOne( $this->filter(), $this->validatedUpdateFields(), $this->options() )
-                          ->getModifiedCount();
+        return (bool) $this->collection()
+                           ->client()
+                           ->updateOne( $this->filter(), $this->validatedUpdateFields(), $this->options() )
+                           ->getModifiedCount();
     }
 
     /**

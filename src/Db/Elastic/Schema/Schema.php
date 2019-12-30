@@ -102,7 +102,8 @@ class Schema implements SchemaInterface
                                  'body'  => [], ] );
 
             return true;
-        } catch ( Throwable $e ) {
+        }
+        catch ( Throwable $e ) {
             return false;
         }
     }

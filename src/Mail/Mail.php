@@ -359,10 +359,12 @@ class Mail
             if ( $this->text && $this->html ) {
                 $message .= $this->openMixedBoundary() . $this->messageAlternative();
 
-            } elseif ( $this->html ) {
+            }
+            elseif ( $this->html ) {
                 $message .= $this->openMixedBoundary() . $this->messageHtml();
 
-            } elseif ( $this->text ) {
+            }
+            elseif ( $this->text ) {
                 $message .= $this->openMixedBoundary() . $this->messageText();
             }
 
@@ -519,7 +521,8 @@ class Mail
 
             $message .= $this->closeRelatedBoundary();
 
-        } else {
+        }
+        else {
             $message .= $html;
         }
 
@@ -628,13 +631,16 @@ class Mail
         if ( count( $this->files ) ) {
             $headers .= $this->mime( 'mixed' );
 
-        } elseif ( $this->text && $this->html ) {
+        }
+        elseif ( $this->text && $this->html ) {
             $headers .= $this->mime( 'alternative' );
 
-        } elseif ( $this->html ) {
+        }
+        elseif ( $this->html ) {
             $headers .= $this->mime( 'html', $this->htmlEnc );
 
-        } elseif ( $this->text ) {
+        }
+        elseif ( $this->text ) {
             $headers .= $this->mime( 'text', $this->textEnc );
         }
 

@@ -217,10 +217,12 @@ class Header
         foreach ( explode( ', ', $this->getHeader( 'Cache-Control' ) ) as $value ) {
             if ( $value === 'must-revalidate' ) {
                 $cache->offsetSet( 'revalidate', true );
-            } else {
+            }
+            else {
                 if ( ( $age = Str::match( '/max-age=([0-9]+)/', $value ) ) !== false ) {
                     $cache->offsetSet( 'max', $age );
-                } else {
+                }
+                else {
                     $cache->offsetSet( 'control', $value );
                 }
             }
@@ -516,7 +518,7 @@ class Header
      */
     public function __unset( $key )
     {
-        return (bool)$this->header->offsetUnset( $key );
+        return (bool) $this->header->offsetUnset( $key );
     }
 
     /**
@@ -599,7 +601,8 @@ class Header
                         return $this->unsetHeader( $key );
                 }
                 /** Gestion des methodes AddFields || Get */
-            } else {
+            }
+            else {
                 switch ( $action ) {
                     case 'set':
                         return $this->setHeader( $key, $value );

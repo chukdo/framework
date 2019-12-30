@@ -155,7 +155,8 @@ Class Database implements DatabaseInterface
             $this->client()
                  ->indices()
                  ->delete( [ 'index' => $this->prefixName() . $collection ] );
-        } catch ( Throwable $e ) {
+        }
+        catch ( Throwable $e ) {
         }
 
         return $this;

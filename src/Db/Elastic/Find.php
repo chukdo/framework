@@ -64,7 +64,7 @@ Class Find extends Where implements FindInterface
                       ->client()
                       ->count( $this->projection() );
 
-        return (int)$count[ 'count' ];
+        return (int) $count[ 'count' ];
     }
 
     /**

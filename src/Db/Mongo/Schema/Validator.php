@@ -69,14 +69,16 @@ class Validator
                 if ( $get = $json->offsetGet( $key ) ) {
                     $validator = new Validator( $property );
                     $json->offsetSet( $key, $validator->validateType( $get, true ) );
-                } else {
+                }
+                else {
                     if ( $this->property->isRequired( $key ) ) {
                         throw new MongoException( sprintf( 'The field [%s] is required', $key ) );
                     }
                 }
             }
             /** Update */
-        } else {
+        }
+        else {
             foreach ( $json as $key => $value ) {
                 if ( $property = $this->property->get( $key ) ) {
                     $validator = new Validator( $property );
@@ -103,7 +105,8 @@ class Validator
             foreach ( $type as $i => $t ) {
                 try {
                     return $this->validateProperty( $t, $data, $insert );
-                } catch ( MongoException $e ) {
+                }
+                catch ( MongoException $e ) {
                     if ( $i === $count ) {
                         throw $e;
                     }
@@ -161,7 +164,8 @@ class Validator
 
                 if ( $enum ) {
                     $validatedData = $this->validateList( $data );
-                } else {
+                }
+                else {
                     throw new MongoException( sprintf( 'The field [%s] must be a valid type not [%s]', $this->property->name(), $this->property->type() ) );
                 }
         }
@@ -198,7 +202,7 @@ class Validator
             throw new MongoException( sprintf( 'The field [%s] must be a string', $this->property->name() ) );
         }
 
-        $data    = (string)$data;
+        $data    = (string) $data;
         $pattern = $this->property->pattern();
 
         if ( $pattern && !Str::match( '/' . $pattern . '/i', $data ) ) {
@@ -219,7 +223,7 @@ class Validator
             throw new MongoException( sprintf( 'The field [%s] must be a int', $this->property->name() ) );
         }
 
-        $data = (int)$data;
+        $data = (int) $data;
         $this->checkMin( $data );
         $this->checkMax( $data );
 
@@ -257,7 +261,7 @@ class Validator
             throw new MongoException( sprintf( 'The field [%s] must be a float', $this->property->name() ) );
         }
 
-        $data = (float)$data;
+        $data = (float) $data;
         $this->checkMin( $data );
         $this->checkMax( $data );
 
@@ -275,7 +279,7 @@ class Validator
             throw new MongoException( sprintf( 'The field [%s] must be a bool', $this->property->name() ) );
         }
 
-        $data = (bool)$data;
+        $data = (bool) $data;
 
         return $data;
     }
@@ -296,7 +300,7 @@ class Validator
         }
 
         if ( Is::scalar( $data ) ) {
-            return new UTCDateTime( (int)$data );
+            return new UTCDateTime( (int) $data );
         }
 
         throw new MongoException( sprintf( 'The field [%s] must be a date', $this->property->name() ) );
@@ -318,7 +322,7 @@ class Validator
         }
 
         if ( Is::scalar( $data ) ) {
-            return new Timestamp( (int)$data, 1 );
+            return new Timestamp( (int) $data, 1 );
         }
 
         throw new MongoException( sprintf( 'The field [%s] must be a timestamp', $this->property->name() ) );
@@ -363,7 +367,8 @@ class Validator
                     $data->offsetSet( $key, $validator->validateType( $value, true ) );
                 }
             }
-        } elseif ( $items = $this->property->items() ) {
+        }
+        elseif ( $items = $this->property->items() ) {
             $validator = new Validator( $items );
             $data      = $validator->validateType( $data, false );
         }

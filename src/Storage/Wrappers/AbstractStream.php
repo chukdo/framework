@@ -213,11 +213,13 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
         $size = $this->streamSize();
         if ( $new_size > $size ) {
             return $this->streamSetRange( $size, str_repeat( chr( 0 ), $new_size - $size ) );
-        } else {
+        }
+        else {
             if ( $new_size < $size ) {
                 if ( $new_size == 0 ) {
                     $this->streamSet( null );
-                } else {
+                }
+                else {
                     $this->streamSet( $this->streamGetRange( 0, $new_size ) );
                 }
                 if ( $this->getTell() > $new_size ) {
@@ -271,11 +273,12 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
                 break;
             case 'a':
             case 'a+':
-                if ( $tell = $this->streamSize() ) {
-                    $this->setTell( $tell );
-                } else {
-                    $this->streamSet( null );
-                }
+            if ( $tell = $this->streamSize() ) {
+                $this->setTell( $tell );
+            }
+            else {
+                $this->streamSet( null );
+            }
                 break;
             case 'x':
             case 'x+':
@@ -418,7 +421,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     {
         $this->setUrl( $path );
 
-        return (bool)$this->streamDelete();
+        return (bool) $this->streamDelete();
     }
 
     /**

@@ -53,12 +53,13 @@ class RedisStream extends AbstractStream
     public function initStream(): RedisInterface
     {
         $scheme = $this->getScheme();
-        $host   = (int)$this->getHost();
+        $host   = (int) $this->getHost();
         try {
             $stream = ServiceLocator::getInstance()
                                     ->getResource( $scheme );
             $stream->select( $host );
-        } catch ( Exception $e ) {
+        }
+        catch ( Exception $e ) {
             throw new StreamException( sprintf( '[%s] is not a registred resource', $scheme ), $e->getCode(), $e );
         }
         if ( !( $stream instanceof RedisInterface ) ) {
@@ -82,7 +83,8 @@ class RedisStream extends AbstractStream
         if ( $length > 0 ) {
             return $this->getStream()
                         ->getRange( $this->getPath(), $offset, --$length );
-        } else {
+        }
+        else {
             return null;
         }
     }
@@ -98,8 +100,8 @@ class RedisStream extends AbstractStream
      */
     public function streamSetRange( int $offset, string $content ): bool
     {
-        return (bool)$this->getStream()
-                          ->setRange( $this->getPath(), $offset, $content );
+        return (bool) $this->getStream()
+                           ->setRange( $this->getPath(), $offset, $content );
     }
 
     /**
@@ -112,8 +114,8 @@ class RedisStream extends AbstractStream
      */
     public function streamSet( ?string $content ): bool
     {
-        return (bool)$this->getStream()
-                          ->set( $this->getPath(), $content );
+        return (bool) $this->getStream()
+                           ->set( $this->getPath(), $content );
     }
 
     /**
@@ -126,8 +128,8 @@ class RedisStream extends AbstractStream
      */
     public function streamAppend( string $content ): bool
     {
-        return (bool)$this->getStream()
-                          ->append( $this->getPath(), $content );
+        return (bool) $this->getStream()
+                           ->append( $this->getPath(), $content );
     }
 
     /**
@@ -138,8 +140,8 @@ class RedisStream extends AbstractStream
      */
     public function streamExists(): bool
     {
-        return (bool)$this->getStream()
-                          ->exists( $this->getPath() );
+        return (bool) $this->getStream()
+                           ->exists( $this->getPath() );
     }
 
     /**
@@ -150,8 +152,8 @@ class RedisStream extends AbstractStream
      */
     public function streamSize(): int
     {
-        return (int)$this->getStream()
-                         ->strlen( $this->getPath() );
+        return (int) $this->getStream()
+                          ->strlen( $this->getPath() );
     }
 
     /**
@@ -162,8 +164,8 @@ class RedisStream extends AbstractStream
      */
     public function streamDelete(): bool
     {
-        return (bool)$this->getStream()
-                          ->del( $this->getPath() );
+        return (bool) $this->getStream()
+                           ->del( $this->getPath() );
     }
 
     /**
@@ -176,8 +178,8 @@ class RedisStream extends AbstractStream
      */
     public function streamRename( string $path ): bool
     {
-        if ( (bool)$this->getStream()
-                        ->rename( $this->getPath(), $path ) ) {
+        if ( (bool) $this->getStream()
+                         ->rename( $this->getPath(), $path ) ) {
             return true;
         }
 
@@ -246,7 +248,7 @@ class RedisStream extends AbstractStream
      */
     public function streamAccessTime( $time = false ): int
     {
-        return (int)$this->streamInfo( $this->getPath(), 'atime', $time
+        return (int) $this->streamInfo( $this->getPath(), 'atime', $time
             ? time()
             : null );
     }
@@ -285,7 +287,7 @@ class RedisStream extends AbstractStream
      */
     public function streamCreatedTime( $time = false ): int
     {
-        return (int)$this->streamInfo( $this->getPath(), 'ctime', $time
+        return (int) $this->streamInfo( $this->getPath(), 'ctime', $time
             ? time()
             : null );
     }
@@ -300,7 +302,7 @@ class RedisStream extends AbstractStream
      */
     public function streamModifiedTime( $time = false ): int
     {
-        return (int)$this->streamInfo( $this->getPath(), 'mtime', $time
+        return (int) $this->streamInfo( $this->getPath(), 'mtime', $time
             ? time()
             : null );
     }

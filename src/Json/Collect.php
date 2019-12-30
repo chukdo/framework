@@ -159,7 +159,8 @@ class Collect
             if ( $eval = $this->eval( $unwind ) ) {
                 if ( $this->hasGroup() ) {
                     $this->groupData( $eval );
-                } else {
+                }
+                else {
                     $this->appendData( $eval );
                 }
             }
@@ -299,7 +300,8 @@ class Collect
                 if ( !$closure( $get, $where[ 'value' ], $where[ 'value2' ] ) ) {
                     return null;
                 }
-            } else {
+            }
+            else {
                 return null;
             }
         }
@@ -358,12 +360,12 @@ class Collect
                     : null;
                 break;
             case 'in':
-                $closure = fn( $v, $value ) => Arr::in( $v, (array)$value )
+                $closure = fn( $v, $value ) => Arr::in( $v, (array) $value )
                     ? $v
                     : null;
                 break;
             case '!in':
-                $closure = fn( $v, $value ) => !Arr::in( $v, (array)$value )
+                $closure = fn( $v, $value ) => !Arr::in( $v, (array) $value )
                     ? $v
                     : null;
                 break;
@@ -378,7 +380,7 @@ class Collect
                     : null;
                 break;
             case 'size':
-                $closure = fn( $v, $value ) => count( (array)$v ) === $value
+                $closure = fn( $v, $value ) => count( (array) $v ) === $value
                     ? $v
                     : null;
                 break;
@@ -394,8 +396,8 @@ class Collect
                 $closure = static function( $v, $value )
                 {
                     $valid = false;
-                    foreach ( (array)$value as $valueItem ) {
-                        if ( Arr::in( $valueItem, (array)$v ) ) {
+                    foreach ( (array) $value as $valueItem ) {
+                        if ( Arr::in( $valueItem, (array) $v ) ) {
                             $valid = true;
                             break;
                         }
@@ -409,8 +411,8 @@ class Collect
             case 'all':
                 $closure = static function( $v, $value )
                 {
-                    foreach ( (array)$value as $valueItem ) {
-                        if ( !Arr::in( $valueItem, (array)$v ) ) {
+                    foreach ( (array) $value as $valueItem ) {
+                        if ( !Arr::in( $valueItem, (array) $v ) ) {
                             return null;
                         }
                     }
@@ -421,7 +423,8 @@ class Collect
             default :
                 if ( $operator instanceof Closure ) {
                     $closure = $operator;
-                } else {
+                }
+                else {
                     throw new JsonException( sprintf( "Unknown operator [%s]", $operator ) );
                 }
         }
@@ -442,7 +445,8 @@ class Collect
                 if ( !$closure( $get, Arr::get( $data, $where[ 'value' ] ), Arr::get( $data, $where[ 'value2' ] ) ) ) {
                     return null;
                 }
-            } else {
+            }
+            else {
                 return null;
             }
         }
@@ -525,7 +529,7 @@ class Collect
             $getField = count( $getField );
         }
 
-        if ( (int)$getField == $getField ) {
+        if ( (int) $getField == $getField ) {
             Arr::inc( $this->collection, $sumPath, $getField );
         }
 
@@ -541,7 +545,8 @@ class Collect
     {
         if ( $this->hasSum() ) {
             $this->sumData( $data );
-        } else {
+        }
+        else {
             $this->collection[] = $data;
         }
 

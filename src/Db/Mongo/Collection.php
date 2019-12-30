@@ -62,10 +62,10 @@ Class Collection implements CollectionInterface
     public static function filterOut( ?string $field, $value )
     {
         if ( $value instanceof ObjectId ) {
-            return (string)$value;
+            return (string) $value;
         }
         if ( $value instanceof Timestamp ) {
-            return ( new DateTime() )->setTimestamp( (int)(string)$value );
+            return ( new DateTime() )->setTimestamp( (int) (string) $value );
         }
         if ( $value instanceof UTCDateTime ) {
             return $value->toDateTime();
@@ -84,12 +84,14 @@ Class Collection implements CollectionInterface
     {
         if ( $field === '_id' && Is::string( $value ) ) {
             $value = new ObjectId( $value );
-        } else {
+        }
+        else {
             if ( $value instanceof DateTime ) {
                 $value = new UTCDateTime( $value->getTimestamp() * 1000 );
-            } else {
+            }
+            else {
                 if ( Str::contain( $field, 'date' ) && Is::scalar( $value ) ) {
-                    $value = new UTCDateTime( 1000 * (int)$value );
+                    $value = new UTCDateTime( 1000 * (int) $value );
                 }
             }
         }
@@ -118,7 +120,8 @@ Class Collection implements CollectionInterface
                 return $reflector->newInstanceArgs( [ $this,
                                                       $data, ] );
             }
-        } catch ( ReflectionException $e ) {
+        }
+        catch ( ReflectionException $e ) {
         }
 
         return new Record( $this, $data );
@@ -204,6 +207,7 @@ Class Collection implements CollectionInterface
         $name   = $this->name();
         $dbName = $this->database()
                        ->name();
+
         return $this->database()
                     ->server()
                     ->command( [ 'collStats' => $name ], $dbName )

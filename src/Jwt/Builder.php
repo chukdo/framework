@@ -109,7 +109,7 @@ class Builder
      *
      * @return $this
      */
-    public function audience( ... $url ): self
+    public function audience( ...$url ): self
     {
         if ( !isset( $this->claims[ 'aud' ] ) ) {
             $this->claims[ 'aud' ] = [];

@@ -94,7 +94,7 @@ class Smtp implements TransportInterface
 
         $this->log[] = 'S: ' . $s;
 
-        return (int)substr( $s, 0, 3 );
+        return (int) substr( $s, 0, 3 );
     }
 
     /**
@@ -120,12 +120,13 @@ class Smtp implements TransportInterface
             }
 
             if ( $c && $this->mailFrom( $from ) ) {
-                foreach ( (array)$to as $mail ) {
+                foreach ( (array) $to as $mail ) {
                     $this->mailTo( $mail );
                 }
 
                 if ( $r = $this->data( $message, $headers ) ) {
                     $this->quit();
+
                     return $r;
                 }
             }
@@ -189,10 +190,12 @@ class Smtp implements TransportInterface
         switch ( $mode ) {
             case 'PLAIN' :
                 $b64e = base64_encode( "\0" . $this->dsn[ 'user' ] . "\0" . $this->dsn[ 'pass' ] );
+
                 return ( $this->write( 'AUTH PLAIN' ) === 334 ) && $this->write( $b64e ) === 235;
             case 'LOGIN' :
                 $b64u = base64_encode( $this->dsn[ 'user' ] );
                 $b64p = base64_encode( $this->dsn[ 'pass' ] );
+
                 return ( $this->write( 'AUTH LOGIN' ) === 334 ) && ( $this->write( $b64u ) === 334 ) && $this->write( $b64p ) === 235;
             default :
                 return false;

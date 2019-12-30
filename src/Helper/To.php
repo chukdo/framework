@@ -29,20 +29,20 @@ final class To
     {
         switch ( $type ) {
             case 'boolean':
-                return (bool)$value;
+                return (bool) $value;
                 break;
             case 'integer':
-                return (int)$value;
+                return (int) $value;
                 break;
             case 'double':
-                return (float)$value;
+                return (float) $value;
                 break;
             case 'array':
-                return (array)$value;
+                return (array) $value;
                 break;
             case 'string':
             default:
-                return (string)$value;
+            return (string) $value;
         }
     }
 
@@ -85,7 +85,7 @@ final class To
      */
     public static function utf8( string $value ): string
     {
-        $value = (string)$value;
+        $value = (string) $value;
         if ( ( $value !== false ) && !mb_check_encoding( $value, 'UTF-8' ) ) {
             $value = mb_convert_encoding( $value, 'UTF-8' );
         }
@@ -134,7 +134,7 @@ final class To
      */
     public static function int( $value ): int
     {
-        return (int)self::scalar( $value );
+        return (int) self::scalar( $value );
     }
 
     /**
@@ -147,16 +147,19 @@ final class To
         $scalar = '';
         if ( Is::scalar( $value ) ) {
             $scalar = $value;
-        } else {
+        }
+        else {
             if ( Is::object( $value, '__toString' ) ) {
                 $scalar = $value->__toString();
-            } else {
+            }
+            else {
                 if ( Is::traversable( $value ) ) {
                     foreach ( $value as $v ) {
                         $scalar .= self::scalar( $v ) . ' ';
                     }
-                } else {
-                    $scalar = (string)$value;
+                }
+                else {
+                    $scalar = (string) $value;
                 }
             }
         }
@@ -176,7 +179,7 @@ final class To
             $value = str_replace( '.', '', $value );
         }
 
-        return (float)str_replace( ',', '.', $value );
+        return (float) str_replace( ',', '.', $value );
     }
 
     /**
@@ -224,19 +227,23 @@ final class To
         if ( is_array( $value ) ) {
             $array = $value;
             /** La valeur est TRUE | FALSE | NULL | '' */
-        } else {
+        }
+        else {
             if ( $value === true || $value === false || $value === null || $value === '' || $value === 0 ) {
                 $array = [];
                 /** La valeur est un entier ou une chaine de caractere */
-            } else {
+            }
+            else {
                 if ( Is::scalar( $value ) ) {
                     $array = [ $value ];
                     /** La valeur est un object avec une fonction de transformation */
-                } else {
+                }
+                else {
                     if ( Is::object( $value, 'toArray' ) ) {
                         $array = $value->toArray();
                         /** La valeur est un tableau ou est travsersable */
-                    } else {
+                    }
+                    else {
                         if ( Is::traversable( $value ) ) {
                             foreach ( $value as $k => $v ) {
                                 $array[ $k ] = is_scalar( $v )
@@ -244,7 +251,8 @@ final class To
                                     : self::arr( $v );
                             }
                             /** retourne un tableau vide */
-                        } else {
+                        }
+                        else {
                             $array = [];
                         }
                     }
@@ -286,19 +294,24 @@ final class To
         $prefix = str_repeat( ' |  ', $indent );
         if ( is_numeric( $value ) ) {
             $text .= "Number: $value";
-        } else {
+        }
+        else {
             if ( is_string( $value ) ) {
                 $text .= "String: '$value'";
-            } else {
+            }
+            else {
                 if ( $value === null ) {
                     $text .= 'Null';
-                } else {
+                }
+                else {
                     if ( $value === true ) {
                         $text .= 'True';
-                    } else {
+                    }
+                    else {
                         if ( $value === false ) {
                             $text .= 'False';
-                        } else {
+                        }
+                        else {
                             if ( is_array( $value ) ) {
                                 $text .= 'Array (' . count( $value ) . ')';
                                 $indent++;
@@ -306,7 +319,8 @@ final class To
                                     $text .= "\n$prefix [$k] = ";
                                     $text .= self::text( $v, $indent );
                                 }
-                            } else {
+                            }
+                            else {
                                 if ( is_object( $value ) ) {
                                     $text .= 'Object (' . get_class( $value ) . ')';
                                     $indent++;
@@ -353,7 +367,8 @@ final class To
                 $v = self::html( $v, $type
                     ? Str::type( $v )
                     : null, null, $type );
-            } else {
+            }
+            else {
                 if ( $v instanceof DateTime ) {
                     $v = $v->format( 'd-m-Y H:i:s' );
                 }

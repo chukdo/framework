@@ -309,10 +309,12 @@ class Response
         $hasFile    = $this->file !== null;
         if ( $hasContent ) {
             $this->sendContentResponse();
-        } else {
+        }
+        else {
             if ( $hasFile ) {
                 $this->sendDownloadResponse();
-            } else {
+            }
+            else {
                 $this->sendHeaderResponse();
             }
         }
@@ -334,7 +336,8 @@ class Response
             $this->header->setHeader( 'Content-Encoding', 'deflate' );
             $content = gzdeflate( $this->content );
 
-        } elseif ( Str::contain( HttpRequest::server( 'HTTP_ACCEPT_ENCODING' ), 'gzip' ) ) {
+        }
+        elseif ( Str::contain( HttpRequest::server( 'HTTP_ACCEPT_ENCODING' ), 'gzip' ) ) {
             $this->header->setHeader( 'Content-Encoding', 'gzip' );
             $content = gzencode( $this->content );
         }
@@ -348,7 +351,8 @@ class Response
             }
             echo "0\r\n";
 
-        } else {
+        }
+        else {
             $this->header->setHeader( 'Content-Length', strlen( $content ) );
             $this->sendHeaderResponse();
             echo $content;
@@ -385,7 +389,8 @@ class Response
             }
             fclose( $f );
             echo "0\r\n";
-        } else {
+        }
+        else {
             $this->header->setHeader( 'Content-Length', filesize( $this->file ) );
             $this->sendHeaderResponse();
             readfile( $this->file );

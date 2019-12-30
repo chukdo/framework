@@ -91,7 +91,8 @@ Class Index
             }
 
             return true;
-        } catch ( Exception $e ) {
+        }
+        catch ( Exception $e ) {
             return false;
         }
     }
@@ -107,7 +108,8 @@ Class Index
                  ->dropIndexes();
 
             return true;
-        } catch ( Exception $e ) {
+        }
+        catch ( Exception $e ) {
             return false;
         }
     }
@@ -125,7 +127,8 @@ Class Index
                  ->dropIndex( $name );
 
             return true;
-        } catch ( Exception $e ) {
+        }
+        catch ( Exception $e ) {
             return false;
         }
     }

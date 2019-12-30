@@ -86,7 +86,8 @@ class ExceptionMessage
                 $code .= ( $line + $i + 1 ) . ( $i === -1
                         ? '> '
                         : ': ' ) . $spl->current() . "\n";
-            } catch ( Throwable $e ) {
+            }
+            catch ( Throwable $e ) {
             }
         }
         $code = highlight_string( '<?php ' . $code, true );
@@ -132,7 +133,8 @@ class ExceptionMessage
                      ->content( $content )
                      ->send()
                      ->end();
-        } catch ( Throwable $e ) {
+        }
+        catch ( Throwable $e ) {
             die( $content );
         }
     }

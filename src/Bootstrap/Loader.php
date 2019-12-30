@@ -89,7 +89,7 @@ class Loader
     {
         /** normalize namespace */
         $ns = trim( $ns, '\\' );
-        foreach ( (array)$paths as $path ) {
+        foreach ( (array) $paths as $path ) {
             /** normalize the base directory with a separator */
             $path = rtrim( $path, DIRECTORY_SEPARATOR ) . DIRECTORY_SEPARATOR;
             /* initialize the namespace array */
@@ -99,7 +99,8 @@ class Loader
             /* retain the base directory for the namespace */
             if ( $prepend ) {
                 array_unshift( $this->namespaces[ $ns ], $path );
-            } else {
+            }
+            else {
                 array_push( $this->namespaces[ $ns ], $path );
             }
         }

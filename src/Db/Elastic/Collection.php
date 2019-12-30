@@ -59,7 +59,7 @@ Class Collection implements CollectionInterface
     public static function filterOut( ?string $field, $value )
     {
         if ( Str::contain( $field, 'date' ) ) {
-            return ( new DateTime() )->setTimestamp( 1000 * (int)(string)$value );
+            return ( new DateTime() )->setTimestamp( 1000 * (int) (string) $value );
         }
 
         return $value;
@@ -75,9 +75,10 @@ Class Collection implements CollectionInterface
     {
         if ( $value instanceof DateTime ) {
             $value = $value->getTimestamp() * 1000;
-        } else {
+        }
+        else {
             if ( Str::contain( $field, 'date' ) && Is::scalar( $value ) ) {
-                $value = 1000 * (int)$value;
+                $value = 1000 * (int) $value;
             }
         }
 
@@ -89,7 +90,7 @@ Class Collection implements CollectionInterface
      */
     public function id(): string
     {
-        return (string)new ObjectId();
+        return (string) new ObjectId();
     }
 
     /**
@@ -105,7 +106,8 @@ Class Collection implements CollectionInterface
                 return $reflector->newInstanceArgs( [ $this,
                                                       $data, ] );
             }
-        } catch ( ReflectionException $e ) {
+        }
+        catch ( ReflectionException $e ) {
         }
 
         return new Record( $this, $data );
@@ -195,9 +197,11 @@ Class Collection implements CollectionInterface
                  ->delete( [ 'index' => $this->fullName() ] );
 
             return true;
-        } catch ( Missing404Exception $e ) {
+        }
+        catch ( Missing404Exception $e ) {
             return true;
-        } catch ( Throwable $e ) {
+        }
+        catch ( Throwable $e ) {
             return false;
         }
     }

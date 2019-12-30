@@ -134,7 +134,8 @@ final class Archive
                     throw new AppException( sprintf( 'Directory "%s" was not created', $concurrentDirectory ) );
                 }
                 /** Fichier */
-            } else {
+            }
+            else {
                 if ( !$root && !is_dir( $path . $dir ) && !mkdir( $concurrentDirectory = $path . $dir, 0777, true ) && !is_dir( $concurrentDirectory ) ) {
                     throw new AppException( sprintf( 'Directory "%s" was not created', $concurrentDirectory ) );
                 }
@@ -152,7 +153,8 @@ final class Archive
                     @chmod( $file, 0777 );
                     $ret[] = $file;
                     /** Error */
-                } else {
+                }
+                else {
                     throw new AppException( sprintf( 'Zip File Function error: can\'t write file %s', $file ) );
                 }
             }

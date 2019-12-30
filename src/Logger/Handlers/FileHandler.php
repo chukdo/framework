@@ -47,6 +47,6 @@ class FileHandler extends AbstractHandler
         $r  = fwrite( $fp, $record . "\n" );
         fclose( $fp );
 
-        return (bool)$r;
+        return (bool) $r;
     }
 }

@@ -43,12 +43,14 @@ class Json extends ArrayObject implements JsonInterface
             foreach ( $data as $k => $v ) {
                 $this->offsetSet( $k, $v );
             }
-        } else {
+        }
+        else {
             if ( Is::jsonString( $data ) ) {
                 foreach ( json_decode( $data, true, 512, JSON_THROW_ON_ERROR ) as $k => $v ) {
                     $this->offsetSet( $k, $v );
                 }
-            } else {
+            }
+            else {
                 if ( !Is::null( $data ) ) {
                     throw new JsonException( 'Data must be null or Iterable or JsonString' );
                 }
@@ -66,7 +68,8 @@ class Json extends ArrayObject implements JsonInterface
     {
         if ( ( $this->strict === true && Is::iterable( $value ) ) || ( Is::arr( $value ) && !Is::jsonInterface( $value ) ) ) {
             parent::offsetSet( $key, new Json( $value, $this->strict ) );
-        } else {
+        }
+        else {
             parent::offsetSet( $key, $value );
         }
 
@@ -182,7 +185,7 @@ class Json extends ArrayObject implements JsonInterface
      */
     public function __unset( string $key ): bool
     {
-        return (bool)$this->offsetUnset( $key );
+        return (bool) $this->offsetUnset( $key );
     }
 
     /**
@@ -214,10 +217,12 @@ class Json extends ArrayObject implements JsonInterface
 
         if ( $get === null ) {
             $this->set( $path, [ $value ] );
-        } else {
+        }
+        else {
             if ( ( $get instanceof Json ) ) {
                 $get->append( $value );
-            } else {
+            }
+            else {
                 $this->set( $path, [ $get,
                                      $value, ] );
             }
@@ -327,7 +332,8 @@ class Json extends ArrayObject implements JsonInterface
     {
         if ( ( $this->strict === true && Is::iterable( $value ) ) || ( Is::arr( $value ) && !Is::jsonInterface( $value ) ) ) {
             parent::append( new Json( $value, $this->strict ) );
-        } else {
+        }
+        else {
             parent::append( $value );
         }
 
@@ -550,7 +556,8 @@ class Json extends ArrayObject implements JsonInterface
     {
         if ( $byKey ) {
             $this->natcasesort();
-        } else {
+        }
+        else {
             $this->ksort();
         }
 
@@ -716,13 +723,15 @@ class Json extends ArrayObject implements JsonInterface
                     $set( $path, [ 'op'    => 'common',
                                    'value' => $srcValue, ] );
                     /** Replace */
-                } else {
+                }
+                else {
                     $set( $path, [ 'op'    => 'replace',
                                    'old'   => $srcValue,
                                    'value' => $newValue, ] );
                 }
                 /** Delete */
-            } else {
+            }
+            else {
                 $set( $path, [ 'op' => 'remove', ] );
             }
         }
@@ -750,7 +759,8 @@ class Json extends ArrayObject implements JsonInterface
 
             if ( $v instanceof JsonInterface ) {
                 $mixed->merge( $v->to2d( $k ) );
-            } else {
+            }
+            else {
                 $mixed->offsetSet( $k, $v );
             }
         }
@@ -833,7 +843,8 @@ class Json extends ArrayObject implements JsonInterface
                 if ( $r->count() > 0 ) {
                     $json->offsetSet( $k, $r );
                 }
-            } else {
+            }
+            else {
                 $r = $closure( $k, $v );
                 if ( $r !== null ) {
                     $json->offsetSet( $k, $r );
@@ -907,10 +918,12 @@ class Json extends ArrayObject implements JsonInterface
                     $json->push( $get );
                 }
             }
-        } else {
+        }
+        else {
             if ( $get instanceof JsonInterface && !$emptyPath ) {
                 $json->merge( $get->wildcard( $endPath, $scalarResultOnly ) );
-            } else {
+            }
+            else {
                 if ( $get && $emptyPath && ( ( is_scalar( $get ) && $scalarResultOnly ) || !$scalarResultOnly ) ) {
                     $json->append( $get );
                 }
@@ -932,7 +945,8 @@ class Json extends ArrayObject implements JsonInterface
             foreach ( $push as $k => $v ) {
                 if ( is_int( $k ) ) {
                     $this->append( $v );
-                } else {
+                }
+                else {
                     if ( $overwrite || !$this->offsetExists( $k ) ) {
                         $this->offsetSet( $k, $v );
                     }

@@ -42,8 +42,9 @@ Class RecordList extends Json
 
         foreach ( $json as $k => $v ) {
             if ( $idAsKey ) {
-                $this->offsetSet( (string)$v->offsetGet( '_id' ), $v );
-            } else {
+                $this->offsetSet( (string) $v->offsetGet( '_id' ), $v );
+            }
+            else {
                 $this->append( $v );
             }
         }

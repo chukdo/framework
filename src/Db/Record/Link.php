@@ -90,7 +90,7 @@ Class Link
      *
      * @return Link
      */
-    public function with( ... $fields ): self
+    public function with( ...$fields ): self
     {
         $this->with = Arr::spreadArgs( $fields );
 
@@ -102,7 +102,7 @@ Class Link
      *
      * @return Link
      */
-    public function without( ... $fields ): self
+    public function without( ...$fields ): self
     {
         $this->without = Arr::spreadArgs( $fields );
 
@@ -133,7 +133,7 @@ Class Link
                 /** Multiple ids */
                 if ( Is::JsonInterface( $value ) ) {
                     $list = [];
-                    foreach ( (array)$value as $id ) {
+                    foreach ( (array) $value as $id ) {
                         if ( $get = $find->offsetGet( $id ) ) {
                             $list[] = $this->collection->record( $get );
                         }
@@ -141,12 +141,15 @@ Class Link
                     if ( !empty( $list ) ) {
                         $json->offsetSet( $this->getLinkedName(), $list );
                     }
-                } /** Single id */ else {
+                }
+                /** Single id */
+                else {
                     if ( $get = $find->offsetGet( $value ) ) {
                         $json->offsetSet( $this->getLinkedName(), $this->collection->record( $get ) );
                     }
                 }
-            } else {
+            }
+            else {
                 if ( Is::JsonInterface( $value ) ) {
                     $this->hydrateIds( $value, $find );
                 }
@@ -191,7 +194,8 @@ Class Link
         foreach ( $json as $key => $value ) {
             if ( $key === $this->field ) {
                 $extractIds = Arr::append( $value, $extractIds, true );
-            } else {
+            }
+            else {
                 if ( Is::JsonInterface( $value ) ) {
                     $extractIds = Arr::push( $extractIds, $this->extractIds( $value ), true );
                 }

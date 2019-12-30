@@ -58,7 +58,8 @@ class RedisHandler extends AbstractHandler
             $this->redis->rpush( $this->key, $record );
 
             return true;
-        } catch ( Exception $e ) {
+        }
+        catch ( Exception $e ) {
             return false;
         }
     }

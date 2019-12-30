@@ -28,7 +28,7 @@ $app->registerServices( [ Providers\AppServiceProvider::class,
                           Providers\ValidatorServiceProvider::class,
                           Providers\MongoServiceProvider::class, ] );
 
-Router::any( '/', function( $inputs, $response )
+Router::any( '/', function( Input $inputs, \Chukdo\Http\Response $response )
 {
     $response->header( 'X-test', 'test header' );
 

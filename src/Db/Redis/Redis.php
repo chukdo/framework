@@ -150,14 +150,14 @@ class Redis implements RedisInterface
             }
             break;
             /** Integer */ case ':':
-            $s = (int)$reply;
+            $s = (int) $reply;
             break;
             /** Bulk */ case '$':
             $s = null;
             if ( $reply === '-1' ) {
                 break;
             }
-            $size = (int)$reply;
+            $size = (int) $reply;
             $read = 0;
             if ( $size > 0 ) {
                 while ( $read < $size ) {
@@ -165,7 +165,8 @@ class Redis implements RedisInterface
                     $read += $len;
                     if ( ( $r = stream_get_line( $this->sock, $len ) ) !== 0 ) {
                         $s .= $r;
-                    } else {
+                    }
+                    else {
                         throw new RedisException( 'Failed to read response from stream' );
                     }
                 }
@@ -178,7 +179,7 @@ class Redis implements RedisInterface
             if ( $reply === '*-1' ) {
                 break;
             }
-            $c = (int)$reply;
+            $c = (int) $reply;
             $s = [];
             for ( $i = 0; $i < $c; ++$i ) {
                 $s[] = $this->read();
@@ -229,8 +230,8 @@ class Redis implements RedisInterface
         /** command SCAN */
         $scan = $this->getIterator( $this->pointer );
         if ( count( $scan ) === 2 ) {
-            $this->pointer = (int)$scan[ 0 ];
-            $this->stack   = (array)$scan[ 1 ];
+            $this->pointer = (int) $scan[ 0 ];
+            $this->stack   = (array) $scan[ 1 ];
         }
     }
 
@@ -314,13 +315,14 @@ class Redis implements RedisInterface
     {
         if ( !empty( $this->stack ) ) {
             array_shift( $this->stack );
-        } else {
+        }
+        else {
             if ( $this->pointer !== 0 ) {
                 /** command SCAN */
                 $scan = $this->getIterator( $this->pointer );
                 if ( count( $scan ) === 2 ) {
-                    $this->pointer = (int)$scan[ 0 ];
-                    $this->stack   = (array)$scan[ 1 ];
+                    $this->pointer = (int) $scan[ 0 ];
+                    $this->stack   = (array) $scan[ 1 ];
                 }
             }
         }
@@ -439,7 +441,7 @@ class Redis implements RedisInterface
      */
     public function del( string $key ): bool
     {
-        return (bool)$this->__call( 'DEL', [ $key ] );
+        return (bool) $this->__call( 'DEL', [ $key ] );
     }
 
     /**

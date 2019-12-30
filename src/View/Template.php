@@ -128,7 +128,7 @@ class Template
         return $this->view()
                     ->getResponseHandler()
                     ->header( 'Content-Type', 'text/html; charset=utf-8' )
-                    ->content( (string)$this );
+                    ->content( (string) $this );
     }
 
     /**
@@ -156,6 +156,6 @@ class Template
         ob_start();
         include $this->file;
 
-        return (string)ob_get_clean();
+        return (string) ob_get_clean();
     }
 }

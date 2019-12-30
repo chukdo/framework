@@ -262,7 +262,8 @@ class Service implements ArrayAccess
                 foreach ( $arg as $k => $v ) {
                     $args[ $key ][ $k ] = $this->resolveServiceArg( $v );
                 }
-            } else {
+            }
+            else {
                 $args[ $key ] = $this->resolveServiceArg( $arg );
             }
         }

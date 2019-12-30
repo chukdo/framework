@@ -143,10 +143,12 @@ class Router
         if ( $closure instanceof Closure ) {
             $appMiddleware = new ClosureMiddleware( $closure );
 
-        } elseif ( Is::string( $closure ) ) {
+        }
+        elseif ( Is::string( $closure ) ) {
             $appMiddleware = new ControlerMiddleware( $closure );
 
-        } else {
+        }
+        else {
             throw new RouteException( 'Router stack need a Closure or a String controler@action' );
         }
         $route = new Route( $method, $uri, $this->request, $appMiddleware );

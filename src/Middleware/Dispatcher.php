@@ -97,9 +97,11 @@ class Dispatcher
                     $confMiddleware = $this->request()
                                            ->conf( substr( $middleware, 1 ) );
                     $middleware     = new $confMiddleware();
-                } catch ( Throwable $e ) {
                 }
-            } else {
+                catch ( Throwable $e ) {
+                }
+            }
+            else {
                 $middleware = new $middleware();
             }
         }

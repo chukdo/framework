@@ -107,9 +107,9 @@ Class Find extends Where implements FindInterface
      */
     public function count(): int
     {
-        return (int)$this->collection()
-                         ->client()
-                         ->countDocuments( $this->filter() );
+        return (int) $this->collection()
+                          ->client()
+                          ->countDocuments( $this->filter() );
     }
 
     /**
@@ -196,7 +196,8 @@ Class Find extends Where implements FindInterface
         foreach ( $fields as $field ) {
             if ( $field === '_id' ) {
                 $this->hiddenId = true;
-            } else {
+            }
+            else {
                 $this->projection[ $field ] = 0;
             }
         }

@@ -84,7 +84,8 @@ class Conf extends Json
                     $this->loadFile( $path . $channel . '/' . $env . '.json' );
                 }
             }
-        } catch ( Throwable $e ) {
+        }
+        catch ( Throwable $e ) {
 
         }
 

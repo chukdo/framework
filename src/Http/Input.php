@@ -49,7 +49,8 @@ class Input extends Json implements InputInterface
     {
         try {
             return new FileUploaded( $name, $allowedMimeTypes, $maxFileSize );
-        } catch ( Throwable $e ) {
+        }
+        catch ( Throwable $e ) {
             return null;
         }
     }

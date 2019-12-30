@@ -46,7 +46,8 @@ class AzureStream extends AbstractStream
         }
         if ( $offset >= $this->streamLenght ) {
             return null;
-        } else {
+        }
+        else {
             return substr( $this->streamContent, $offset, $length );
         }
     }
@@ -94,7 +95,8 @@ class AzureStream extends AbstractStream
         try {
             $stream = ServiceLocator::getInstance()
                                     ->getResource( $scheme );
-        } catch ( Exception $e ) {
+        }
+        catch ( Exception $e ) {
             throw new StreamException( sprintf( '[%s] is not a registred resource', $scheme ), $e->getCode(), $e );
         }
         if ( !( $stream instanceof BlobRestProxy ) ) {
@@ -128,8 +130,8 @@ class AzureStream extends AbstractStream
      */
     public function streamSet( ?string $content ): bool
     {
-        return (bool)$this->getStream()
-                          ->createBlockBlob( $this->getHost(), $this->getPath(), $content );
+        return (bool) $this->getStream()
+                           ->createBlockBlob( $this->getHost(), $this->getPath(), $content );
     }
 
     /**
@@ -142,8 +144,8 @@ class AzureStream extends AbstractStream
      */
     public function streamAppend( string $content ): bool
     {
-        return (bool)$this->getStream()
-                          ->appendBlock( $this->getHost(), $this->getPath(), $content );
+        return (bool) $this->getStream()
+                           ->appendBlock( $this->getHost(), $this->getPath(), $content );
     }
 
     /**
@@ -154,8 +156,9 @@ class AzureStream extends AbstractStream
     public function streamExists(): bool
     {
         try {
-            return (bool)$this->streamSize() > 0;
-        } catch ( Throwable $e ) {
+            return (bool) $this->streamSize() > 0;
+        }
+        catch ( Throwable $e ) {
         }
 
         return false;
@@ -170,10 +173,10 @@ class AzureStream extends AbstractStream
     public function streamSize(): int
     {
         if ( $this->streamLenght == 0 ) {
-            $this->streamLenght = (int)$this->getStream()
-                                            ->getBlob( $this->getHost(), $this->getPath() )
-                                            ->getProperties()
-                                            ->getContentLength();
+            $this->streamLenght = (int) $this->getStream()
+                                             ->getBlob( $this->getHost(), $this->getPath() )
+                                             ->getProperties()
+                                             ->getContentLength();
         }
 
         return $this->streamLenght;
@@ -262,7 +265,8 @@ class AzureStream extends AbstractStream
                 if ( strpos( $name, $path ) === 0 ) {
                     $list[] = trim( substr( $name, strlen( $path ) ), '/' );
                 }
-            } else {
+            }
+            else {
                 $list[] = $name;
             }
         }
@@ -309,11 +313,11 @@ class AzureStream extends AbstractStream
             return time();
         }
 
-        return (int)$this->getStream()
-                         ->getBlob( $this->getHost(), $this->getPath() )
-                         ->getProperties()
-                         ->getLastModified()
-                         ->getTimestamp();
+        return (int) $this->getStream()
+                          ->getBlob( $this->getHost(), $this->getPath() )
+                          ->getProperties()
+                          ->getLastModified()
+                          ->getTimestamp();
     }
 
     /**

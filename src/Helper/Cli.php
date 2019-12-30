@@ -41,7 +41,8 @@ final class Cli
         foreach ( $argv as $k => $arg ) {
             if ( strpos( $arg, '-' ) === 0 ) {
                 $key = trim( $arg, '-' );
-            } else {
+            }
+            else {
                 $inputs[ $key ] = $arg;
             }
         }

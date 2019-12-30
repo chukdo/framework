@@ -126,8 +126,8 @@ final class Is
      */
     public static function between( int $value, int $min = 0, int $max = 0 ): bool
     {
-        $min = (int)$min;
-        $max = (int)$max;
+        $min = (int) $min;
+        $max = (int) $max;
         if ( ( $min > 0 ) && $value < $min ) {
             return false;
         }
@@ -304,7 +304,8 @@ final class Is
             if ( $value === '' || $value === null ) {
                 return true;
             }
-        } else {
+        }
+        else {
             if ( self::traversable( $value ) ) {
                 foreach ( $value as $v ) {
                     return false;

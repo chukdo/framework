@@ -20,11 +20,11 @@ class Oauth2 extends Controler
     public function __construct()
     {
         $this->client = new Generic();
-        $this->client->setUrlAuthorize( 'https://www.dropbox.com/1/oauth2/authorize' )
-                     ->setUrlAccessToken( 'https://api.dropbox.com/1/oauth2/token' )
+        $this->client->setUrlAuthorize( 'https://www.dropbox.com/oauth2/authorize' )
+                     ->setUrlAccessToken( 'https://api.dropboxapi.com/oauth2/token' )
                      ->setClientId( '1gnu9jmet15ofyp' )
                      ->setClientSecret( 'rngrh6odd07b3t3' )
-                     ->setRedirectUri( 'https://eb295eaf.ngrok.io/oauth2/callback' );
+                     ->setRedirectUri( 'https://e8a75802.ngrok.io/oauth2/callback/' );
     }
 
     /**
@@ -53,6 +53,6 @@ class Oauth2 extends Controler
 
         $token = $this->client->getToken( 'code', [ 'code' => $inputs->code ] );
 
-        return $response->content( (string)$token );
+        return $response->content( (string) $token );
     }
 }

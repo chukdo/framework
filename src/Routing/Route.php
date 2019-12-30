@@ -213,7 +213,7 @@ class Route
         foreach ( $keys as $key ) {
             $routePath = str_replace( '{' . $key . '}', '(' . $this->parseWhere( $key ) . ')', $routePath );
         }
-        $values      = (array)Str::match( '`^' . $routePath . '$`', $requestPath );
+        $values      = (array) Str::match( '`^' . $routePath . '$`', $requestPath );
         $countValues = count( $values );
         if ( $countValues > 0 && $countValues === $countKeys ) {
             $match = [];

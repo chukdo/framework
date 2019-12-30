@@ -61,7 +61,8 @@ class Xml extends Node
             $xml->setElement( $xml->doc()->documentElement );
 
             return $xml;
-        } catch ( Throwable $e ) {
+        }
+        catch ( Throwable $e ) {
             throw new XmlException( $e->getMessage(), $e->getCode(), $e );
         }
     }
@@ -176,7 +177,8 @@ class Xml extends Node
             $xml->setElement( $xml->doc()->documentElement );
 
             return $xml;
-        } catch ( Throwable $e ) {
+        }
+        catch ( Throwable $e ) {
             throw new XmlException( $e->getMessage(), $e->getCode(), $e );
         }
     }

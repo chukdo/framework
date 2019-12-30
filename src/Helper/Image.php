@@ -185,11 +185,13 @@ final class Image
             $r  = max( $rw, $rh );
             $w  = $sw / $r;
             $h  = $sh / $r;
-        } else {
+        }
+        else {
             if ( $dw > 0 ) {
                 $w = $dw;
                 $h = $w * $sh / $sw;
-            } else {
+            }
+            else {
                 if ( $dh > 0 ) {
                     $h = $dh;
                     $w = $h * $sw / $sh;

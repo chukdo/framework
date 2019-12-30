@@ -121,31 +121,37 @@ class Parser
     {
         if ( !$this->hasValidSignature( $secret ) ) {
             $this->err = 'The JWT signature is not a valid';
+
             return false;
         }
 
         if ( !$this->hasValidStart( $time ) ) {
             $this->err = 'The JWT is not yet valid';
+
             return false;
         }
 
         if ( !$this->hasValidExpired( $time ) ) {
             $this->err = 'The JWT has expired';
+
             return false;
         }
 
         if ( !$this->hasValidId() ) {
             $this->err = 'The JWT claim:jti is not a valid';
+
             return false;
         }
 
         if ( !$this->hasValidIssuer() ) {
             $this->err = 'The JWT claim:iss is not a valid';
+
             return false;
         }
 
         if ( !$this->hasValidAudience() ) {
             $this->err = 'The JWT claim:aud is not a valid';
+
             return false;
         }
 

@@ -89,7 +89,8 @@ Class Write extends Where implements WriteInterface
                 $values[ $k ] = $this->filterValues( $k, $v );
             }
             $value = $values;
-        } else {
+        }
+        else {
             $value = Collection::filterIn( $field, $value );
         }
 
@@ -167,7 +168,7 @@ Class Write extends Where implements WriteInterface
                         ->client()
                         ->deleteByQuery( $this->filter() );
 
-        return (int)$command[ 'deleted' ];
+        return (int) $command[ 'deleted' ];
     }
 
     /**
@@ -228,7 +229,7 @@ Class Write extends Where implements WriteInterface
         $source = '';
         $params = [];
         foreach ( $this->fields() as $type => $field ) {
-            foreach ( (array)$field as $key => $value ) {
+            foreach ( (array) $field as $key => $value ) {
                 if ( $key === '_id' ) {
                     continue;
                 }
@@ -325,7 +326,8 @@ Class Write extends Where implements WriteInterface
                    ->id();
         if ( $id ) {
             $this->updateOne();
-        } else {
+        }
+        else {
             $id = $this->insert();
         }
 

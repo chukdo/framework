@@ -25,7 +25,8 @@ Class Merge extends Stage
     {
         if ( $db ) {
             $this->pipe[ 'into' ] = $collection;
-        } else {
+        }
+        else {
             $this->pipe[ 'into' ] = [ 'coll' => $collection,
                                       'db'   => $db, ];
         }
@@ -44,7 +45,8 @@ Class Merge extends Stage
 
         if ( count( $args ) == 1 ) {
             $this->pipe[ 'on' ] = reset( $args );
-        } else {
+        }
+        else {
             $this->pipe[ 'on' ] = $args;
         }
 

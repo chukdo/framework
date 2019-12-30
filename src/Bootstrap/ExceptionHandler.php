@@ -35,7 +35,7 @@ class ExceptionHandler implements Handler
      */
     public function render( Throwable $e ): void
     {
-        $message = new ExceptionMessage( $e, (int)$this->app->env() );
+        $message = new ExceptionMessage( $e, (int) $this->app->env() );
         $message->render();
         exit;
     }
@@ -48,7 +48,8 @@ class ExceptionHandler implements Handler
         try {
             $this->app->make( 'ExceptionLogger' )
                       ->emergency( '#' . $e->getCode() . ' ' . $e->getMessage() . ' ' . $e->getFile() . '(' . $e->getLine() . ')' );
-        } catch ( Throwable $e ) {
+        }
+        catch ( Throwable $e ) {
         }
     }
 }
