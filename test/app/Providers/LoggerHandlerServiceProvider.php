@@ -9,7 +9,9 @@ class LoggerHandlerServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton( 'LoggerHandler', [ 'class' => FileHandler::class,
-                                                  'args'  => [ '@log.dsn', ], ] );
+        $this->app->singleton( 'LoggerHandler', [
+            'class' => FileHandler::class,
+            'args'  => [ '@log.dsn', ],
+        ] );
     }
 }

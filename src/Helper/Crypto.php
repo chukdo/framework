@@ -23,8 +23,10 @@ final class Crypto
      */
     public static function encodeCsrf( int $duration, string $salt ): string
     {
-        return self::encrypt( json_encode( [ 'time'     => time(),
-                                             'duration' => $duration ?? 60, ], JSON_THROW_ON_ERROR, 512 ), $salt );
+        return self::encrypt( json_encode( [
+                                               'time'     => time(),
+                                               'duration' => $duration ?? 60,
+                                           ], JSON_THROW_ON_ERROR, 512 ), $salt );
     }
 
     /**

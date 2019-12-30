@@ -56,9 +56,11 @@ Class Aggregate
      */
     public function all( bool $allowDiskUse = false, bool $bypassDocumentValidation = false ): Json
     {
-        return new Json( $this->cursor( [ 'allowDiskUse'             => $allowDiskUse,
-                                          'bypassDocumentValidation' => $bypassDocumentValidation,
-                                          'useCursor'                => true, ] ) );
+        return new Json( $this->cursor( [
+                                            'allowDiskUse'             => $allowDiskUse,
+                                            'bypassDocumentValidation' => $bypassDocumentValidation,
+                                            'useCursor'                => true,
+                                        ] ) );
     }
 
     /**
@@ -94,8 +96,10 @@ Class Aggregate
     public function explain(): Json
     {
         return new Json( new Cursor( $this->collection->client()
-                                                      ->aggregate( $this->projection(), [ 'explain'   => true,
-                                                                                          'useCursor' => true, ] ) ) );
+                                                      ->aggregate( $this->projection(), [
+                                                          'explain'   => true,
+                                                          'useCursor' => true,
+                                                      ] ) ) );
     }
 
 }

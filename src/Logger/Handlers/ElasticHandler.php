@@ -55,10 +55,12 @@ class ElasticHandler extends AbstractHandler
     public function write( $record ): bool
     {
         $this->init( $record[ 'channel' ] );
-        $write = $this->elastic->index( [ 'index' => $record[ 'channel' ],
-                                          'type'  => 'search',
-                                          'id'    => uniqid( '', true ),
-                                          'body'  => $record, ] );
+        $write = $this->elastic->index( [
+                                            'index' => $record[ 'channel' ],
+                                            'type'  => 'search',
+                                            'id'    => uniqid( '', true ),
+                                            'body'  => $record,
+                                        ] );
 
         return !isset( $write[ 'error' ] );
     }
@@ -71,9 +73,21 @@ class ElasticHandler extends AbstractHandler
         if ( !$this->elastic->indices()
                             ->exists( [ 'index' => $channel ] ) ) {
             $this->elastic->indices()
-                          ->create( [ 'index' => $channel,
-                                      'body'  => [ 'mappings' => [ 'search' => [ 'properties' => [ 'date' => [ 'type'   => 'date',
-                                                                                                               'format' => 'epoch_second', ], ], ], ], ], ] );
+                          ->create( [
+                                        'index' => $channel,
+                                        'body'  => [
+                                            'mappings' => [
+                                                'search' => [
+                                                    'properties' => [
+                                                        'date' => [
+                                                            'type'   => 'date',
+                                                            'format' => 'epoch_second',
+                                                        ],
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ] );
         }
     }
 }

@@ -224,12 +224,14 @@ class Node implements IteratorAggregate
             }
             else {
                 $len1 = strlen( $value );
-                $len2 = strlen( str_replace( [ '"',
-                                               '[',
-                                               ']',
-                                               '&',
-                                               '<',
-                                               '>', ], '', $value ) );
+                $len2 = strlen( str_replace( [
+                                                 '"',
+                                                 '[',
+                                                 ']',
+                                                 '&',
+                                                 '<',
+                                                 '>',
+                                             ], '', $value ) );
                 $this->appendNode( $len1 !== $len2
                                        ? new DOMCDATASection( $value )
                                        : new DOMText( $value ) );
@@ -1094,13 +1096,17 @@ class Node implements IteratorAggregate
                             $array[ $name ][] = $value;
                         }
                         else {
-                            $array[ $name ] = [ $array[ $name ],
-                                                $value, ];
+                            $array[ $name ] = [
+                                $array[ $name ],
+                                $value,
+                            ];
                         }
                     }
                     else {
-                        $array[ $name ] = [ $array[ $name ],
-                                            $value, ];
+                        $array[ $name ] = [
+                            $array[ $name ],
+                            $value,
+                        ];
                     }
                 }
                 else {

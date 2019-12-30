@@ -44,12 +44,16 @@ Trait TraitWhereOperation
                 return [ '$lte' => Collection::filterIn( $field, $value ) ];
                 break;
             case '<>' :
-                return [ '$gt' => Collection::filterIn( $field, $value ),
-                         '$lt' => Collection::filterIn( $field, $value2 ), ];
+                return [
+                    '$gt' => Collection::filterIn( $field, $value ),
+                    '$lt' => Collection::filterIn( $field, $value2 ),
+                ];
                 break;
             case '<=>' :
-                return [ '$gte' => Collection::filterIn( $field, $value ),
-                         '$lte' => Collection::filterIn( $field, $value2 ), ];
+                return [
+                    '$gte' => Collection::filterIn( $field, $value ),
+                    '$lte' => Collection::filterIn( $field, $value2 ),
+                ];
                 break;
             case 'in':
                 $in = [];
@@ -71,8 +75,12 @@ Trait TraitWhereOperation
                 return [ '$type' => Collection::filterIn( $field, $value ) ];
                 break;
             case '%':
-                return [ '$mod' => [ $value,
-                                     $value2, ], ];
+                return [
+                    '$mod' => [
+                        $value,
+                        $value2,
+                    ],
+                ];
                 break;
             case 'size':
                 return [ '$size' => $value ];

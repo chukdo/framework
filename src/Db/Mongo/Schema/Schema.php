@@ -36,8 +36,10 @@ class Schema implements SchemaInterface
         $this->collection = $collection;
         $db               = $collection->database();
         $json             = $db->server()
-                               ->command( [ 'listCollections' => 1,
-                                            'filter'          => [ 'name' => $collection->name() ], ], $db->name() );
+                               ->command( [
+                                              'listCollections' => 1,
+                                              'filter'          => [ 'name' => $collection->name() ],
+                                          ], $db->name() );
         $this->property   = new Property( $json->getJson( '0.options.validator.$jsonSchema' )
                                                ->toArray() );
     }
@@ -47,9 +49,11 @@ class Schema implements SchemaInterface
      */
     public function drop(): bool
     {
-        $schema = [ 'validator'        => [ '$jsonSchema' => [ 'bsonType' => 'object' ], ],
-                    'validationLevel'  => 'strict',
-                    'validationAction' => 'error', ];
+        $schema = [
+            'validator'        => [ '$jsonSchema' => [ 'bsonType' => 'object' ], ],
+            'validationLevel'  => 'strict',
+            'validationAction' => 'error',
+        ];
         $save   = new Json( $this->collection()
                                  ->database()
                                  ->client()
@@ -146,9 +150,11 @@ class Schema implements SchemaInterface
      */
     public function save(): bool
     {
-        $schema = [ 'validator'        => [ '$jsonSchema' => $this->toArray(), ],
-                    'validationLevel'  => 'strict',
-                    'validationAction' => 'error', ];
+        $schema = [
+            'validator'        => [ '$jsonSchema' => $this->toArray(), ],
+            'validationLevel'  => 'strict',
+            'validationAction' => 'error',
+        ];
         $save   = new Json( $this->collection()
                                  ->database()
                                  ->client()

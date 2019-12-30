@@ -31,12 +31,18 @@ class HandleExceptions
     {
         $this->app = $app;
         error_reporting( -1 );
-        set_error_handler( [ $this,
-                             'handleError', ] );
-        set_exception_handler( [ $this,
-                                 'handleException', ] );
-        register_shutdown_function( [ $this,
-                                      'handleShutdown', ] );
+        set_error_handler( [
+                               $this,
+                               'handleError',
+                           ] );
+        set_exception_handler( [
+                                   $this,
+                                   'handleException',
+                               ] );
+        register_shutdown_function( [
+                                        $this,
+                                        'handleShutdown',
+                                    ] );
         ini_set( 'display_errors', 'Off' );
     }
 
@@ -73,10 +79,12 @@ class HandleExceptions
      */
     protected function isFatal( int $type ): bool
     {
-        return in_array( $type, [ E_COMPILE_ERROR,
-                                  E_CORE_ERROR,
-                                  E_ERROR,
-                                  E_PARSE, ], true );
+        return in_array( $type, [
+            E_COMPILE_ERROR,
+            E_CORE_ERROR,
+            E_ERROR,
+            E_PARSE,
+        ], true );
     }
 
     /**

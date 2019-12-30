@@ -97,9 +97,11 @@ class Schema implements SchemaInterface
             $this->collection()
                  ->client()
                  ->indices()
-                 ->putMapping( [ 'index' => $this->collection()
-                                                 ->fullName(),
-                                 'body'  => [], ] );
+                 ->putMapping( [
+                                   'index' => $this->collection()
+                                                   ->fullName(),
+                                   'body'  => [],
+                               ] );
 
             return true;
         }
@@ -148,9 +150,11 @@ class Schema implements SchemaInterface
         $save = new Json( $this->collection()
                                ->client()
                                ->indices()
-                               ->putMapping( [ 'index' => $this->collection()
-                                                               ->name(),
-                                               'body'  => $this->toArray(), ] ) );
+                               ->putMapping( [
+                                                 'index' => $this->collection()
+                                                                 ->name(),
+                                                 'body'  => $this->toArray(),
+                                             ] ) );
 
         return $save->offsetGet( 'acknowledged' ) === 1;
     }

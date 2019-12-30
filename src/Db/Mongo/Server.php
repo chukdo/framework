@@ -65,12 +65,18 @@ Class Server implements ServerInterface
     {
         $members = [];
         foreach ( $hosts as $index => $host ) {
-            $members[] = [ '_id'  => $index,
-                           'host' => $host, ];
+            $members[] = [
+                '_id'  => $index,
+                'host' => $host,
+            ];
         }
 
-        return $this->command( [ 'replSetInitiate' => [ '_id'     => $name,
-                                                        'members' => $members, ], ] )
+        return $this->command( [
+                                   'replSetInitiate' => [
+                                       '_id'     => $name,
+                                       'members' => $members,
+                                   ],
+                               ] )
                     ->get( 'ok' ) === 1;
     }
 
@@ -187,8 +193,10 @@ Class Server implements ServerInterface
      */
     public function kill( int $op ): bool
     {
-        return $this->command( [ 'killOp' => 1,
-                                 'op'     => $op, ] )
+        return $this->command( [
+                                   'killOp' => 1,
+                                   'op'     => $op,
+                               ] )
                     ->get( 'ok' ) === 1;
     }
 }

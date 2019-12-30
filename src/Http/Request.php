@@ -240,10 +240,12 @@ class Request
         }
         if ( $accept = $this->header()
                             ->getHeader( 'Accepts' ) ) {
-            $renders = [ 'json' => 'json',
-                         'xml'  => 'xml',
-                         'pdf'  => 'pdf',
-                         'zip'  => 'zip', ];
+            $renders = [
+                'json' => 'json',
+                'xml'  => 'xml',
+                'pdf'  => 'pdf',
+                'zip'  => 'zip',
+            ];
             foreach ( $renders as $contain => $render ) {
                 if ( Str::contain( $accept, $contain ) ) {
                     return $render;

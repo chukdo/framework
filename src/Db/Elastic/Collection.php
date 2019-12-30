@@ -103,8 +103,10 @@ Class Collection implements CollectionInterface
         try {
             $reflector = new ReflectionClass( '\App\Model\Elastic\Record\\' . $this->name() );
             if ( $reflector->implementsInterface( Record::class ) ) {
-                return $reflector->newInstanceArgs( [ $this,
-                                                      $data, ] );
+                return $reflector->newInstanceArgs( [
+                                                        $this,
+                                                        $data,
+                                                    ] );
             }
         }
         catch ( ReflectionException $e ) {
@@ -139,14 +141,20 @@ Class Collection implements CollectionInterface
                               ->createCollection( $collection );
         $newCollection->client()
                       ->indices()
-                      ->putMapping( [ 'index' => $newCollection->fullName(),
-                                      'body'  => $schema
-                                          ? $schema->toArray()
-                                          : $this->schema()
-                                                 ->toArray(), ] );
+                      ->putMapping( [
+                                        'index' => $newCollection->fullName(),
+                                        'body'  => $schema
+                                            ? $schema->toArray()
+                                            : $this->schema()
+                                                   ->toArray(),
+                                    ] );
         $this->client()
-             ->reindex( [ 'body' => [ 'source' => [ 'index' => $this->fullName() ],
-                                      'dest'   => [ 'index' => $newCollection->fullName() ], ], ] );
+             ->reindex( [
+                            'body' => [
+                                'source' => [ 'index' => $this->fullName() ],
+                                'dest'   => [ 'index' => $newCollection->fullName() ],
+                            ],
+                        ] );
         $this->drop();
 
         return $newCollection;

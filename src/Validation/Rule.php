@@ -41,9 +41,11 @@ class Rule
     /**
      * @var array
      */
-    protected array $type = [ 'array' => false,
-                              'min'   => 0,
-                              'max'   => 10000, ];
+    protected array $type = [
+        'array' => false,
+        'min'   => 0,
+        'max'   => 10000,
+    ];
 
     /**
      * @var bool
@@ -83,8 +85,10 @@ class Rule
         $rules = explode( '|', $rule );
 
         foreach ( $rules as $ruleItem ) {
-            [ $ruleName,
-              $attrs ] = $this->parseAttributes( $ruleItem );
+            [
+                $ruleName,
+                $attrs,
+            ] = $this->parseAttributes( $ruleItem );
 
             switch ( $ruleName ) {
                 case 'form':
@@ -97,9 +101,11 @@ class Rule
                     $this->label = $attrs->get( 0 );
                     break;
                 case 'array':
-                    $this->type = [ 'array' => true,
-                                    'min'   => $attrs->get( 0, 0 ),
-                                    'max'   => $attrs->get( 1, $attrs->get( 0, 10000 ) ), ];
+                    $this->type = [
+                        'array' => true,
+                        'min'   => $attrs->get( 0, 0 ),
+                        'max'   => $attrs->get( 1, $attrs->get( 0, 10000 ) ),
+                    ];
                     break;
                 default:
                     $this->rules[ $ruleName ] = (array) $attrs;
@@ -114,8 +120,10 @@ class Rule
      */
     protected function parseAttributes( string $rule ): array
     {
-        [ $rule,
-          $attrs ] = Str::explode( ':', $rule, 2 );
+        [
+            $rule,
+            $attrs,
+        ] = Str::explode( ':', $rule, 2 );
         $json = new Json( Str::explode( ',', $attrs ) );
 
         /** Recherche d'attributs faisant référence à un chemin de configuration (commence par @) */
@@ -132,8 +140,10 @@ class Rule
             return $v;
         } );
 
-        return [ $rule,
-                 $filter, ];
+        return [
+            $rule,
+            $filter,
+        ];
     }
 
     /**

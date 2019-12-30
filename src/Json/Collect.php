@@ -102,8 +102,10 @@ class Collect
      */
     public function sum( string $field, string $name = null, string $group = null ): self
     {
-        $this->sum[ $group ?? uniqid( '', true ) ] = [ 'field' => $field,
-                                                       'name'  => $name ?? $field, ];
+        $this->sum[ $group ?? uniqid( '', true ) ] = [
+            'field' => $field,
+            'name'  => $name ?? $field,
+        ];
 
         return $this;
     }
@@ -681,10 +683,12 @@ class Collect
      */
     public function where( string $field, $operator, $value, $value2 = null ): Collect
     {
-        $this->where[] = [ 'field'    => $field,
-                           'operator' => $operator,
-                           'value'    => $value,
-                           'value2'   => $value2, ];
+        $this->where[] = [
+            'field'    => $field,
+            'operator' => $operator,
+            'value'    => $value,
+            'value2'   => $value2,
+        ];
 
         return $this;
     }
@@ -699,10 +703,12 @@ class Collect
      */
     public function match( string $field, $operator, $value, $value2 = null ): Collect
     {
-        $this->match[] = [ 'field'    => $field,
-                           'operator' => $operator,
-                           'value'    => $value,
-                           'value2'   => $value2, ];
+        $this->match[] = [
+            'field'    => $field,
+            'operator' => $operator,
+            'value'    => $value,
+            'value2'   => $value2,
+        ];
 
         return $this;
     }

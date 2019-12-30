@@ -81,11 +81,13 @@ abstract Class AbstractProvider implements ProviderInterface
      */
     public function getAuthorizationUrl(): string
     {
-        $url = new Url( $this->getUrlAuthorize(), [ 'client_id'     => $this->getClientId(),
-                                                    'redirect_uri'  => $this->getRedirectUri(),
-                                                    'response_type' => 'code',
-                                                    'scope'         => $this->getScope(),
-                                                    'state'         => $this->getState() ] );
+        $url = new Url( $this->getUrlAuthorize(), [
+            'client_id'     => $this->getClientId(),
+            'redirect_uri'  => $this->getRedirectUri(),
+            'response_type' => 'code',
+            'scope'         => $this->getScope(),
+            'state'         => $this->getState(),
+        ] );
 
         return $url->buildUrl();
     }
@@ -126,8 +128,10 @@ abstract Class AbstractProvider implements ProviderInterface
      */
     protected function getTokenUrl( string $grantType, array $options = [] ): Url
     {
-        $url = new Url( $this->getUrlAccessToken(), [ 'client_id'     => $this->getClientId(),
-                                                      'client_secret' => $this->getClientSecret() ] );
+        $url = new Url( $this->getUrlAccessToken(), [
+            'client_id'     => $this->getClientId(),
+            'client_secret' => $this->getClientSecret(),
+        ] );
 
         switch ( $grantType ) {
             case 'code' :

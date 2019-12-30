@@ -215,8 +215,10 @@ Class Write extends Where implements WriteInterface
     {
         $command = $this->collection()
                         ->client()
-                        ->updateByQuery( $this->filter( [ 'body.script' => $this->validatedUpdateFields(),
-                                                          'conflicts'   => 'proceed', ] ) );
+                        ->updateByQuery( $this->filter( [
+                                                            'body.script' => $this->validatedUpdateFields(),
+                                                            'conflicts'   => 'proceed',
+                                                        ] ) );
 
         return $command[ 'updated' ];
     }
@@ -241,8 +243,10 @@ Class Write extends Where implements WriteInterface
             }
         }
 
-        return [ 'source' => $source,
-                 'params' => $params, ];
+        return [
+            'source' => $source,
+            'params' => $params,
+        ];
     }
 
     /**
@@ -287,8 +291,10 @@ Class Write extends Where implements WriteInterface
                 $source = 'ctx.op = \'none\'';
         }
 
-        return [ 'source' => $source,
-                 'param'  => $param, ];
+        return [
+            'source' => $source,
+            'param'  => $param,
+        ];
     }
 
     /**
@@ -309,10 +315,12 @@ Class Write extends Where implements WriteInterface
     {
         $command = $this->collection()
                         ->client()
-                        ->update( $this->filter( [ 'id'                => $this->getOne()
-                                                                               ->id(),
-                                                   'body.script'       => $this->validatedUpdateFields(),
-                                                   'retry_on_conflict' => 3, ], false ) );
+                        ->update( $this->filter( [
+                                                     'id'                => $this->getOne()
+                                                                                 ->id(),
+                                                     'body.script'       => $this->validatedUpdateFields(),
+                                                     'retry_on_conflict' => 3,
+                                                 ], false ) );
 
         return $command[ 'result' ] === 'updated';
     }
@@ -347,8 +355,10 @@ Class Write extends Where implements WriteInterface
         }
         $this->collection()
              ->client()
-             ->index( $this->filter( [ 'id'   => $id,
-                                       'body' => $body, ], false ) );
+             ->index( $this->filter( [
+                                         'id'   => $id,
+                                         'body' => $body,
+                                     ], false ) );
 
         return $id;
     }

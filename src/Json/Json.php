@@ -223,8 +223,10 @@ class Json extends ArrayObject implements JsonInterface
                 $get->append( $value );
             }
             else {
-                $this->set( $path, [ $get,
-                                     $value, ] );
+                $this->set( $path, [
+                    $get,
+                    $value,
+                ] );
             }
         }
 
@@ -527,8 +529,10 @@ class Json extends ArrayObject implements JsonInterface
         $function   = array_shift( $param );
         $param[ 0 ] = $this->get( $param[ 0 ] );
 
-        return call_user_func_array( [ Is::class,
-                                       $function, ], $param );
+        return call_user_func_array( [
+                                         Is::class,
+                                         $function,
+                                     ], $param );
     }
 
     /**
@@ -575,8 +579,10 @@ class Json extends ArrayObject implements JsonInterface
         $function   = array_shift( $param );
         $param[ 0 ] = $this->get( $param[ 0 ] );
 
-        return call_user_func_array( [ To::class,
-                                       $function, ], $param );
+        return call_user_func_array( [
+                                         To::class,
+                                         $function,
+                                     ], $param );
     }
 
     /**
@@ -720,14 +726,18 @@ class Json extends ArrayObject implements JsonInterface
             if ( $newValue = $new->offsetUnset( $path ) ) {
                 /** Common */
                 if ( $srcValue === $newValue ) {
-                    $set( $path, [ 'op'    => 'common',
-                                   'value' => $srcValue, ] );
+                    $set( $path, [
+                        'op'    => 'common',
+                        'value' => $srcValue,
+                    ] );
                     /** Replace */
                 }
                 else {
-                    $set( $path, [ 'op'    => 'replace',
-                                   'old'   => $srcValue,
-                                   'value' => $newValue, ] );
+                    $set( $path, [
+                        'op'    => 'replace',
+                        'old'   => $srcValue,
+                        'value' => $newValue,
+                    ] );
                 }
                 /** Delete */
             }
@@ -738,8 +748,10 @@ class Json extends ArrayObject implements JsonInterface
 
         /** Add */
         foreach ( $new as $path => $newValue ) {
-            $set( $path, [ 'op'    => 'add',
-                           'value' => $newValue, ] );
+            $set( $path, [
+                'op'    => 'add',
+                'value' => $newValue,
+            ] );
         }
 
         return $diff;

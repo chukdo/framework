@@ -28,40 +28,42 @@ final class Http
      */
     public static function mimeContentType( string $name ): string
     {
-        $mimeTypes = [ 'txt'  => 'text/plain',
-                       'htm'  => 'text/html',
-                       'html' => 'text/html',
-                       'php'  => 'text/html',
-                       'css'  => 'text/css',
-                       'js'   => 'application/javascript',
-                       'json' => 'application/json',
-                       'xml'  => 'application/xml',
-                       'png'  => 'image/png',
-                       'jpe'  => 'image/jpeg',
-                       'jpeg' => 'image/jpeg',
-                       'jpg'  => 'image/jpeg',
-                       'gif'  => 'image/gif',
-                       'bmp'  => 'image/bmp',
-                       'ico'  => 'image/vnd.microsoft.icon',
-                       'tiff' => 'image/tiff',
-                       'tif'  => 'image/tiff',
-                       'svg'  => 'image/svg+xml',
-                       'zip'  => 'application/zip',
-                       'rar'  => 'application/x-rar-compressed',
-                       'mp3'  => 'audio/mpeg',
-                       'pdf'  => 'application/pdf',
-                       'psd'  => 'image/vnd.adobe.photoshop',
-                       'ai'   => 'application/postscript',
-                       'eps'  => 'application/postscript',
-                       'ps'   => 'application/postscript',
-                       'ttf'  => 'font/ttf',
-                       'doc'  => 'application/msword',
-                       'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                       'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                       'rtf'  => 'application/rtf',
-                       'xls'  => 'application/vnd.ms-excel',
-                       'ppt'  => 'application/vnd.ms-powerpoint',
-                       'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation', ];
+        $mimeTypes = [
+            'txt'  => 'text/plain',
+            'htm'  => 'text/html',
+            'html' => 'text/html',
+            'php'  => 'text/html',
+            'css'  => 'text/css',
+            'js'   => 'application/javascript',
+            'json' => 'application/json',
+            'xml'  => 'application/xml',
+            'png'  => 'image/png',
+            'jpe'  => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'jpg'  => 'image/jpeg',
+            'gif'  => 'image/gif',
+            'bmp'  => 'image/bmp',
+            'ico'  => 'image/vnd.microsoft.icon',
+            'tiff' => 'image/tiff',
+            'tif'  => 'image/tiff',
+            'svg'  => 'image/svg+xml',
+            'zip'  => 'application/zip',
+            'rar'  => 'application/x-rar-compressed',
+            'mp3'  => 'audio/mpeg',
+            'pdf'  => 'application/pdf',
+            'psd'  => 'image/vnd.adobe.photoshop',
+            'ai'   => 'application/postscript',
+            'eps'  => 'application/postscript',
+            'ps'   => 'application/postscript',
+            'ttf'  => 'font/ttf',
+            'doc'  => 'application/msword',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'rtf'  => 'application/rtf',
+            'xls'  => 'application/vnd.ms-excel',
+            'ppt'  => 'application/vnd.ms-powerpoint',
+            'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        ];
         $ext       = Str::extension( $name );
 
         if ( array_key_exists( $ext, $mimeTypes ) ) {
@@ -78,11 +80,13 @@ final class Http
      */
     public static function browser( string $ua = null ): array
     {
-        $browser          = [ 'platform' => null,
-                              'browser'  => null,
-                              'mobile'   => null,
-                              'version'  => null,
-                              'bot'      => null, ];
+        $browser          = [
+            'platform' => null,
+            'browser'  => null,
+            'mobile'   => null,
+            'version'  => null,
+            'bot'      => null,
+        ];
         $ua               = strtolower( $ua );
         $browser[ 'bot' ] = Str::match( '/baiduspider|googlebot|yandexbot|bingbot|lynx|wget|curl/', $ua );
         $is               = static function( $contain, $name = false ) use ( $ua, &$browser )

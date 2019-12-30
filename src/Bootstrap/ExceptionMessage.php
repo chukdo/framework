@@ -47,19 +47,23 @@ class ExceptionMessage
             $e = $previous;
         }
         foreach ( $e->getTrace() as $trace ) {
-            $trace       = Arr::merge( [ 'file'     => null,
-                                         'line'     => null,
-                                         'class'    => null,
-                                         'type'     => null,
-                                         'function' => null, ], $trace );
+            $trace       = Arr::merge( [
+                                           'file'     => null,
+                                           'line'     => null,
+                                           'class'    => null,
+                                           'type'     => null,
+                                           'function' => null,
+                                       ], $trace );
             $file        = $trace[ 'file' ];
             $line        = $trace[ 'line' ];
-            $backTrace[] = [ 'Call' => $trace[ 'class' ] . $trace[ 'type' ] . $trace[ 'function' ] . '()',
-                             'File' => $file,
-                             'Line' => $line,
-                             'Php'  => $file && $line
-                                 ? $this->getCode( $trace[ 'file' ], $trace[ 'line' ] )
-                                 : '', ];
+            $backTrace[] = [
+                'Call' => $trace[ 'class' ] . $trace[ 'type' ] . $trace[ 'function' ] . '()',
+                'File' => $file,
+                'Line' => $line,
+                'Php'  => $file && $line
+                    ? $this->getCode( $trace[ 'file' ], $trace[ 'line' ] )
+                    : '',
+            ];
         }
         $this->message[ 'Call' ]  = get_class( $e );
         $this->message[ 'Error' ] = $e->getMessage();

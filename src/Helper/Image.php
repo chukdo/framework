@@ -47,10 +47,12 @@ final class Image
             $f        = finfo_open();
             $mimeType = finfo_buffer( $f, $string, FILEINFO_MIME_TYPE );
 
-            return [ 'w' => imagesx( $image ),
-                     'h' => imagesy( $image ),
-                     't' => $mimeType,
-                     'i' => $image, ];
+            return [
+                'w' => imagesx( $image ),
+                'h' => imagesy( $image ),
+                't' => $mimeType,
+                'i' => $image,
+            ];
         }
 
         return null;

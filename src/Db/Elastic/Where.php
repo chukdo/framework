@@ -114,12 +114,24 @@ Abstract Class Where
                 return [ 'range' => [ $field => [ 'lte' => Collection::filterIn( $field, $value ), ], ], ];
                 break;
             case '<>' :
-                return [ 'range' => [ $field => [ 'gt' => Collection::filterIn( $field, $value ),
-                                                  'lt' => Collection::filterIn( $field, $value ), ], ], ];
+                return [
+                    'range' => [
+                        $field => [
+                            'gt' => Collection::filterIn( $field, $value ),
+                            'lt' => Collection::filterIn( $field, $value ),
+                        ],
+                    ],
+                ];
                 break;
             case '<=>' :
-                return [ 'range' => [ $field => [ 'gte' => Collection::filterIn( $field, $value ),
-                                                  'lte' => Collection::filterIn( $field, $value ), ], ], ];
+                return [
+                    'range' => [
+                        $field => [
+                            'gte' => Collection::filterIn( $field, $value ),
+                            'lte' => Collection::filterIn( $field, $value ),
+                        ],
+                    ],
+                ];
                 break;
             case 'in':
             case '!in':
@@ -131,16 +143,24 @@ Abstract Class Where
                 return [ 'terms' => [ $field => $in, ], ];
                 break;
             case 'size':
-                return [ '
-                script' => [ 'script' => 'doc[\'' . $field . '\']values.size() = ' . $value, ], ];
+                return [
+                    '
+                script' => [ 'script' => 'doc[\'' . $field . '\']values.size() = ' . $value, ],
+                ];
                 break;
             case 'exists':
             case '!exists':
                 return [ 'exists' => [ 'field' => $field, ], ];
                 break;
             case 'regex':
-                return [ 'regexp' => [ $field => [ 'value' => $value,
-                                                   'flags' => $value2 ?? 'ALL', ], ], ];
+                return [
+                    'regexp' => [
+                        $field => [
+                            'value' => $value,
+                            'flags' => $value2 ?? 'ALL',
+                        ],
+                    ],
+                ];
                 break;
             case 'match':
                 return [ 'match' => [ $field => $value, ], ];
@@ -188,9 +208,11 @@ Abstract Class Where
      */
     public function filter( array $params = [], bool $withFilter = true ): array
     {
-        $query = new Json( [ 'index' => $this->collection()
-                                             ->fullName(),
-                             'body'  => [], ] );
+        $query = new Json( [
+                               'index' => $this->collection()
+                                               ->fullName(),
+                               'body'  => [],
+                           ] );
         foreach ( $params as $key => $value ) {
             $query->set( $key, $value );
         }

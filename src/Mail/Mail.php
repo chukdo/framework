@@ -219,11 +219,13 @@ class Mail
             finfo_close( $fi );
 
 
-            $this->files[] = [ 'content'     => $content,
-                               'type'        => $type,
-                               'name'        => $name,
-                               'disposition' => $disposition,
-                               'encoding'    => $encoding ];
+            $this->files[] = [
+                'content'     => $content,
+                'type'        => $type,
+                'name'        => $name,
+                'disposition' => $disposition,
+                'encoding'    => $encoding,
+            ];
         }
 
         return $this;
@@ -237,8 +239,10 @@ class Mail
      */
     protected function encode( string $data, string $encoding = '8bit' ): string
     {
-        $encoding = str_replace( [ ' ',
-                                   '_' ], '-', strtolower( $encoding ) );
+        $encoding = str_replace( [
+                                     ' ',
+                                     '_',
+                                 ], '-', strtolower( $encoding ) );
 
         switch ( $encoding ) {
             case 'base64' :
@@ -341,11 +345,13 @@ class Mail
      */
     public function log(): array
     {
-        return [ 'subject'  => $this->subject,
-                 'text'     => $this->text,
-                 'mailfrom' => $this->from,
-                 'mailto'   => $this->to,
-                 'replyto'  => $this->replyto ];
+        return [
+            'subject'  => $this->subject,
+            'text'     => $this->text,
+            'mailfrom' => $this->from,
+            'mailto'   => $this->to,
+            'replyto'  => $this->replyto,
+        ];
     }
 
     /**
@@ -429,13 +435,17 @@ class Mail
      */
     protected function mime( string $type, string $encoding = null ): ?string
     {
-        $encoding = str_replace( [ ' ',
-                                   '_' ], '-', strtolower( $encoding ) );
-        $mime     = [ 'mixed'       => "Content-Type: multipart/mixed; boundary=$this->mboundary" . $this->newLine(),
-                      'alternative' => "Content-Type: multipart/alternative; boundary=$this->aboundary" . $this->newLine(),
-                      'related'     => "Content-Type: multipart/related; boundary=$this->rboundary" . $this->newLine(),
-                      'text'        => "Content-Type: text/plain; charset=$this->charset" . $this->newLine() . "Content-Transfer-Encoding: $encoding" . $this->newLine(),
-                      'html'        => "Content-Type: text/html; charset=$this->charset" . $this->newLine() . "Content-Transfer-Encoding: $encoding" . $this->newLine() ];
+        $encoding = str_replace( [
+                                     ' ',
+                                     '_',
+                                 ], '-', strtolower( $encoding ) );
+        $mime     = [
+            'mixed'       => "Content-Type: multipart/mixed; boundary=$this->mboundary" . $this->newLine(),
+            'alternative' => "Content-Type: multipart/alternative; boundary=$this->aboundary" . $this->newLine(),
+            'related'     => "Content-Type: multipart/related; boundary=$this->rboundary" . $this->newLine(),
+            'text'        => "Content-Type: text/plain; charset=$this->charset" . $this->newLine() . "Content-Transfer-Encoding: $encoding" . $this->newLine(),
+            'html'        => "Content-Type: text/html; charset=$this->charset" . $this->newLine() . "Content-Transfer-Encoding: $encoding" . $this->newLine(),
+        ];
 
         return $mime[ $type ] ?? null;
     }
@@ -555,8 +565,10 @@ class Mail
         $images = Str::matchAll( '/(data:image\/[^\'")]+)/i', $html );
 
         foreach ( $images as $image ) {
-            [ $mime,
-              $content ] = Str::match( '/data:([^;]+);base64,(.*)/', $image );
+            [
+                $mime,
+                $content,
+            ] = Str::match( '/data:([^;]+);base64,(.*)/', $image );
             $name = md5( $content );
 
             $html = str_replace( "data:$mime;base64,$content", 'cid:' . $name, $html );
@@ -654,8 +666,10 @@ class Mail
      */
     public function qHeader( string $name ): string
     {
-        return str_replace( ' ', '-', ucwords( str_replace( [ '-',
-                                                              '_' ], ' ', strtolower( $name ) ) ) );
+        return str_replace( ' ', '-', ucwords( str_replace( [
+                                                                '-',
+                                                                '_',
+                                                            ], ' ', strtolower( $name ) ) ) );
     }
 
     /**
@@ -667,11 +681,13 @@ class Mail
      */
     public function inlineImage( string $content, string $name, bool $type ): self
     {
-        $this->inlineImages[ $name ] = [ 'content'     => trim( chunk_split( $content ) ),
-                                         'name'        => $name,
-                                         'type'        => $type,
-                                         'disposition' => 'inline;',
-                                         'encoding'    => 'base64' ];
+        $this->inlineImages[ $name ] = [
+            'content'     => trim( chunk_split( $content ) ),
+            'name'        => $name,
+            'type'        => $type,
+            'disposition' => 'inline;',
+            'encoding'    => 'base64',
+        ];
 
         return $this;
     }

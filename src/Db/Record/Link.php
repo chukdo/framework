@@ -60,8 +60,10 @@ Class Link
     {
         $this->database = $database;
         $dbName         = $database->name();
-        [ $db,
-          $field, ] = array_pad( explode( '.', $field ), -2, $dbName );
+        [
+            $db,
+            $field,
+        ] = array_pad( explode( '.', $field ), -2, $dbName );
         if ( !Str::match( '/^_[a-z0-9]+$/i', $field ) ) {
             throw new RecordException( sprintf( 'Field [%s] has not a valid format.', $field ) );
         }

@@ -61,10 +61,12 @@ class RouteAttributes
      */
     public function get(): array
     {
-        return [ 'middleware'      => $this->getMiddleware(),
-                 'validator'       => $this->getValidator(),
-                 'errorMiddleware' => $this->getErrorMiddleware(),
-                 'prefix'          => $this->getPrefix(), ];
+        return [
+            'middleware'      => $this->getMiddleware(),
+            'validator'       => $this->getValidator(),
+            'errorMiddleware' => $this->getErrorMiddleware(),
+            'prefix'          => $this->getPrefix(),
+        ];
     }
 
     /**
@@ -146,10 +148,12 @@ class RouteAttributes
      */
     public function add( array $attributes ): self
     {
-        $attributes = Arr::merge( [ 'middleware'      => [],
-                                    'validator'       => [],
-                                    'errorMiddleware' => null,
-                                    'prefix'          => '', ], $attributes );
+        $attributes = Arr::merge( [
+                                      'middleware'      => [],
+                                      'validator'       => [],
+                                      'errorMiddleware' => null,
+                                      'prefix'          => '',
+                                  ], $attributes );
         $this->setMiddleware( $attributes[ 'middleware' ] );
         $this->setValidator( $attributes[ 'validator' ], $attributes[ 'errorMiddleware' ] );
         $this->setPrefix( $attributes[ 'prefix' ] );

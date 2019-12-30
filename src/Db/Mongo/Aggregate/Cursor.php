@@ -35,9 +35,11 @@ class Cursor implements Iterator
     public function __construct( MongoDbCursor $cursor )
     {
         $this->cursor = $cursor;
-        $this->cursor->setTypeMap( [ 'root'     => 'array',
-                                     'document' => 'array',
-                                     'array'    => 'array', ] );
+        $this->cursor->setTypeMap( [
+                                       'root'     => 'array',
+                                       'document' => 'array',
+                                       'array'    => 'array',
+                                   ] );
         $this->iterator = new IteratorIterator( $this->cursor );
         $this->iterator->rewind();
     }

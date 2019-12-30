@@ -136,8 +136,10 @@ Class Find extends Where implements FindInterface
      */
     public function projection(): array
     {
-        $projection = [ 'projection'      => $this->projection,
-                        'noCursorTimeout' => false, ];
+        $projection = [
+            'projection'      => $this->projection,
+            'noCursorTimeout' => false,
+        ];
         if ( !empty( $this->sort ) ) {
             $projection[ 'sort' ] = $this->sort;
         }
@@ -302,9 +304,13 @@ Class Find extends Where implements FindInterface
         $explain = $this->collection()
                         ->database()
                         ->server()
-                        ->command( [ 'explain' => [ 'find'   => $this->collection()
-                                                                     ->name(),
-                                                    'filter' => $this->filter(), ], ] );
+                        ->command( [
+                                       'explain' => [
+                                           'find'   => $this->collection()
+                                                            ->name(),
+                                           'filter' => $this->filter(),
+                                       ],
+                                   ] );
         $json    = new Json();
         $json->offsetSet( 'queryPlanner', $explain->get( '0.queryPlanner' ) );
         $json->offsetSet( 'executionStats', $explain->get( '0.executionStats' ) );

@@ -117,8 +117,10 @@ Class Collection implements CollectionInterface
         try {
             $reflector = new ReflectionClass( '\App\Model\Mongo\Record\\' . $this->name() );
             if ( $reflector->implementsInterface( Record::class ) ) {
-                return $reflector->newInstanceArgs( [ $this,
-                                                      $data, ] );
+                return $reflector->newInstanceArgs( [
+                                                        $this,
+                                                        $data,
+                                                    ] );
             }
         }
         catch ( ReflectionException $e ) {
@@ -161,8 +163,10 @@ Class Collection implements CollectionInterface
         $new           = $newDatabase . '.' . $newCollection;
         $command       = $this->database()
                               ->server()
-                              ->command( [ 'renameCollection' => $old,
-                                           'to'               => $new, ] );
+                              ->command( [
+                                             'renameCollection' => $old,
+                                             'to'               => $new,
+                                         ] );
         if ( $command->offsetGet( 'ok' ) === 1 ) {
             return $this->database()
                         ->server()

@@ -125,7 +125,9 @@ class Facade
             throw new FacadeException( sprintf( "[%s] does not implement [%s] method.", $class, $method ) );
         }
 
-        return call_user_func_array( [ $instance,
-                                       $method, ], $args );
+        return call_user_func_array( [
+                                         $instance,
+                                         $method,
+                                     ], $args );
     }
 }

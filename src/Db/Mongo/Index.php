@@ -65,14 +65,18 @@ Class Index
         $orderby               = $sort === SORT_ASC
             ? 1
             : -1;
-        $this->index[ $field ] = [ 'name'   => $name,
-                                   'order'  => $orderby,
-                                   'field'  => $field,
-                                   'unique' => $unique, ];
+        $this->index[ $field ] = [
+            'name'   => $name,
+            'order'  => $orderby,
+            'field'  => $field,
+            'unique' => $unique,
+        ];
         $this->collection()
              ->client()
-             ->createIndex( [ $field => $orderby ], [ 'unique' => $unique,
-                                                      'name'   => $name, ] );
+             ->createIndex( [ $field => $orderby ], [
+                 'unique' => $unique,
+                 'name'   => $name,
+             ] );
 
         return $this;
     }
@@ -86,8 +90,10 @@ Class Index
             foreach ( $this->index as $index ) {
                 $this->collection()
                      ->client()
-                     ->createIndex( [ $index[ 'field' ] => $index[ 'order' ] ], [ 'unique' => $index[ 'unique' ],
-                                                                                  'name'   => $index[ 'name' ], ] );
+                     ->createIndex( [ $index[ 'field' ] => $index[ 'order' ] ], [
+                         'unique' => $index[ 'unique' ],
+                         'name'   => $index[ 'name' ],
+                     ] );
             }
 
             return true;

@@ -30,12 +30,14 @@ class Builder
     /**
      * @var array
      */
-    protected array $keywords = [ 'iss',
-                                  'iat',
-                                  'aud',
-                                  'nbf',
-                                  'jti',
-                                  'sub' ];
+    protected array $keywords = [
+        'iss',
+        'iat',
+        'aud',
+        'nbf',
+        'jti',
+        'sub',
+    ];
 
     /**
      * @param iterable $values

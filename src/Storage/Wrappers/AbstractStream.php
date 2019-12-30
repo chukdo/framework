@@ -273,12 +273,12 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
                 break;
             case 'a':
             case 'a+':
-            if ( $tell = $this->streamSize() ) {
-                $this->setTell( $tell );
-            }
-            else {
-                $this->streamSet( null );
-            }
+                if ( $tell = $this->streamSize() ) {
+                    $this->setTell( $tell );
+                }
+                else {
+                    $this->streamSet( null );
+                }
                 break;
             case 'x':
             case 'x+':
@@ -398,13 +398,15 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     public function stream_stat(): ?array
     {
         if ( $size = $this->streamSize() ) {
-            return [ 'size'  => $size,
-                     'mode'  => $this->streamIsDir()
-                         ? 16895
-                         : 33279,
-                     'ctime' => $this->streamCreatedTime(),
-                     'atime' => $this->streamAccessTime(),
-                     'mtime' => $this->streamModifiedTime(), ];
+            return [
+                'size'  => $size,
+                'mode'  => $this->streamIsDir()
+                    ? 16895
+                    : 33279,
+                'ctime' => $this->streamCreatedTime(),
+                'atime' => $this->streamAccessTime(),
+                'mtime' => $this->streamModifiedTime(),
+            ];
         }
 
         return null;

@@ -76,9 +76,11 @@ class Parser
             return [];
         }
 
-        return [ 'header'    => $tokenParts[ 0 ],
-                 'payload'   => $tokenParts[ 1 ],
-                 'signature' => $tokenParts[ 2 ], ];
+        return [
+            'header'    => $tokenParts[ 0 ],
+            'payload'   => $tokenParts[ 1 ],
+            'signature' => $tokenParts[ 2 ],
+        ];
     }
 
     /**

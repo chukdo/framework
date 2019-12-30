@@ -21,9 +21,13 @@ Class GeoNear extends Stage
      */
     public function near( float $lon, float $lat ): self
     {
-        $this->pipe[ 'near' ] = [ 'type'        => 'Point',
-                                  'coordinates' => [ $lon,
-                                                     $lat, ], ];
+        $this->pipe[ 'near' ] = [
+            'type'        => 'Point',
+            'coordinates' => [
+                $lon,
+                $lat,
+            ],
+        ];
 
         return $this;
     }

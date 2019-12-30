@@ -27,8 +27,10 @@ Class Merge extends Stage
             $this->pipe[ 'into' ] = $collection;
         }
         else {
-            $this->pipe[ 'into' ] = [ 'coll' => $collection,
-                                      'db'   => $db, ];
+            $this->pipe[ 'into' ] = [
+                'coll' => $collection,
+                'db'   => $db,
+            ];
         }
 
         return $this;

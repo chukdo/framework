@@ -129,12 +129,16 @@ class View
      */
     public function path( string $template ): ?array
     {
-        [ $folder,
-          $name, ] = Str::split( $template, '::', 2 );
-        $r = [ 'folder' => null,
-               'name'   => null,
-               'file'   => null,
-               'exists' => false, ];
+        [
+            $folder,
+            $name,
+        ] = Str::split( $template, '::', 2 );
+        $r = [
+            'folder' => null,
+            'name'   => null,
+            'file'   => null,
+            'exists' => false,
+        ];
         if ( $name ) {
             $r[ 'folder' ] = $folder;
             $r[ 'name' ]   = $name;

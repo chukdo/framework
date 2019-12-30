@@ -240,8 +240,10 @@ final class Arr
                 self::set( $array, $path, $get );
             }
             else {
-                self::set( $array, $path, [ $get,
-                                            $value, ] );
+                self::set( $array, $path, [
+                    $get,
+                    $value,
+                ] );
             }
         }
 

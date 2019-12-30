@@ -40,8 +40,10 @@ class Loader
      */
     public function register(): self
     {
-        spl_autoload_register( [ $this,
-                                 'loadClass', ] );
+        spl_autoload_register( [
+                                   $this,
+                                   'loadClass',
+                               ] );
 
         return $this;
     }
@@ -53,8 +55,10 @@ class Loader
      */
     public function unregister(): self
     {
-        spl_autoload_unregister( [ $this,
-                                   'loadClass', ] );
+        spl_autoload_unregister( [
+                                     $this,
+                                     'loadClass',
+                                 ] );
 
         return $this;
     }

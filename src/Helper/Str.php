@@ -343,23 +343,27 @@ final class Str
      */
     public static function removeSpecialChars( string $value ): string
     {
-        return self::replace( [ '/[éèêë]/iu',
-                                '/[àäâ]/iu',
-                                '/[ùüû]/iu',
-                                '/[ôö]/iu',
-                                '/[ç]/iu',
-                                '/[îï]/iu',
-                                '/²/iu',
-                                '/°/iu',
-                                '/œ/iu', ], [ 'e',
-                                              'a',
-                                              'u',
-                                              'o',
-                                              'c',
-                                              'i',
-                                              '2',
-                                              '.',
-                                              'oe', ], self::trim( $value ) );
+        return self::replace( [
+                                  '/[éèêë]/iu',
+                                  '/[àäâ]/iu',
+                                  '/[ùüû]/iu',
+                                  '/[ôö]/iu',
+                                  '/[ç]/iu',
+                                  '/[îï]/iu',
+                                  '/²/iu',
+                                  '/°/iu',
+                                  '/œ/iu',
+                              ], [
+                                  'e',
+                                  'a',
+                                  'u',
+                                  'o',
+                                  'c',
+                                  'i',
+                                  '2',
+                                  '.',
+                                  'oe',
+                              ], self::trim( $value ) );
     }
 
     /**

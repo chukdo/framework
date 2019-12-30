@@ -246,8 +246,10 @@ class Redis implements RedisInterface
      */
     protected function getIterator( int $pointer )
     {
-        $this->write( $this->command( array_merge( [ $this->type,
-                                                     $pointer, ], $this->args ) ) );
+        $this->write( $this->command( array_merge( [
+                                                       $this->type,
+                                                       $pointer,
+                                                   ], $this->args ) ) );
 
         return $this->read();
     }
@@ -267,14 +269,18 @@ class Redis implements RedisInterface
                     $current = $this->get( $key );
                     break;
                 case 'list':
-                    $current = $this->__call( 'LRANGE', [ $key,
-                                                          '0',
-                                                          '-1', ] );
+                    $current = $this->__call( 'LRANGE', [
+                        $key,
+                        '0',
+                        '-1',
+                    ] );
                     break;
                 case 'zset':
-                    $current = $this->__call( 'ZRANGE', [ $key,
-                                                          '0',
-                                                          '-1', ] );
+                    $current = $this->__call( 'ZRANGE', [
+                        $key,
+                        '0',
+                        '-1',
+                    ] );
                     break;
                 case 'hash':
                     $current = $this->__call( 'HGETALL', [ $key ] );
@@ -429,8 +435,10 @@ class Redis implements RedisInterface
      */
     public function set( string $key, $value )
     {
-        return $this->__call( 'SET', [ $key,
-                                       $value, ] );
+        return $this->__call( 'SET', [
+            $key,
+            $value,
+        ] );
     }
 
     /**
@@ -475,8 +483,10 @@ class Redis implements RedisInterface
      */
     public function __set( string $key, $value )
     {
-        return $this->__call( 'SET', [ $key,
-                                       $value, ] );
+        return $this->__call( 'SET', [
+            $key,
+            $value,
+        ] );
     }
 
     /**

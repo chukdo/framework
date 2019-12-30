@@ -42,7 +42,7 @@ final class To
                 break;
             case 'string':
             default:
-            return (string) $value;
+                return (string) $value;
         }
     }
 
@@ -110,11 +110,15 @@ final class To
      */
     public static function base64UrlEncode( string $value ): string
     {
-        return str_replace( [ '+',
-                              '/',
-                              '=', ], [ '-',
-                                        '_',
-                                        '', ], self::base64Encode( $value ) );
+        return str_replace( [
+                                '+',
+                                '/',
+                                '=',
+                            ], [
+                                '-',
+                                '_',
+                                '',
+                            ], self::base64Encode( $value ) );
     }
 
     /**

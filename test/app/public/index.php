@@ -21,12 +21,14 @@ $app->lang()
     ->loadDir( __DIR__ . '/../Lang/' . \Chukdo\Helper\HttpRequest::tld() );
 
 /** Service APP register */
-$app->registerServices( [ Providers\AppServiceProvider::class,
-                          Providers\ServiceLocatorServiceProvider::class,
-                          Providers\LoggerHandlerServiceProvider::class,
-                          Providers\ExceptionLoggerServiceProvider::class,
-                          Providers\ValidatorServiceProvider::class,
-                          Providers\MongoServiceProvider::class, ] );
+$app->registerServices( [
+                            Providers\AppServiceProvider::class,
+                            Providers\ServiceLocatorServiceProvider::class,
+                            Providers\LoggerHandlerServiceProvider::class,
+                            Providers\ExceptionLoggerServiceProvider::class,
+                            Providers\ValidatorServiceProvider::class,
+                            Providers\MongoServiceProvider::class,
+                        ] );
 
 Router::any( '/', function( Input $inputs, \Chukdo\Http\Response $response )
 {
@@ -35,13 +37,17 @@ Router::any( '/', function( Input $inputs, \Chukdo\Http\Response $response )
     return View::setDefaultFolder( __DIR__ . '/../Views/' )
                ->setResponseHandler( $response )
                ->loadFunction( new Basic() )
-               ->render( 'test', [ 'title' => 'Test',
-                                   'list'  => [ '<a href="/oauth2/authorize">Check dropbox access</a>',
-                                                'h',
-                                                'u',
-                                                'k',
-                                                'd',
-                                                'o', ], ] );
+               ->render( 'test', [
+                   'title' => 'Test',
+                   'list'  => [
+                       '<a href="/oauth2/authorize">Check dropbox access</a>',
+                       'h',
+                       'u',
+                       'k',
+                       'd',
+                       'o',
+                   ],
+               ] );
 } );
 
 Router::any( '/oauth2/authorize', '\App\Controlers\Oauth2@authorize' );

@@ -331,10 +331,12 @@ Class Write extends Where implements WriteInterface
      */
     public function updateOneAndGet( bool $before = true ): Record
     {
-        $options = Arr::merge( [ 'projection'     => [],
-                                 'returnDocument' => $before
-                                     ? FindOneAndUpdate::RETURN_DOCUMENT_BEFORE
-                                     : FindOneAndUpdate::RETURN_DOCUMENT_AFTER, ], $this->options() );
+        $options = Arr::merge( [
+                                   'projection'     => [],
+                                   'returnDocument' => $before
+                                       ? FindOneAndUpdate::RETURN_DOCUMENT_BEFORE
+                                       : FindOneAndUpdate::RETURN_DOCUMENT_AFTER,
+                               ], $this->options() );
 
         return $this->collection()
                     ->record( $this->collection()
@@ -426,11 +428,15 @@ Class Write extends Where implements WriteInterface
                 return $this->field( 'pull', $field, [ '$lte' => $value, ] );
                 break;
             case '<>' :
-                return $this->field( 'pull', $field, [ '$gt' => $value,
-                                                       '$lt' => $value2, ] );
+                return $this->field( 'pull', $field, [
+                    '$gt' => $value,
+                    '$lt' => $value2,
+                ] );
             case '<=>' :
-                return $this->field( 'pull', $field, [ '$gte' => $value,
-                                                       '$lte' => $value2, ] );
+                return $this->field( 'pull', $field, [
+                    '$gte' => $value,
+                    '$lte' => $value2,
+                ] );
             case 'in':
                 return $this->field( 'pull', $field, [ '$in' => $value, ] );
                 break;
@@ -537,9 +543,11 @@ Class Write extends Where implements WriteInterface
             $value[ '$slice' ] = $slice;
         }
         if ( $orderby !== null ) {
-            $value[ '$sort' ] = [ $orderby => $sort === SORT_ASC
-                ? 1
-                : -1, ];
+            $value[ '$sort' ] = [
+                $orderby => $sort === SORT_ASC
+                    ? 1
+                    : -1,
+            ];
         }
 
         return $this->field( 'push', $field, $value );

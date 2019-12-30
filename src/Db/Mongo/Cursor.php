@@ -41,9 +41,11 @@ class Cursor implements Iterator
     {
         $this->collection = $collection;
         $this->cursor     = $cursor;
-        $this->cursor->setTypeMap( [ 'root'     => 'array',
-                                     'document' => 'array',
-                                     'array'    => 'array', ] );
+        $this->cursor->setTypeMap( [
+                                       'root'     => 'array',
+                                       'document' => 'array',
+                                       'array'    => 'array',
+                                   ] );
         $this->iterator = new IteratorIterator( $this->cursor );
         $this->iterator->rewind();
     }

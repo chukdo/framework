@@ -33,14 +33,16 @@ class Logger implements LoggerInterface
      *
      * @var array
      */
-    public static array $levels = [ 100 => 'Debug',
-                                    200 => 'Info',
-                                    250 => 'Notice',
-                                    300 => 'Warning',
-                                    400 => 'Error',
-                                    500 => 'Critical',
-                                    550 => 'Alert',
-                                    600 => 'Emergency', ];
+    public static array $levels = [
+        100 => 'Debug',
+        200 => 'Info',
+        250 => 'Notice',
+        300 => 'Warning',
+        400 => 'Error',
+        500 => 'Critical',
+        550 => 'Alert',
+        600 => 'Emergency',
+    ];
 
     /**
      * @var string
@@ -146,13 +148,15 @@ class Logger implements LoggerInterface
         if ( !isset( self::$levels[ $level ] ) ) {
             throw new LoggerException( sprintf( "You tried to log record with unknown level [%s]", $level ) );
         }
-        $record = [ 'message'   => $this->interpolate( $message, $context ),
-                    'level'     => $level,
-                    'levelname' => $this->getLevel( $level ),
-                    'channel'   => $this->getName(),
-                    'date'      => time(),
-                    'extra'     => [],
-                    'formatted' => null, ];
+        $record = [
+            'message'   => $this->interpolate( $message, $context ),
+            'level'     => $level,
+            'levelname' => $this->getLevel( $level ),
+            'channel'   => $this->getName(),
+            'date'      => time(),
+            'extra'     => [],
+            'formatted' => null,
+        ];
 
         return $this->handleRecord( $this->processRecord( $record ) );
     }

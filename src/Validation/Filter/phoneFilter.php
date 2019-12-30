@@ -42,13 +42,17 @@ class PhoneFilter implements FilterInterface
     {
 
         if ( Str::match( '/^(?:(?:\+|00)\d{2}|0)\s{0,2}[1-9](?:[\s.-]{0,3}\d{2}){4}$/', $input ) ) {
-            return str_replace( [ '.',
-                                  ',',
-                                  ' ',
-                                  '+', ], [ '',
-                                            '',
-                                            '',
-                                            '00', ], $input );
+            return str_replace( [
+                                    '.',
+                                    ',',
+                                    ' ',
+                                    '+',
+                                ], [
+                                    '',
+                                    '',
+                                    '',
+                                    '00',
+                                ], $input );
         }
 
         return $input;
