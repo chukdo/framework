@@ -105,7 +105,8 @@ abstract Class AbstractProvider implements ProviderInterface
             ? $url->post()
             : $url->get();
         var_dump( $res->raw() );
-        var_dump( $res->headers() );
+        var_dump( $res->headers()
+                      ->getStatus() );
         exit;
         $token = new Json();
 

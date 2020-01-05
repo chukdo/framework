@@ -100,6 +100,8 @@ class Header
      */
     public function parseHeaders( string $header ): int
     {
+        $this->setStatus( (int) Str::match( '/[0-9]{3}/', $header ) );
+
         preg_match_all( '/^([^:\n]*): ?(.*)$/m', $header, $headers, PREG_SET_ORDER );
 
         $headers = array_merge( ...array_map( fn( $set ) => [ $set[ 1 ] => trim( $set[ 2 ] ) ], $headers ) );
@@ -122,7 +124,7 @@ class Header
      */
     public function getStatus(): ?int
     {
-        return Str::match( '/([0-9]{3})/', $this->getHttp() );
+        return (int) Str::match( '/[0-9]{3}/', $this->getHttp() );
     }
 
     /**
