@@ -26,11 +26,6 @@ class Curl
     protected ?string $raw = null;
 
     /**
-     * @var string
-     */
-    protected string $content;
-
-    /**
      * @var Header
      */
     protected Header $headers;
@@ -67,7 +62,7 @@ class Curl
     {
         if ( $this->raw === null ) {
             $this->raw = curl_exec( $this->handle );
-            $status    = (int) curl_getinfo( $this->handle, CURLINFO_HTTP_CODE );
+            $status    = (int) curl_getinfo( $this->handle, CURLINFO_RESPONSE_CODE );
             $errno     = curl_errno( $this->handle );
 
             /** Curl Error */
@@ -77,7 +72,8 @@ class Curl
 
             /** Bad http header status */
             if ( $status >= 400 ) {
-                throw new HttpException( sprintf( 'Curl return bad http status [%s]', $status ) );
+                throw new HttpException( sprintf( 'Curl return bad http status [%s]', $this->headers()
+                                                                                           ->getHttp() ) );
             }
 
             /** Empty response */
@@ -149,21 +145,21 @@ class Curl
     }
 
     /**
-     * @return mixed
+     * @return Json|Xml|string|null
      */
     public function content()
     {
-        $this->execute();
+        $content = $this->raw();
 
-        if ( strpos( $this->content, '{' ) === 0 ) {
-            return new Json( json_decode( $this->content, true, 512, JSON_THROW_ON_ERROR ) );
+        if ( strpos( $content, '{' ) === 0 ) {
+            return new Json( json_decode( $content, true, 512, JSON_THROW_ON_ERROR ) );
         }
 
-        if ( strpos( $this->content, '<' ) === 0 ) {
-            return Xml::loadFromString( $this->content );
+        if ( strpos( $content, '<' ) === 0 ) {
+            return Xml::loadFromString( $content );
         }
 
-        return $this->content;
+        return $content;
     }
 
     /**

@@ -104,7 +104,7 @@ abstract Class AbstractProvider implements ProviderInterface
         $res = $method === 'POST'
             ? $url->post()
             : $url->get();
-        var_dump( $res->raw() );
+        var_dump( $res->content() );
         var_dump( $res->headers()
                       ->getStatus() );
         exit;
