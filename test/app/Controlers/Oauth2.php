@@ -24,7 +24,7 @@ class Oauth2 extends Controler
                      ->setUrlAccessToken( 'https://api.dropboxapi.com/oauth2/token' )
                      ->setClientId( '1gnu9jmet15ofyp' )
                      ->setClientSecret( 'rngrh6odd07b3t3' )
-                     ->setRedirectUri( 'https://e8a75802.ngrok.io/oauth2/callback/' );
+                     ->setRedirectUri( 'https://0452c7ee.ngrok.io/oauth2/callback/' );
     }
 
     /**
