@@ -314,16 +314,11 @@ class Url
      * @param array       $options
      * @param Header|null $headers
      *
-     * @return string
+     * @return Curl
      */
-    public function get( array $options = [], Header $headers = null ): string
+    public function get( array $options = [], Header $headers = null ): Curl
     {
-        $curl = new Curl( array_merge( [
-                                           CURLOPT_URL            => $this->buildUrl(),
-                                           CURLOPT_RETURNTRANSFER => true,
-                                       ], $options ), $headers );
-
-        return $curl->data();
+        return new Curl( $this->buildUrl(), $options, $headers );
     }
 
     /**
@@ -336,11 +331,8 @@ class Url
     public function fileGet( string $file, array $options = [], Header $headers = null ): int
     {
         $fileHandle = fopen( $file, 'wb' );
-
-        $curl = new Curl( array_merge( [
-                                           CURLOPT_URL  => $this->buildUrl(),
-                                           CURLOPT_FILE => $fileHandle,
-                                       ], $options ), $headers );
+        $options    = Arr::merge( [ CURLOPT_FILE => $fileHandle ], $options );
+        $curl       = new Curl( $this->buildUrl(), $options, $headers );
         fclose( $fileHandle );
 
         return $curl->contentLength();
@@ -353,13 +345,16 @@ class Url
      *
      * @return string
      */
-    public function filePostStream( string $file, array $options = [], Header $headers = null ): string
+    public function filePut( string $file, array $options = [], Header $headers = null ): string
     {
-        return $this->post( array_merge( [
-                                             CURLOPT_PUT            => true,
-                                             CURLOPT_FOLLOWLOCATION => false,
-                                             CURLOPT_INFILE         => fopen( $file, 'rb' ),
-                                         ], $options ), $headers );
+        $options = Arr::merge( [
+                                   CURLOPT_PUT            => true,
+                                   CURLOPT_FOLLOWLOCATION => false,
+                                   CURLOPT_INFILE         => fopen( $file, 'rb' ),
+                               ], $options );
+
+        return $this->post( $options, $headers )
+                    ->raw();
     }
 
     /**
@@ -371,53 +366,56 @@ class Url
      */
     public function filePost( string $file, array $options = [], Header $headers = null ): string
     {
-        return $this->post( array_merge( [
-                                             CURLOPT_POSTREDIR  => 3,
-                                             CURLOPT_POSTFIELDS => file_get_contents( $file ),
-                                         ], $options ), $headers );
+        $options = Arr::merge( [
+                                   CURLOPT_POSTREDIR  => 3,
+                                   CURLOPT_POSTFIELDS => file_get_contents( $file ),
+                               ], $options );
+
+        return $this->post( $options, $headers )
+                    ->raw();
     }
 
     /**
      * @param array       $options
      * @param Header|null $headers
      *
-     * @return string
+     * @return Curl
      */
-    public function post( array $options = [], Header $headers = null ): string
+    public function post( array $options = [], Header $headers = null ): Curl
     {
-        $curl = new Curl( array_merge( [
-                                           CURLOPT_URL            => $this->buildDsn() . $this->buildPath(),
-                                           CURLOPT_POSTFIELDS     => $this->getInputs(),
-                                           CURLOPT_CUSTOMREQUEST  => 'POST',
-                                           CURLOPT_RETURNTRANSFER => true,
-                                       ], $options ), $headers );
+        $options = Arr::merge( [
+                                   CURLOPT_POSTFIELDS    => $this->getInputs(),
+                                   CURLOPT_CUSTOMREQUEST => 'POST',
+                               ], $options );
 
-        return $curl->data();
+        return new Curl( $this->buildDsn() . $this->buildPath(), $options, $headers );
     }
 
     /**
      * @param array       $options
      * @param Header|null $headers
      *
-     * @return string
+     * @return Curl
      */
-    public function put( array $options = [], Header $headers = null ): string
+    public function put( array $options = [], Header $headers = null ): Curl
     {
-        return $this->post( array_merge( [
-                                             CURLOPT_POST          => false,
-                                             CURLOPT_CUSTOMREQUEST => 'PUT',
-                                         ], $options ), $headers );
+        $options = Arr::merge( [
+                                   CURLOPT_POST          => false,
+                                   CURLOPT_CUSTOMREQUEST => 'PUT',
+                               ], $options );
+
+        return $this->post( $options, $headers );
     }
 
     /**
      * @param array       $options
      * @param Header|null $headers
      *
-     * @return string
+     * @return Curl
      */
-    public function delete( array $options = [], Header $headers = null ): string
+    public function delete( array $options = [], Header $headers = null ): Curl
     {
-        return $this->get( array_merge( [ CURLOPT_CUSTOMREQUEST => 'DELETE' ], $options ), $headers );
+        return $this->get( Arr::merge( [ CURLOPT_CUSTOMREQUEST => 'DELETE' ], $options ), $headers );
     }
 
     /**

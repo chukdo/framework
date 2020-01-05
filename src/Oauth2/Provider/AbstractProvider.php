@@ -7,7 +7,6 @@ use Chukdo\Helper\Arr;
 use Chukdo\Http\Url;
 use Chukdo\Json\Json;
 use Chukdo\Oauth2\Oauth2Exception;
-use GuzzleHttp\Client;
 
 abstract Class AbstractProvider implements ProviderInterface
 {
@@ -101,18 +100,12 @@ abstract Class AbstractProvider implements ProviderInterface
      */
     public function getToken( string $grantType, array $options = [], string $method = 'POST' ): Json
     {
-        $client = new Client();
-        $url    = $this->getTokenUrl( $grantType, $options );
-
-        if ( $method === 'POST' ) {
-            $res = $client->post( $url->buildUri(), $url->getInputs() );
-        }
-        else {
-            $res = $client->get( $url->buildUrl() );
-        }
-
-        echo 'code: ' . $res->getStatusCode();
-        var_dump( $res->getBody() );
+        $url = $this->getTokenUrl( $grantType, $options );
+        $res = $method === 'POST'
+            ? $url->post()
+            : $url->get();
+        var_dump( $res->raw() );
+        var_dump( $res->headers() );
         exit;
         $token = new Json();
 

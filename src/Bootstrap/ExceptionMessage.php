@@ -154,8 +154,7 @@ class ExceptionMessage
         $climate->output->defaultTo( 'buffer' );
         $climate->border();
         $climate->red()
-                ->out( strtoupper( $message[ 'Call' ]
-                                       ?: 'Exception' ) );
+                ->out( strtoupper( $message[ 'Call' ] ?? 'Exception' ) );
         $climate->border();
         $padding = $climate->padding( 7 );
         $padding->label( 'Code' )

@@ -52,10 +52,12 @@ final class HttpRequest
         if ( Cli::runningInConsole() ) {
             return Cli::inputs();
         }
+
         if ( !empty( $_REQUEST ) ) {
             return $_REQUEST;
         }
-        if ( ( $data = self::input() ) && Str::contain( self::server( 'ACCEPT' ), 'json' ) ) {
+
+        if ( ( $data = self::input() ) && ( strpos( $data, '{' ) === 0 ) && Str::contain( self::server( 'ACCEPT' ), 'json' ) ) {
             return json_decode( $data, true, 512, JSON_THROW_ON_ERROR );
         }
 
@@ -68,12 +70,12 @@ final class HttpRequest
     public static function input(): ?string
     {
         static $input = null;
+
         if ( $input ) {
             return $input;
         }
-        $input = file_get_contents( 'php://input' );
 
-        return $input;
+        return $input = file_get_contents( 'php://input' );
     }
 
     /**

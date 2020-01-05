@@ -94,6 +94,30 @@ class Header
     }
 
     /**
+     * @param string $header
+     *
+     * @return int
+     */
+    public function parseHeaders( string $header ): int
+    {
+        preg_match_all( '/^([^:\n]*): ?(.*)$/m', $header, $headers, PREG_SET_ORDER );
+
+        $headers = array_merge( ...array_map( fn( $set ) => [ $set[ 1 ] => trim( $set[ 2 ] ) ], $headers ) );
+
+        foreach ( $headers as $key => $value ) {
+            if ( $key === '/^Set-Cookie:/' ) {
+                $match = Str::match( '/^(?<name>.*?)=(?<value>.*?);/', $value );
+                $this->setCookie( $match->offsetGet( 'name' ), $match->offsetGet( 'value' ) );
+            }
+            else {
+                $this->setHeader( $key, (string) $value );
+            }
+        }
+
+        return strlen( $header );
+    }
+
+    /**
      * @return int|null
      */
     public function getStatus(): ?int
@@ -471,16 +495,19 @@ class Header
     public function setCookie( string $name, string $value = null, string $expires = null, string $path = null, string $domain = null ): self
     {
         $value  = rawurlencode( $value );
-        $cookie = 'AddFields-Cookie: ' . $name . '=' . $value;
+        $cookie = 'Set-Cookie: ' . $name . '=' . $value;
+
         if ( $expires ) {
             $expires = gmdate( DATE_RFC850, $expires );
             $cookie  .= "; expires=$expires";
         }
+
         $cookie .= '; path=' . ( $path
                 ?: '/' );
         if ( $domain ) {
             $cookie .= '; domain=' . $domain;
         }
+
         $this->cookie->offsetSet( $name, $cookie );
 
         return $this;
@@ -610,7 +637,7 @@ class Header
                     case 'unset':
                         return $this->unsetHeader( $key );
                 }
-                /** Gestion des methodes AddFields || Get */
+                /** Gestion des methodes Set || Get */
             }
             else {
                 switch ( $action ) {

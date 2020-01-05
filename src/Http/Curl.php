@@ -2,6 +2,9 @@
 
 namespace Chukdo\Http;
 
+use Chukdo\Json\Json;
+use Chukdo\Xml\Xml;
+
 /**
  * Curl.
  *
@@ -18,39 +21,42 @@ class Curl
     protected $handle;
 
     /**
-     * @var mixed
+     * @var string|null
      */
-    protected $data = null;
+    protected ?string $raw = null;
+
+    /**
+     * @var string
+     */
+    protected string $content;
+
+    /**
+     * @var Header
+     */
+    protected Header $headers;
 
     /**
      * Curl constructor.
      *
+     * @param string      $url
      * @param array       $options
      * @param Header|null $headers
      */
-    public function __construct( array $options = [], Header $headers = null )
+    public function __construct( string $url, array $options = [], Header $headers = null )
     {
-        $this->handle = curl_init();
+        $this->handle  = curl_init();
+        $this->headers = new Header();
 
-        $this->setOption( CURLOPT_FOLLOWLOCATION, true )
-             ->setOption( CURLOPT_HEADER, true )
-             ->setOptions( $options );
+        $this->setUrl( $url )
+             ->setOption( CURLOPT_SSL_VERIFYPEER, false )
+             ->setOption( CURLOPT_RETURNTRANSFER, true )
+             ->setOption( CURLOPT_FOLLOWLOCATION, true )
+             ->setOptions( $options )
+             ->setOption( CURLOPT_HEADER, false )
+             ->setOption( CURLOPT_HEADERFUNCTION, fn( $h, $header ) => $this->headers->parseHeaders( $header ) );
 
         if ( $headers ) {
             $this->setHeaders( $headers );
-        }
-
-
-        $status = $this->status();
-
-        /** Curl Error */
-        if ( $error = $this->error() ) {
-            throw new HttpException( $error );
-        }
-
-        /** Bad http header status */
-        if ( $status >= 400 ) {
-            throw new HttpException( sprintf( 'Curl return bad http status [%s]', $status ) );
         }
     }
 
@@ -59,19 +65,24 @@ class Curl
      */
     public function execute(): void
     {
-        if ( $this->data === null ) {
-            $this->data = curl_exec( $this->handle );
-            $status     = $this->status();
-            $error      = $this->error();
+        if ( $this->raw === null ) {
+            $this->raw = curl_exec( $this->handle );
+            $status    = (int) curl_getinfo( $this->handle, CURLINFO_HTTP_CODE );
+            $errno     = curl_errno( $this->handle );
 
             /** Curl Error */
-            if ( $error ) {
-                throw new HttpException( $error );
+            if ( $errno ) {
+                throw new HttpException( curl_error( $this->handle ) );
             }
 
             /** Bad http header status */
             if ( $status >= 400 ) {
                 throw new HttpException( sprintf( 'Curl return bad http status [%s]', $status ) );
+            }
+
+            /** Empty response */
+            if ( $this->raw === null ) {
+                throw new HttpException( 'Curl has empty response' );
             }
         }
     }
@@ -84,6 +95,18 @@ class Curl
     public function setHeaders( Header $headers ): self
     {
         curl_setopt( $this->handle, CURLOPT_HTTPHEADER, (array) $headers->getHeaders() );
+
+        return $this;
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return $this
+     */
+    public function setUrl( string $url ): self
+    {
+        curl_setopt( $this->handle, CURLOPT_URL, $url );
 
         return $this;
     }
@@ -116,47 +139,41 @@ class Curl
     }
 
     /**
-     * @return string|null
-     */
-    public function error(): ?string
-    {
-        $this->execute();
-
-        if ( curl_errno( $this->handle ) ) {
-            return curl_error( $this->handle );
-        }
-
-        return null;
-    }
-
-    /**
      * @return bool|mixed|string
      */
-    public function data()
+    public function raw()
     {
         $this->execute();
 
-        return $this->data;
+        return $this->raw;
     }
 
     /**
-     * @return int
+     * @return mixed
      */
-    public function contentLength(): int
+    public function content()
     {
         $this->execute();
 
-        return (int) curl_getinfo( $this->handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD );
+        if ( strpos( $this->content, '{' ) === 0 ) {
+            return new Json( json_decode( $this->content, true, 512, JSON_THROW_ON_ERROR ) );
+        }
+
+        if ( strpos( $this->content, '<' ) === 0 ) {
+            return Xml::loadFromString( $this->content );
+        }
+
+        return $this->content;
     }
 
     /**
-     * @return int
+     * @return Header
      */
-    public function status(): int
+    public function headers(): Header
     {
         $this->execute();
 
-        return (int) curl_getinfo( $this->handle, CURLINFO_HTTP_CODE );
+        return $this->headers;
     }
 
     /**
