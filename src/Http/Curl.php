@@ -62,7 +62,7 @@ class Curl
     {
         if ( $this->raw === null ) {
             $this->raw = curl_exec( $this->handle );
-            $status    = (int) curl_getinfo( $this->handle, CURLINFO_RESPONSE_CODE );
+            $status    = $this->headers->getStatus();
             $errno     = curl_errno( $this->handle );
 
             /** Curl Error */
@@ -72,8 +72,7 @@ class Curl
 
             /** Bad http header status */
             if ( $status >= 400 ) {
-                throw new HttpException( sprintf( 'Curl return bad http status [%s]', $this->headers()
-                                                                                           ->getHttp() ) );
+                throw new HttpException( sprintf( 'Curl return bad http status [%s]', $status ) );
             }
 
             /** Empty response */

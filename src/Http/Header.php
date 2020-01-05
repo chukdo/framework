@@ -100,7 +100,9 @@ class Header
      */
     public function parseHeaders( string $header ): int
     {
-        $this->setStatus( (int) Str::match( '/[0-9]{3}/', $header ) );
+        if ( strpos( $header, 'HTTP' ) === 0 ) {
+            $this->setStatus( (int) Str::match( '/[0-9]{3}/', $header ) );
+        }
 
         preg_match_all( '/^([^:\n]*): ?(.*)$/m', $header, $headers, PREG_SET_ORDER );
 
