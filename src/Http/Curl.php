@@ -38,17 +38,19 @@ class Curl
     /**
      * Curl constructor.
      *
-     * @param string $url
-     * @param array  $options
-     * @param array  $headers
+     * @param string|null $method
+     * @param string|null $url
+     * @param array       $headers
+     * @param array       $options
      */
-    public function __construct( string $url, array $options = [], array $headers = [] )
+    public function __construct( string $method = null, string $url = null, array $headers = [], array $options = [] )
     {
         $this->curl        = curl_init();
         $this->headers     = new Header();
         $this->curlHeaders = new Header();
 
-        $this->setUrl( $url )
+        $this->setMethod( $method )
+             ->setUrl( $url )
              ->setOption( CURLOPT_SSL_VERIFYPEER, false )
              ->setOption( CURLOPT_RETURNTRANSFER, true )
              ->setOption( CURLOPT_FOLLOWLOCATION, true )
@@ -64,7 +66,7 @@ class Curl
     public function execute(): void
     {
         if ( $this->raw === null ) {
-            curl_setopt( $this->curl, CURLOPT_HTTPHEADER, (array) $this->headers->getHeaders() );
+            curl_setopt( $this->curl, CURLOPT_HTTPHEADER, (array) $this->curlHeaders->getHeaders() );
 
             $this->raw = curl_exec( $this->curl );
             $status    = $this->headers->getStatus();
@@ -77,7 +79,7 @@ class Curl
 
             /** Bad http header status */
             if ( $status >= 400 ) {
-                throw new HttpException( sprintf( 'Curl return bad http status [%s]', $status ) );
+                throw new HttpException( sprintf( 'Curl return bad http status [%s] message [%s]', $status, $this->raw ) );
             }
 
             /** Empty response */
@@ -85,6 +87,47 @@ class Curl
                 throw new HttpException( 'Curl has empty response' );
             }
         }
+    }
+
+    /**
+     * @param $inputs
+     *
+     * @return $this
+     */
+    public function setInputs( $inputs ): self
+    {
+        return $this->setOption( CURLOPT_POSTFIELDS, $inputs );
+    }
+
+    /**
+     * @param string $method
+     *
+     * @return $this
+     */
+    public function setMethod( string $method = 'GET' ): self
+    {
+        $method = strtoupper( trim( $method ) );
+
+        switch ( $method ) {
+            case 'POST' :
+                $this->setOption( CURLOPT_POST, true );
+                break;
+            case 'PUT' :
+                $this->setOption( CURLOPT_CUSTOMREQUEST, 'PUT' );
+                break;
+            case 'GET' :
+                $this->setOption( CURLOPT_HTTPGET, true );
+                break;
+            case 'DELETE' :
+                $this->setOption( CURLOPT_CUSTOMREQUEST, 'DELETE' );
+                break;
+            case 'HEAD' :
+                $this->setOption( CURLOPT_HTTPGET, true )
+                     ->setOption( CURLOPT_NOBODY, true );
+                break;
+        }
+
+        return $this;
     }
 
     /**
@@ -127,13 +170,15 @@ class Curl
     }
 
     /**
-     * @param string $url
+     * @param string|null $url
      *
      * @return $this
      */
-    public function setUrl( string $url ): self
+    public function setUrl( string $url = null ): self
     {
-        curl_setopt( $this->curl, CURLOPT_URL, $url );
+        if ( $url ) {
+            curl_setopt( $this->curl, CURLOPT_URL, $url );
+        }
 
         return $this;
     }

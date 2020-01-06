@@ -6,9 +6,7 @@ use Chukdo\Contracts\Oauth2\Token as TokenInterface;
 use Chukdo\Contracts\Oauth2\Provider as ProviderInterface;
 use Chukdo\Helper\Arr;
 use Chukdo\Http\Url;
-use Chukdo\Json\Json;
 use Chukdo\Oauth2\Oauth2Exception;
-use Chukdo\Oauth2\Token\Token;
 
 abstract Class AbstractProvider implements ProviderInterface
 {
@@ -94,7 +92,7 @@ abstract Class AbstractProvider implements ProviderInterface
     }
 
     /**
-     * @param string $grantType code|password|client|implicit (utile uniquement en JS)
+     * @param string $grantType authorisation_code|password|client_credentials|token_refresh|implicit (utile uniquement en JS)
      * @param array  $options
      * @param string $method
      *
@@ -116,15 +114,15 @@ abstract Class AbstractProvider implements ProviderInterface
         ] );
 
         if ( $grantType === 'code' && !isset( $options[ 'code' ] ) ) {
-            throw new Oauth2Exception( 'Access Token Url need a option [code]' );
+            throw new Oauth2Exception( 'Access GenericToken Url need a option [code]' );
         }
 
         if ( $grantType === 'password' && !isset( $options[ 'username' ], $options[ 'password' ] ) ) {
-            throw new Oauth2Exception( 'Access Token Url need a option [username] and [password]' );
+            throw new Oauth2Exception( 'Access GenericToken Url need a option [username] and [password]' );
         }
 
         if ( $grantType === 'refresh' && !isset( $options[ 'refresh_token' ] ) ) {
-            throw new Oauth2Exception( 'Access Token Url need a option [code]' );
+            throw new Oauth2Exception( 'Access GenericToken Url need a option [code]' );
         }
 
         switch ( $grantType ) {

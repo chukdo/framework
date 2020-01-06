@@ -5,7 +5,7 @@ namespace Chukdo\Jwt;
 use Chukdo\Helper\To;
 
 /**
- * Json Web Token.
+ * Json Web GenericToken.
  *
  * @version      1.0.0
  * @copyright    licence MIT, Copyright (C) 2019 Domingo

@@ -4,6 +4,7 @@ namespace Chukdo\Http;
 
 use Chukdo\Helper\Str;
 use Chukdo\Helper\Arr;
+use Chukdo\Oauth2\Token\AbstractToken;
 
 /**
  * Gestion des URLs.
@@ -311,139 +312,170 @@ class Url
     }
 
     /**
+     * @param string $method
      * @param string $file
-     * @param array  $options
      * @param array  $headers
+     * @param array  $options
      *
-     * @return int
+     * @return Curl
      */
-    public function fileGet( string $file, array $options = [], array $headers = [] ): int
+    public function fileMethod( string $method, string $file, array $headers = [], array $options = [] ): Curl
     {
-        $fileHandle = fopen( $file, 'wb' );
-        $options    = Arr::merge( [ CURLOPT_FILE => $fileHandle ], $options );
-        $curl       = new Curl( $this->buildUrl(), $options, $headers );
-        fclose( $fileHandle );
+        $method = strtoupper( trim( $method ) );
 
-        return $curl->headers()
-                    ->getHeader( 'Content-Length' );
+        switch ( $method ) {
+            case 'POST' :
+                return $this->filePost( $file, $headers, $options );
+            case 'PUT' :
+                return $this->filePut( $file, $headers, $options );
+            case 'GET' :
+                return $this->fileGet( $file, $headers, $options );
+        }
+
+        throw new HttpException( sprintf( '[%s] is not a valid Http Verb for file.', $method ) );
     }
 
     /**
      * @param string $file
-     * @param array  $options
      * @param array  $headers
+     * @param array  $options
      *
-     * @return string
+     * @return Curl
      */
-    public function filePut( string $file, array $options = [], array $headers = [] ): string
+    public function fileGet( string $file, array $headers = [], array $options = [] ): Curl
+    {
+        $options[ CURLOPT_FILE ] = $fileHandle = fopen( $file, 'wb' );
+        $curl                    = new Curl( 'GET', $this->buildUrl(), $headers, $options );
+
+        fclose( $fileHandle );
+
+        return $curl;
+    }
+
+    /**
+     * @param string $file
+     * @param array  $headers
+     * @param array  $options
+     *
+     * @return Curl
+     */
+    public function filePut( string $file, array $headers = [], array $options = [] ): Curl
     {
         $options = Arr::merge( [
-                                   CURLOPT_PUT            => true,
                                    CURLOPT_FOLLOWLOCATION => false,
                                    CURLOPT_INFILE         => fopen( $file, 'rb' ),
                                ], $options );
 
-        return $this->httpPost( $options, $headers )
-                    ->raw();
+        return new Curl( 'PUT', $this->buildDsn() . $this->buildPath(), $headers, $options );
     }
 
     /**
      * @param string $file
-     * @param array  $options
      * @param array  $headers
+     * @param array  $options
      *
-     * @return string
+     * @return Curl
      */
-    public function filePost( string $file, array $options = [], array $headers = [] ): string
+    public function filePost( string $file, array $headers = [], array $options = [] ): Curl
     {
         $options = Arr::merge( [
                                    CURLOPT_POSTREDIR  => 3,
                                    CURLOPT_POSTFIELDS => file_get_contents( $file ),
                                ], $options );
 
-        return $this->httpPost( $options, $headers )
-                    ->raw();
+        return new Curl( 'POST', $this->buildDsn() . $this->buildPath(), $headers, $options );
     }
 
     /**
      * @param string $method
-     * @param array  $options
      * @param array  $headers
+     *
+     * @param array  $options
      *
      * @return Curl
      */
-    public function httpMethod( string $method, array $options = [], array $headers = [] ): Curl
+    public function httpMethod( string $method, array $headers = [], array $options = [] ): Curl
     {
+        $method = strtoupper( trim( $method ) );
+
         switch ( $method ) {
-            case 'post' :
             case 'POST' :
-                return $this->httpPost( $options, $headers );
-            case 'put' :
+                return $this->httpPost( $headers, $options );
             case 'PUT' :
-                return $this->httpPut( $options, $headers );
-            case 'get' :
+                return $this->httpPut( $headers, $options );
             case 'GET' :
-                return $this->httpGet( $options, $headers );
-            case 'delete' :
+                return $this->httpGet( $headers, $options );
+            case 'HEAD' :
+                return $this->httpHead( $headers, $options );
             case 'DELETE' :
-                return $this->httpDelete( $options, $headers );
+                return $this->httpDelete( $headers, $options );
         }
 
         throw new HttpException( sprintf( '[%s] is not a valid Http Verb.', $method ) );
     }
 
     /**
-     * @param array $options
      * @param array $headers
+     *
+     * @param array $options
      *
      * @return Curl
      */
-    public function httpGet( array $options = [], array $headers = [] ): Curl
+    public function httpHead( array $headers = [], array $options = [] ): Curl
     {
-        return new Curl( $this->buildUrl(), $options, $headers );
+        return new Curl( 'HEAD', $this->buildUrl(), $headers, $options );
     }
 
     /**
-     * @param array $options
      * @param array $headers
+     *
+     * @param array $options
      *
      * @return Curl
      */
-    public function httpPost( array $options = [], array $headers = [] ): Curl
+    public function httpGet( array $headers = [], array $options = [] ): Curl
     {
-        $options = Arr::merge( [
-                                   CURLOPT_POSTFIELDS    => $this->getInputs(),
-                                   CURLOPT_CUSTOMREQUEST => 'POST',
-                               ], $options );
-
-        return new Curl( $this->buildDsn() . $this->buildPath(), $options, $headers );
+        return new Curl( 'GET', $this->buildUrl(), $headers, $options );
     }
 
     /**
-     * @param array $options
      * @param array $headers
+     *
+     * @param array $options
      *
      * @return Curl
      */
-    public function httpPut( array $options = [], array $headers = [] ): Curl
+    public function httpDelete( array $headers = [], array $options = [] ): Curl
     {
-        $options = Arr::merge( [
-                                   CURLOPT_POST          => false,
-                                   CURLOPT_CUSTOMREQUEST => 'PUT',
-                               ], $options );
-
-        return $this->httpPost( $options, $headers );
+        return new Curl( 'DELETE', $this->buildUrl(), $headers, $options );
     }
 
     /**
-     * @param array $options
      * @param array $headers
+     *
+     * @param array $options
      *
      * @return Curl
      */
-    public function httpDelete( array $options = [], array $headers = [] ): Curl
+    public function httpPost( array $headers = [], array $options = [] ): Curl
     {
-        return $this->httpGet( Arr::merge( [ CURLOPT_CUSTOMREQUEST => 'DELETE' ], $options ), $headers );
+        $options[ CURLOPT_POSTFIELDS ] = $this->getInputs();
+
+        return new Curl( 'POST', $this->buildDsn() . $this->buildPath(), $headers, $options );
+    }
+
+    /**
+     * @param array $headers
+     *
+     * @param array $options
+     *
+     * @return Curl
+     */
+    public function httpPut( array $headers = [], array $options = [] ): Curl
+    {
+        $options[ CURLOPT_POSTFIELDS ] = $this->getInputs();
+
+        return new Curl( 'PUT', $this->buildDsn() . $this->buildPath(), $headers, $options );
     }
 
     /**
