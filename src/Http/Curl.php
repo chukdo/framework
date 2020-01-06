@@ -18,7 +18,12 @@ class Curl
     /**
      * @var resource
      */
-    protected $handle;
+    protected $curl;
+
+    /**
+     * @var Header
+     */
+    protected Header $curlHeaders;
 
     /**
      * @var string|null
@@ -33,14 +38,15 @@ class Curl
     /**
      * Curl constructor.
      *
-     * @param string      $url
-     * @param array       $options
-     * @param Header|null $headers
+     * @param string $url
+     * @param array  $options
+     * @param array  $headers
      */
-    public function __construct( string $url, array $options = [], Header $headers = null )
+    public function __construct( string $url, array $options = [], array $headers = [] )
     {
-        $this->handle  = curl_init();
-        $this->headers = new Header();
+        $this->curl        = curl_init();
+        $this->headers     = new Header();
+        $this->curlHeaders = new Header();
 
         $this->setUrl( $url )
              ->setOption( CURLOPT_SSL_VERIFYPEER, false )
@@ -48,11 +54,8 @@ class Curl
              ->setOption( CURLOPT_FOLLOWLOCATION, true )
              ->setOptions( $options )
              ->setOption( CURLOPT_HEADER, false )
-             ->setOption( CURLOPT_HEADERFUNCTION, fn( $h, $header ) => $this->headers->parseHeaders( $header ) );
-
-        if ( $headers ) {
-            $this->setHeaders( $headers );
-        }
+             ->setOption( CURLOPT_HEADERFUNCTION, fn( $h, $header ) => $this->headers->parseHeaders( $header ) )
+             ->setHeaders( $headers );
     }
 
     /**
@@ -61,13 +64,15 @@ class Curl
     public function execute(): void
     {
         if ( $this->raw === null ) {
-            $this->raw = curl_exec( $this->handle );
+            curl_setopt( $this->curl, CURLOPT_HTTPHEADER, (array) $this->headers->getHeaders() );
+
+            $this->raw = curl_exec( $this->curl );
             $status    = $this->headers->getStatus();
-            $errno     = curl_errno( $this->handle );
+            $errno     = curl_errno( $this->curl );
 
             /** Curl Error */
             if ( $errno ) {
-                throw new HttpException( curl_error( $this->handle ) );
+                throw new HttpException( curl_error( $this->curl ) );
             }
 
             /** Bad http header status */
@@ -83,13 +88,40 @@ class Curl
     }
 
     /**
-     * @param Header $headers
+     * @param string $token
      *
      * @return $this
      */
-    public function setHeaders( Header $headers ): self
+    public function setBearer( string $token ): self
     {
-        curl_setopt( $this->handle, CURLOPT_HTTPHEADER, (array) $headers->getHeaders() );
+        $this->curlHeaders->setHeader( 'Authorization', 'Bearer ' . $token );
+
+        return $this;
+    }
+
+    /**
+     * @param array $headers
+     *
+     * @return $this
+     */
+    public function setHeaders( array $headers = [] ): self
+    {
+        foreach ( $headers as $key => $value ) {
+            $this->setHeader( $key, $value );
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function setHeader( string $key, string $value ): self
+    {
+        $this->curlHeaders->setHeader( $key, $value );
 
         return $this;
     }
@@ -101,7 +133,7 @@ class Curl
      */
     public function setUrl( string $url ): self
     {
-        curl_setopt( $this->handle, CURLOPT_URL, $url );
+        curl_setopt( $this->curl, CURLOPT_URL, $url );
 
         return $this;
     }
@@ -114,7 +146,7 @@ class Curl
      */
     public function setOption( string $key, $value ): self
     {
-        curl_setopt( $this->handle, $key, $value );
+        curl_setopt( $this->curl, $key, $value );
 
         return $this;
     }
@@ -176,7 +208,7 @@ class Curl
      */
     public function close(): void
     {
-        curl_close( $this->handle );
+        curl_close( $this->curl );
     }
 
     /**

@@ -2,24 +2,25 @@
 
 namespace App\Controlers;
 
+use Chukdo\Helper\To;
 use Chukdo\Http\Controler;
 use Chukdo\Http\Response;
 use Chukdo\Http\Input;
-use Chukdo\Oauth2\Provider\Generic;
+use Chukdo\Oauth2\Provider\GenericProvider;
 
 class Oauth2 extends Controler
 {
     /**
-     * @var Generic
+     * @var GenericProvider
      */
-    protected Generic $client;
+    protected GenericProvider $client;
 
     /**
      * Oauth2 constructor.
      */
     public function __construct()
     {
-        $this->client = new Generic();
+        $this->client = new GenericProvider();
         $this->client->setUrlAuthorize( 'https://www.dropbox.com/oauth2/authorize' )
                      ->setUrlAccessToken( 'https://api.dropboxapi.com/oauth2/token' )
                      ->setClientId( '1gnu9jmet15ofyp' )
@@ -48,11 +49,11 @@ class Oauth2 extends Controler
     {
         if ( !$this->client->checkState( $inputs->state ) ) {
             return $response->status( 500 )
-                            ->content( 'state error' );
+                ->content( 'state error' );
         }
 
-        $token = $this->client->getToken( 'code', [ 'code' => $inputs->code ] );
+        $token = $this->client->getToken( 'authorization_code', [ 'authorization_code' => $inputs->code ] );
 
-        return $response->content( (string) $token );
+        return $response->content( (string) $token->getToken() . To::html( $token->values() ) );
     }
 }

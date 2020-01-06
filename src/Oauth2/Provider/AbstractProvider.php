@@ -2,11 +2,13 @@
 
 namespace Chukdo\Oauth2\Provider;
 
+use Chukdo\Contracts\Oauth2\Token as TokenInterface;
 use Chukdo\Contracts\Oauth2\Provider as ProviderInterface;
 use Chukdo\Helper\Arr;
 use Chukdo\Http\Url;
 use Chukdo\Json\Json;
 use Chukdo\Oauth2\Oauth2Exception;
+use Chukdo\Oauth2\Token\Token;
 
 abstract Class AbstractProvider implements ProviderInterface
 {
@@ -96,23 +98,9 @@ abstract Class AbstractProvider implements ProviderInterface
      * @param array  $options
      * @param string $method
      *
-     * @return Json
+     * @return TokenInterface
      */
-    public function getToken( string $grantType, array $options = [], string $method = 'POST' ): Json
-    {
-        $url = $this->getTokenUrl( $grantType, $options );
-        $res = $method === 'POST'
-            ? $url->post()
-            : $url->get();
-        var_dump( $res->content() );
-        var_dump( $res->headers()
-                      ->getStatus() );
-        exit;
-        $token = new Json();
-
-
-        return $token;
-    }
+    abstract public function getToken( string $grantType, array $options = [], string $method = 'POST' ): TokenInterface;
 
     /**
      * @param string $grantType
@@ -127,76 +115,50 @@ abstract Class AbstractProvider implements ProviderInterface
             'client_secret' => $this->getClientSecret(),
         ] );
 
-        switch ( $grantType ) {
-            case 'code' :
-                if ( !isset( $options[ 'code' ] ) ) {
-                    throw new Oauth2Exception( 'Access Token Url need a option [code]' );
-                }
+        if ( $grantType === 'code' && !isset( $options[ 'code' ] ) ) {
+            throw new Oauth2Exception( 'Access Token Url need a option [code]' );
+        }
 
-                $this->setTokenUrlInputsFromCode( $url, $options[ 'code' ] );
+        if ( $grantType === 'password' && !isset( $options[ 'username' ], $options[ 'password' ] ) ) {
+            throw new Oauth2Exception( 'Access Token Url need a option [username] and [password]' );
+        }
+
+        if ( $grantType === 'refresh' && !isset( $options[ 'refresh_token' ] ) ) {
+            throw new Oauth2Exception( 'Access Token Url need a option [code]' );
+        }
+
+        switch ( $grantType ) {
+            case 'authorization_code' :
+                $url->setInput( 'redirect_uri', $this->getRedirectUri() )
+                    ->setInput( 'grant_type', 'authorization_code' )
+                    ->setInput( 'code', $options[ 'authorization_code' ] );
                 break;
             case 'password' :
-                if ( !isset( $options[ 'username' ], $options[ 'password' ] ) ) {
-                    throw new Oauth2Exception( 'Access Token Url need a option [username] and [password]' );
-                }
-
-                $this->setTokenUrlInputsFromPassword( $url, $options[ 'username' ], $options[ 'password' ] );
+                $url->setInput( 'redirect_uri', $this->getRedirectUri() )
+                    ->setInput( 'grant_type', 'password' )
+                    ->setInput( 'username', $options[ 'username' ] )
+                    ->setInput( 'password', $options[ 'password' ] );
                 break;
-            case 'client' :
-                $this->setTokenUrlInputsFromClient( $url );
+            case 'client_credentials' :
+                $url->setInput( 'grant_type', 'client_credentials' )
+                    ->setInput( 'scope', $this->getScope() );
+                break;
+            case 'refresh_token':
+                $url->setInput( 'grant_type', 'refresh_token' )
+                    ->setInput( 'refresh_token', $options[ 'refresh_token' ] )
+                    ->setInput( 'scope', $this->getScope() );
                 break;
             case 'implicit' :
-                $this->setTokenUrlInputsFromImplicit( $url );
+                $url->setInput( 'redirect_uri', $this->getRedirectUri() )
+                    ->setInput( 'response_type', 'token' )
+                    ->setInput( 'state', $this->getState() )
+                    ->setInput( 'scope', $this->getScope() );
                 break;
             default :
                 throw new Oauth2Exception( sprintf( 'Grant Type [%s] is unknow', $grantType ) );
         }
 
         return $url;
-    }
-
-    /**
-     * @param Url    $url
-     * @param string $code
-     */
-    protected function setTokenUrlInputsFromCode( Url $url, string $code ): void
-    {
-        $url->setInput( 'redirect_uri', $this->getRedirectUri() )
-            ->setInput( 'grant_type', 'authorization_code' )
-            ->setInput( 'code', $code );
-    }
-
-    /**
-     * @param Url    $url
-     * @param string $username
-     * @param string $password
-     */
-    protected function setTokenUrlInputsFromPassword( Url $url, string $username, string $password ): void
-    {
-        $url->setInput( 'redirect_uri', $this->getRedirectUri() )
-            ->setInput( 'grant_type', 'password' )
-            ->setInput( 'username', $username )
-            ->setInput( 'password', $password );
-    }
-
-    /**
-     * @param Url $url
-     */
-    protected function setTokenUrlInputsFromClient( Url $url ): void
-    {
-        $url->setInput( 'grant_type', 'client_credentials' )
-            ->setInput( 'scope', $this->getScope() );
-    }
-
-    /**
-     * @param Url $url
-     */
-    protected function setTokenUrlInputsFromImplicit( Url $url ): void
-    {
-        $url->setInput( 'redirect_uri', $this->getRedirectUri() )
-            ->setInput( 'response_type', 'token' )
-            ->setInput( 'scope', $this->getState() )
-            ->setInput( 'scope', $this->getScope() );
     }
 
     /**
