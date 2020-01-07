@@ -4,7 +4,6 @@ namespace Chukdo\Http;
 
 use Chukdo\Helper\Str;
 use Chukdo\Helper\Arr;
-use Chukdo\Oauth2\Token\AbstractToken;
 
 /**
  * Gestion des URLs.
@@ -56,9 +55,9 @@ class Url
     /**
      * @param string $url
      *
-     * @return Url
+     * @return $this
      */
-    public function parseUrl( string $url ): Url
+    public function parseUrl( string $url ): self
     {
         $mergeUrl  = [
             'scheme'   => 'file',
@@ -86,9 +85,9 @@ class Url
     /**
      * @param string $fragment
      *
-     * @return Url
+     * @return $this
      */
-    public function setFragment( string $fragment ): Url
+    public function setFragment( string $fragment ): self
     {
         $this->url[ 'fragment' ] = $fragment;
 
@@ -98,9 +97,9 @@ class Url
     /**
      * @param string $query
      *
-     * @return Url
+     * @return $this
      */
-    public function setQuery( string $query ): Url
+    public function setQuery( string $query ): self
     {
         parse_str( $query, $this->url[ 'input' ] );
 
@@ -110,9 +109,9 @@ class Url
     /**
      * @param string $path
      *
-     * @return Url
+     * @return $this
      */
-    public function setPath( string $path ): Url
+    public function setPath( string $path ): self
     {
         $this->setDir( dirname( $path ) );
         $this->setFile( basename( $path ) );
@@ -123,9 +122,9 @@ class Url
     /**
      * @param string $dir
      *
-     * @return Url
+     * @return $this
      */
-    public function setDir( string $dir ): Url
+    public function setDir( string $dir ): self
     {
         $this->url[ 'dir' ] = $dir;
 
@@ -135,9 +134,9 @@ class Url
     /**
      * @param string $file
      *
-     * @return Url
+     * @return $this
      */
-    public function setFile( string $file ): Url
+    public function setFile( string $file ): self
     {
         $this->url[ 'file' ] = $file;
 
@@ -147,9 +146,9 @@ class Url
     /**
      * @param string $pass
      *
-     * @return Url
+     * @return $this
      */
-    public function setPass( string $pass ): Url
+    public function setPass( string $pass ): self
     {
         $this->url[ 'pass' ] = $pass;
 
@@ -159,9 +158,9 @@ class Url
     /**
      * @param string $user
      *
-     * @return Url
+     * @return $this
      */
-    public function setUser( string $user ): Url
+    public function setUser( string $user ): self
     {
         $this->url[ 'user' ] = $user;
 
@@ -171,9 +170,9 @@ class Url
     /**
      * @param string $port
      *
-     * @return Url
+     * @return $this
      */
-    public function setPort( string $port ): Url
+    public function setPort( string $port ): self
     {
         $this->url[ 'port' ] = $port;
 
@@ -183,9 +182,9 @@ class Url
     /**
      * @param string $host
      *
-     * @return Url
+     * @return $this
      */
-    public function setHost( string $host ): Url
+    public function setHost( string $host ): self
     {
         $this->url[ 'host' ] = $host;
 
@@ -195,9 +194,9 @@ class Url
     /**
      * @param string $scheme
      *
-     * @return Url
+     * @return $this
      */
-    public function setScheme( string $scheme ): Url
+    public function setScheme( string $scheme ): self
     {
         $this->url[ 'scheme' ] = $scheme;
 
@@ -205,12 +204,26 @@ class Url
     }
 
     /**
-     * @param string $key
-     * @param string $value
+     * @param iterable $inputs
      *
-     * @return Url
+     * @return $this
      */
-    public function setInput( string $key, string $value ): Url
+    public function setInputs( iterable $inputs ): self
+    {
+        foreach ( $inputs as $key => $value ) {
+            $this->setInput( $key, $value );
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param        $value
+     *
+     * @return $this
+     */
+    public function setInput( string $key, $value ): self
     {
         $this->url[ 'input' ][ $key ] = $value;
 
@@ -300,7 +313,15 @@ class Url
 
     public function __toString()
     {
-        return $this->buildUrl();
+        return $this->buildCompleteUrl();
+    }
+
+    /**
+     * @return string
+     */
+    public function buildCompleteUrl(): string
+    {
+        return $this->buildDsn() . $this->buildPath() . $this->buildQuery() . $this->buildFragment();
     }
 
     /**
@@ -308,174 +329,7 @@ class Url
      */
     public function buildUrl(): string
     {
-        return $this->buildDsn() . $this->buildPath() . $this->buildQuery() . $this->buildFragment();
-    }
-
-    /**
-     * @param string $method
-     * @param string $file
-     * @param array  $headers
-     * @param array  $options
-     *
-     * @return Curl
-     */
-    public function fileMethod( string $method, string $file, array $headers = [], array $options = [] ): Curl
-    {
-        $method = strtoupper( trim( $method ) );
-
-        switch ( $method ) {
-            case 'POST' :
-                return $this->filePost( $file, $headers, $options );
-            case 'PUT' :
-                return $this->filePut( $file, $headers, $options );
-            case 'GET' :
-                return $this->fileGet( $file, $headers, $options );
-        }
-
-        throw new HttpException( sprintf( '[%s] is not a valid Http Verb for file.', $method ) );
-    }
-
-    /**
-     * @param string $file
-     * @param array  $headers
-     * @param array  $options
-     *
-     * @return Curl
-     */
-    public function fileGet( string $file, array $headers = [], array $options = [] ): Curl
-    {
-        $options[ CURLOPT_FILE ] = $fileHandle = fopen( $file, 'wb' );
-        $curl                    = new Curl( 'GET', $this->buildUrl(), $headers, $options );
-
-        fclose( $fileHandle );
-
-        return $curl;
-    }
-
-    /**
-     * @param string $file
-     * @param array  $headers
-     * @param array  $options
-     *
-     * @return Curl
-     */
-    public function filePut( string $file, array $headers = [], array $options = [] ): Curl
-    {
-        $options = Arr::merge( [
-                                   CURLOPT_FOLLOWLOCATION => false,
-                                   CURLOPT_INFILE         => fopen( $file, 'rb' ),
-                               ], $options );
-
-        return new Curl( 'PUT', $this->buildDsn() . $this->buildPath(), $headers, $options );
-    }
-
-    /**
-     * @param string $file
-     * @param array  $headers
-     * @param array  $options
-     *
-     * @return Curl
-     */
-    public function filePost( string $file, array $headers = [], array $options = [] ): Curl
-    {
-        $options = Arr::merge( [
-                                   CURLOPT_POSTREDIR  => 3,
-                                   CURLOPT_POSTFIELDS => file_get_contents( $file ),
-                               ], $options );
-
-        return new Curl( 'POST', $this->buildDsn() . $this->buildPath(), $headers, $options );
-    }
-
-    /**
-     * @param string $method
-     * @param array  $headers
-     *
-     * @param array  $options
-     *
-     * @return Curl
-     */
-    public function httpMethod( string $method, array $headers = [], array $options = [] ): Curl
-    {
-        $method = strtoupper( trim( $method ) );
-
-        switch ( $method ) {
-            case 'POST' :
-                return $this->httpPost( $headers, $options );
-            case 'PUT' :
-                return $this->httpPut( $headers, $options );
-            case 'GET' :
-                return $this->httpGet( $headers, $options );
-            case 'HEAD' :
-                return $this->httpHead( $headers, $options );
-            case 'DELETE' :
-                return $this->httpDelete( $headers, $options );
-        }
-
-        throw new HttpException( sprintf( '[%s] is not a valid Http Verb.', $method ) );
-    }
-
-    /**
-     * @param array $headers
-     *
-     * @param array $options
-     *
-     * @return Curl
-     */
-    public function httpHead( array $headers = [], array $options = [] ): Curl
-    {
-        return new Curl( 'HEAD', $this->buildUrl(), $headers, $options );
-    }
-
-    /**
-     * @param array $headers
-     *
-     * @param array $options
-     *
-     * @return Curl
-     */
-    public function httpGet( array $headers = [], array $options = [] ): Curl
-    {
-        return new Curl( 'GET', $this->buildUrl(), $headers, $options );
-    }
-
-    /**
-     * @param array $headers
-     *
-     * @param array $options
-     *
-     * @return Curl
-     */
-    public function httpDelete( array $headers = [], array $options = [] ): Curl
-    {
-        return new Curl( 'DELETE', $this->buildUrl(), $headers, $options );
-    }
-
-    /**
-     * @param array $headers
-     *
-     * @param array $options
-     *
-     * @return Curl
-     */
-    public function httpPost( array $headers = [], array $options = [] ): Curl
-    {
-        $options[ CURLOPT_POSTFIELDS ] = $this->getInputs();
-
-        return new Curl( 'POST', $this->buildDsn() . $this->buildPath(), $headers, $options );
-    }
-
-    /**
-     * @param array $headers
-     *
-     * @param array $options
-     *
-     * @return Curl
-     */
-    public function httpPut( array $headers = [], array $options = [] ): Curl
-    {
-        $options[ CURLOPT_POSTFIELDS ] = $this->getInputs();
-
-        return new Curl( 'PUT', $this->buildDsn() . $this->buildPath(), $headers, $options );
+        return $this->buildDsn() . $this->buildPath() . $this->buildFragment();
     }
 
     /**

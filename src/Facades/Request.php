@@ -2,7 +2,7 @@
 
 namespace Chukdo\Facades;
 /**
- * Initialisation d'une facade Request.
+ * Initialisation d'une facade RequestApi.
  *
  * @version       1.0.0
  * @copyright     licence MIT, Copyright (C) 2019 Domingo

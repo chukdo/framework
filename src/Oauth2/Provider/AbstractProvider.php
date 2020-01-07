@@ -88,7 +88,7 @@ abstract Class AbstractProvider implements ProviderInterface
             'state'         => $this->getState(),
         ] );
 
-        return $url->buildUrl();
+        return $url->buildCompleteUrl();
     }
 
     /**

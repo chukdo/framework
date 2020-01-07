@@ -2,12 +2,13 @@
 
 namespace App\Controlers;
 
-use Chukdo\Helper\To;
 use Chukdo\Http\Controler;
+use Chukdo\Http\RequestApi;
 use Chukdo\Http\Response;
 use Chukdo\Http\Input;
 use Chukdo\Contracts\Oauth2\Provider as ProviderInterface;
 use Chukdo\Oauth2\Provider\DropboxProvider;
+use Chukdo\Oauth2\Provider\GenericProvider;
 
 class Oauth2 extends Controler
 {
@@ -21,9 +22,11 @@ class Oauth2 extends Controler
      */
     public function __construct()
     {
-        $this->client = new DropboxProvider();
+        $this->client = new GenericProvider();
         $this->client->setClientId( '1gnu9jmet15ofyp' )
                      ->setClientSecret( 'rngrh6odd07b3t3' )
+                     ->setUrlAuthorize( 'https://www.dropbox.com/oauth2/authorize' )
+                     ->setUrlAccessToken( 'https://api.dropboxapi.com/oauth2/token' )
                      ->setRedirectUri( 'https://0452c7ee.ngrok.io/oauth2/callback/' );
     }
 
@@ -48,11 +51,16 @@ class Oauth2 extends Controler
     {
         if ( !$this->client->checkState( $inputs->state ) ) {
             return $response->status( 500 )
-                ->content( 'state error' );
+                            ->content( 'state error' );
         }
 
         $token = $this->client->getToken( 'authorization_code', [ 'authorization_code' => $inputs->code ] );
+        $api   = new RequestApi( 'POST', 'https://api.dropboxapi.com/2/file_requests/list_v2' );
+        $res   = $api->setBearer( $token->getToken() )
+                     ->setType( 'json' )
+                     ->setInput( 'limit', 3 )
+                     ->send();
 
-        return $response->content( $token->api( 'file_requests/list_v2' ) );
+        return $response->content( $res->raw() );
     }
 }

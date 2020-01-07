@@ -3,6 +3,7 @@
 namespace Chukdo\Http;
 
 use Chukdo\Helper\Arr;
+use Chukdo\Helper\Http;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
 
@@ -19,7 +20,7 @@ class Header
     /**
      * Status RFC 2616.
      *
-     * @param array $status
+     * @param array $rfc2616
      */
     public array $rfc2616 = [
         100 => 'HTTP/1.1 100 Continue',
@@ -38,7 +39,7 @@ class Header
         304 => 'HTTP/1.1 304 Not Modified',
         305 => 'HTTP/1.1 305 Use Proxy',
         307 => 'HTTP/1.1 307 Temporary Redirect',
-        400 => 'HTTP/1.1 400 Bad Request',
+        400 => 'HTTP/1.1 400 Bad RequestApi',
         401 => 'HTTP/1.1 401 Unauthorized',
         402 => 'HTTP/1.1 402 Payment Required',
         403 => 'HTTP/1.1 403 Forbidden',
@@ -46,13 +47,13 @@ class Header
         405 => 'HTTP/1.1 405 Method Not Allowed',
         406 => 'HTTP/1.1 406 Not Acceptable',
         407 => 'HTTP/1.1 407 Proxy Authentication Required',
-        408 => 'HTTP/1.1 408 Request Time-out',
+        408 => 'HTTP/1.1 408 RequestApi Time-out',
         409 => 'HTTP/1.1 409 Conflict',
         410 => 'HTTP/1.1 410 Gone',
         411 => 'HTTP/1.1 411 Length Required',
         412 => 'HTTP/1.1 412 Precondition Failed',
-        413 => 'HTTP/1.1 413 Request Entity Too Large',
-        414 => 'HTTP/1.1 414 Request-URI Too Large',
+        413 => 'HTTP/1.1 413 RequestApi Entity Too Large',
+        414 => 'HTTP/1.1 414 RequestApi-URI Too Large',
         415 => 'HTTP/1.1 415 Unsupported Media Type',
         416 => 'HTTP/1.1 416 Requested range not satisfiable',
         417 => 'HTTP/1.1 417 Expectation Failed',
@@ -64,11 +65,9 @@ class Header
     ];
 
     /**
-     * Entete HTTP.
-     *
-     * @param string $http
+     * @var int
      */
-    protected string $http = '';
+    protected int $status = 200;
 
     /**
      * Entetes.
@@ -122,33 +121,21 @@ class Header
     }
 
     /**
-     * @return int|null
+     * @return int
      */
-    public function getStatus(): ?int
+    public function getStatus(): int
     {
-        return (int) Str::match( '/[0-9]{3}/', $this->getHttp() );
+        return $this->status;
     }
 
     /**
-     * @return string
-     */
-    public function getHttp(): string
-    {
-        return $this->http;
-    }
-
-    /**
-     * Defini l'entete HTTP
-     * Ex. POST /test_rest_modele.php HTTP/1.1 pour un requete HTTP
-     * Ex. HTTP/1.1 200 OK pour une reponse HTTP.
-     *
-     * @param string $value
+     * @param int $status
      *
      * @return Header
      */
-    public function setHttp( string $value ): self
+    public function setStatus( int $status ): self
     {
-        $this->http = $value;
+        $this->status = $status;
 
         return $this;
     }
@@ -315,17 +302,35 @@ class Header
     }
 
     /**
-     * @param int $status
+     * @param string $token
      *
-     * @return Header
+     * @return $this
      */
-    public function setStatus( int $status ): self
+    public function setBearer( string $token ): self
     {
-        if ( isset( $this->rfc2616[ $status ] ) ) {
-            $this->setHttp( $this->rfc2616[ $status ] );
+        return $this->setHeader( 'Authorization', 'Bearer ' . $token );
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return $this
+     */
+    public function setType( string $type ): self
+    {
+        return $this->setHeader( 'Content-type', Http::extToContentType( $type ) );
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getType(): ?string
+    {
+        if ( $contentType = $this->getHeader( 'Content-type' ) ) {
+            return Http::contentTypeToExt( $contentType );
         }
 
-        return $this;
+        return null;
     }
 
     /**
@@ -437,35 +442,107 @@ class Header
      */
     public function send(): string
     {
-        $http    = $this->getHttp() . "\r\n";
-        $headers = '';
-        $cookies = '';
-        foreach ( $this->getHeaders() as $name => $header ) {
-            $headers .= "$name: $header\r\n";
-        }
-        foreach ( $this->getCookies() as $name => $cookie ) {
-            $cookies .= $cookie . "\r\n";
-        }
+        return $this->getStatusAsString() . "\r\n" . $this->getHeadersAsString() . $this->getCookieAsString() . "\r\n";
+    }
 
-        return $http . $headers . $cookies . "\r\n";
+    /**
+     * @return string
+     */
+    public function getStatusAsString(): string
+    {
+        return $this->rfc2616[ $this->status ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getHeadersAsString(): string
+    {
+        return $this->hasHeader()
+            ? implode( "\r\n", $this->getHeaders() ) . "\r\n"
+            : '';
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasHeader(): bool
+    {
+        return $this->header()
+                    ->count() > 0;
     }
 
     /**
      * @return Json
      */
-    public function getHeaders(): Json
+    public function header(): Json
     {
         return $this->header;
     }
 
     /**
+     * @return array
+     */
+    public function getHeaders(): array
+    {
+        $headers = [];
+
+        foreach ( $this->header() as $name => $header ) {
+            $headers[] = "$name: $header";
+        }
+
+        return $headers;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCookieAsString(): string
+    {
+        return $this->hasHeader()
+            ? implode( "\r\n", $this->getHeaders() ) . "\r\n"
+            : '';
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasCookie(): bool
+    {
+        return $this->cookie()
+                    ->count() > 0;
+    }
+
+    /**
      * @return Json
      */
-    public function getCookies(): Json
+    public function cookie(): Json
     {
-        $cookies = new Json();
-        foreach ( $this->cookie as $name => $cookie ) {
-            $cookies->append( $this->getCookie( $name ) );
+        return $this->cookie;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCookies(): array
+    {
+        $cookies = [];
+
+        foreach ( $this->cookie() as $name => $cookie ) {
+            $cookieHeader = 'Set-Cookie: ' . $name . '=' . rawurlencode( $cookie->offsetGet( 'value' ) );
+
+            if ( $expires = $cookie->offsetGet( 'expires' ) ) {
+                $expires      = gmdate( DATE_RFC850, $expires );
+                $cookieHeader .= "; expires=$expires";
+            }
+
+            $cookieHeader .= '; path=' . $cookie->offsetGet( 'path', '/' );
+
+            if ( $domain = $cookie->offsetGet( 'domain' ) ) {
+                $cookieHeader .= '; domain=' . $domain;
+            }
+
+            $cookies[] = $cookieHeader;
         }
 
         return $cookies;
@@ -478,11 +555,7 @@ class Header
      */
     public function getCookie( string $name ): ?Json
     {
-        if ( $cookie = $this->cookie->offsetGet( $name ) ) {
-            return Str::match( '/([^=]+)=([^;]+)(?:; expires=([^;]+))?(?:; path=([^;]+))?(?:; domain=([^;]+))?/i', $cookie );
-        }
-
-        return null;
+        return $this->cookie->offsetGet( $name );
     }
 
     /**
@@ -498,21 +571,12 @@ class Header
      */
     public function setCookie( string $name, string $value = null, string $expires = null, string $path = null, string $domain = null ): self
     {
-        $value  = rawurlencode( $value );
-        $cookie = 'Set-Cookie: ' . $name . '=' . $value;
-
-        if ( $expires ) {
-            $expires = gmdate( DATE_RFC850, $expires );
-            $cookie  .= "; expires=$expires";
-        }
-
-        $cookie .= '; path=' . ( $path
-                ?: '/' );
-        if ( $domain ) {
-            $cookie .= '; domain=' . $domain;
-        }
-
-        $this->cookie->offsetSet( $name, $cookie );
+        $this->cookie->offsetSet( $name, [
+            'value'   => $value,
+            'expires' => $expires,
+            'path'    => $path,
+            'domain'  => $domain,
+        ] );
 
         return $this;
     }

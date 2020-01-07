@@ -42,7 +42,7 @@ class Request
     protected Url $url;
 
     /**
-     * Request constructor.
+     * RequestApi constructor.
      *
      * @param App $app
      *

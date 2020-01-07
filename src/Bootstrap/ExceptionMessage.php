@@ -115,21 +115,21 @@ class ExceptionMessage
         }
         switch ( $render ) {
             case 'cli':
-                $contentType = Http::mimeContentType( 'text' );
+                $contentType = Http::extToContentType( 'text' );
                 $content     = $this->renderCli( $this->message );
                 break;
             case 'xml':
-                $contentType = Http::mimeContentType( 'xml' );
+                $contentType = Http::extToContentType( 'xml' );
                 $content     = $this->renderXml( $this->message );
                 break;
             case 'json':
-                $contentType = Http::mimeContentType( 'json' );
+                $contentType = Http::extToContentType( 'json' );
                 $content     = $this->renderJson( $this->message );
                 break;
             case 'html':
             default:
-                $contentType = Http::mimeContentType( 'html' );
-                $content     = $this->renderHtml( $this->message );;
+            $contentType = Http::extToContentType( 'html' );
+            $content     = $this->renderHtml( $this->message );;
         }
         try {
             $response->status( 500 )

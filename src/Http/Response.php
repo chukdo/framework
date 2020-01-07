@@ -58,7 +58,7 @@ class Response
     }
 
     /**
-     * Response constructor.
+     * ResponseApi constructor.
      */
     public function __construct()
     {
@@ -168,7 +168,7 @@ class Response
     public function download( string $file, string $name = null, string $type = null ): self
     {
         $name       ??= basename( $file );
-        $type       ??= Http::mimeContentType( $name );
+        $type       ??= Http::extToContentType( $name );
         $this->file = $file;
         $this->header->setHeader( 'Content-Disposition', 'attachment; filename="' . $name . '"' )
                      ->setHeader( 'Content-Type', $type );
@@ -186,7 +186,7 @@ class Response
     public function file( string $file, string $name = null, string $type = null ): self
     {
         $name       ??= basename( $file );
-        $type       ??= Http::mimeContentType( $name );
+        $type       ??= Http::extToContentType( $name );
         $this->file = $file;
         $this->header->setHeader( 'Content-Disposition', 'inline; filename="' . $name . '"' )
                      ->setHeader( 'Content-Type', $type );
@@ -263,7 +263,7 @@ class Response
      */
     public function json( $content ): self
     {
-        $this->header->setHeader( 'Content-Type', 'application/json; charset=utf-8' );
+        $this->header->setHeader( 'Content-Type', 'Application/json; charset=utf-8' );
         $this->content( ( new Json( $content ) )->toJson() );
 
         return $this;

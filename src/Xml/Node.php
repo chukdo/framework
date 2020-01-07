@@ -628,40 +628,37 @@ class Node implements IteratorAggregate
      * @param      $import
      * @param bool $parent importe le noeud lui même et pas seulement les enfants
      *
-     * @param      $import
-     * @param bool $parent
-     *
      * @return $this
      */
     public function import( $import, bool $parent = false ): self
     {
         $node = false;
+
         /** import depuis un objet xml */
         if ( $import instanceof Node ) {
             $node = $import->element();
-            /** import depuis un objet simplexml */
         }
-        else {
-            if ( $import instanceof SimpleXMLElement ) {
-                $node = dom_import_simplexml( $import );
-                /** import depuis un objet domxml */
-            }
-            else {
-                if ( $import instanceof DOMNode ) {
-                    $node = $import;
-                    /** import depuis une chaine de caracteres */
-                }
-                else {
-                    if ( is_string( $import ) ) {
-                        if ( $import[ 0 ] !== '<' ) {
-                            $import = '<xml>' . $import . '</xml>';
-                        }
-                        $xml  = Xml::loadFromString( $import );
-                        $node = $xml->element();
-                    }
-                }
-            }
+
+        /** import depuis un objet simplexml */
+        elseif ( $import instanceof SimpleXMLElement ) {
+            $node = dom_import_simplexml( $import );
         }
+
+        /** import depuis un objet domxml */
+        elseif ( $import instanceof DOMNode ) {
+            $node = $import;
+        }
+
+        /** import depuis une chaine de caracteres */
+        elseif ( is_string( $import ) ) {
+            if ( $import[ 0 ] !== '<' ) {
+                $import = '<xml>' . $import . '</xml>';
+            }
+
+            $xml  = Xml::loadFromString( $import );
+            $node = $xml->element();
+        }
+
         /** importation d'un DOMElement */
         if ( $node instanceof DOMElement ) {
             if ( $parent === true ) {
@@ -674,41 +671,39 @@ class Node implements IteratorAggregate
                                             ->importNode( $child, true ) );
                 }
             }
-            /** importation d'un DOMNode */
         }
-        else {
-            if ( $node instanceof DOMNode ) {
-                $this->appendNode( $this->doc()
-                                        ->importNode( $node, true ) );
-                /** importation d'un tableau */
-            }
-            else {
-                if ( Is::arr( $import ) ) {
-                    foreach ( $import as $k => $v ) {
-                        /* Index */
-                        if ( is_int( $k ) ) {
-                            $node = $this->set( 'item' );
-                            $node->setAttr( 'oname', $k );
-                            /** Noeud invalide */
-                        }
-                        else {
-                            if ( !preg_match( '/^[a-z_](?:[a-z0-9_-]+)?$/iu', $k ) ) {
-                                $node = $this->set( 'item' );
-                                $node->setAttr( 'oname', $k );
-                                /** Noeud valide */
-                            }
-                            else {
-                                $node = $this->set( $k );
-                            }
-                        }
-                        /** gestion de la recursivité */
-                        if ( Is::traversable( $v ) ) {
-                            $node->import( $v );
-                        }
-                        else {
-                            $node->setValue( $v );
-                        }
-                    }
+
+        /** importation d'un DOMNode */
+        elseif ( $node instanceof DOMNode ) {
+            $this->appendNode( $this->doc()
+                                    ->importNode( $node, true ) );
+        }
+
+        /** importation d'un tableau */
+        elseif ( Is::arr( $import ) ) {
+            foreach ( $import as $k => $v ) {
+
+                /** Index */
+                if ( is_int( $k ) ) {
+                    $node = $this->set( 'item' );
+                    $node->setAttr( 'oname', $k );
+                }
+                /** Noeud invalide */
+                elseif ( !preg_match( '/^[a-z_](?:[a-z0-9_-]+)?$/iu', $k ) ) {
+                    $node = $this->set( 'item' );
+                    $node->setAttr( 'oname', $k );
+                }
+                /** Noeud valide */
+                else {
+                    $node = $this->set( $k );
+                }
+
+                /** gestion de la recursivité */
+                if ( Is::traversable( $v ) ) {
+                    $node->import( $v );
+                }
+                else {
+                    $node->setValue( $v );
                 }
             }
         }
