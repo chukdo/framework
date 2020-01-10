@@ -188,20 +188,11 @@ class RequestApi
     }
 
     /**
-     * @return string|null
-     */
-    public function getType(): ?string
-    {
-        return $this->header()
-                    ->getType();
-    }
-
-    /**
      * @return bool
      */
     public function hasInputs(): bool
     {
-        return count( $this->inputs ) > 0;
+        return $this->rawInput || count( $this->inputs ) > 0;
     }
 
     /**
@@ -267,5 +258,14 @@ class RequestApi
         }
 
         return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getType(): ?string
+    {
+        return $this->header()
+                    ->getType();
     }
 }

@@ -141,7 +141,9 @@ final class Str
     {
         $match   = new Json();
         $matches = [];
+
         preg_match_all( $pattern, $value, $matches, PREG_SET_ORDER );
+
         foreach ( $matches as $k => $array ) {
             switch ( count( $array ) ) {
                 case 0:
@@ -170,7 +172,9 @@ final class Str
     public static function match( string $pattern, string $value )
     {
         $match = [];
+
         preg_match( $pattern, $value, $match );
+
         switch ( count( $match ) ) {
             case 0:
                 return null;

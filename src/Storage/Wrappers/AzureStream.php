@@ -16,9 +16,9 @@ use Throwable;
 class AzureStream extends AbstractStream
 {
     /**
-     * @var object StreamInterface
+     * @var object|null
      */
-    protected object $stream;
+    protected ?object $stream;
 
     /**
      * @var string|null
@@ -28,7 +28,7 @@ class AzureStream extends AbstractStream
     /**
      * @var int
      */
-    private int $streamLenght = 0;
+    private int $streamLength = 0;
 
     /**
      * Retourne une portion du contenu du fichier.
@@ -44,7 +44,7 @@ class AzureStream extends AbstractStream
         if ( $this->streamContent === null ) {
             $this->streamGet();
         }
-        if ( $offset >= $this->streamLenght ) {
+        if ( $offset >= $this->streamLength ) {
             return null;
         }
         else {
@@ -64,7 +64,7 @@ class AzureStream extends AbstractStream
             $this->streamContent = stream_get_contents( $this->getStream()
                                                              ->getBlob( $this->getHost(), $this->getPath() )
                                                              ->getContentStream() );
-            $this->streamLenght  = strlen( $this->streamContent );
+            $this->streamLength  = strlen( $this->streamContent );
         }
 
         return $this->streamContent;
@@ -172,14 +172,14 @@ class AzureStream extends AbstractStream
      */
     public function streamSize(): int
     {
-        if ( $this->streamLenght == 0 ) {
-            $this->streamLenght = (int) $this->getStream()
+        if ( $this->streamLength === 0 ) {
+            $this->streamLength = (int) $this->getStream()
                                              ->getBlob( $this->getHost(), $this->getPath() )
                                              ->getProperties()
                                              ->getContentLength();
         }
 
-        return $this->streamLenght;
+        return $this->streamLength;
     }
 
     /**

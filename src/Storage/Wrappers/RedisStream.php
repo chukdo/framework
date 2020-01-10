@@ -54,6 +54,7 @@ class RedisStream extends AbstractStream
     {
         $scheme = $this->getScheme();
         $host   = (int) $this->getHost();
+
         try {
             $stream = ServiceLocator::getInstance()
                                     ->getResource( $scheme );
@@ -62,6 +63,7 @@ class RedisStream extends AbstractStream
         catch ( Exception $e ) {
             throw new StreamException( sprintf( '[%s] is not a registred resource', $scheme ), $e->getCode(), $e );
         }
+
         if ( !( $stream instanceof RedisInterface ) ) {
             throw new StreamException( sprintf( 'service [%s] is not a redis interface', $scheme ) );
         }
@@ -84,9 +86,8 @@ class RedisStream extends AbstractStream
             return $this->getStream()
                         ->getRange( $this->getPath(), $offset, --$length );
         }
-        else {
-            return null;
-        }
+
+        return null;
     }
 
     /**

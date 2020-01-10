@@ -301,18 +301,18 @@ final class Is
     {
         if ( self::scalar( $value ) ) {
             $value = trim( $value );
+
             if ( $value === '' || $value === null ) {
                 return true;
             }
         }
-        else {
-            if ( self::traversable( $value ) ) {
-                foreach ( $value as $v ) {
-                    return false;
-                }
 
-                return true;
+        elseif ( self::traversable( $value ) ) {
+            foreach ( $value as $v ) {
+                return false;
             }
+
+            return true;
         }
 
         return false;
@@ -326,5 +326,15 @@ final class Is
     public static function traversable( $value ): bool
     {
         return is_array( $value ) || $value instanceof Traversable;
+    }
+
+    /**
+     * @param $value
+     *
+     * @return bool
+     */
+    public static function dateTime( $value ): bool
+    {
+        return $value instanceof DateTime;
     }
 }

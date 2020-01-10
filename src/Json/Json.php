@@ -145,7 +145,7 @@ class Json extends ArrayObject implements JsonInterface
      *
      * @return string
      */
-    public function toJson( bool $prettify = false ): string
+    public function toJson( bool $prettify = true ): string
     {
         return json_encode( $this->toArray(), $prettify
             ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR

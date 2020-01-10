@@ -2,8 +2,10 @@
 
 namespace Chukdo\Oauth2\Provider;
 
+use Chukdo\Contracts\Oauth2\Owner as OwnerInterface;
 use Chukdo\Contracts\Oauth2\Token as TokenInterface;
 use Chukdo\Http\RequestApi;
+use Chukdo\Oauth2\Owner\GenericOwner;
 use Chukdo\Oauth2\Token\GenericToken;
 
 Class GenericProvider extends AbstractProvider
@@ -22,5 +24,22 @@ Class GenericProvider extends AbstractProvider
         $response = $request->send();
 
         return new GenericToken( $response->content() );
+    }
+
+    /**
+     * @param string $token
+     * @param string $method
+     *
+     * @return OwnerInterface
+     */
+    public function getOwner( string $token, string $method = 'POST' ): OwnerInterface
+    {
+        $request  = new RequestApi( $method, $this->getUrlResourceOwner() );
+        $response = $request->setBearer( $token )
+                            ->setType( 'json' )
+                            ->setRawInput( 'null' )
+                            ->send();
+
+        return new GenericOwner( $response->content() );
     }
 }

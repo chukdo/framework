@@ -3,6 +3,7 @@
 namespace Chukdo\Oauth2\Provider;
 
 use Chukdo\Contracts\Oauth2\Token as TokenInterface;
+use Chukdo\Contracts\Oauth2\Owner as OwnerInterface;
 use Chukdo\Contracts\Oauth2\Provider as ProviderInterface;
 use Chukdo\Helper\Arr;
 use Chukdo\Http\Url;
@@ -99,6 +100,13 @@ abstract Class AbstractProvider implements ProviderInterface
      * @return TokenInterface
      */
     abstract public function getToken( string $grantType, array $options = [], string $method = 'POST' ): TokenInterface;
+
+    /**
+     * @param string $token
+     *
+     * @return OwnerInterface
+     */
+    abstract public function getOwner( string $token ): OwnerInterface;
 
     /**
      * @param string $grantType

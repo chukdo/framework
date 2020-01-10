@@ -43,7 +43,7 @@ class FileUploaded
      */
     public function __construct( string $name, string $allowedMimeTypes = null, int $maxFileSize = null )
     {
-        $uploadedFiles = $this->normalizeUploadedFiles();
+        $uploadedFiles = self::normalizeUploadedFiles();
 
         if ( isset( $uploadedFiles[ $name ] ) ) {
             $this->name         = $name;
@@ -65,7 +65,7 @@ class FileUploaded
         foreach ( $_FILES as $name => $file ) {
             foreach ( $file as $type => $value ) {
                 if ( is_array( $value ) ) {
-                    foreach ( self::__normalizeUploadedFiles( $value ) as $nName => $nValue ) {
+                    foreach ( self::_normalizeUploadedFiles( $value ) as $nName => $nValue ) {
                         $uploadedFiles[ $name . '.' . $nName ][ $type ] = $nValue;
                     }
                 }
@@ -83,12 +83,12 @@ class FileUploaded
      *
      * @return array
      */
-    private static function __normalizeUploadedFiles( array $array ): array
+    private static function _normalizeUploadedFiles( array $array ): array
     {
         $uploadedFiles = [];
         foreach ( $array as $k => $v ) {
             if ( is_array( $v ) ) {
-                foreach ( self::__normalizeUploadedFiles( $v ) as $_k => $_v ) {
+                foreach ( self::_normalizeUploadedFiles( $v ) as $_k => $_v ) {
                     $uploadedFiles[ $k . '.' . $_k ] = $_v;
                 }
             }

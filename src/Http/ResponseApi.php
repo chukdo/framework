@@ -2,6 +2,7 @@
 
 namespace Chukdo\Http;
 
+use Chukdo\Helper\Arr;
 use Chukdo\Helper\Http;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
@@ -47,12 +48,20 @@ class ResponseApi
 
         switch ( $request->method() ) {
             case 'POST' :
-                $this->setOption( CURLOPT_POST, true )
-                     ->setOption( CURLOPT_POSTFIELDS, $request->getInputs() );
+                $this->setOption( CURLOPT_POST, true );
+
+                if ( $request->hasInputs() ) {
+                    $this->setOption( CURLOPT_POSTFIELDS, $request->getInputs() );
+                }
+
                 break;
             case 'PUT' :
-                $this->setOption( CURLOPT_CUSTOMREQUEST, 'PUT' )
-                     ->setOption( CURLOPT_POSTFIELDS, $request->getInputs() );
+                $this->setOption( CURLOPT_CUSTOMREQUEST, 'PUT' );
+
+                if ( $request->hasInputs() ) {
+                    $this->setOption( CURLOPT_POSTFIELDS, $request->getInputs() );
+                }
+
                 break;
             case 'GET' :
                 $this->setOption( CURLOPT_HTTPGET, true );
@@ -68,15 +77,15 @@ class ResponseApi
         }
 
         $this->setOption( CURLOPT_SSL_VERIFYPEER, false )
-             ->setOption( CURLOPT_AUTOREFERER, true )
-             ->setOption( CURLOPT_FOLLOWLOCATION, true )
-             ->setOption( CURLOPT_RETURNTRANSFER, true )
-             ->setOption( CURLINFO_HEADER_OUT, true )
-             ->setOption( CURLOPT_HTTPHEADER, (array) $request->header()
-                                                              ->getHeaders() )
-             ->setOption( CURLOPT_HEADER, false )
-             ->setOption( CURLOPT_HEADERFUNCTION, fn( $h, $header ) => $this->header->parseHeaders( $header ) )
-             ->setOptions( $options );
+            ->setOption( CURLOPT_AUTOREFERER, true )
+            ->setOption( CURLOPT_FOLLOWLOCATION, true )
+            ->setOption( CURLOPT_RETURNTRANSFER, true )
+            ->setOption( CURLINFO_HEADER_OUT, true )
+            ->setOption( CURLOPT_HTTPHEADER, (array) $request->header()
+                ->getHeaders() )
+            ->setOption( CURLOPT_HEADER, false )
+            ->setOption( CURLOPT_HEADERFUNCTION, fn( $h, $header ) => $this->header->parseHeaders( $header ) )
+            ->setOptions( $options );
 
         $this->raw = curl_exec( $this->curl );
     }
@@ -127,7 +136,7 @@ class ResponseApi
 
         $content = $this->raw();
         $type    = Http::contentTypeToExt( $this->header()
-                                                ->getHeader( 'Content-Type' ) );
+                                               ->getHeader( 'Content-Type' ) );
 
         if ( $type === 'json' ) {
             return new Json( json_decode( $content, true, 512, JSON_THROW_ON_ERROR ) );
@@ -150,7 +159,7 @@ class ResponseApi
             return Xml::loadFromString( $content, true );
         }
 
-        throw new HttpException( sprintf( 'Can\'t decode response type [%s]', $type ) );
+        throw new HttpException( sprintf( 'Can\'t decode response [%s]', $content ) );
     }
 
     /**

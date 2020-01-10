@@ -12,11 +12,9 @@ namespace Chukdo\Support;
 class Singleton
 {
     /**
-     * Tableau des instances.
-     *
-     * @var object
+     * @var object|null
      */
-    private static $singletonInstance = null;
+    private static ?object $singletonInstance = null;
 
     /**
      * Constructeur verouillé pour ne pas etre instancié depuis l'exterieur de la classe.
@@ -49,7 +47,7 @@ class Singleton
      */
     public static function getInstance()
     {
-        if ( is_null( self::$singletonInstance ) ) {
+        if ( self::$singletonInstance === null ) {
             self::$singletonInstance = new static();
         }
 
