@@ -335,7 +335,7 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
      *
      * @return Json
      */
-    public function to2d( string $prefix = null ): Json;
+    public function toArray2D( string $prefix = null ): Json;
 
     /**
      * @param string|null $title
@@ -347,11 +347,11 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
 
     /**
      * @param string|null $title
-     * @param string|null $color
+     * @param string      $color
      *
      * @return string
      */
-    public function toConsole( string $title = null, string $color = null ): string;
+    public function toConsole( string $title = null, string $color = '' ): string;
 
     /**
      * @return Xml

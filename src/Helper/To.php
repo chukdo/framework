@@ -291,9 +291,9 @@ final class To
     public static function html( $value, string $title = null, string $color = null, bool $type = false ): string
     {
         $html  = '';
-        $title ??= ( $type
+        $title ??= $type
             ? Str::type( $value )
-            : null );
+            : null;
 
         if ( $title ) {
             $color = $color

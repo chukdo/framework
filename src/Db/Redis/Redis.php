@@ -412,7 +412,7 @@ class Redis implements RedisInterface
      */
     public function __destruct()
     {
-        $this->sock = '';
+        unset( $this->sock );
     }
 
     /**
@@ -498,5 +498,122 @@ class Redis implements RedisInterface
     public function __unset( string $key )
     {
         return $this->__call( 'DEL', [ $key ] );
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     *
+     * @return mixed
+     */
+    public function rpush( string $key, string $value )
+    {
+        return $this->__call( 'RPUSH', [
+            $key,
+            $value,
+        ] );
+    }
+
+    /**
+     * @param string $key
+     * @param int    $offset
+     * @param int    $length
+     *
+     * @return mixed
+     */
+    public function getRange( string $key, int $offset, int $length )
+    {
+        return $this->__call( 'GETRANGE', [
+            $key,
+            $offset,
+            $length,
+        ] );
+    }
+
+    /**
+     * @param string $key
+     * @param int    $offset
+     * @param string $content
+     *
+     * @return mixed
+     */
+    public function setRange( string $key, int $offset, string $content )
+    {
+        return $this->__call( 'SETRANGE', [
+            $key,
+            $offset,
+            $content,
+        ] );
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     *
+     * @return mixed
+     */
+    public function append( string $key, string $value )
+    {
+        return $this->__call( 'APPEND', [
+            $key,
+            $value,
+        ] );
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function strlen( string $key )
+    {
+        return $this->__call( 'STRLEN', [ $key ] );
+    }
+
+    /**
+     * @param string $key
+     * @param        $newKey
+     *
+     * @return mixed
+     */
+    public function rename( string $key, $newKey )
+    {
+        return $this->__call( 'RENAME', [
+            $key,
+            $newKey,
+        ] );
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function keys( string $key )
+    {
+        return $this->__call( 'KEYS', [ $key ] );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hset( string $name, string $key, string $value )
+    {
+        return $this->__call( 'HSET', [
+            $name,
+            $key,
+            $value,
+        ] );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hget( string $name, string $key )
+    {
+        return $this->__call( 'HGET', [
+            $name,
+            $key,
+        ] );
     }
 }

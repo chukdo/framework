@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use Chukdo\Bootstrap\ServiceProvider;
-use Chukdo\DB\Mongo\Server;
+use Chukdo\Db\Mongo\Server;
 
 class MongoServiceProvider extends ServiceProvider
 {

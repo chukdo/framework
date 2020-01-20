@@ -1,6 +1,6 @@
 <?php
 
-namespace Chukdo\Db\Mongo;
+namespace Chukdo\Db\Record;
 
 use Chukdo\Bootstrap\AppException;
 

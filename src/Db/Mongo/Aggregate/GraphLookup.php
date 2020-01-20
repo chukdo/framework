@@ -100,14 +100,14 @@ Class GraphLookup extends Stage
     /**
      * @param string $field
      * @param string $operator
-     * @param        $value
+     * @param null   $value
      * @param null   $value2
      *
      * @return Match
      */
-    public function where( string $field, string $operator, $value, $value2 = null ): Match
+    public function where( string $field, string $operator, $value = null, $value2 = null ): Match
     {
-        $match = new Match();
+        $match = new Match( new PipelineStage() );
         $match->where( $field, $operator, $value, $value2 );
 
         return $this->pipe[ 'restrictSearchWithMatch' ] = $match;

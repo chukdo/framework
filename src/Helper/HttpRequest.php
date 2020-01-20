@@ -134,35 +134,44 @@ final class HttpRequest
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public static function host(): string
+    public static function host(): ?string
     {
         return self::server( 'HTTP_HOST' );
     }
 
     /**
-     * @return string
+     * @param string|null $default
+     *
+     * @return string|null
      */
-    public static function tld(): string
+    public static function tld( string $default = null ): ?string
     {
-        return ( new Url( self::uri() ) )->getTld();
+        return ( new Url( self::uri() ) )->getTld()
+            ?: $default;
     }
 
     /**
-     * @return string
+     * @param string|null $default
+     *
+     * @return string|null
      */
-    public static function domain(): string
+    public static function domain( string $default = null ): ?string
     {
-        return ( new Url( self::uri() ) )->getDomain();
+        return ( new Url( self::uri() ) )->getDomain()
+            ?: $default;
     }
 
     /**
-     * @return string
+     * @param string|null $default
+     *
+     * @return string|null
      */
-    public static function subDomain(): string
+    public static function subDomain( string $default = null ): ?string
     {
-        return ( new Url( self::uri() ) )->getSubDomain();
+        return ( new Url( self::uri() ) )->getSubDomain()
+            ?: $default;
     }
 
     /**

@@ -315,7 +315,7 @@ class RedisStream extends AbstractStream
      */
     public function streamClose(): bool
     {
-        $this->stream = null;
+        unset( $this->stream );
 
         return true;
     }

@@ -1,0 +1,11 @@
+parameters:
+	checkGenericClassInNonGenericObjectType:
+		false
+	checkMissingIterableValueType:
+		false
+	ignoreErrors:
+		- '#PHPDoc tag @#'
+		- '#Unsafe usage of new static()#'
+		- '#Cannot call method get() on array|League#'
+		- '#Call to an undefined method Chukdo\\Contracts\\Db\\Stage#'
+		- '#with no typehint specified#'

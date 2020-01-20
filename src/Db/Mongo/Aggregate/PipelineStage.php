@@ -12,10 +12,8 @@ use Chukdo\Contracts\Db\Stage as StageInterface;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class PipelineStage implements StageInterface
+Class PipelineStage extends AbstractPipelineStage
 {
-    use TraitPipelineStage;
-
     /**
      * @var array
      */
@@ -56,7 +54,7 @@ Class PipelineStage implements StageInterface
             return $this->pipe[ $key ];
         }
 
-        $class = '\Chukdo\DB\Mongo\Aggregate\\' . ucfirst( $pipe );
+        $class = '\Chukdo\Db\Mongo\Aggregate\\' . ucfirst( $pipe );
 
         return $this->pipe[ $key ] = new $class( $this );
     }

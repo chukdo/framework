@@ -32,9 +32,7 @@ class Conf extends Json
         }
 
         foreach ( $files as $file ) {
-            if ( !$this->loadFile( $file ) ) {
-                throw new AppException( sprintf( 'Conf file [%s] no exist', $file ) );
-            }
+            $this->loadFile( $file );
         }
 
         return $this;
@@ -51,7 +49,7 @@ class Conf extends Json
 
         if ( $storage->exists( $file ) ) {
             $load = new self( $storage->get( $file ) );
-            $this->merge( $load->to2d(), true );
+            $this->merge( $load->toArray2D(), true );
 
             return $this;
         }

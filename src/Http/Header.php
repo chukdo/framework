@@ -2,6 +2,7 @@
 
 namespace Chukdo\Http;
 
+use DateTime;
 use Chukdo\Helper\Arr;
 use Chukdo\Helper\Http;
 use Chukdo\Helper\Str;
@@ -294,9 +295,9 @@ class Header
     public function setAuthorization( string $auth ): self
     {
         $this->setStatus( 401 )
-             ->setHeader( 'Cache-Control', 'no-store, no-cache, must-revalidate' )
-             ->setHeader( 'Pragma', 'no-cache' )
-             ->setHeader( 'WWW-Authenticate', 'Basic realm="' . urlencode( $auth ) . '"' );
+            ->setHeader( 'Cache-Control', 'no-store, no-cache, must-revalidate' )
+            ->setHeader( 'Pragma', 'no-cache' )
+            ->setHeader( 'WWW-Authenticate', 'Basic realm="' . urlencode( $auth ) . '"' );
 
         return $this;
     }
@@ -354,7 +355,7 @@ class Header
     public function setLocation( string $url, int $status = 302 ): self
     {
         $this->setStatus( $status )
-             ->setHeader( 'Location', $url );
+            ->setHeader( 'Location', $url );
 
         return $this;
     }
@@ -393,6 +394,18 @@ class Header
     }
 
     /**
+     * @param DateTime $time
+     *
+     * @return $this
+     */
+    public function setDate( DateTime $time ): self
+    {
+        $this->setHeader( 'Date', $time->format( DateTime::RFC850 ) );
+
+        return $this;
+    }
+
+    /**
      * Autorise toutes les origines d'appels (utile pour les cross ajax call).
      *
      * @param string|null $origin
@@ -407,8 +420,8 @@ class Header
             $isAllow = false;
             $uri     = trim( $_SERVER[ 'HTTP_ORIGIN' ], '/' );
             $origins = explode( ' ', $origin );
-            $method  = $method ?? 'GET, POST, PUT, DELETE, OPTIONS';
-            $allow   = $allow ?? 'Content-Type, Content-Range, Content-Disposition, Content-Description, ' . 'Accept, Access-Control-Allow-Headers, Authorization, X-Requested-With';
+            $method  ??= 'GET, POST, PUT, DELETE, OPTIONS';
+            $allow   ??= 'Content-Type, Content-Range, Content-Disposition, Content-Description, ' . 'Accept, Access-Control-Allow-Headers, Authorization, X-Requested-With';
             foreach ( $origins as $item ) {
                 if ( $item && substr( $uri, -strlen( $item ) ) === $item ) {
                     $isAllow = true;
@@ -469,7 +482,7 @@ class Header
     public function hasHeader(): bool
     {
         return $this->header()
-                    ->count() > 0;
+                ->count() > 0;
     }
 
     /**
@@ -510,7 +523,7 @@ class Header
     public function hasCookie(): bool
     {
         return $this->cookie()
-                    ->count() > 0;
+                ->count() > 0;
     }
 
     /**
@@ -649,17 +662,14 @@ class Header
             'contentencoding'    => 'Content-Encoding',
             'contentdisposition' => 'Content-disposition',
             'date'               => 'Date',
-            // Date RFC850
             'except'             => 'Expect',
             'from'               => 'From',
             'host'               => 'Host',
             'ifmatch'            => 'If-Match',
             'ifmodifiedsince'    => 'If-Modified-Since',
-            // Date RFC850
             'ifnonematch'        => 'If-None-Match',
             'ifrange'            => 'If-Range',
             'ifunmodifiedsince'  => 'If-Unmodified-Since',
-            // Date RFC850
             'maxforwards'        => 'Max-Forwards',
             'pragma'             => 'Pragma',
             'proxyauthorization' => 'Proxy-Authorization',
@@ -672,9 +682,7 @@ class Header
             'contentrange'       => 'Content-Range',
             'etag'               => 'ETag',
             'expires'            => 'Expires',
-            // Date RFC850
             'lastmodified'       => 'Last-Modified',
-            // Date RFC850
             'location'           => 'Location',
             'retryafter'         => 'Retry-After',
             'server'             => 'Server',
@@ -682,6 +690,7 @@ class Header
             'vary'               => 'Vary',
             'wwwauthenticate'    => 'WWW-Authenticate',
         ];
+
         /** Entetes utilisant des dates au format RFC850 */
         $date = [
             'date',
@@ -690,6 +699,7 @@ class Header
             'expires',
             'lastmodified',
         ];
+
         /** La methode existe */
         if ( isset( $method[ $header ] ) ) {
             $key = $method[ $header ];

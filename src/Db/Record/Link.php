@@ -5,7 +5,6 @@ namespace Chukdo\Db\Record;
 use Chukdo\Contracts\Db\Database as DatabaseInterface;
 use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\Contracts\Json\Json as JsonInterface;
-use Chukdo\Db\Mongo\RecordException;
 use Chukdo\Helper\Is;
 use Chukdo\Helper\Arr;
 use Chukdo\Helper\Str;

@@ -760,9 +760,11 @@ class Node implements IteratorAggregate
      */
     public function last(): ?Node
     {
-        $childs = (array) $this->childs();
-        if ( count( $childs ) > 0 ) {
-            return end( $childs );
+        $childs = $this->childs();
+        $count  = $childs->count();
+
+        if ( $count > 0 ) {
+            return $childs->get( $count - 1 );
         }
 
         return null;

@@ -2,6 +2,8 @@
 
 namespace Chukdo\Db\Mongo\Aggregate;
 
+use Chukdo\Contracts\Db\Stage as StageInterface;
+
 /**
  * Aggregate PipelineStage.
  *
@@ -10,8 +12,15 @@ namespace Chukdo\Db\Mongo\Aggregate;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-trait TraitPipelineStage
+abstract class AbstractPipelineStage implements StageInterface
 {
+    /**
+     * @param $pipe
+     *
+     * @return StageInterface
+     */
+    abstract function pipeStage( $pipe ): StageInterface;
+
     /**
      * @param string $field
      * @param        $expression
@@ -33,8 +42,8 @@ trait TraitPipelineStage
     public function bucket( $expression, array $boundaries ): Bucket
     {
         return $this->pipeStage( 'bucket' )
-                    ->groupBy( $expression )
-                    ->boundaries( $boundaries );
+            ->groupBy( $expression )
+            ->boundaries( $boundaries );
     }
 
     /**
@@ -46,8 +55,8 @@ trait TraitPipelineStage
     public function bucketAuto( $expression, int $buckets ): BucketAuto
     {
         return $this->pipeStage( 'bucketAuto' )
-                    ->groupBy( $expression )
-                    ->buckets( $buckets );
+            ->groupBy( $expression )
+            ->buckets( $buckets );
     }
 
     /**
@@ -58,7 +67,7 @@ trait TraitPipelineStage
     public function facet( string $field ): FacetPipelineStage
     {
         return $this->pipeStage( 'facet' )
-                    ->facetPipelineStage( $field );
+            ->facetPipelineStage( $field );
     }
 
     /**
@@ -69,7 +78,7 @@ trait TraitPipelineStage
     public function count( string $field ): self
     {
         $this->pipeStage( 'count' )
-             ->set( $field );
+            ->set( $field );
 
         return $this;
     }
@@ -85,9 +94,9 @@ trait TraitPipelineStage
     public function geoNear( float $lon, float $lat, string $distanceField, int $distance ): GeoNear
     {
         return $this->pipeStage( 'geoNear' )
-                    ->near( $lon, $lat )
-                    ->distanceField( $distanceField )
-                    ->maxDistance( $distance );
+            ->near( $lon, $lat )
+            ->distanceField( $distanceField )
+            ->maxDistance( $distance );
     }
 
     /**
@@ -100,10 +109,10 @@ trait TraitPipelineStage
     public function graphLookup( string $foreignCollection, string $foreignField, string $localField ): GraphLookup
     {
         return $this->pipeStage( 'graphLookup' )
-                    ->from( $foreignCollection )
-                    ->connectFromField( $foreignField )
-                    ->connectToField( $localField )
-                    ->as( 'lookup' );
+            ->from( $foreignCollection )
+            ->connectFromField( $foreignField )
+            ->connectToField( $localField )
+            ->as( 'lookup' );
     }
 
     /**
@@ -114,7 +123,7 @@ trait TraitPipelineStage
     public function group( $expression ): Group
     {
         return $this->pipeStage( 'group' )
-                    ->id( $expression );
+            ->id( $expression );
     }
 
     /**
@@ -125,7 +134,7 @@ trait TraitPipelineStage
     public function limit( int $limit ): self
     {
         $this->pipeStage( 'limit' )
-             ->set( $limit );
+            ->set( $limit );
 
         return $this;
     }
@@ -140,10 +149,10 @@ trait TraitPipelineStage
     public function lookup( string $foreignCollection, string $foreignField, string $localField ): Lookup
     {
         return $this->pipeStage( 'lookup' )
-                    ->from( $foreignCollection )
-                    ->foreignField( $foreignField )
-                    ->localField( $localField )
-                    ->as( 'lookup' );
+            ->from( $foreignCollection )
+            ->foreignField( $foreignField )
+            ->localField( $localField )
+            ->as( 'lookup' );
     }
 
     /**
@@ -157,7 +166,7 @@ trait TraitPipelineStage
     public function where( string $field, string $operator, $value = null, $value2 = null ): Match
     {
         return $this->pipeStage( 'match' )
-                    ->where( $field, $operator, $value, $value2 );
+            ->where( $field, $operator, $value, $value2 );
     }
 
     /**
@@ -171,7 +180,7 @@ trait TraitPipelineStage
     public function orWhere( string $field, string $operator, $value = null, $value2 = null ): Match
     {
         return $this->pipeStage( 'match' )
-                    ->where( $field, $operator, $value, $value2 );
+            ->where( $field, $operator, $value, $value2 );
     }
 
     /**
@@ -183,8 +192,8 @@ trait TraitPipelineStage
     public function mergeTo( string $collection, string $on = '_id' ): self
     {
         $this->pipeStage( 'merge' )
-             ->into( $collection )
-             ->on( $on );
+            ->into( $collection )
+            ->on( $on );
 
         return $this;
     }
@@ -197,7 +206,7 @@ trait TraitPipelineStage
     public function saveTo( string $collection ): self
     {
         $this->pipeStage( 'out' )
-             ->set( $collection );
+            ->set( $collection );
 
         return $this;
     }
@@ -242,7 +251,7 @@ trait TraitPipelineStage
     public function replaceWith( $expression ): self
     {
         $this->pipeStage( 'replaceRoot' )
-             ->set( $expression );
+            ->set( $expression );
 
         return $this;
     }
@@ -255,7 +264,7 @@ trait TraitPipelineStage
     public function sample( int $size ): self
     {
         $this->pipeStage( 'sample' )
-             ->set( $size );
+            ->set( $size );
 
         return $this;
     }
@@ -268,7 +277,7 @@ trait TraitPipelineStage
     public function skip( int $skip ): self
     {
         $this->pipeStage( 'skip' )
-             ->set( $skip );
+            ->set( $skip );
 
         return $this;
     }
@@ -296,7 +305,7 @@ trait TraitPipelineStage
     public function sortByCount( $expression ): self
     {
         $this->pipeStage( 'sortByCount' )
-             ->set( $expression );
+            ->set( $expression );
 
         return $this;
     }
@@ -309,7 +318,7 @@ trait TraitPipelineStage
     public function unwind( string $field ): self
     {
         $this->pipeStage( 'unwind' )
-             ->set( $field );
+            ->set( $field );
 
         return $this;
     }

@@ -16,22 +16,22 @@ use Exception;
 class RedisHandler extends AbstractHandler
 {
     /**
-     * @var RedisInterface|null
+     * @var RedisInterface
      */
-    protected ?RedisInterface $redis;
+    protected RedisInterface $redis;
 
     /**
      * @var string
      */
-    protected ?string $key;
+    protected string $key;
 
     /**
      * RedisHandler constructor.
      *
-     * @param RedisInterface|null $redis
-     * @param string|null         $key
+     * @param RedisInterface $redis
+     * @param string|null    $key
      */
-    public function __construct( ?RedisInterface $redis, string $key = null )
+    public function __construct( RedisInterface $redis, string $key = null )
     {
         $this->redis = $redis;
         $this->key   = $key ?? 'log';
@@ -44,7 +44,7 @@ class RedisHandler extends AbstractHandler
     public function __destruct()
     {
         $this->redis->__destruct();
-        $this->redis = null;
+        unset( $this->redis );
     }
 
     /**

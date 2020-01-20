@@ -186,7 +186,7 @@ final class Is
      */
     public static function date( $value, string $format = null ): bool
     {
-        $format    = $format ?? 'd/m/Y';
+        $format    ??= 'd/m/Y';
         $checkDate = DateTime::createFromFormat( $format, $value );
 
         return $value === $checkDate->format( $format );

@@ -2,6 +2,7 @@
 
 namespace Chukdo\Contracts\Http;
 
+use Chukdo\Contracts\Json\Json;
 use Chukdo\Storage\FileUploaded;
 
 /**
@@ -12,7 +13,7 @@ use Chukdo\Storage\FileUploaded;
  * @since         08/01/2019
  * @author        Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-interface Input
+interface Input extends Json
 {
     /**
      * @param string      $name

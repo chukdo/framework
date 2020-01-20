@@ -302,6 +302,23 @@ class Json extends ArrayObject implements JsonInterface
     }
 
     /**
+     * @param mixed $value
+     *
+     * @return self
+     */
+    public function append( $value ): self
+    {
+        if ( ( $this->strict === true && Is::iterable( $value ) ) || ( Is::arr( $value ) && !Is::jsonInterface( $value ) ) ) {
+            parent::append( new Json( $value, $this->strict ) );
+        }
+        else {
+            parent::append( $value );
+        }
+
+        return $this;
+    }
+
+    /**
      * @return $this
      */
     public function all(): self
@@ -323,23 +340,6 @@ class Json extends ArrayObject implements JsonInterface
         }
 
         return $this->append( $value );
-    }
-
-    /**
-     * @param mixed $value
-     *
-     * @return self
-     */
-    public function append( $value ): self
-    {
-        if ( ( $this->strict === true && Is::iterable( $value ) ) || ( Is::arr( $value ) && !Is::jsonInterface( $value ) ) ) {
-            parent::append( new Json( $value, $this->strict ) );
-        }
-        else {
-            parent::append( $value );
-        }
-
-        return $this;
     }
 
     /**
@@ -540,7 +540,13 @@ class Json extends ArrayObject implements JsonInterface
      */
     public function isArray(): bool
     {
-        return $this->isArray;
+        foreach ( $this as $k => $v ) {
+            if ( !Is::int( $k ) ) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -587,11 +593,11 @@ class Json extends ArrayObject implements JsonInterface
 
     /**
      * @param string|null $title
-     * @param string|null $color
+     * @param string      $color
      *
      * @return string
      */
-    public function toConsole( string $title = null, string $color = null ): string
+    public function toConsole( string $title = null, string $color = '' ): string
     {
         if ( !Cli::runningInConsole() ) {
             throw new JsonException( 'You can call json::toConsole only in CLI mode.' );
@@ -601,9 +607,21 @@ class Json extends ArrayObject implements JsonInterface
         $climate->output->defaultTo( 'buffer' );
 
         if ( $title ) {
+            $title = ucfirst( $title );
             $climate->border();
-            $climate->style->addCommand( 'colored', $color ?? 'green' );
-            $climate->colored( ucfirst( $title ?? $this->name ) );
+
+            switch ( strtolower( $color ) ) {
+                case 'red' :
+                    $climate->red( $title );
+                    break;
+                case 'blue' :
+                    $climate->blue( $title );
+                    break;
+                case 'green':
+                    $climate->green( $title );
+                    break;
+            }
+
             $climate->border();
         }
 
@@ -633,29 +651,6 @@ class Json extends ArrayObject implements JsonInterface
         $xml->import( $this->toArray() );
 
         return $xml;
-    }
-
-    /**
-     * @param string $path
-     *
-     * @return mixed|null
-     */
-    public function unset( string $path )
-    {
-        if ( Str::notContain( $path, '.' ) ) {
-            return $this->offsetUnset( $path );
-        }
-
-        $arr       = new Iterate( Str::split( $path, '.' ) );
-        $firstPath = $arr->getFirstAndRemove();
-        $endPath   = $arr->join( '.' );
-        $get       = $this->offsetGet( $firstPath );
-
-        if ( $get instanceof JsonInterface ) {
-            return $get->unset( $endPath );
-        }
-
-        return null;
     }
 
     /**
@@ -712,8 +707,8 @@ class Json extends ArrayObject implements JsonInterface
      */
     public function diff( JsonInterface $json, bool $flat = false ): Json
     {
-        $src  = $this->to2d();
-        $new  = $json->to2d();
+        $src  = $this->toArray2D();
+        $new  = $json->toArray2D();
         $diff = new Json();
         $set  = static function( $path, $data ) use ( $diff, $flat )
         {
@@ -762,7 +757,7 @@ class Json extends ArrayObject implements JsonInterface
      *
      * @return Json
      */
-    public function to2d( string $prefix = null ): Json
+    public function toArray2D( string $prefix = null ): Json
     {
         $mixed = new Json();
 
@@ -770,7 +765,7 @@ class Json extends ArrayObject implements JsonInterface
             $k = trim( $prefix . '.' . $k, '.' );
 
             if ( $v instanceof JsonInterface ) {
-                $mixed->merge( $v->to2d( $k ) );
+                $mixed->merge( $v->toArray2D( $k ) );
             }
             else {
                 $mixed->offsetSet( $k, $v );
@@ -999,6 +994,29 @@ class Json extends ArrayObject implements JsonInterface
         }
 
         return $except;
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return mixed|null
+     */
+    public function unset( string $path )
+    {
+        if ( Str::notContain( $path, '.' ) ) {
+            return $this->offsetUnset( $path );
+        }
+
+        $arr       = new Iterate( Str::split( $path, '.' ) );
+        $firstPath = $arr->getFirstAndRemove();
+        $endPath   = $arr->join( '.' );
+        $get       = $this->offsetGet( $firstPath );
+
+        if ( $get instanceof JsonInterface ) {
+            return $get->unset( $endPath );
+        }
+
+        return null;
     }
 
     /**

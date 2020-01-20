@@ -235,7 +235,8 @@ class Router
                              ->send();
             }
         }
-        ( $this->fallback )( $this->request, $this->response );
+
+        return ( $this->fallback )( $this->request, $this->response );
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Chukdo\Http;
 
+use DateTime;
 use Chukdo\Helper\Http;
 use Chukdo\Helper\HttpRequest;
 use Chukdo\Helper\Str;
@@ -66,9 +67,9 @@ class Response
         $this->file    = null;
         $this->header  = new Header();
         $this->header->setStatus( 200 )
-                     ->setDate( time() )
-                     ->setServer( 'Apache' )
-                     ->setConnection( 'close' )
+                     ->setDate( new DateTime() )
+                     ->setHeader( 'Server', 'Apache' )
+                     ->setHeader( 'Connection', 'close' )
                      ->setCacheControl( false, false, 'no-store, no-cache, must-revalidate' );
     }
 
@@ -171,7 +172,7 @@ class Response
         $type       ??= Http::extToContentType( $name );
         $this->file = $file;
         $this->header->setHeader( 'Content-Disposition', 'attachment; filename="' . $name . '"' )
-                     ->setHeader( 'Content-Type', $type );
+            ->setHeader( 'Content-Type', $type );
 
         return $this;
     }
@@ -189,7 +190,7 @@ class Response
         $type       ??= Http::extToContentType( $name );
         $this->file = $file;
         $this->header->setHeader( 'Content-Disposition', 'inline; filename="' . $name . '"' )
-                     ->setHeader( 'Content-Type', $type );
+            ->setHeader( 'Content-Type', $type );
 
         return $this;
     }
@@ -279,7 +280,7 @@ class Response
     {
         $this->header->setHeader( 'Content-Type', 'text/xml; charset=utf-8' );
         $this->content( ( new Xml() )->import( $content )
-                                     ->toXmlString( $html, true ) );
+                            ->toXmlString( $html, true ) );
 
         return $this;
     }

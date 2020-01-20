@@ -44,19 +44,20 @@ class App extends Service
     public function __construct()
     {
         parent::__construct();
-        $this->instance( App::class, $this );
+        $this->instance( __CLASS__, $this );
         $this->instance( Conf::class, new Conf() );
         $this->instance( Lang::class, new Lang() );
     }
 
     /**
-     * @param $data
+     * @param mixed $data
      */
-    public function dd( $data )
+    public function dd( $data ): void
     {
         if ( $data === null ) {
             die( 'Null' );
         }
+
         die( PHP_SAPI === 'cli'
             ? To::text( $data )
             : To::html( $data, null, null, true ) );
@@ -136,9 +137,9 @@ class App extends Service
 
     /**
      * @param string $name
-     * @param        $bindObject
+     * @param mixed  $bindObject
      *
-     * @return App
+     * @return $this
      */
     protected function resolve( string $name, $bindObject ): self
     {

@@ -13,10 +13,8 @@ use Chukdo\Contracts\Db\Stage as StageInterface;
  * @since        08/01/2019
  * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
  */
-Class Stage implements StageInterface
+Class Stage extends AbstractPipelineStage
 {
-    use TraitPipelineStage;
-
     /**
      * @var array
      */

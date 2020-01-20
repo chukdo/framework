@@ -153,7 +153,7 @@ class Xml extends Node
      */
     public function __wakeup(): void
     {
-        $xml        = xml::loadFromString( $this->buffer );
+        $xml        = self::loadFromString( $this->buffer );
         $this->xml  = $xml->doc();
         $this->node = $xml->element();
     }

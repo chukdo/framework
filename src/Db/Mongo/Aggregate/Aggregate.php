@@ -2,7 +2,7 @@
 
 namespace Chukdo\Db\Mongo\Aggregate;
 
-use Chukdo\DB\Mongo\Collection;
+use Chukdo\Db\Mongo\Collection;
 use Chukdo\Json\Json;
 
 /**

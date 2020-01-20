@@ -2,8 +2,7 @@
 
 namespace Chukdo\Db\Record;
 
-use Chukdo\DB\Mongo\Collection;
-use Chukdo\Db\Mongo\RecordException;
+use Chukdo\Db\Mongo\Collection;
 use Exception;
 use DateTime;
 use Chukdo\Json\Json;

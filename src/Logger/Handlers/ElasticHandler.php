@@ -17,21 +17,21 @@ use Elasticsearch\ClientBuilder;
 class ElasticHandler extends AbstractHandler
 {
     /**
-     * @var Client|null
+     * @var Client
      */
-    protected ?Client $elastic;
+    protected Client $elastic;
 
     /**
      * @var string
      */
-    private ?string $dsn;
+    private string $dsn;
 
     /**
      * ElasticHandler constructor.
      *
-     * @param string|null $dsn
+     * @param string $dsn
      */
-    public function __construct( ?string $dsn )
+    public function __construct( string $dsn )
     {
         $this->dsn     = $dsn;
         $this->elastic = ClientBuilder::create()
@@ -43,8 +43,7 @@ class ElasticHandler extends AbstractHandler
 
     public function __destruct()
     {
-        $this->dsn     = null;
-        $this->elastic = null;
+        unset( $this->dsn, $this->elastic );
     }
 
     /**

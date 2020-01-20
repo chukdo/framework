@@ -2,12 +2,11 @@
 
 /** Namespaces */
 
-use \Chukdo\Facades\Request;
-use \Chukdo\Http\Input;
-use \Chukdo\Facades\Response;
+use \App\Providers;
 use \Chukdo\Facades\View;
 use \Chukdo\Facades\Router;
-use \App\Providers;
+use Chukdo\Http\Input;
+use Chukdo\Http\Response;
 use Chukdo\View\Functions\Basic;
 
 $app = require __DIR__ . '/../Bootstrap/App.php';
@@ -18,7 +17,7 @@ $app->conf()
     ->loadDefault( __DIR__ . '/../Conf/', $app->env(), $app->channel() );
 
 $app->lang()
-    ->loadDir( __DIR__ . '/../Lang/' . \Chukdo\Helper\HttpRequest::tld() );
+    ->loadDir( __DIR__ . '/../Lang/' . \Chukdo\Helper\HttpRequest::tld( 'fr' ) );
 
 /** Service APP register */
 $app->registerServices( [
@@ -30,7 +29,7 @@ $app->registerServices( [
                             Providers\MongoServiceProvider::class,
                         ] );
 
-Router::any( '/', function( Input $inputs, \Chukdo\Http\Response $response )
+Router::any( '/', function( Input $inputs, Response $response )
 {
     $response->header( 'X-test', 'test header' );
 

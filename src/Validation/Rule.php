@@ -221,7 +221,7 @@ class Rule
 
         if ( $input instanceof InputInterface ) {
             if ( $this->type[ 'array' ] ) {
-                $countInput = count( $input->toSimpleArray() );
+                $countInput = count( $input->toArray2D() );
 
                 if ( $countInput >= $this->type[ 'min' ] && $countInput <= $this->type[ 'max' ] ) {
                     return true;

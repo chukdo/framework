@@ -33,7 +33,7 @@ class FileHandler extends AbstractHandler
      */
     public function __destruct()
     {
-        $this->file = null;
+        unset( $this->file );
     }
 
     /**

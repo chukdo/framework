@@ -16,6 +16,11 @@ use Iterator;
 interface Redis extends Iterator, Countable
 {
     /**
+     *
+     */
+    public function __destruct();
+
+    /**
      * Lecture d'une reponse du serveur.
      *
      * @return mixed
@@ -55,6 +60,108 @@ interface Redis extends Iterator, Countable
      * @return mixed
      */
     public function info( string $key = null );
+
+    /**
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function exists( string $key );
+
+    /**
+     * @param string $key
+     * @param        $value
+     *
+     * @return mixed
+     */
+    public function set( string $key, $value );
+
+    /**
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function get( string $key );
+
+    /**
+     * @param string $key
+     * @param int    $offset
+     * @param int    $length
+     *
+     * @return mixed
+     */
+    public function getRange( string $key, int $offset, int $length );
+
+    /**
+     * @param string $key
+     * @param int    $offset
+     * @param string $content
+     *
+     * @return mixed
+     */
+    public function setRange( string $key, int $offset, string $content );
+
+    /**
+     * @param string $key
+     * @param string $value
+     *
+     * @return mixed
+     */
+    public function append( string $key, string $value );
+
+    /**
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function strlen( string $key );
+
+    /**
+     * @param string $key
+     * @param        $newKey
+     *
+     * @return mixed
+     */
+    public function rename( string $key, $newKey );
+
+    /**
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function keys( string $key );
+
+    /**
+     * @param string $name
+     * @param string $key
+     * @param string $value
+     *
+     * @return mixed
+     */
+    public function hset( string $name, string $key, string $value );
+
+    /**
+     * @param string $name
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function hget( string $name, string $key );
+
+    /**
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function del( string $key );
+
+    /**
+     * @param string $key
+     * @param string $value
+     *
+     * @return mixed
+     */
+    public function rpush( string $key, string $value );
 
     /**
      * @param string $name

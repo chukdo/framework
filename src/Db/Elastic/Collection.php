@@ -1,6 +1,6 @@
 <?php
 
-Namespace Chukdo\DB\Elastic;
+Namespace Chukdo\Db\Elastic;
 
 use MongoDB\BSON\ObjectId;
 use Chukdo\Db\Elastic\Schema\Schema;
@@ -132,8 +132,8 @@ Class Collection implements CollectionInterface
      */
     public function rename( string $collection, string $database = null, Schema $schema = null ): Collection
     {
-        $database      = $database ?? $this->database()
-                                           ->name();
+        $database      ??= $this->database()
+                                ->name();
         $newCollection = $this->database()
                               ->server()
                               ->database( $database )
@@ -169,6 +169,15 @@ Class Collection implements CollectionInterface
     }
 
     /**
+     * @return Client
+     */
+    public function client(): Client
+    {
+        return $this->database()
+                    ->client();
+    }
+
+    /**
      * @return string
      */
     public function fullName(): string
@@ -183,15 +192,6 @@ Class Collection implements CollectionInterface
     public function schema(): Schema
     {
         return new Schema( $this );
-    }
-
-    /**
-     * @return Client
-     */
-    public function client(): Client
-    {
-        return $this->database()
-                    ->client();
     }
 
     /**

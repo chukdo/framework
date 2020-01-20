@@ -1,6 +1,6 @@
 <?php
 
-Namespace Chukdo\DB\Mongo;
+Namespace Chukdo\Db\Mongo;
 
 use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\Db\Record\Record;

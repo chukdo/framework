@@ -59,7 +59,7 @@ final class Crypto
         $token = str_replace( ' ', '+', $token );
         $json  = json_decode( self::decrypt( $token, $salt ), false, 512, JSON_THROW_ON_ERROR );
 
-        return $json && ( $json->time + $json->duration >= time() );
+        return $json && ( (int) $json->time + (int) $json->duration >= time() );
     }
 
     /**

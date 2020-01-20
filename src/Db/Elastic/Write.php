@@ -3,7 +3,7 @@
 namespace Chukdo\Db\Elastic;
 
 use Chukdo\Contracts\Db\Write as WriteInterface;
-use Chukdo\DB\Record\Record;
+use Chukdo\Db\Record\Record;
 use Chukdo\Helper\Is;
 use Chukdo\Json\Json;
 

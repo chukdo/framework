@@ -1,6 +1,6 @@
 <?php
 
-Namespace Chukdo\DB\Mongo;
+Namespace Chukdo\Db\Mongo;
 
 use Chukdo\Json\Json;
 use MongoDB\Driver\Manager;

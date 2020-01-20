@@ -4,7 +4,7 @@ namespace Chukdo\Db\Elastic\Schema;
 
 use Throwable;
 use Chukdo\Contracts\Db\Schema as SchemaInterface;
-use Chukdo\DB\Elastic\Collection;
+use Chukdo\Db\Elastic\Collection;
 use Chukdo\Json\Json;
 
 /**

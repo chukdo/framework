@@ -124,6 +124,7 @@ Class Find extends Where implements FindInterface
                            ->client()
                            ->find( $this->filter(), $options );
         $recordList = new RecordList( $this->collection(), new Json( $find ), $idAsKey );
+
         foreach ( $this->link as $link ) {
             $recordList = $link->hydrate( $recordList );
         }
@@ -244,9 +245,13 @@ Class Find extends Where implements FindInterface
                         ->client()
                         ->findOne( $this->filter(), $options );
         $record  = $this->collection()
-                        ->record( $find, $this->hiddenId );
+                        ->record( $find );
         foreach ( $this->link as $link ) {
             $record = $link->hydrate( $record );
+        }
+
+        if ( $this->hiddenId ) {
+            $record->offsetUnset( '_id' );
         }
 
         return $record;

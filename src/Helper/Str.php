@@ -115,20 +115,18 @@ final class Str
     }
 
     /**
-     * Retourne un caractere d'une chaine en fonction de sa position.
-     *
      * @param string $string
      * @param int    $index
      *
-     * @return string
+     * @return string|null
      */
-    public static function charAt( string $string, int $index ): string
+    public static function charAt( string $string, int $index ): ?string
     {
         if ( $index < strlen( $string ) ) {
             return $string[ $index ];
         }
 
-        return -1;
+        return null;
     }
 
     /**

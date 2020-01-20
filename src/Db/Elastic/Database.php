@@ -1,6 +1,6 @@
 <?php
 
-Namespace Chukdo\DB\Elastic;
+Namespace Chukdo\Db\Elastic;
 
 use Chukdo\Helper\Str;
 use Chukdo\Json\Json;

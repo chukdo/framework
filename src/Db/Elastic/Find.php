@@ -198,9 +198,9 @@ Class Find extends Where implements FindInterface
      * @param string|null            $linked
      * @param DatabaseInterface|null $database
      *
-     * @return Find
+     * @return $this
      */
-    public function link( string $field, array $with = [], array $without = [], string $linked = null, DatabaseInterface $database = null ): Find
+    public function link( string $field, array $with = [], array $without = [], string $linked = null, DatabaseInterface $database = null ): self
     {
         $link         = new Link( $database ?? $this->collection()
                                                     ->database(), $field );
@@ -208,7 +208,7 @@ Class Find extends Where implements FindInterface
                              ->without( $without )
                              ->setLinkedName( $linked );
 
-        return self;
+        return $this;
     }
 
     /**
