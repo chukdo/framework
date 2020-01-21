@@ -34,6 +34,11 @@ class Storage
     public function deleteDirectory( string $directory ): bool
     {
         $dir = opendir( $directory );
+
+        if ( $dir === false ) {
+            throw new StorageException( sprintf( 'Can\'t open dir [%s]', $directory ) );
+        }
+
         while ( ( $file = readdir( $dir ) ) !== false ) {
             if ( $this->isFile( $file ) ) {
                 $full = $directory . '/' . $file;
@@ -45,6 +50,7 @@ class Storage
                 }
             }
         }
+
         closedir( $dir );
 
         return rmdir( $directory );
@@ -74,6 +80,11 @@ class Storage
     {
         $list = [];
         $dir  = opendir( $directory );
+
+        if ( $dir === false ) {
+            throw new StorageException( sprintf( 'Can\'t open dir [%s]', $directory ) );
+        }
+
         while ( ( $file = readdir( $dir ) ) !== false ) {
             if ( $this->isFile( $file ) ) {
                 $full = $directory . '/' . $file;
@@ -98,6 +109,11 @@ class Storage
     {
         $list = [];
         $dir  = opendir( $directory );
+
+        if ( $dir === false ) {
+            throw new StorageException( sprintf( 'Can\'t open dir [%s]', $directory ) );
+        }
+
         while ( ( $file = readdir( $dir ) ) !== false ) {
             if ( $this->isFile( $file ) ) {
                 $full = $directory . '/' . $file;
@@ -106,6 +122,7 @@ class Storage
                 }
             }
         }
+
         closedir( $dir );
 
         return $list;
@@ -128,7 +145,7 @@ class Storage
      */
     public function size( string $file ): int
     {
-        return filesize( $file );
+        return (int) filesize( $file );
     }
 
     /**
@@ -160,7 +177,7 @@ class Storage
      */
     public function get( string $file ): string
     {
-        return file_get_contents( $file );
+        return (string) file_get_contents( $file );
     }
 
     /**
@@ -187,14 +204,21 @@ class Storage
     {
         $list = [];
         $dir  = opendir( $directory );
+
+        if ( $dir === false ) {
+            throw new StorageException( sprintf( 'Can\'t open dir [%s]', $directory ) );
+        }
+
         while ( ( $file = readdir( $dir ) ) !== false ) {
             if ( $this->isFile( $file ) ) {
                 $full = $directory . '/' . $file;
-                if ( !is_dir( $full ) && Str::match( $match, $full ) ) {
+
+                if ( !is_dir( $full ) && ( $match === null || Str::match( $match, $full ) ) ) {
                     $list[] = $full;
                 }
             }
         }
+
         closedir( $dir );
 
         return $list;
@@ -210,14 +234,21 @@ class Storage
     {
         $list = [];
         $dir  = opendir( $directory );
+
+        if ( $dir === false ) {
+            throw new StorageException( sprintf( 'Can\'t open dir [%s]', $directory ) );
+        }
+
         while ( ( $file = readdir( $dir ) ) !== false ) {
             if ( $this->isFile( $file ) ) {
                 $full = $directory . '/' . $file;
-                if ( !is_dir( $full ) && Str::match( $match, $full ) ) {
+
+                if ( !is_dir( $full ) && ( $match === null || Str::match( $match, $full ) ) ) {
                     $list = Arr::push( $list, $this->allFiles( $full, $match ) );
                 }
             }
         }
+
         closedir( $dir );
 
         return $list;

@@ -23,7 +23,7 @@ class Basic implements FunctionsInterface
     public function register( View $view ): void
     {
         foreach ( get_class_methods( $this ) as $method ) {
-            if ( $method != 'register' ) {
+            if ( $method !== 'register' ) {
                 $view->registerFunction( $method, Closure::fromCallable( [
                                                                              $this,
                                                                              $method,

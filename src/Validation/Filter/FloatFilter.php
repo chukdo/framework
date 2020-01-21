@@ -3,6 +3,7 @@
 namespace Chukdo\Validation\Filter;
 
 use Chukdo\Contracts\Validation\Filter as FilterInterface;
+use Chukdo\Helper\Is;
 use Chukdo\Helper\Str;
 
 /**
@@ -40,11 +41,15 @@ class FloatFilter implements FilterInterface
      */
     public function filter( $input )
     {
+        $input = (string) $input;
+
         if ( Str::match( '/^[0-9 .,]+$/', $input ) ) {
             $input = str_replace( ' ', '', $input );
+
             if ( Str::contain( $input, '.' ) && Str::contain( $input, ',' ) ) {
                 $input = str_replace( '.', '', $input );
             }
+
             $input = str_replace( ',', '.', $input );
 
             return (float) $input;

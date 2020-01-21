@@ -58,7 +58,8 @@ abstract class AbstractHandler implements HandlerInterface
     {
         if ( $this->isHandling( $record ) ) {
             $record = $this->processRecord( $record );
-            if ( !$this->formatter ) {
+
+            if ( !( $this->formatter instanceof FormatterInterface ) ) {
                 $this->setFormatter( new JsonStringFormatter() );
             }
 

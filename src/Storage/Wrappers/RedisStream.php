@@ -259,7 +259,7 @@ class RedisStream extends AbstractStream
      *
      * @param string $path
      * @param string $name
-     * @param null   $value
+     * @param mixed  $value
      *
      * @return mixed
      * @throws StreamException

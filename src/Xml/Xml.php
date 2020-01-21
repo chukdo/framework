@@ -3,6 +3,7 @@
 namespace Chukdo\Xml;
 
 use DOMDocument;
+use DOMElement;
 use Throwable;
 
 /**
@@ -22,24 +23,43 @@ class Xml extends Node
     protected DOMDocument $xml;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private string $buffer;
+    private ?string $buffer;
 
     /**
      * Xml constructor.
      *
-     * @param string $name
-     * @param string $uri
+     * @param string      $name
+     * @param string|null $uri
      */
-    public function __construct( string $name = 'xml', string $uri = '' )
+    public function __construct( string $name = 'xml', string $uri = null )
     {
         $this->xml                     = new DOMDocument( '1.0', 'UTF-8' );
-        $this->xml->formatOutput       = false;
+        $this->xml->formatOutput       = true;
         $this->xml->preserveWhiteSpace = false;
-        parent::__construct( $this->xml->appendChild( $uri !== ''
-                                                          ? $this->xml->createElementNS( $uri, $name )
-                                                          : $this->xml->createElement( $name ) ) );
+        parent::__construct( $this->root( $name, $uri ) );
+    }
+
+    /**
+     * @param string      $name
+     * @param string|null $uri
+     *
+     * @return DOMElement
+     */
+    protected function root( string $name = 'xml', string $uri = null ): DOMElement
+    {
+        $node = $uri !== null
+            ? $this->xml->createElementNS( $uri, $name )
+            : $this->xml->createElement( $name );
+
+        $elem = $this->xml->appendChild( $node );
+
+        if ( $elem instanceof DOMElement ) {
+            return $elem;
+        }
+
+        throw new XmlException( 'Xml intialization failed' );
     }
 
     /**
@@ -58,7 +78,10 @@ class Xml extends Node
                       ->load( $file )
                 : $xml->doc()
                       ->loadHTMLFile( $file );
-            $xml->setElement( $xml->doc()->documentElement );
+
+            if ( $xml->doc()->documentElement instanceof DOMElement ) {
+                $xml->setElement( $xml->doc()->documentElement );
+            }
 
             return $xml;
         }
@@ -100,7 +123,8 @@ class Xml extends Node
     public function __toString(): string
     {
         return $this->doc()
-                    ->saveXML();
+                    ->saveXML()
+            ?: '';
     }
 
     /**
@@ -117,10 +141,10 @@ class Xml extends Node
         }
 
         return $html
-            ? $this->doc()
-                   ->saveHTMLFile( $file )
-            : $this->doc()
-                   ->save( $file );
+            ? (bool) $this->doc()
+                          ->saveHTMLFile( $file )
+            : (bool) $this->doc()
+                          ->save( $file );
     }
 
     /**
@@ -136,15 +160,19 @@ class Xml extends Node
     /**
      * @param bool $html
      *
-     * @return string
+     * @return string|null
      */
-    public function saveToString( bool $html = false ): string
+    public function saveToString( bool $html = false ): ?string
     {
-        return $html
-            ? $this->doc()
-                   ->saveHTML()
-            : $this->doc()
-                   ->saveXML();
+        if ( $html ) {
+            return $this->doc()
+                        ->saveHTML()
+                ?: null;
+        }
+
+        return $this->doc()
+                    ->saveXML()
+            ?: null;
     }
 
     /**
@@ -153,7 +181,7 @@ class Xml extends Node
      */
     public function __wakeup(): void
     {
-        $xml        = self::loadFromString( $this->buffer );
+        $xml        = self::loadFromString( (string) $this->buffer );
         $this->xml  = $xml->doc();
         $this->node = $xml->element();
     }
@@ -174,7 +202,10 @@ class Xml extends Node
                       ->loadHTML( '<?xml encoding="UTF-8">' . $string, LIBXML_COMPACT )
                 : $xml->doc()
                       ->loadXML( $string );
-            $xml->setElement( $xml->doc()->documentElement );
+
+            if ( $xml->doc()->documentElement instanceof DOMElement ) {
+                $xml->setElement( $xml->doc()->documentElement );
+            }
 
             return $xml;
         }

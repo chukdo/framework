@@ -39,7 +39,7 @@ class RequestApi
     /**
      * @var string
      */
-    protected string $method = 'GET';
+    protected string $method = '';
 
     /**
      * RequestApi constructor.
@@ -48,7 +48,7 @@ class RequestApi
      * @param string|null $url
      * @param iterable    $inputs
      */
-    public function __construct( string $method = null, string $url = null, iterable $inputs = [] )
+    public function __construct( string $method = 'GET', string $url = null, iterable $inputs = [] )
     {
         $this->header = new Header();
 
@@ -62,7 +62,7 @@ class RequestApi
      *
      * @return $this
      */
-    public function setMethod( string $method = 'GET' ): self
+    public function setMethod( string $method ): self
     {
         $this->method = strtoupper( trim( $method ) );
 

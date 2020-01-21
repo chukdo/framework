@@ -55,8 +55,8 @@ class Request
         $this->inputs = $app->make( Input::class, true );
         $this->header = new Header();
         $this->url    = new Url( HttpRequest::uri() );
-        $this->header->setHeader( 'Content-Type', HttpRequest::server( 'CONTENT_TYPE', '' ) );
-        $this->header->setHeader( 'Content-Length', HttpRequest::server( 'CONTENT_LENGTH', '' ) );
+        $this->header->setHeader( 'Content-Type', (string) HttpRequest::server( 'CONTENT_TYPE' ) );
+        $this->header->setHeader( 'Content-Length', (string) HttpRequest::server( 'CONTENT_LENGTH' ) );
         $this->header->setHeaders( HttpRequest::headers() );
     }
 
@@ -80,24 +80,24 @@ class Request
     }
 
     /**
-     * @param string $key
-     * @param null   $default
+     * @param string      $key
+     * @param string|null $default
      *
      * @return string|null
      */
-    public function conf( string $key, $default = null ): ?string
+    public function conf( string $key, string $default = null ): ?string
     {
         return $this->app->conf()
                          ->offsetGet( $key, $default );
     }
 
     /**
-     * @param string $key
-     * @param null   $default
+     * @param string      $key
+     * @param string|null $default
      *
      * @return string|null
      */
-    public function lang( string $key, $default = null ): ?string
+    public function lang( string $key, string $default = null ): ?string
     {
         return $this->app->lang()
                          ->offsetGet( 'validation.' . $key, $default );
@@ -124,9 +124,9 @@ class Request
      * @param string|null $allowedMimeTypes
      * @param int|null    $maxFileSize
      *
-     * @return FileUploaded
+     * @return FileUploaded|null
      */
-    public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): FileUploaded
+    public function file( string $name, string $allowedMimeTypes = null, int $maxFileSize = null ): ?FileUploaded
     {
         return $this->inputs->file( $name, $allowedMimeTypes, $maxFileSize );
     }
@@ -156,7 +156,7 @@ class Request
      */
     public function with( ...$offsets ): Input
     {
-        return $this->inputs->with( $offsets );
+        return new Input( $this->inputs->with( $offsets ) );
     }
 
     /**
@@ -166,7 +166,7 @@ class Request
      */
     public function without( ...$offsets ): Input
     {
-        return $this->inputs->without( $offsets );
+        return new Input( $this->inputs->without( $offsets ) );
     }
 
     /**
@@ -196,7 +196,7 @@ class Request
      */
     public function wildcard( string $path ): Input
     {
-        return $this->inputs->wildcard( $path );
+        return new Input( $this->inputs->wildcard( $path ) );
     }
 
     /**

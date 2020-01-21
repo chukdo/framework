@@ -23,7 +23,7 @@ Class GenericProvider extends AbstractProvider
         $request  = new RequestApi( $method, $url->buildUrl(), $url->getInputs() );
         $response = $request->send();
 
-        return new GenericToken( $response->content() );
+        return new GenericToken( $response->json() );
     }
 
     /**
@@ -40,6 +40,6 @@ Class GenericProvider extends AbstractProvider
                             ->setRawInput( 'null' )
                             ->send();
 
-        return new GenericOwner( $response->content() );
+        return new GenericOwner( $response->json() );
     }
 }

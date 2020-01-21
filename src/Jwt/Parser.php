@@ -90,7 +90,13 @@ class Parser
      */
     protected function headerDecode( string $header ): array
     {
-        return $this->jsonDecode( To::base64Decode( $header ) );
+        $decode = To::base64Decode( $header );
+
+        if ( $decode === null ) {
+            throw new JwtException( 'Can\'t decode header JWT' );
+        }
+
+        return $this->jsonDecode( $decode );
     }
 
     /**
@@ -110,7 +116,13 @@ class Parser
      */
     protected function payloadDecode( string $payload ): array
     {
-        return $this->jsonDecode( To::base64Decode( $payload ) );
+        $decode = To::base64Decode( $payload );
+
+        if ( $decode === null ) {
+            throw new JwtException( 'Can\'t decode header JWT' );
+        }
+
+        return $this->jsonDecode( $decode );
     }
 
     /**

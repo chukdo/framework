@@ -91,7 +91,7 @@ class Logger implements LoggerInterface
      */
     public function pushHandler( HandlerInterface $handler ): self
     {
-        array_push( $this->handlers, $handler );
+        $this->handlers[] = $handler;
 
         return $this;
     }
@@ -105,7 +105,7 @@ class Logger implements LoggerInterface
      */
     public function pushProcessor( ProcessorInterface $processor ): self
     {
-        array_push( $this->processors, $processor );
+        $this->processors[] = $processor;
 
         return $this;
     }
@@ -151,7 +151,7 @@ class Logger implements LoggerInterface
         $record = [
             'message'   => $this->interpolate( $message, $context ),
             'level'     => $level,
-            'levelname' => $this->getLevel( $level ),
+            'levelname' => self::getLevel( $level ),
             'channel'   => $this->getName(),
             'date'      => time(),
             'extra'     => [],

@@ -204,6 +204,19 @@ class Url
     }
 
     /**
+     * @param string $key
+     * @param        $value
+     *
+     * @return $this
+     */
+    public function setInput( string $key, $value ): self
+    {
+        $this->url[ 'input' ][ $key ] = $value;
+
+        return $this;
+    }
+
+    /**
      * @param iterable $inputs
      *
      * @return $this
@@ -213,19 +226,6 @@ class Url
         foreach ( $inputs as $key => $value ) {
             $this->setInput( $key, $value );
         }
-
-        return $this;
-    }
-
-    /**
-     * @param string $key
-     * @param        $value
-     *
-     * @return $this
-     */
-    public function setInput( string $key, $value ): self
-    {
-        $this->url[ 'input' ][ $key ] = $value;
 
         return $this;
     }
@@ -249,14 +249,14 @@ class Url
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getSubDomain(): ?string
+    public function getSubDomain(): string
     {
         $subDomains = $this->getSubDomains();
 
         return empty( $subDomains )
-            ? null
+            ? ''
             : $subDomains[ 0 ];
     }
 
@@ -275,31 +275,35 @@ class Url
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getDomain(): ?string
+    public function getDomain(): string
     {
         $tld  = '.' . $this->getTld();
         $host = $this->getHost();
-        if ( Str::contain( $host, '.' ) ) {
-            $domain = explode( '.', str_replace( $tld, '', $host ) );
 
-            return end( $domain );
+        if ( Str::contain( $host, '.' ) ) {
+            $uri    = explode( '.', str_replace( $tld, '', $host ) );
+            $domain = end( $uri );
+
+            return $domain !== false
+                ? $domain
+                : '';
         }
 
-        return null;
+        return '';
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getTld(): ?string
+    public function getTld(): string
     {
         $tld = explode( '.', substr( $this->getHost(), strlen( $this->getHost() ) - 8 ) );
         array_shift( $tld );
 
         return empty( $tld )
-            ? null
+            ? ''
             : implode( '.', $tld );
     }
 
@@ -322,14 +326,6 @@ class Url
     public function buildCompleteUrl(): string
     {
         return $this->buildDsn() . $this->buildPath() . $this->buildQuery() . $this->buildFragment();
-    }
-
-    /**
-     * @return string
-     */
-    public function buildUrl(): string
-    {
-        return $this->buildDsn() . $this->buildPath() . $this->buildFragment();
     }
 
     /**
@@ -492,5 +488,13 @@ class Url
     public function getFragment(): string
     {
         return $this->url[ 'fragment' ];
+    }
+
+    /**
+     * @return string
+     */
+    public function buildUrl(): string
+    {
+        return $this->buildDsn() . $this->buildPath() . $this->buildFragment();
     }
 }

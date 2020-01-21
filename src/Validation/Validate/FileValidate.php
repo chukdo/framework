@@ -48,7 +48,10 @@ class FileValidate implements ValidateInterface
                 $this->allowedMimeTypes .= $attr . ',';
             }
         }
-        $this->allowedMimeTypes = trim( $this->allowedMimeTypes, ',' );
+
+        if ( $this->allowedMimeTypes !== null ) {
+            $this->allowedMimeTypes = trim( $this->allowedMimeTypes, ',' );
+        }
 
         return $this;
     }

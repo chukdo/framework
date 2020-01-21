@@ -146,8 +146,9 @@ class Validator
     public function validate(): bool
     {
         $validate = true;
+
         foreach ( $this->rules() as $rule ) {
-            $validate .= $rule->validate();
+            $validate = $validate && (bool) $rule->validate();
         }
 
         return $validate;
@@ -236,6 +237,6 @@ class Validator
      */
     public function message( string $key ): string
     {
-        return $this->request->lang( $key, sprintf( 'Validation message [%s] cannot be found', $key ) );
+        return (string) $this->request->lang( $key, sprintf( 'Validation message [%s] cannot be found', $key ) );
     }
 }

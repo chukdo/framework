@@ -209,7 +209,7 @@ class Header
     public function setCacheControl( int $max = 3600, bool $revalidate = false, string $control = null ): self
     {
         $cache = [];
-        if ( $control !== false ) {
+        if ( $control !== null ) {
             $cache[] = $control;
         }
         if ( $max !== false ) {

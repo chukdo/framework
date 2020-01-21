@@ -6,6 +6,7 @@ use Chukdo\Helper\Arr;
 use Chukdo\Helper\Http;
 use Chukdo\Helper\Str;
 use Chukdo\Json\Json;
+use Chukdo\Jwt\JwtException;
 use Chukdo\Xml\Xml;
 
 /**
@@ -77,26 +78,26 @@ class ResponseApi
         }
 
         $this->setOption( CURLOPT_SSL_VERIFYPEER, false )
-            ->setOption( CURLOPT_AUTOREFERER, true )
-            ->setOption( CURLOPT_FOLLOWLOCATION, true )
-            ->setOption( CURLOPT_RETURNTRANSFER, true )
-            ->setOption( CURLINFO_HEADER_OUT, true )
-            ->setOption( CURLOPT_HTTPHEADER, (array) $request->header()
-                ->getHeaders() )
-            ->setOption( CURLOPT_HEADER, false )
-            ->setOption( CURLOPT_HEADERFUNCTION, fn( $h, $header ) => $this->header->parseHeaders( $header ) )
-            ->setOptions( $options );
+             ->setOption( CURLOPT_AUTOREFERER, true )
+             ->setOption( CURLOPT_FOLLOWLOCATION, true )
+             ->setOption( CURLOPT_RETURNTRANSFER, true )
+             ->setOption( CURLINFO_HEADER_OUT, true )
+             ->setOption( CURLOPT_HTTPHEADER, (array) $request->header()
+                                                              ->getHeaders() )
+             ->setOption( CURLOPT_HEADER, false )
+             ->setOption( CURLOPT_HEADERFUNCTION, fn( $h, $header ) => $this->header->parseHeaders( $header ) )
+             ->setOptions( $options );
 
-        $this->raw = curl_exec( $this->curl );
+        $this->raw = (string) curl_exec( $this->curl );
     }
 
     /**
-     * @param string $key
-     * @param        $value
+     * @param int $key
+     * @param     $value
      *
      * @return $this
      */
-    protected function setOption( string $key, $value ): self
+    protected function setOption( int $key, $value ): self
     {
         curl_setopt( $this->curl, $key, $value );
 
@@ -126,7 +127,7 @@ class ResponseApi
     }
 
     /**
-     * @return Json|Xml
+     * @return mixed
      */
     public function content()
     {
@@ -134,29 +135,34 @@ class ResponseApi
             throw new HttpException( $this->error() );
         }
 
-        $content = $this->raw();
-        $type    = Http::contentTypeToExt( $this->header()
-                                               ->getHeader( 'Content-Type' ) );
+        $content     = $this->raw();
+        $contentType = $this->header()
+                            ->getHeader( 'Content-Type' );
 
-        if ( $type === 'json' ) {
-            return new Json( json_decode( $content, true, 512, JSON_THROW_ON_ERROR ) );
+        if ( $contentType !== null ) {
+            $type = Http::contentTypeToExt( $contentType );
+
+            switch ( $type ) {
+                case 'json':
+                    return $this->json();
+                    break;
+                case 'html':
+                    return $this->html();
+                    break;
+                case 'xml':
+                    return $this->xml();
+                    break;
+            }
         }
 
-        if ( $type === 'html' ) {
-            return Xml::loadFromString( $content, true );
+        /** Auto detect Json */
+        if ( strpos( $content, '{' ) === 0 ) {
+            return $this->json();
         }
 
-        if ( $type === 'xml' ) {
-            return Xml::loadFromString( $content, false );
-        }
-
-        /** Auto detect */
-        if ( strpos( $content, '{' ) === 0 || Str::contain( $type, 'json' ) ) {
-            return new Json( json_decode( $content, true, 512, JSON_THROW_ON_ERROR ) );
-        }
-
+        /** Auto detect Html */
         if ( strpos( $content, '<' ) === 0 ) {
-            return Xml::loadFromString( $content, true );
+            return $this->xml();
         }
 
         throw new HttpException( sprintf( 'Can\'t decode response [%s]', $content ) );
@@ -171,9 +177,9 @@ class ResponseApi
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function error(): ?string
+    public function error(): string
     {
         $status = $this->header->getStatus();
         $errno  = curl_errno( $this->curl );
@@ -193,14 +199,18 @@ class ResponseApi
             return 'Curl has empty response';
         }
 
-        return null;
+        return '';
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function raw(): ?string
+    public function raw(): string
     {
+        if ( $this->raw === null ) {
+            throw new JwtException( 'Curl has empty response' );
+        }
+
         return $this->raw;
     }
 
@@ -210,6 +220,30 @@ class ResponseApi
     public function header(): Header
     {
         return $this->header;
+    }
+
+    /**
+     * @return Json
+     */
+    public function json(): Json
+    {
+        return new Json( json_decode( $this->raw(), true, 512, JSON_THROW_ON_ERROR ) );
+    }
+
+    /**
+     * @return Xml
+     */
+    public function html(): Xml
+    {
+        return Xml::loadFromString( $this->raw(), true );
+    }
+
+    /**
+     * @return Xml
+     */
+    public function xml(): Xml
+    {
+        return Xml::loadFromString( $this->raw(), false );
     }
 
     /**

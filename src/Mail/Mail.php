@@ -199,34 +199,44 @@ class Mail
      */
     public function addFile( string $file, string $name = null, bool $attachment = true, string $encoding = 'base64' ): self
     {
-        if ( file_exists( $file ) ) {
-            if ( !$name ) {
-                $name = basename( $file );
-            }
-
-            $content     = $this->encode( file_get_contents( $file ), $encoding );
-            $disposition = $attachment
-                ? "attachment; filename=\"$name\""
-                : 'inline;';
-            $type        = 'application/octet-stream';
-
-            $fi = finfo_open( FILEINFO_MIME_TYPE );
-
-            if ( $ff = finfo_file( $fi, $file ) ) {
-                $type = $ff;
-            }
-
-            finfo_close( $fi );
-
-
-            $this->files[] = [
-                'content'     => $content,
-                'type'        => $type,
-                'name'        => $name,
-                'disposition' => $disposition,
-                'encoding'    => $encoding,
-            ];
+        if ( !file_exists( $file ) ) {
+            throw new MailException( sprintf( 'File [%s] no exists', $file ) );
         }
+
+        if ( !( $get = file_get_contents( $file ) ) ) {
+            throw new MailException( sprintf( 'Can\'t read file [%s] no exists', $file ) );
+        }
+
+        if ( !$name ) {
+            $name = basename( $file );
+        }
+
+        $content     = $this->encode( $get, $encoding );
+        $disposition = $attachment
+            ? "attachment; filename=\"$name\""
+            : 'inline;';
+        $type        = 'application/octet-stream';
+
+        $fi = finfo_open( FILEINFO_MIME_TYPE );
+
+        if ( $fi === false ) {
+            throw new MailException( sprintf( 'Can\'t read file info [%s]', $file ) );
+        }
+
+        if ( $ff = finfo_file( $fi, $file ) ) {
+            $type = $ff;
+        }
+
+        finfo_close( $fi );
+
+
+        $this->files[] = [
+            'content'     => $content,
+            'type'        => $type,
+            'name'        => $name,
+            'disposition' => $disposition,
+            'encoding'    => $encoding,
+        ];
 
         return $this;
     }
@@ -337,21 +347,13 @@ class Mail
      */
     public function sendMail(): bool
     {
-        return $this->transport->sendMail( $this->from, $this->to, $this->message(), $this->headers() );
-    }
+        $message = $this->message();
 
-    /**
-     * @return array
-     */
-    public function log(): array
-    {
-        return [
-            'subject'  => $this->subject,
-            'text'     => $this->text,
-            'mailfrom' => $this->from,
-            'mailto'   => $this->to,
-            'replyto'  => $this->replyto,
-        ];
+        if ( $message === null ) {
+            throw new MailException( sprintf( 'No message to mail at [%s]', reset( $this->to ) ) );
+        }
+
+        return $this->transport->sendMail( $this->from, $this->to, $message, $this->headers() );
     }
 
     /**
@@ -428,12 +430,12 @@ class Mail
     }
 
     /**
-     * @param string      $type
-     * @param string|null $encoding
+     * @param string $type
+     * @param string $encoding
      *
      * @return string|null
      */
-    protected function mime( string $type, string $encoding = null ): ?string
+    protected function mime( string $type, string $encoding = '8bit' ): ?string
     {
         $encoding = str_replace( [
                                      ' ',
@@ -690,6 +692,20 @@ class Mail
         ];
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function log(): array
+    {
+        return [
+            'subject'  => $this->subject,
+            'text'     => $this->text,
+            'mailfrom' => $this->from,
+            'mailto'   => $this->to,
+            'replyto'  => $this->replyto,
+        ];
     }
 
     /**

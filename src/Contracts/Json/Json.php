@@ -411,8 +411,6 @@ interface Json extends IteratorAggregate, ArrayAccess, Serializable, Countable
 
     /**
      * @param string $key
-     *
-     * @return bool
      */
-    public function __unset( string $key ): bool;
+    public function __unset( string $key ): void;
 }

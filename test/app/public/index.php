@@ -1,10 +1,10 @@
 <?php
 
 /** Namespaces */
-
 use \App\Providers;
 use \Chukdo\Facades\View;
 use \Chukdo\Facades\Router;
+use Chukdo\Helper\Str;
 use Chukdo\Http\Input;
 use Chukdo\Http\Response;
 use Chukdo\View\Functions\Basic;
@@ -29,7 +29,7 @@ $app->registerServices( [
                             Providers\MongoServiceProvider::class,
                         ] );
 
-Router::any( '/', function( Input $inputs, Response $response )
+Router::any( '/', static function( Input $inputs, Response $response )
 {
     $response->header( 'X-test', 'test header' );
 

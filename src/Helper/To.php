@@ -205,22 +205,22 @@ final class To
     /**
      * @param $value
      *
-     * @return Xml
+     * @return String
      */
-    public static function xml( $value ): Xml
+    public static function xml( $value ): String
     {
-        if ( $value instanceof Xml ) {
+        if ( is_scalar( $value ) && strpos( $value, '<' ) === 0 ) {
             return $value;
         }
 
-        if ( Is::object( $value, 'toXml' ) ) {
-            return $value->toXml();
+        if ( Is::object( $value, 'toXmlString' ) ) {
+            return $value->toXmlString();
         }
 
         $xml = new Xml();
         $xml->import( $value );
 
-        return $xml;
+        return $xml->toXmlString();
     }
 
     /**
@@ -325,6 +325,13 @@ final class To
                                                           ], self::json( $value ) ) . '</pre>';
         }
 
+        if ( Is::xml( $value ) ) {
+            return '<pre ' . $style . '>' . Str::replace( [
+                                                              '/<(.*?)>/',
+                                                          ], [
+                                                              '<span style="color:#ef6500;">&lt;$1&gt;</span>',
+                                                          ], self::xml( $value ) ) . '</pre>';
+        }
 
         if ( $title ) {
             $color = $color

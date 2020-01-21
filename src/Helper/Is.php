@@ -4,6 +4,8 @@ namespace Chukdo\Helper;
 
 use Chukdo\Contracts\Json\Json as JsonInterface;
 use Chukdo\Json\Iterate;
+use Chukdo\Xml\Node;
+use Chukdo\Xml\Xml;
 use DateTime;
 use stdClass;
 use ArrayObject;
@@ -280,6 +282,16 @@ final class Is
     public static function mongoId( string $value ): bool
     {
         return filter_var( $value, FILTER_VALIDATE_REGEXP, [ 'options' => [ 'regexp' => '/^[0-9abcdef]{22,26}$/iu', ], ] ) !== false;
+    }
+
+    /**
+     * @param $value
+     *
+     * @return bool
+     */
+    public static function xml( $value ): bool
+    {
+        return $value instanceof Xml || $value instanceof Node;
     }
 
     /**

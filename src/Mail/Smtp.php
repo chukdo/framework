@@ -3,6 +3,7 @@
 namespace Chukdo\Mail;
 
 use Chukdo\Contracts\Mail\Transport as TransportInterface;
+use Chukdo\Helper\Is;
 
 /**
  * SMTP.
@@ -41,12 +42,17 @@ class Smtp implements TransportInterface
      */
     public function __construct( string $dsn, int $timeout = 10 )
     {
-        $this->dsn = parse_url( $dsn );
+        $parsedUrl = parse_url( $dsn );
 
-        $host   = $this->dsn[ 'host' ];
-        $port   = $this->dsn[ 'port' ];
-        $scheme = $this->dsn[ 'scheme' ];
-        $sock   = $scheme === 'ssl'
+        if ( $parsedUrl === false ) {
+            throw new MailException( sprintf( 'Can\'t connect to dsn [%s]', $dsn ) );
+        }
+
+        $this->dsn = $parsedUrl;
+        $host      = $this->dsn[ 'host' ];
+        $port      = $this->dsn[ 'port' ];
+        $scheme    = $this->dsn[ 'scheme' ];
+        $sock      = $scheme === 'ssl'
             ? "$scheme://$host:$port"
             : "$host:$port";
 
@@ -81,7 +87,7 @@ class Smtp implements TransportInterface
             $g = @fgets( $this->sock, 515 );
             $s .= $g;
 
-            if ( $g[ 3 ] !== '-' ) {
+            if ( $g !== false && $g[ 3 ] !== '-' ) {
                 break;
             }
 

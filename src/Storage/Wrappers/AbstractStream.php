@@ -19,12 +19,12 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     /**
      * @var Url
      */
-    protected ?Url $url = null;
+    protected Url $url;
 
     /**
      * @var string
      */
-    protected ?string $mode = null;
+    protected string $mode = '';
 
     /**
      * @var int
@@ -162,8 +162,9 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
                                                                                          ->getPath(), $this->getMode() ) );
                 break;
         }
-        $read = $this->streamGetRange( $this->getTell(), $count );
+        $read = (string) $this->streamGetRange( $this->getTell(), $count );
         $this->appendTell( min( strlen( $read ), $count ) );
+
         if ( $this->getTell() >= $this->streamSize() ) {
             $this->setEof();
         }
@@ -175,9 +176,9 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     /**
      * Retourne le mode d'ecriture ou de lecture du fichier.
      *
-     * @return string|null
+     * @return string
      */
-    protected function getMode(): ?string
+    protected function getMode(): string
     {
         return $this->mode;
     }
@@ -194,9 +195,9 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     }
 
     /**
-     * @return Url|null
+     * @return Url
      */
-    private function getUrl(): ?Url
+    private function getUrl(): Url
     {
         return $this->url;
     }
@@ -211,20 +212,21 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     public function stream_truncate( int $new_size ): bool
     {
         $size = $this->streamSize();
+
         if ( $new_size > $size ) {
             return $this->streamSetRange( $size, str_repeat( chr( 0 ), $new_size - $size ) );
         }
-        else {
-            if ( $new_size < $size ) {
-                if ( $new_size == 0 ) {
-                    $this->streamSet( null );
-                }
-                else {
-                    $this->streamSet( $this->streamGetRange( 0, $new_size ) );
-                }
-                if ( $this->getTell() > $new_size ) {
-                    $this->streamSetRange( $new_size, str_repeat( chr( 0 ), $this->getTell() - $new_size ) );
-                }
+
+        if ( $new_size < $size ) {
+            if ( $new_size === 0 ) {
+                $this->streamSet( '' );
+            }
+            elseif ( $getRange = $this->streamGetRange( 0, $new_size ) ) {
+                $this->streamSet( $getRange );
+            }
+
+            if ( $this->getTell() > $new_size ) {
+                $this->streamSetRange( $new_size, str_repeat( chr( 0 ), $this->getTell() - $new_size ) );
             }
         }
 
@@ -269,7 +271,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
                 break;
             case 'w':
             case 'w+':
-                $this->streamSet( null );
+            $this->streamSet( '' );
                 break;
             case 'a':
             case 'a+':
@@ -277,7 +279,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
                     $this->setTell( $tell );
                 }
                 else {
-                    $this->streamSet( null );
+                    $this->streamSet( '' );
                 }
                 break;
             case 'x':
@@ -286,12 +288,12 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
                     throw new StreamException( sprintf( 'Mode X not allow [%s] file exists', $this->getUrl()
                                                                                                   ->getPath() ) );
                 }
-                $this->streamSet( null );
+            $this->streamSet( '' );
                 break;
             case 'c':
             case 'c+':
                 if ( !$exits ) {
-                    $this->streamSet( null );
+                    $this->streamSet( '' );
                 }
                 break;
         }
@@ -472,9 +474,9 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     /**
      * Retourne le host du fichier.
      *
-     * @return string|null
+     * @return string
      */
-    protected function getHost(): ?string
+    protected function getHost(): string
     {
         return $this->getUrl()
                     ->getHost();
@@ -558,7 +560,7 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     {
         $this->setUrl( $path );
 
-        return $this->streamSetDir( $options & 1 );
+        return $this->streamSetDir( $options === STREAM_MKDIR_RECURSIVE );
     }
 
     /**
@@ -577,22 +579,18 @@ abstract class AbstractStream implements StreamWrapperInterface, StreamInterface
     }
 
     /**
-     * Retourne le scheme du fichier.
-     *
-     * @return string|null
+     * @return string
      */
-    protected function getScheme(): ?string
+    protected function getScheme(): string
     {
         return $this->getUrl()
                     ->getScheme();
     }
 
     /**
-     * Retourne le chemin du fichier.
-     *
-     * @return string|null
+     * @return string
      */
-    protected function getPath(): ?string
+    protected function getPath(): string
     {
         return trim( $this->getUrl()
                           ->getPath(), '/' );

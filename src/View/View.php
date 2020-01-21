@@ -30,12 +30,12 @@ class View
     /**
      * @var string
      */
-    protected ?string $defaultFolder = null;
+    protected string $defaultFolder;
 
     /**
      * @var array
      */
-    protected array $sharedData = [];
+    protected iterable $sharedData = [];
 
     /**
      * @var array
@@ -55,30 +55,33 @@ class View
      */
     public function __construct( string $folder = null, Response $response = null )
     {
-        $this->setDefaultFolder( $folder );
-        $this->setResponseHandler( $response );
+        if ( $folder !== null ) {
+            $this->setDefaultFolder( $folder );
+        }
+
+        $this->setResponseHandler( $response ?? new Response() );
     }
 
     /**
-     * @param string|null $folder
+     * @param string $folder
      *
-     * @return View
+     * @return $this
      */
-    public function setDefaultFolder( string $folder = null ): self
+    public function setDefaultFolder( string $folder ): self
     {
-        $this->defaultFolder = rtrim( $folder, '/' );
+        $this->defaultFolder = rtrim( (string) $folder, '/' );
 
         return $this;
     }
 
     /**
-     * @param Response|null $response
+     * @param Response $response
      *
-     * @return View
+     * @return $this
      */
-    public function setResponseHandler( Response $response = null ): self
+    public function setResponseHandler( Response $response ): self
     {
-        $this->response = $response ?? new Response();
+        $this->response = $response;
 
         return $this;
     }
@@ -92,9 +95,9 @@ class View
     }
 
     /**
-     * @return Response|null
+     * @return Response
      */
-    public function getResponseHandler(): ?Response
+    public function getResponseHandler(): Response
     {
         return $this->response;
     }
@@ -119,29 +122,32 @@ class View
      */
     public function exists( string $template ): bool
     {
-        return $this->path( $template )[ 'exists' ];
+        return $this->path( $template )[ 'exists' ] ?? false;
     }
 
     /**
      * @param string $template
      *
-     * @return array|null
+     * @return array
      */
-    public function path( string $template ): ?array
+    public function path( string $template ): array
     {
         [
             $folder,
             $name,
         ] = Str::split( $template, '::', 2 );
+
         $r = [
             'folder' => null,
             'name'   => null,
             'file'   => null,
             'exists' => false,
         ];
+
         if ( $name ) {
             $r[ 'folder' ] = $folder;
             $r[ 'name' ]   = $name;
+
             if ( isset( $this->folders[ $folder ] ) ) {
                 $r[ 'file' ]   = $this->folders[ $folder ] . '/' . $name . '.html';
                 $r[ 'exists' ] = file_exists( $r[ 'file' ] );
@@ -149,6 +155,7 @@ class View
         }
         else {
             $r[ 'name' ] = $folder;
+
             if ( $this->defaultFolder ) {
                 $r[ 'file' ]   = $this->defaultFolder . '/' . $folder . '.html';
                 $r[ 'exists' ] = file_exists( $r[ 'file' ] );
@@ -254,7 +261,7 @@ class View
      *
      * @return string
      */
-    public function renderToString( string $template, iterable $data = null ): string
+    public function renderToString( string $template, iterable $data = [] ): string
     {
         return (string) $this->make( $template, $data );
     }
@@ -265,7 +272,7 @@ class View
      *
      * @return Template
      */
-    public function make( string $template, iterable $data = null ): Template
+    public function make( string $template, iterable $data = [] ): Template
     {
         return new Template( $template, $data, $this );
     }
@@ -276,7 +283,7 @@ class View
      *
      * @return Response
      */
-    public function render( string $template, iterable $data = null ): Response
+    public function render( string $template, iterable $data = [] ): Response
     {
         return $this->make( $template, $data )
                     ->render();

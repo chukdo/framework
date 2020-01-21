@@ -173,7 +173,7 @@ class Route
                                        ->getDomain();
         $routeDomain   = $this->uri()
                               ->getDomain();
-        if ( $routeDomain === null || $requestDomain === $routeDomain ) {
+        if ( $routeDomain === '' || $requestDomain === $routeDomain ) {
             return true;
         }
 
@@ -188,13 +188,11 @@ class Route
      */
     protected function matchPattern( string $routePattern, string $requestPattern ): bool
     {
-        if ( Str::contain( $routePattern, '{' ) ) {
-            if ( $inputs = $this->extractInputs( $routePattern, $requestPattern ) ) {
-                $this->request->inputs()
-                              ->merge( $inputs, true );
+        if ( Str::contain( $routePattern, '{' ) && $inputs = $this->extractInputs( $routePattern, $requestPattern ) ) {
+            $this->request->inputs()
+                          ->merge( $inputs, true );
 
-                return true;
-            }
+            return true;
         }
 
         return false;
@@ -210,15 +208,21 @@ class Route
     {
         $keys      = Str::matchAll( '/\{([a-z0-9_]+)\}/', $routePath );
         $countKeys = count( $keys );
+
         foreach ( $keys as $key ) {
             $routePath = str_replace( '{' . $key . '}', '(' . $this->parseWhere( $key ) . ')', $routePath );
         }
+
         $values      = (array) Str::match( '`^' . $routePath . '$`', $requestPath );
         $countValues = count( $values );
+
         if ( $countValues > 0 && $countValues === $countKeys ) {
             $match = [];
+
             foreach ( $keys as $k => $key ) {
-                $match[ $key ] = $values[ $k ];
+                if ( isset( $values[ $k ] ) ) {
+                    $match[ $key ] = $values[ $k ];
+                }
             }
 
             return $match;
@@ -247,7 +251,7 @@ class Route
         $routeSubDomain   = $this->uri()
                                  ->getSubDomain();
 
-        if ( $routeSubDomain === null || $requestSubDomain === $routeSubDomain ) {
+        if ( $routeSubDomain === '' || $requestSubDomain === $routeSubDomain ) {
             return true;
         }
 

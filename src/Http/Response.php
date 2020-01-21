@@ -70,7 +70,7 @@ class Response
                      ->setDate( new DateTime() )
                      ->setHeader( 'Server', 'Apache' )
                      ->setHeader( 'Connection', 'close' )
-                     ->setCacheControl( false, false, 'no-store, no-cache, must-revalidate' );
+                     ->setCacheControl( 0, true, 'no-store, no-cache, must-revalidate' );
     }
 
     /**
@@ -172,7 +172,7 @@ class Response
         $type       ??= Http::extToContentType( $name );
         $this->file = $file;
         $this->header->setHeader( 'Content-Disposition', 'attachment; filename="' . $name . '"' )
-            ->setHeader( 'Content-Type', $type );
+                     ->setHeader( 'Content-Type', $type );
 
         return $this;
     }
@@ -190,7 +190,7 @@ class Response
         $type       ??= Http::extToContentType( $name );
         $this->file = $file;
         $this->header->setHeader( 'Content-Disposition', 'inline; filename="' . $name . '"' )
-            ->setHeader( 'Content-Type', $type );
+                     ->setHeader( 'Content-Type', $type );
 
         return $this;
     }
@@ -280,7 +280,7 @@ class Response
     {
         $this->header->setHeader( 'Content-Type', 'text/xml; charset=utf-8' );
         $this->content( ( new Xml() )->import( $content )
-                            ->toXmlString( $html, true ) );
+                                     ->toXmlString( $html ) );
 
         return $this;
     }
@@ -306,21 +306,19 @@ class Response
         if ( headers_sent( $filename, $linenum ) || error_get_last() !== null ) {
             throw new HttpException( sprintf( 'Headers already sent from file %s at line %s', $filename, $linenum ) );
         }
-        $hasContent = $this->content !== null;
-        $hasFile    = $this->file !== null;
-        if ( $hasContent ) {
+
+        if ( $this->content !== null ) {
             $this->sendContentResponse();
         }
-        else {
-            if ( $hasFile ) {
-                $this->sendDownloadResponse();
-            }
-            else {
-                $this->sendHeaderResponse();
+        elseif ( $this->file !== null ) {
+            $this->sendDownloadResponse();
+
+            if ( $this->deleteFileAfterSend ) {
+                unlink( $this->file );
             }
         }
-        if ( $this->deleteFileAfterSend ) {
-            unlink( $this->file );
+        else {
+            $this->sendHeaderResponse();
         }
 
         return $this;
@@ -331,16 +329,20 @@ class Response
      */
     protected function sendContentResponse(): self
     {
+        if ( $this->content === null ) {
+            throw new HttpException( 'Response content empty' );
+        }
+
         $content = $this->content;
 
         if ( Str::contain( HttpRequest::server( 'HTTP_ACCEPT_ENCODING' ), 'deflate' ) ) {
             $this->header->setHeader( 'Content-Encoding', 'deflate' );
-            $content = gzdeflate( $this->content );
+            $content = (string) gzdeflate( $content );
 
         }
         elseif ( Str::contain( HttpRequest::server( 'HTTP_ACCEPT_ENCODING' ), 'gzip' ) ) {
             $this->header->setHeader( 'Content-Encoding', 'gzip' );
-            $content = gzencode( $this->content );
+            $content = (string) gzencode( $content );
         }
 
         if ( $this->header->getHeader( 'Transfer-Encoding' ) === 'chunked' ) {
@@ -354,7 +356,7 @@ class Response
 
         }
         else {
-            $this->header->setHeader( 'Content-Length', strlen( $content ) );
+            $this->header->setHeader( 'Content-Length', (string) strlen( $content ) );
             $this->sendHeaderResponse();
             echo $content;
         }
@@ -380,21 +382,35 @@ class Response
      */
     protected function sendDownloadResponse(): self
     {
+        $file = (string) $this->file;
+
+        if ( !file_exists( $file ) ) {
+            throw new HttpException( sprintf( 'File [%s] no exists', $file ) );
+        }
+
         if ( $this->header->getHeader( 'Transfer-Encoding' ) === 'chunked' ) {
             $this->sendHeaderResponse();
-            $f = fopen( $this->file, 'rb' );
-            while ( !feof( $f ) ) {
-                $c = fread( $f, 131072 );
-                $l = dechex( strlen( $c ) );
-                echo "$l\r\n$c\r\n";
+
+            $f = fopen( $file, 'rb' );
+
+            if ( $f === false ) {
+                throw new HttpException( sprintf( 'Can\'t load file [%s]', $file ) );
             }
+
+            while ( !feof( $f ) ) {
+                if ( $c = fread( $f, 131072 ) ) {
+                    $l = dechex( strlen( $c ) );
+                    echo "$l\r\n$c\r\n";
+                }
+            }
+
             fclose( $f );
             echo "0\r\n";
         }
         else {
-            $this->header->setHeader( 'Content-Length', filesize( $this->file ) );
+            $this->header->setHeader( 'Content-Length', (string) filesize( $file ) );
             $this->sendHeaderResponse();
-            readfile( $this->file );
+            readfile( $file );
         }
 
         return $this;

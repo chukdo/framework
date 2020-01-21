@@ -15,14 +15,14 @@ use Chukdo\Contracts\Json\Json;
 interface Owner
 {
     /**
-     * @return string|null
+     * @return string
      */
-    public function getId(): ?string;
+    public function getId(): string;
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getEmail(): ?string;
+    public function getEmail(): string;
 
     /**
      * @return Json

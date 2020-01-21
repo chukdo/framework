@@ -48,7 +48,7 @@ class Dispatcher
 
     /**
      * @param string $name
-     * @param null   $value
+     * @param mixed  $value
      *
      * @return mixed
      */

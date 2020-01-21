@@ -44,27 +44,30 @@ class AzureStream extends AbstractStream
         if ( $this->streamContent === null ) {
             $this->streamGet();
         }
+
         if ( $offset >= $this->streamLength ) {
             return null;
         }
-        else {
-            return substr( $this->streamContent, $offset, $length );
-        }
+
+        return substr( (string) $this->streamContent, $offset, $length );
     }
 
     /**
      * Retourne le contenu du fichier.
      *
-     * @return mixed
+     * @return string|null
      * @throws StreamException
      */
-    public function streamGet()
+    public function streamGet(): ?string
     {
         if ( $this->streamContent === null ) {
-            $this->streamContent = stream_get_contents( $this->getStream()
-                                                             ->getBlob( $this->getHost(), $this->getPath() )
-                                                             ->getContentStream() );
-            $this->streamLength  = strlen( $this->streamContent );
+            $get = stream_get_contents( $this->getStream()
+                                             ->getBlob( $this->getHost(), $this->getPath() )
+                                             ->getContentStream() );
+            if ( $get !== false ) {
+                $this->streamContent = $get;
+                $this->streamLength  = strlen( $this->streamContent );
+            }
         }
 
         return $this->streamContent;
@@ -123,12 +126,12 @@ class AzureStream extends AbstractStream
     /**
      * Ajoute du contenu au debut du fichier.
      *
-     * @param string|null $content
+     * @param string $content
      *
      * @return bool
      * @throws StreamException
      */
-    public function streamSet( ?string $content ): bool
+    public function streamSet( string $content ): bool
     {
         return (bool) $this->getStream()
                            ->createBlockBlob( $this->getHost(), $this->getPath(), $content );

@@ -43,10 +43,9 @@ class BoolFilter implements FilterInterface
         if ( $input === '0' ) {
             return false;
         }
-        else {
-            if ( $input === '1' ) {
-                return true;
-            }
+
+        if ( $input === '1' ) {
+            return true;
         }
 
         return $input;

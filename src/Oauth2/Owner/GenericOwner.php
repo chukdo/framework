@@ -21,11 +21,12 @@ Class GenericOwner extends AbstractOwner
      */
     public function __construct( Json $json )
     {
-        $this->id = $json->offsetGet( 'id', $json->offsetGet( 'id', 'account_id' ) );
-        $standard = array_flip( [
-                                    'id',
-                                    'account_id',
-                                ] );
+        $this->id    = $json->offsetGet( 'id', $json->offsetGet( 'id', 'account_id' ) );
+        $this->email = $json->offsetGet( 'email', '' );
+        $standard    = array_flip( [
+                                       'id',
+                                       'account_id',
+                                   ] );
 
         $this->values = new Json( array_diff_key( $json->toArray(), $standard ) );
     }

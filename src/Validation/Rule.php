@@ -209,7 +209,7 @@ class Rule
             $path = $this->path;
         }
         $this->validator->errors()
-                        ->offsetSet( $path, sprintf( $this->validator->message( $key ), $this->label ) );
+                        ->offsetSet( $path, sprintf( (string) $this->validator->message( $key ), $this->label ) );
     }
 
     /**
@@ -275,10 +275,11 @@ class Rule
     protected function validateRule(): bool
     {
         $validated = true;
+
         foreach ( $this->rules as $name => $attrs ) {
             if ( $validate = $this->validator->validator( $name ) ) {
                 $validate->attributes( $attrs );
-                $validated .= $this->validateInput( $validate, $name );
+                $validated = $validated && $this->validateInput( $validate, $name );
             }
         }
 
@@ -320,11 +321,11 @@ class Rule
             }
             elseif ( $this->isForm ) {
                 $this->error( $name, $k );
-                $validated .= false;
+                $validated = false;
             }
             else {
                 $this->error( $name );
-                $validated .= false;
+                $validated = false;
                 break;
             }
         }
@@ -349,7 +350,7 @@ class Rule
         }
         else {
             $this->error( $name );
-            $validated .= false;
+            $validated = false;
         }
 
         return $validated;

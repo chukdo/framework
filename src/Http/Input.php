@@ -21,9 +21,9 @@ class Input extends Json implements InputInterface
     /**
      * Input constructor.
      *
-     * @param null $data
+     * @param iterable|null $data
      */
-    public function __construct( $data = null )
+    public function __construct( iterable $data = null )
     {
         $data ??= HttpRequest::all();
 

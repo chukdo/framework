@@ -118,9 +118,10 @@ class RouteAttributes
      *
      * @return RouteAttributes
      */
-    public function setPrefix( ?string $prefix ): self
+    public function setPrefix( string $prefix = null ): self
     {
-        $prefix = trim( $prefix, '/' );
+        $prefix = trim( (string) $prefix, '/' );
+
         if ( $prefix !== '' ) {
             $this->prefix .= '/' . $prefix;
         }
