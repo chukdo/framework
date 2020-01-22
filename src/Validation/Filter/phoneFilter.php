@@ -41,7 +41,7 @@ class PhoneFilter implements FilterInterface
     public function filter( $input )
     {
 
-        if ( Str::match( '/^(?:(?:\+|00)\d{2}|0)\s{0,2}[1-9](?:[\s.-]{0,3}\d{2}){4}$/', $input ) ) {
+        if ( Str::matchOne( '/^(?:(?:\+|00)\d{2}|0)\s{0,2}[1-9](?:[\s.-]{0,3}\d{2}){4}$/', $input ) ) {
             return str_replace( [
                                     '.',
                                     ',',

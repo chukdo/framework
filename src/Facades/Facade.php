@@ -36,16 +36,16 @@ class Facade
      * @param App        $app
      * @param array|null $alias
      */
-    public static function setFacadeApplication( App $app, array $alias = null ): void
+    public static function setFacadeApplication( App $app, array $alias = [] ): void
     {
         static::$app = $app;
         self::registerAlias( $alias );
     }
 
     /**
-     * @param array|null $alias
+     * @param array $alias
      */
-    public static function registerAlias( array $alias = null ): void
+    public static function registerAlias( array $alias = [] ): void
     {
         foreach ( $alias as $name => $class ) {
             self::setClassAlias( $name, $class );

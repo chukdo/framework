@@ -42,13 +42,13 @@ class Smtp implements TransportInterface
      */
     public function __construct( string $dsn, int $timeout = 10 )
     {
-        $parsedUrl = parse_url( $dsn );
+        $urlParsed = parse_url( $dsn );
 
-        if ( $parsedUrl === false ) {
+        if ( $urlParsed === false ) {
             throw new MailException( sprintf( 'Can\'t connect to dsn [%s]', $dsn ) );
         }
 
-        $this->dsn = $parsedUrl;
+        $this->dsn = $urlParsed;
         $host      = $this->dsn[ 'host' ];
         $port      = $this->dsn[ 'port' ];
         $scheme    = $this->dsn[ 'scheme' ];

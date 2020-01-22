@@ -63,7 +63,7 @@ Class Link
             $db,
             $field,
         ] = array_pad( explode( '.', $field ), -2, $dbName );
-        if ( !Str::match( '/^_[a-z0-9]+$/i', $field ) ) {
+        if ( !Str::matchOne( '/^_[a-z0-9]+$/i', $field ) ) {
             throw new RecordException( sprintf( 'Field [%s] has not a valid format.', $field ) );
         }
         if ( $db !== $dbName ) {

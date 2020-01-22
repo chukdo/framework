@@ -335,14 +335,16 @@ class Response
 
         $content = $this->content;
 
-        if ( Str::contain( HttpRequest::server( 'HTTP_ACCEPT_ENCODING' ), 'deflate' ) ) {
-            $this->header->setHeader( 'Content-Encoding', 'deflate' );
-            $content = (string) gzdeflate( $content );
+        if ( $encoding = HttpRequest::server( 'HTTP_ACCEPT_ENCODING' ) ) {
+            if ( Str::contain( $encoding, 'deflate' ) ) {
+                $this->header->setHeader( 'Content-Encoding', 'deflate' );
+                $content = (string) gzdeflate( $content );
 
-        }
-        elseif ( Str::contain( HttpRequest::server( 'HTTP_ACCEPT_ENCODING' ), 'gzip' ) ) {
-            $this->header->setHeader( 'Content-Encoding', 'gzip' );
-            $content = (string) gzencode( $content );
+            }
+            elseif ( Str::contain( $encoding, 'gzip' ) ) {
+                $this->header->setHeader( 'Content-Encoding', 'gzip' );
+                $content = (string) gzencode( $content );
+            }
         }
 
         if ( $this->header->getHeader( 'Transfer-Encoding' ) === 'chunked' ) {

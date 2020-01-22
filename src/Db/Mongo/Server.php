@@ -43,7 +43,7 @@ Class Server implements ServerInterface
     {
         $this->dsn      = $dsn
             ?: 'mongodb://127.0.0.1:27017';
-        $this->client   = new Manager( $dsn );
+        $this->client   = new Manager( $this->dsn );
         $this->database = $database;
     }
 
@@ -152,14 +152,12 @@ Class Server implements ServerInterface
      */
     public function status(): Json
     {
-        $status = $this->command( [ 'serverStatus' => 1 ] )
-                       ->getIndexJson( '0' )
-                       ->filter( fn( $k, $v ) => is_scalar( $v )
-                           ? $v
-                           : false )
-                       ->clean();
-
-        return $status;
+        return $this->command( [ 'serverStatus' => 1 ] )
+                    ->getIndexJson( 0 )
+                    ->filter( fn( $k, $v ) => is_scalar( $v )
+                        ? $v
+                        : false )
+                    ->clean();
     }
 
     /**
@@ -176,14 +174,12 @@ Class Server implements ServerInterface
      */
     public function ReplicatSetStatus(): Json
     {
-        $status = $this->command( [ 'replSetGetStatus' => 1 ] )
-                       ->getIndexJson( '0' )
-                       ->filter( fn( $k, $v ) => is_scalar( $v )
-                           ? $v
-                           : false )
-                       ->clean();
-
-        return $status;
+        return $this->command( [ 'replSetGetStatus' => 1 ] )
+                    ->getIndexJson( 0 )
+                    ->filter( fn( $k, $v ) => is_scalar( $v )
+                        ? $v
+                        : false )
+                    ->clean();
     }
 
     /**

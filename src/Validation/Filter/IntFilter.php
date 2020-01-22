@@ -40,7 +40,7 @@ class IntFilter implements FilterInterface
      */
     public function filter( $input )
     {
-        if ( Str::match( '/^[0-9]+$/', $input ) ) {
+        if ( Str::matchOne( '/^[0-9]+$/', $input ) ) {
             return (int) $input;
         }
 

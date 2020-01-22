@@ -213,7 +213,7 @@ class Storage
             if ( $this->isFile( $file ) ) {
                 $full = $directory . '/' . $file;
 
-                if ( !is_dir( $full ) && ( $match === null || Str::match( $match, $full ) ) ) {
+                if ( !is_dir( $full ) && ( $match === null || Str::matchOne( $match, $full ) ) ) {
                     $list[] = $full;
                 }
             }
@@ -243,7 +243,7 @@ class Storage
             if ( $this->isFile( $file ) ) {
                 $full = $directory . '/' . $file;
 
-                if ( !is_dir( $full ) && ( $match === null || Str::match( $match, $full ) ) ) {
+                if ( !is_dir( $full ) && ( $match === null || Str::matchOne( $match, $full ) ) ) {
                     $list = Arr::push( $list, $this->allFiles( $full, $match ) );
                 }
             }

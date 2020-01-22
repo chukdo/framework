@@ -95,20 +95,20 @@ interface Find
     /**
      * @param string $field
      * @param string $operator
-     * @param        $value
-     * @param null   $value2
+     * @param mixed  $value
+     * @param mixed  $value2
      *
-     * @return Find|Write|object
+     * @return Find
      */
-    public function where( string $field, string $operator, $value, $value2 = null );
+    public function where( string $field, string $operator, $value = null, $value2 = null );
 
     /**
      * @param string $field
      * @param string $operator
-     * @param        $value
-     * @param null   $value2
+     * @param mixed  $value
+     * @param mixed  $value2
      *
-     * @return Find|Write|object
+     * @return Find
      */
-    public function orWhere( string $field, string $operator, $value, $value2 = null );
+    public function orWhere( string $field, string $operator, $value = null, $value2 = null );
 }

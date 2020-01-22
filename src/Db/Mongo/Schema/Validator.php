@@ -102,6 +102,7 @@ class Validator
 
         if ( Is::arr( $type ) ) {
             $count = count( $type );
+
             foreach ( $type as $i => $t ) {
                 try {
                     return $this->validateProperty( $t, $data, $insert );
@@ -205,7 +206,7 @@ class Validator
         $data    = (string) $data;
         $pattern = $this->property->pattern();
 
-        if ( $pattern && !Str::match( '/' . $pattern . '/i', $data ) ) {
+        if ( $pattern && !Str::matchOne( '/' . $pattern . '/i', $data ) ) {
             throw new MongoException( sprintf( 'The field [%s] must be a string with pattern [%s]', $this->property->name(), $pattern ) );
         }
 

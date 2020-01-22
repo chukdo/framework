@@ -116,7 +116,7 @@ final class Is
         $ncname     = " (?: $letter | _ )(?: $ncnamechar )* ";
         $qname      = " (?: $ncname: )? $ncname ";
 
-        return preg_match( '/^' . $qname . '$/x', $name );
+        return (bool) preg_match( '/^' . $qname . '$/x', $name );
     }
 
     /**
@@ -191,7 +191,11 @@ final class Is
         $format    ??= 'd/m/Y';
         $checkDate = DateTime::createFromFormat( $format, $value );
 
-        return $value === $checkDate->format( $format );
+        if ( $checkDate ) {
+            return $value === $checkDate->format( $format );
+        }
+
+        return false;
     }
 
     /**

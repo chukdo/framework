@@ -22,20 +22,20 @@ interface Write
     /**
      * @param string $field
      * @param string $operator
-     * @param null   $value
-     * @param null   $value2
+     * @param mixed  $value
+     * @param mixed  $value2
      *
-     * @return Write|Find
+     * @return Write
      */
     public function where( string $field, string $operator, $value = null, $value2 = null );
 
     /**
      * @param string $field
      * @param string $operator
-     * @param null   $value
-     * @param null   $value2
+     * @param mixed  $value
+     * @param mixed  $value2
      *
-     * @return Write|Find
+     * @return Write
      */
     public function orWhere( string $field, string $operator, $value = null, $value2 = null );
 

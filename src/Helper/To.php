@@ -71,11 +71,13 @@ final class To
      */
     public static function fileName( string $name, string $prefix = null, string $suffix = null ): string
     {
-        if ( $name !== '' ) {
-            return preg_replace( '/_{2,}/', '_', $prefix . str_replace( ' ', '_', Str::allText( $name ) ) . $suffix );
+        $file = Str::allText( $name );
+
+        if ( $prefix ) {
+            $file = $prefix . str_replace( ' ', '_', $file ) . $suffix;
         }
 
-        return '';
+        return (string) preg_replace( '/_{2,}/', '_', $file );
     }
 
     /**
@@ -181,7 +183,7 @@ final class To
             $value = str_replace( '.', '', $value );
         }
 
-        return (float) str_replace( ',', '.', $value );
+        return (float) str_replace( ',', '.', (string) $value );
     }
 
     /**
@@ -203,27 +205,6 @@ final class To
     }
 
     /**
-     * @param $value
-     *
-     * @return String
-     */
-    public static function xml( $value ): String
-    {
-        if ( is_scalar( $value ) && strpos( $value, '<' ) === 0 ) {
-            return $value;
-        }
-
-        if ( Is::object( $value, 'toXmlString' ) ) {
-            return $value->toXmlString();
-        }
-
-        $xml = new Xml();
-        $xml->import( $value );
-
-        return $xml->toXmlString();
-    }
-
-    /**
      * @param     $value
      * @param int $indent
      *
@@ -236,43 +217,34 @@ final class To
         if ( is_numeric( $value ) ) {
             $text .= "Number: $value";
         }
-        else {
-            if ( is_string( $value ) ) {
-                $text .= "String: '$value'";
+        elseif ( is_string( $value ) ) {
+            $text .= "String: '$value'";
+        }
+        elseif ( $value === null ) {
+            $text .= 'Null';
+        }
+        elseif ( $value === true ) {
+            $text .= 'True';
+        }
+        elseif ( $value === false ) {
+            $text .= 'False';
+        }
+        elseif ( is_array( $value ) ) {
+            $text .= 'Array (' . count( $value ) . ')';
+            $indent++;
+            foreach ( $value AS $k => $v ) {
+                $text .= "\n$prefix [$k] = ";
+                $text .= self::text( $v, $indent );
             }
-            else {
-                if ( $value === null ) {
-                    $text .= 'Null';
-                }
-                else {
-                    if ( $value === true ) {
-                        $text .= 'True';
-                    }
-                    else {
-                        if ( $value === false ) {
-                            $text .= 'False';
-                        }
-                        else {
-                            if ( is_array( $value ) ) {
-                                $text .= 'Array (' . count( $value ) . ')';
-                                $indent++;
-                                foreach ( $value AS $k => $v ) {
-                                    $text .= "\n$prefix [$k] = ";
-                                    $text .= self::text( $v, $indent );
-                                }
-                            }
-                            else {
-                                if ( is_object( $value ) ) {
-                                    $text .= 'Object (' . get_class( $value ) . ')';
-                                    $indent++;
-                                    foreach ( $value AS $k => $v ) {
-                                        $text .= "\n$prefix $k -> ";
-                                        $text .= self::text( $v, $indent );
-                                    }
-                                }
-                            }
-                        }
-                    }
+        }
+        elseif ( is_object( $value ) ) {
+            $text .= 'Object (' . get_class( $value ) . ')';
+            $indent++;
+
+            if ( is_iterable( $value ) ) {
+                foreach ( $value as $k => $v ) {
+                    $text .= "\n$prefix $k -> ";
+                    $text .= self::text( $v, $indent );
                 }
             }
         }
@@ -360,7 +332,7 @@ final class To
     public static function json( $value ): string
     {
         if ( is_scalar( $value ) ) {
-            return $value;
+            return (string) $value;
         }
 
         if ( Is::object( $value, 'toJson' ) ) {
@@ -378,6 +350,7 @@ final class To
     public static function arr( $value ): array
     {
         $array = [];
+
         if ( is_array( $value ) ) {
             $array = $value;
         }
@@ -412,5 +385,26 @@ final class To
         }
 
         return $array;
+    }
+
+    /**
+     * @param $value
+     *
+     * @return String
+     */
+    public static function xml( $value ): String
+    {
+        if ( is_string( $value ) && strpos( $value, '<' ) === 0 ) {
+            return $value;
+        }
+
+        if ( Is::object( $value, 'toXmlString' ) ) {
+            return $value->toXmlString();
+        }
+
+        $xml = new Xml();
+        $xml->import( $value );
+
+        return $xml->toXmlString();
     }
 }

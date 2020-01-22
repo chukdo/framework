@@ -27,12 +27,12 @@ Abstract Class Where
     /**
      * @param string $field
      * @param string $operator
-     * @param null   $value
-     * @param null   $value2
+     * @param mixed  $value
+     * @param mixed  $value2
      *
-     * @return Find|Write|object
+     * @return $this
      */
-    public function where( string $field, string $operator, $value = null, $value2 = null )
+    public function where( string $field, string $operator, $value = null, $value2 = null ): self
     {
         $this->where[ $field ] = $this->whereOperator( $field, $operator, $value, $value2 );
 
@@ -42,12 +42,12 @@ Abstract Class Where
     /**
      * @param string $field
      * @param string $operator
-     * @param null   $value
-     * @param null   $value2
+     * @param mixed  $value
+     * @param mixed  $value2
      *
-     * @return Find|Write|object
+     * @return $this
      */
-    public function orWhere( string $field, string $operator, $value = null, $value2 = null )
+    public function orWhere( string $field, string $operator, $value = null, $value2 = null ): self
     {
         $this->orWhere[ $field ] = $this->whereOperator( $field, $operator, $value, $value2 );
 

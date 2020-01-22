@@ -1,6 +1,7 @@
 <?php
 
 namespace Chukdo\Helper;
+
 /**
  * Classe Image
  * Manipulation d'images.
@@ -22,15 +23,17 @@ final class Image
     /**
      * @param string $file
      *
-     * @return array|null
+     * @return array
      */
-    public static function loadImageFromFile( string $file ): ?array
+    public static function loadImageFromFile( string $file ): array
     {
-        if ( $string = file_get_contents( $file ) ) {
-            return self::loadImageFromString( $string );
+        $string = file_get_contents( $file );
+
+        if ( $string === false ) {
+            throw new ImageException( sprintf( 'Can\'t load image from file [%s]', $file ) );
         }
 
-        return null;
+        return self::loadImageFromString( $string );
     }
 
     /**
@@ -38,48 +41,56 @@ final class Image
      *
      * @param string $string
      *
-     * @return array|null
+     * @return array
      */
-    public static function loadImageFromString( string $string ): ?array
+    public static function loadImageFromString( string $string ): array
     {
         $image = imagecreatefromstring( $string );
-        if ( $image !== false ) {
-            $f        = finfo_open();
-            $mimeType = finfo_buffer( $f, $string, FILEINFO_MIME_TYPE );
 
-            return [
-                'w' => imagesx( $image ),
-                'h' => imagesy( $image ),
-                't' => $mimeType,
-                'i' => $image,
-            ];
+        if ( $image === false ) {
+            throw new ImageException( 'Can\'t load image from string' );
         }
 
-        return null;
+        $f = finfo_open();
+
+        if ( $f === false ) {
+            throw new ImageException( 'Can\'t create finfo resource' );
+        }
+
+        $mimeType = finfo_buffer( $f, $string, FILEINFO_MIME_TYPE );
+
+        return [
+            'w' => imagesx( $image ),
+            'h' => imagesy( $image ),
+            't' => $mimeType,
+            'i' => $image,
+        ];
     }
 
     /**
      * @param string $base64
      *
-     * @return array|null
+     * @return array
      */
-    public static function loadImageFromBase64( string $base64 ): ?array
+    public static function loadImageFromBase64( string $base64 ): array
     {
-        $pattern = '/^data:image\/[a-z]{3,4};base64,/';
-        if ( $string = base64_decode( preg_replace( $pattern, '', $base64 ) ) ) {
-            return self::loadImageFromString( $string );
+        $pattern  = '/^data:image\/[a-z]{3,4};base64,/';
+        $toDecode = preg_replace( $pattern, '', $base64 );
+
+        if ( $toDecode === null ) {
+            throw new ImageException( 'Can\'t decode image pattern' );
         }
 
-        return null;
+        return self::loadImageFromString( base64_decode( $toDecode ) );
     }
 
     /**
      * @param array $image [w, h, t, i] (self::loadImage*)
      * @param int   $quality
      *
-     * @return string|null
+     * @return string
      */
-    public static function convertToJpg( array $image, int $quality ): ?string
+    public static function convertToJpg( array $image, int $quality ): string
     {
         return self::convert( $image, IMAGETYPE_JPEG, $quality );
     }
@@ -91,34 +102,33 @@ final class Image
      * @param int      $format  type d'image (IMAGETYPE_GIF | IMAGETYPE_JPEG | IMAGETYPE_PNG)
      * @param int|null $quality (0 à 100)
      *
-     * @return string si l'operation reussi false sinon
+     * @return string|null
      */
-    public static function convert( array $image, int $format, int $quality = null ): ?string
+    public static function convert( array $image, int $format, int $quality = null ): string
     {
-        if ( $image ) {
-            $w   = $image[ 'w' ];
-            $h   = $image[ 'h' ];
-            $src = $image[ 'i' ];
-            $dst = imagecreatetruecolor( $w, $h );
-            if ( $src && $dst ) {
-                imagecopy( $dst, $src, 0, 0, 0, 0, $w, $h );
-                $r = self::getImage( $dst, $format, $quality ?? 92 );
-                imagedestroy( $src );
-                imagedestroy( $dst );
+        $w   = $image[ 'w' ];
+        $h   = $image[ 'h' ];
+        $src = $image[ 'i' ];
+        $dst = imagecreatetruecolor( $w, $h );
 
-                return $r;
-            }
+        if ( $src && $dst ) {
+            imagecopy( $dst, $src, 0, 0, 0, 0, $w, $h );
+            $r = self::getImage( $dst, $format, $quality ?? 92 );
+            imagedestroy( $src );
+            imagedestroy( $dst );
+
+            return $r;
         }
 
-        return null;
+        throw new ImageException( sprintf( 'Can\'t convert image to format [%s] missing src or dst param', $format ) );
     }
 
     /**
      * Retourne le flux d'une nouvelle image (que l'on peut sauver dans un fichier).
      *
-     * @param resource $image   (imagecreatetruecolor)
-     * @param int      $format  type d'image (IMAGETYPE_GIF | IMAGETYPE_JPEG | IMAGETYPE_PNG)
-     * @param int|null $quality (0 à 100)
+     * @param          $image  (imagecreatetruecolor)
+     * @param int      $format type d'image (IMAGETYPE_GIF | IMAGETYPE_JPEG | IMAGETYPE_PNG)
+     * @param int|null $quality
      *
      * @return string
      */
@@ -133,25 +143,23 @@ final class Image
                 imagejpeg( $image, null, $quality ?? 85 );
                 break;
             case 'image/png':
-                $quality = 9 - abs( floor( ( ( $quality ?? 85 ) - 1 ) / 10 ) );
+                $quality = (int) ( 9 - abs( floor( ( ( $quality ?? 85 ) - 1 ) / 10 ) ) );
                 imagealphablending( $image, false );
                 imagesavealpha( $image, true );
                 imagepng( $image, null, $quality ?? 85 );
                 break;
         }
-        $r = ob_get_contents();
-        ob_end_clean();
 
-        return $r;
+        return (string) ob_get_clean();
     }
 
     /**
      * @param array $image [w, h, t, i] (self::loadImage*)
      * @param int   $quality
      *
-     * @return string|null
+     * @return string
      */
-    public static function convertToPng( array $image, $quality )
+    public static function convertToPng( array $image, $quality ): string
     {
         return self::convert( $image, IMAGETYPE_PNG, $quality );
     }
@@ -159,9 +167,9 @@ final class Image
     /**
      * @param array $image [w, h, t, i] (self::loadImage*)
      *
-     * @return string|null
+     * @return string
      */
-    public static function convertToGif( array $image )
+    public static function convertToGif( array $image ): string
     {
         return self::convert( $image, IMAGETYPE_GIF );
     }
@@ -173,14 +181,15 @@ final class Image
      * @param int      $dw    largeur
      * @param int|null $dh    hauteur
      *
-     * @return string|null
+     * @return string
      */
-    public static function resize( array $image, int $dw = 0, int $dh = null ): ?string
+    public static function resize( array $image, int $dw = 0, int $dh = null ): string
     {
         $sw = $image[ 'w' ];
         $sh = $image[ 'h' ];
         $h  = 0;
         $w  = 0;
+
         if ( $dw > 0 && $dh > 0 ) {
             $rw = $sw / $dw;
             $rh = $sh / $dh;
@@ -188,30 +197,29 @@ final class Image
             $w  = $sw / $r;
             $h  = $sh / $r;
         }
-        else {
-            if ( $dw > 0 ) {
-                $w = $dw;
-                $h = $w * $sh / $sw;
-            }
-            else {
-                if ( $dh > 0 ) {
-                    $h = $dh;
-                    $w = $h * $sw / $sh;
-                }
-            }
+        elseif ( $dw > 0 ) {
+            $w = $dw;
+            $h = $w * $sh / $sw;
         }
+        elseif ( $dh > 0 ) {
+            $h = $dh;
+            $w = $h * $sw / $sh;
+        }
+
         /** Image source trop petite pour etre redimensionner */
         $whd = $dw > 0 && $dh > 0 && $dw >= $sw && $dh >= $sh;
         $wd  = $dw > 0 && $dw >= $sw;
         $hd  = $dh > 0 && $dh >= $sh;
+
         if ( $whd || $wd || $hd ) {
             return self::getImage( $image[ 'i' ], $image[ 't' ] );
         }
+
         if ( $w > 0 && $h > 0 ) {
-            return self::resampleImage( $image, 0, 0, $w, $h );
+            return self::resampleImage( $image, 0, 0, (int) $w, (int) $h );
         }
 
-        return null;
+        throw new ImageException( sprintf( 'Can\'t resize image to [%s, %s]', $dw, $dh ) );
     }
 
     /**
@@ -225,36 +233,43 @@ final class Image
      * @param int      $sw    source largeur
      * @param int|null $sh    source hauteur
      *
-     * @return string si l'operation reussi false si le resize n'est pas nécessaire
+     * @return string
      */
-    public static function resampleImage( array $image, int $sx, int $sy, int $dw, int $dh, int $sw = 0, int $sh = null ): ?string
+    public static function resampleImage( array $image, int $sx, int $sy, int $dw, int $dh, int $sw = 0, int $sh = null ): string
     {
-        $type = $image[ 't' ];
-        $src  = $image[ 'i' ];
+        $type = $image[ 't' ] ?? false;
+        $src  = $image[ 'i' ] ?? false;
         $dst  = imagecreatetruecolor( $dw, $dh );
-        $sw   = $sw > 0
+
+        if ( $dst === false ) {
+            throw new ImageException( 'Can\'t resample image dst missing' );
+        }
+
+        if ( $src === false ) {
+            throw new ImageException( 'Can\'t resample image src missing' );
+        }
+
+        $sw = $sw > 0
             ? $sw
             : $image[ 'w' ];
-        $sh   = $sh > 0
+        $sh = $sh > 0
             ? $sh
             : $image[ 'h' ];
-        $dx   = 0;
-        $dy   = 0;
-        if ( $type == 'image/png' ) {
+        $dx = 0;
+        $dy = 0;
+
+        if ( $type === 'image/png' ) {
             imagesavealpha( $dst, true );
             $alpha = imagecolorallocatealpha( $dst, 255, 255, 255, 127 );
             imagefill( $dst, 0, 0, $alpha );
         }
-        if ( $src && $dst ) {
-            imagecopyresampled( $dst, $src, $dx, $dy, $sx, $sy, $dw, $dh, $sw, $sh );
-            $r = self::getImage( $dst, $type, 92 );
-            imagedestroy( $src );
-            imagedestroy( $dst );
 
-            return $r;
-        }
+        imagecopyresampled( $dst, $src, $dx, $dy, $sx, $sy, $dw, $dh, $sw, $sh );
+        $r = self::getImage( $dst, $type, 92 );
+        imagedestroy( $src );
+        imagedestroy( $dst );
 
-        return null;
+        return $r;
     }
 
     /**
@@ -266,16 +281,16 @@ final class Image
      * @param int   $dw    largeur
      * @param int   $dh    hauteur
      *
-     * @return string|null
+     * @return string
      */
-    public static function crop( array $image, int $dx, int $dy, int $dw, int $dh ): ?string
+    public static function crop( array $image, int $dx, int $dy, int $dw, int $dh ): string
     {
         $sw = $image[ 'w' ];
         $sh = $image[ 'h' ];
 
         /** Taille finale > taille initiale */
         if ( $dx + $dw > $sw || $dy + $dh > $sh ) {
-            return null;
+            throw new ImageException( 'Can\'t crop image final size is greater than original size' );
         }
 
         return self::resampleImage( $image, $dx, $dy, $dw, $dh, $dw, $dh );

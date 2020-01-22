@@ -3,6 +3,7 @@
 namespace Chukdo\Helper;
 
 use Chukdo\Http\Url;
+use Chukdo\Xml\Xml;
 
 /**
  * Gestion des messages HTTP.
@@ -57,17 +58,27 @@ final class HttpRequest
             return $_REQUEST;
         }
 
-        if ( ( $data = self::input() ) && ( strpos( $data, '{' ) === 0 ) && Str::contain( self::server( 'ACCEPT' ), 'json' ) ) {
+        $data   = self::input();
+        $isJson = strpos( $data, '{' ) === 0;
+        $isXml  = strpos( $data, '<' ) === 0;
+
+        if ( $data && $isJson ) {
             return json_decode( $data, true, 512, JSON_THROW_ON_ERROR );
+        }
+
+        if ( $data && $isXml ) {
+            $xml = Xml::loadFromString( $data );
+
+            return $xml->toArray();
         }
 
         return [];
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public static function input(): ?string
+    public static function input(): string
     {
         static $input = null;
 
@@ -75,7 +86,7 @@ final class HttpRequest
             return $input;
         }
 
-        return $input = file_get_contents( 'php://input' );
+        return $input = (string) file_get_contents( 'php://input' );
     }
 
     /**
@@ -118,9 +129,15 @@ final class HttpRequest
      */
     public static function render(): ?string
     {
-        return Cli::runningInConsole()
-            ? 'cli'
-            : Str::extension( self::uri() );
+        if ( Cli::runningInConsole() ) {
+            return 'cli';
+        }
+
+        if ( $uri = self::uri() ) {
+            return Str::extension( $uri );
+        }
+
+        return null;
     }
 
     /**
@@ -189,7 +206,7 @@ final class HttpRequest
     {
         $headers = [];
         foreach ( $_SERVER as $key => $value ) {
-            if ( $name = Str::match( '/^HTTP_(.*)/', $key ) ) {
+            if ( $name = Str::matchOne( '/^HTTP_(.*)/', $key ) ) {
                 switch ( $name ) {
                     case 'HOST':
                     case 'COOKIE':

@@ -391,7 +391,7 @@ class Collect
                     ?: null;
                 break;
             case 'regex':
-                $closure = fn( $v, $value, $value2 ) => Str::match( '/' . $value . '/' . ( $value2 ?? 'i' ), $v )
+                $closure = fn( $v, $value, $value2 ) => Str::matchOne( '/' . $value . '/' . ( $value2 ?? 'i' ), $v )
                     ?: null;
                 break;
             case 'match':

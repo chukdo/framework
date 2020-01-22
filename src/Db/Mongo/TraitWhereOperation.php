@@ -17,8 +17,8 @@ Trait TraitWhereOperation
     /**
      * @param string $field
      * @param string $operator
-     * @param null   $value
-     * @param null   $value2
+     * @param mixed  $value
+     * @param mixed  $value2
      *
      * @return array
      */
@@ -88,7 +88,7 @@ Trait TraitWhereOperation
             case 'exists':
                 return [ '$exists' => true ];
                 break;
-            case !'exists':
+            case '!exists':
                 return [ '$exists' => false ];
                 break;
             case 'regex':

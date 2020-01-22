@@ -49,12 +49,12 @@ final class Str
     /**
      * Verifie si une chaine de caractere ne contient pas une autre chaine de caractere.
      *
-     * @param string|null $haystack La chaîne dans laquelle on doit chercher
-     * @param string|null $needle   valeur recherché
+     * @param string $haystack La chaîne dans laquelle on doit chercher
+     * @param string $needle   valeur recherché
      *
      * @return bool
      */
-    public static function notContain( ?string $haystack, ?string $needle ): bool
+    public static function notContain( string $haystack, string $needle ): bool
     {
         return !self::contain( $haystack, $needle );
     }
@@ -62,51 +62,57 @@ final class Str
     /**
      * Verifie si une chaine de caractere contient une autre chaine de caractere.
      *
-     * @param string|null $haystack La chaîne dans laquelle on doit chercher
-     * @param string|null $needle   valeur recherché
+     * @param string $haystack La chaîne dans laquelle on doit chercher
+     * @param string $needle   valeur recherché
      *
      * @return bool
      */
-    public static function contain( ?string $haystack, ?string $needle ): bool
+    public static function contain( string $haystack, string $needle ): bool
     {
         return strpos( $haystack, $needle ) !== false;
     }
 
     /**
-     * @param string|null $haystack La chaîne dans laquelle on doit chercher
-     * @param string|null $needle   le debut de chaine à verifier
+     * @param string $haystack La chaîne dans laquelle on doit chercher
+     * @param string $needle   le debut de chaine à verifier
      *
      * @return bool
      */
-    public static function startWith( ?string $haystack, ?string $needle ): bool
+    public static function startWith( string $haystack, string $needle ): bool
     {
         return strpos( $haystack, $needle ) === 0;
     }
 
     /**
-     * @param string|null $haystack La chaîne dans laquelle on doit chercher
-     * @param string|null $needle   la fin de chaine à verifier
+     * @param string $haystack La chaîne dans laquelle on doit chercher
+     * @param string $needle   la fin de chaine à verifier
      *
      * @return bool
      */
-    public static function endWith( ?string $haystack, ?string $needle ): bool
+    public static function endWith( string $haystack, string $needle ): bool
     {
         return substr( $haystack, strlen( $needle ) ) === $needle;
     }
 
     /**
-     * @param string|null $delimiter
-     * @param string|null $string
-     * @param int|null    $length
+     * @param string   $delimiter
+     * @param string   $string
+     * @param int|null $length
      *
      * @return array
      */
-    public static function explode( ?string $delimiter, ?string $string, int $length = null ): array
+    public static function explode( string $delimiter, string $string, int $length = null ): array
     {
         $explode = explode( $delimiter, $string );
-        if ( ( $explode !== false ) && count( $explode ) === 1 && $explode[ 0 ] === '' ) {
+
+        if ( $explode === false ) {
             $explode = [];
         }
+
+        if ( count( $explode ) === 1 && $explode[ 0 ] === '' ) {
+            $explode = [];
+        }
+
         if ( $length ) {
             return array_pad( $explode, $length, null );
         }
@@ -165,6 +171,28 @@ final class Str
      * @param string $pattern
      * @param string $value
      *
+     * @return string|null
+     */
+    public static function matchOne( string $pattern, string $value ): ?string
+    {
+        $match = [];
+
+        preg_match( $pattern, $value, $match );
+
+        switch ( count( $match ) ) {
+            case 1:
+                return $match[ 0 ];
+            case 2:
+                return $match[ 1 ];
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * @param string $pattern
+     * @param string $value
+     *
      * @return Json|string|null
      */
     public static function match( string $pattern, string $value )
@@ -197,7 +225,8 @@ final class Str
      */
     public static function split( string $value, string $delimiter, int $pad = null, $padValue = null ): array
     {
-        $split = explode( $delimiter, $value );
+        $split = self::explode( $delimiter, $value );
+
         if ( $pad ) {
             $split = array_pad( $split, $pad, $padValue );
         }
@@ -263,7 +292,7 @@ final class Str
      */
     public static function uid( string $prefix = null ): string
     {
-        return $prefix . md5( uniqid( mt_rand(), true ) );
+        return $prefix . md5( uniqid( (string) mt_rand(), true ) );
     }
 
     /**
@@ -273,7 +302,7 @@ final class Str
      */
     public static function stripSpaceBetweenTag( string $value ): string
     {
-        return self::trim( preg_replace( '/>[\s|\t|\r|\n]+</', '><', $value ) );
+        return self::trim( self::replace( '/>[\s|\t|\r|\n]+</', '><', $value ) );
     }
 
     /**
@@ -298,7 +327,7 @@ final class Str
      */
     public static function replace( $pattern, $replacement, string $value ): string
     {
-        return preg_replace( $pattern, $replacement, $value );
+        return (string) preg_replace( $pattern, $replacement, $value );
     }
 
     /**

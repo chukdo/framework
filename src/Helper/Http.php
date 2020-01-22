@@ -88,11 +88,11 @@ final class Http
     }
 
     /**
-     * @param string|null $ua
+     * @param string $ua
      *
      * @return array
      */
-    public static function browser( string $ua = null ): array
+    public static function browser( string $ua ): array
     {
         $browser          = [
             'platform' => null,
@@ -102,13 +102,13 @@ final class Http
             'bot'      => null,
         ];
         $ua               = strtolower( $ua );
-        $browser[ 'bot' ] = Str::match( '/baiduspider|googlebot|yandexbot|bingbot|lynx|wget|curl/', $ua );
+        $browser[ 'bot' ] = Str::matchOne( '/baiduspider|googlebot|yandexbot|bingbot|lynx|wget|curl/', $ua );
         $is               = static function( $contain, $name = false ) use ( $ua, &$browser )
         {
             if ( Str::contain( $ua, $contain ) ) {
                 $browser[ 'browser' ] = $name
                     ?: $contain;
-                $browser[ 'version' ] = Str::match( '/' . $contain . '[\/\s](\d+)/', $ua );
+                $browser[ 'version' ] = Str::matchOne( '/' . $contain . '[\/\s](\d+)/', $ua );
 
                 return true;
             }

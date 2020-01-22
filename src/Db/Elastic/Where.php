@@ -60,7 +60,7 @@ Abstract Class Where
      * @param null   $value
      * @param null   $value2
      *
-     * @return Find|Write|object
+     * @return mixed|Find|Write
      */
     public function where( string $field, string $operator, $value = null, $value2 = null )
     {
@@ -176,7 +176,7 @@ Abstract Class Where
      * @param null   $value
      * @param null   $value2
      *
-     * @return Find|Write|object
+     * @return mixed|Find|Write
      */
     public function orWhere( string $field, string $operator, $value = null, $value2 = null )
     {

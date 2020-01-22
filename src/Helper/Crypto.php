@@ -37,9 +37,13 @@ final class Crypto
      */
     public static function encrypt( string $data, string $salt ): string
     {
-        $encrypted = openssl_encrypt( $data, 'aes-256-ecb', $salt, true );
+        $encrypt = openssl_encrypt( $data, 'aes-256-ecb', $salt, 1 );
 
-        return base64_encode( $encrypted );
+        if ( $encrypt === false ) {
+            throw new CryptoException( 'Can\'t encrypt data' );
+        }
+
+        return base64_encode( $encrypt );
     }
 
     /**
@@ -70,9 +74,14 @@ final class Crypto
      */
     public static function decrypt( string $data, string $salt ): string
     {
-        $data = base64_decode( $data );
+        $data    = base64_decode( $data );
+        $decrypt = openssl_decrypt( $data, 'aes-256-ecb', $salt, 1 );
 
-        return openssl_decrypt( $data, 'aes-256-ecb', $salt, true );
+        if ( $decrypt === false ) {
+            throw new CryptoException( 'Can\'t encrypt data' );
+        }
+
+        return $decrypt;
     }
 
     /**
@@ -128,9 +137,9 @@ final class Crypto
      */
     public static function hash( string $name, int $hashlevel = 2 ): string
     {
-        $file = crc32( $name );
+        $file = (string) crc32( $name );
         $path = '';
-        $hash = str_split( hash( 'crc32', $file ), 2 );
+        $hash = str_split( (string) hash( 'crc32', $file ), 2 );
 
         /** Hashlevel */
         for ( $i = 0; $i < $hashlevel; ++$i ) {

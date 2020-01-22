@@ -40,7 +40,7 @@ class Url
     public function __construct( string $url = null, iterable $params = [], string $defaultScheme = null )
     {
         if ( $url ) {
-            if ( $defaultScheme && !Str::match( '/^[a-z0-9]+:\/\//', $url ) ) {
+            if ( $defaultScheme && !Str::matchOne( '/^[a-z0-9]+:\/\//', $url ) ) {
                 $url = $defaultScheme . '://' . $url;
             }
 

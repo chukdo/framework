@@ -1089,16 +1089,8 @@ class Node implements IteratorAggregate
                 : $this->toArray( $default, $child );
             if ( !Is::empty( $value ) ) {
                 if ( isset( $array[ $name ] ) ) {
-                    if ( is_array( $array[ $name ] ) ) {
-                        if ( key( $array[ $name ] ) === 0 ) {
-                            $array[ $name ][] = $value;
-                        }
-                        else {
-                            $array[ $name ] = [
-                                $array[ $name ],
-                                $value,
-                            ];
-                        }
+                    if ( is_array( $array[ $name ] ) && key( $array[ $name ] ) === 0 ) {
+                        $array[ $name ][] = $value;
                     }
                     else {
                         $array[ $name ] = [

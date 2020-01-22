@@ -19,7 +19,7 @@ class Redis implements RedisInterface
      *
      * @var resource
      */
-    protected $sock = null;
+    protected $sock;
 
     /**
      * Pointer SCAN pour iteration.
@@ -59,16 +59,26 @@ class Redis implements RedisInterface
      */
     public function __construct( string $dsn = null, int $timeout = null )
     {
-        $urlParsed  = parse_url( $dsn ?? 'redis://127.0.0.1:6379' );
-        $host       = $urlParsed[ 'host' ];
-        $port       = $urlParsed[ 'port' ];
-        $this->sock = fsockopen( $host, $port, $errno, $errstr, $timeout ?? 5 );
-        if ( $this->sock === null ) {
+        $urlParsed = parse_url( $dsn ?? 'redis://127.0.0.1:6379' );
+
+        if ( $urlParsed === false ) {
+            throw new RedisException( sprintf( 'Can\'t connect to dsn [%s]', $dsn ) );
+        }
+
+        $host = $urlParsed[ 'host' ];
+        $port = $urlParsed[ 'port' ];
+        $sock = fsockopen( $host, $port, $errno, $errstr, $timeout ?? 5 );
+
+        if ( $sock === false ) {
             throw new RedisException( "[$errno $errstr]" );
         }
+
+        $this->sock = $sock;
+
         if ( isset( $urlParsed[ 'pass' ] ) && !$this->__call( 'AUTH', [ $urlParsed[ 'pass' ] ] ) ) {
             throw new RedisException( 'Wrong password' );
         }
+
         $this->setTypeIterator( 'scan' );
     }
 
@@ -134,57 +144,63 @@ class Redis implements RedisInterface
      */
     public function read()
     {
-        $get   = stream_get_line( $this->sock, 512, "\r\n" );
-        $reply = substr( $get, 1 );
-        if ( $get === 0 ) {
+        $get = stream_get_line( $this->sock, 512, "\r\n" );
+
+        if ( $get === false ) {
             throw new RedisException( 'Failed to read type of response from stream' );
         }
+
+        $reply = substr( $get, 1 );
+
         switch ( $get[ 0 ] ) {
-            /** Error */ case '-':
-            throw new RedisException( $reply );
-            break;
-            /** Inline */ case '+':
-            $s = $reply;
-            if ( $s === 'OK' ) {
-                $s = true;
-            }
-            break;
-            /** Integer */ case ':':
-            $s = (int) $reply;
-            break;
-            /** Bulk */ case '$':
-            $s = null;
-            if ( $reply === '-1' ) {
+            case '-':
+                /** Error */ throw new RedisException( $reply );
                 break;
-            }
-            $size = (int) $reply;
-            $read = 0;
-            if ( $size > 0 ) {
-                while ( $read < $size ) {
-                    $len  = min( 1024, $size - $read );
-                    $read += $len;
-                    if ( ( $r = stream_get_line( $this->sock, $len ) ) !== 0 ) {
-                        $s .= $r;
-                    }
-                    else {
-                        throw new RedisException( 'Failed to read response from stream' );
+            case '+':
+                /** Inline */ $s = $reply;
+                if ( $s === 'OK' ) {
+                    $s = true;
+                }
+                break;
+            case ':':
+                /** Integer */ $s = (int) $reply;
+                break;
+            case '$':
+                /** Bulk */ $s = null;
+                if ( $reply === '-1' ) {
+                    break;
+                }
+                $size = (int) $reply;
+                $read = 0;
+                if ( $size > 0 ) {
+                    while ( $read < $size ) {
+                        $len  = min( 1024, $size - $read );
+                        $read += $len;
+
+                        if ( ( $r = stream_get_line( $this->sock, $len ) ) !== false ) {
+                            $s .= $r;
+                        }
+                        else {
+                            throw new RedisException( 'Failed to read response from stream' );
+                        }
                     }
                 }
-            }
-            /** \r\n */
-            stream_get_line( $this->sock, 2 );
-            break;
-            /** Multi Bulk */ case '*':
-            $s = null;
-            if ( $reply === '*-1' ) {
+
+                /** \r\n */
+                stream_get_line( $this->sock, 2 );
                 break;
-            }
-            $c = (int) $reply;
-            $s = [];
-            for ( $i = 0; $i < $c; ++$i ) {
-                $s[] = $this->read();
-            }
-            break;
+
+            case '*':
+                /** Multi Bulk */ $s = null;
+                if ( $reply === '*-1' ) {
+                    break;
+                }
+                $c = (int) $reply;
+                $s = [];
+                for ( $i = 0; $i < $c; ++$i ) {
+                    $s[] = $this->read();
+                }
+                break;
             default:
                 throw new RedisException( sprintf( "Unknow response [%s]", $reply ) );
                 break;
@@ -491,13 +507,10 @@ class Redis implements RedisInterface
 
     /**
      * @param string $key
-     *
-     * @return mixed
-     * @throws RedisException
      */
-    public function __unset( string $key )
+    public function __unset( string $key ): void
     {
-        return $this->__call( 'DEL', [ $key ] );
+        $this->__call( 'DEL', [ $key ] );
     }
 
     /**

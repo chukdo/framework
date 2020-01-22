@@ -220,9 +220,22 @@ class Request
      */
     public function from(): ?string
     {
-        return parse_url( HttpRequest::server( 'HTTP_ORIGIN' )
-                              ?: HttpRequest::server( 'HTTP_REFERER' )
-                ?: HttpRequest::server( 'REMOTE_ADDR' ), PHP_URL_HOST );
+        $origin  = HttpRequest::server( 'HTTP_ORIGIN' );
+        $referer = HttpRequest::server( 'HTTP_REFERER' );
+        $remote  = HttpRequest::server( 'REMOTE_ADDR' );
+        $host    = $origin
+            ?: $referer
+                ?: $remote;
+
+        if ( $host !== null ) {
+            $urlHost = parse_url( $host, PHP_URL_HOST );
+
+            if ( $urlHost !== false ) {
+                return $urlHost;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -281,9 +294,9 @@ class Request
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function userAgent(): string
+    public function userAgent(): ?string
     {
         return HttpRequest::userAgent();
     }

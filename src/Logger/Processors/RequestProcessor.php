@@ -25,7 +25,6 @@ class RequestProcessor implements ProcessorInterface
      */
     public function processRecord( array $record ): array
     {
-        $browser                        = Http::browser( HttpRequest::userAgent() );
         $record[ 'extra' ][ 'request' ] = [
             'uri'       => HttpRequest::uri(),
             'request'   => HttpRequest::all(),
@@ -33,13 +32,23 @@ class RequestProcessor implements ProcessorInterface
             'referer'   => HttpRequest::server( 'HTTP_REFERER' ),
             'method'    => HttpRequest::method(),
             'useragent' => [
-                'platform' => $browser[ 'platform' ]
-                    ?: 'Cli',
+                'platform' => 'cli',
+                'browser'  => null,
+                'version'  => null,
+                'mobile'   => null,
+            ],
+        ];
+
+        if ( $ua = HttpRequest::userAgent() ) {
+            $browser = Http::browser( $ua );
+
+            $record[ 'extra' ][ 'request' ][ 'useragent' ] = [
+                'platform' => $browser[ 'platform' ],
                 'browser'  => $browser[ 'browser' ],
                 'version'  => $browser[ 'version' ],
                 'mobile'   => $browser[ 'mobile' ],
-            ],
-        ];
+            ];
+        }
 
         return $record;
     }

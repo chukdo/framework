@@ -3,18 +3,16 @@
 namespace Chukdo\Http;
 
 use Chukdo\Contracts\Http\Input as InputInterface;
+use Chukdo\Helper\To;
 use Chukdo\Json\Json;
 use Chukdo\Helper\HttpRequest;
 use Chukdo\Storage\FileUploaded;
 use Throwable;
 
 /**
- * Gestion des inputs.
+ * Class Input
  *
- * @version      1.0.0
- * @copyright    licence MIT, Copyright (C) 2019 Domingo
- * @since        08/01/2019
- * @author       Domingo Jean-Pierre <jp.domingo@gmail.com>
+ * @package Chukdo\Http
  */
 class Input extends Json implements InputInterface
 {
@@ -25,12 +23,13 @@ class Input extends Json implements InputInterface
      */
     public function __construct( iterable $data = null )
     {
-        $data ??= HttpRequest::all();
+        $data = To::arr( $data
+                             ?: HttpRequest::all() );
 
         /** Trim all input */
         array_walk_recursive( $data, static function( &$v, $k )
         {
-            if ( is_scalar( $v ) ) {
+            if ( is_string( $v ) ) {
                 $v = trim( $v );
             }
         } );

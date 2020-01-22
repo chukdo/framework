@@ -570,7 +570,7 @@ class Mail
             [
                 $mime,
                 $content,
-            ] = Str::match( '/data:([^;]+);base64,(.*)/', $image );
+            ] = Str::matchAll( '/data:([^;]+);base64,(.*)/', $image );
             $name = md5( $content );
 
             $html = str_replace( "data:$mime;base64,$content", 'cid:' . $name, $html );

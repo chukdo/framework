@@ -40,7 +40,7 @@ class ZipcodeValidate implements ValidateInterface
      */
     public function validate( $input ): bool
     {
-        if ( Str::match( '/^\d{5}$/', $input ) ) {
+        if ( Str::matchOne( '/^\d{5}$/', $input ) ) {
             return true;
         }
 

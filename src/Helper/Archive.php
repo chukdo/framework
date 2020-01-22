@@ -51,7 +51,13 @@ final class Archive
             $headerlen += 2;
         }
 
-        return gzinflate( substr( $data, $headerlen ) );
+        $gzinflate = gzinflate( substr( $data, $headerlen ) );
+
+        if ( $gzinflate === false ) {
+            throw new ArchiveException( 'Can\'t ungzip string' );
+        }
+
+        return $gzinflate;
     }
 
     /**
@@ -63,10 +69,14 @@ final class Archive
      */
     public static function unzipString( string $data ): string
     {
-        $head = unpack( 'Vsig/vver/vflag/vmeth/vmodt/vmodd/Vcrc/Vcsize/Vsize/vnamelen/vexlen', substr( $data, 0, 30 ) );
-        $raw  = gzinflate( substr( $data, 30 + $head[ 'namelen' ] + $head[ 'exlen' ], $head[ 'csize' ] ) );
+        $head      = unpack( 'Vsig/vver/vflag/vmeth/vmodt/vmodd/Vcrc/Vcsize/Vsize/vnamelen/vexlen', substr( $data, 0, 30 ) );
+        $gzinflate = gzinflate( substr( $data, 30 + $head[ 'namelen' ] + $head[ 'exlen' ], $head[ 'csize' ] ) );
 
-        return $raw;
+        if ( $gzinflate === false ) {
+            throw new ArchiveException( 'Can\'t unzip string' );
+        }
+
+        return $gzinflate;
     }
 
     /**
