@@ -18,6 +18,6 @@ Class Unwind extends Stage
      */
     public function set( string $field )
     {
-        $this->pipe = '$' . $field;
+        $this->pipe[ 'unwind' ] = '$' . $field;
     }
 }

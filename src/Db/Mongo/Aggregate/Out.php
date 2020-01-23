@@ -18,6 +18,6 @@ Class Out extends Stage
      */
     public function set( string $collection )
     {
-        $this->pipe = $collection;
+        $this->pipe[ 'out' ] = $collection;
     }
 }

@@ -15,13 +15,6 @@ use Chukdo\Contracts\Db\Stage as StageInterface;
 abstract class AbstractPipelineStage implements StageInterface
 {
     /**
-     * @param $pipe
-     *
-     * @return StageInterface
-     */
-    abstract function pipeStage( $pipe ): StageInterface;
-
-    /**
      * @param string $field
      * @param        $expression
      *
@@ -34,6 +27,13 @@ abstract class AbstractPipelineStage implements StageInterface
     }
 
     /**
+     * @param $pipe
+     *
+     * @return StageInterface
+     */
+    abstract function pipeStage( $pipe ): StageInterface;
+
+    /**
      * @param       $expression
      * @param array $boundaries
      *
@@ -42,8 +42,8 @@ abstract class AbstractPipelineStage implements StageInterface
     public function bucket( $expression, array $boundaries ): Bucket
     {
         return $this->pipeStage( 'bucket' )
-            ->groupBy( $expression )
-            ->boundaries( $boundaries );
+                    ->groupBy( $expression )
+                    ->boundaries( $boundaries );
     }
 
     /**
@@ -55,8 +55,8 @@ abstract class AbstractPipelineStage implements StageInterface
     public function bucketAuto( $expression, int $buckets ): BucketAuto
     {
         return $this->pipeStage( 'bucketAuto' )
-            ->groupBy( $expression )
-            ->buckets( $buckets );
+                    ->groupBy( $expression )
+                    ->buckets( $buckets );
     }
 
     /**
@@ -67,7 +67,7 @@ abstract class AbstractPipelineStage implements StageInterface
     public function facet( string $field ): FacetPipelineStage
     {
         return $this->pipeStage( 'facet' )
-            ->facetPipelineStage( $field );
+                    ->facetPipelineStage( $field );
     }
 
     /**
@@ -78,7 +78,7 @@ abstract class AbstractPipelineStage implements StageInterface
     public function count( string $field ): self
     {
         $this->pipeStage( 'count' )
-            ->set( $field );
+             ->set( $field );
 
         return $this;
     }
@@ -94,9 +94,9 @@ abstract class AbstractPipelineStage implements StageInterface
     public function geoNear( float $lon, float $lat, string $distanceField, int $distance ): GeoNear
     {
         return $this->pipeStage( 'geoNear' )
-            ->near( $lon, $lat )
-            ->distanceField( $distanceField )
-            ->maxDistance( $distance );
+                    ->near( $lon, $lat )
+                    ->distanceField( $distanceField )
+                    ->maxDistance( $distance );
     }
 
     /**
@@ -109,10 +109,10 @@ abstract class AbstractPipelineStage implements StageInterface
     public function graphLookup( string $foreignCollection, string $foreignField, string $localField ): GraphLookup
     {
         return $this->pipeStage( 'graphLookup' )
-            ->from( $foreignCollection )
-            ->connectFromField( $foreignField )
-            ->connectToField( $localField )
-            ->as( 'lookup' );
+                    ->from( $foreignCollection )
+                    ->connectFromField( $foreignField )
+                    ->connectToField( $localField )
+                    ->as( 'lookup' );
     }
 
     /**
@@ -123,7 +123,7 @@ abstract class AbstractPipelineStage implements StageInterface
     public function group( $expression ): Group
     {
         return $this->pipeStage( 'group' )
-            ->id( $expression );
+                    ->id( $expression );
     }
 
     /**
@@ -134,7 +134,7 @@ abstract class AbstractPipelineStage implements StageInterface
     public function limit( int $limit ): self
     {
         $this->pipeStage( 'limit' )
-            ->set( $limit );
+             ->set( $limit );
 
         return $this;
     }
@@ -149,10 +149,10 @@ abstract class AbstractPipelineStage implements StageInterface
     public function lookup( string $foreignCollection, string $foreignField, string $localField ): Lookup
     {
         return $this->pipeStage( 'lookup' )
-            ->from( $foreignCollection )
-            ->foreignField( $foreignField )
-            ->localField( $localField )
-            ->as( 'lookup' );
+                    ->from( $foreignCollection )
+                    ->foreignField( $foreignField )
+                    ->localField( $localField )
+                    ->as( 'lookup' );
     }
 
     /**
@@ -161,12 +161,14 @@ abstract class AbstractPipelineStage implements StageInterface
      * @param null   $value
      * @param null   $value2
      *
-     * @return Match
+     * @return $this
      */
-    public function where( string $field, string $operator, $value = null, $value2 = null ): Match
+    public function where( string $field, string $operator, $value = null, $value2 = null ): self
     {
-        return $this->pipeStage( 'match' )
-            ->where( $field, $operator, $value, $value2 );
+        $this->pipeStage( 'match' )
+             ->where( $field, $operator, $value, $value2 );
+
+        return $this;
     }
 
     /**
@@ -175,12 +177,14 @@ abstract class AbstractPipelineStage implements StageInterface
      * @param null   $value
      * @param null   $value2
      *
-     * @return Match
+     * @return $this
      */
-    public function orWhere( string $field, string $operator, $value = null, $value2 = null ): Match
+    public function orWhere( string $field, string $operator, $value = null, $value2 = null ): self
     {
-        return $this->pipeStage( 'match' )
-            ->where( $field, $operator, $value, $value2 );
+        $this->pipeStage( 'match' )
+             ->orWhere( $field, $operator, $value, $value2 );
+
+        return $this;
     }
 
     /**
@@ -192,8 +196,8 @@ abstract class AbstractPipelineStage implements StageInterface
     public function mergeTo( string $collection, string $on = '_id' ): self
     {
         $this->pipeStage( 'merge' )
-            ->into( $collection )
-            ->on( $on );
+             ->into( $collection )
+             ->on( $on );
 
         return $this;
     }
@@ -206,7 +210,7 @@ abstract class AbstractPipelineStage implements StageInterface
     public function saveTo( string $collection ): self
     {
         $this->pipeStage( 'out' )
-            ->set( $collection );
+             ->set( $collection );
 
         return $this;
     }
@@ -251,7 +255,7 @@ abstract class AbstractPipelineStage implements StageInterface
     public function replaceWith( $expression ): self
     {
         $this->pipeStage( 'replaceRoot' )
-            ->set( $expression );
+             ->set( $expression );
 
         return $this;
     }
@@ -264,7 +268,7 @@ abstract class AbstractPipelineStage implements StageInterface
     public function sample( int $size ): self
     {
         $this->pipeStage( 'sample' )
-            ->set( $size );
+             ->set( $size );
 
         return $this;
     }
@@ -277,7 +281,7 @@ abstract class AbstractPipelineStage implements StageInterface
     public function skip( int $skip ): self
     {
         $this->pipeStage( 'skip' )
-            ->set( $skip );
+             ->set( $skip );
 
         return $this;
     }
@@ -286,15 +290,14 @@ abstract class AbstractPipelineStage implements StageInterface
      * @param string $field
      * @param int    $sort
      *
-     * @return Sort
+     * @return $this
      */
-    public function sort( string $field, int $sort = SORT_ASC ): Sort
+    public function sort( string $field, int $sort = SORT_ASC ): self
     {
-        $stage = $this->pipeStage( 'sort' );
+        $this->pipeStage( 'sort' )
+             ->sort( $field, $sort );
 
-        $stage->sort( $field, $sort );
-
-        return $stage;
+        return $this;
     }
 
     /**
@@ -305,7 +308,7 @@ abstract class AbstractPipelineStage implements StageInterface
     public function sortByCount( $expression ): self
     {
         $this->pipeStage( 'sortByCount' )
-            ->set( $expression );
+             ->set( $expression );
 
         return $this;
     }
@@ -318,7 +321,7 @@ abstract class AbstractPipelineStage implements StageInterface
     public function unwind( string $field ): self
     {
         $this->pipeStage( 'unwind' )
-            ->set( $field );
+             ->set( $field );
 
         return $this;
     }

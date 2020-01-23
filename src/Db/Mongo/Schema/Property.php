@@ -165,8 +165,9 @@ class Property implements PropertyInterface
     public function setList( ...$values ): Property
     {
         $list = $this->list();
+
         foreach ( $values as $value ) {
-            foreach ( (array)$value as $v ) {
+            foreach ( (array) $value as $v ) {
                 $list->appendIfNoExist( $v );
             }
         }
@@ -179,7 +180,13 @@ class Property implements PropertyInterface
      */
     public function list(): Json
     {
-        return $this->property->offsetGetOrSet( 'enum' );
+        $enum = $this->property->offsetGetOrSet( 'enum' );
+
+        if ($enum instanceof Json) {
+            return $enum;
+        }
+
+        return new Json();
     }
 
     /**
@@ -287,8 +294,9 @@ class Property implements PropertyInterface
     public function unsetList( ...$values ): Property
     {
         $list = $this->list();
+
         foreach ( $values as $value ) {
-            foreach ( (array)$value as $v ) {
+            foreach ( (array) $value as $v ) {
                 if ( ( $indexOf = $list->indexOf( $v ) ) !== null ) {
                     $list->offsetUnset( $indexOf );
                 }
@@ -317,7 +325,7 @@ class Property implements PropertyInterface
     {
         $required = $this->required();
         foreach ( $fields as $field ) {
-            foreach ( (array)$field as $f ) {
+            foreach ( (array) $field as $f ) {
                 if ( ( $indexOf = $required->indexOf( $f ) ) !== null ) {
                     $required->offsetUnset( $indexOf );
                 }
@@ -393,24 +401,24 @@ class Property implements PropertyInterface
     }
 
     /**
-     * @param string $name
-     * @param null   $type
-     * @param array  $options
+     * @param string                $name
+     * @param string|array|null     $type
+     * @param array                 $options
      *
      * @return Property
      */
     public function set( string $name, $type = null, array $options = [] ): Property
     {
         $property = new Property( $options, $name );
+
         if ( Is::string( $type ) ) {
             $property->setType( $type );
-        } else {
-            if ( Is::arr( $type ) ) {
-                foreach ( $type as $k => $v ) {
-                    $property->set( $k, $v );
-                }
+        } elseif ( Is::arr( $type ) ) {
+            foreach ( $type as $k => $v ) {
+                $property->set( $k, $v );
             }
         }
+
         $this->properties()
              ->offsetSet( $name, $property );
 

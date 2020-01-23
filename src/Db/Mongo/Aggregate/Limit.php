@@ -18,6 +18,6 @@ Class Limit extends Stage
      */
     public function set( int $limit )
     {
-        $this->pipe = $limit;
+        $this->pipe[ 'limit' ] = $limit;
     }
 }

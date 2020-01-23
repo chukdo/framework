@@ -18,6 +18,6 @@ Class Count extends Stage
      */
     public function set( string $field )
     {
-        $this->pipe = $field;
+        $this->pipe[ 'count' ] = $field;
     }
 }

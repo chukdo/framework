@@ -20,6 +20,6 @@ Class Skip extends Stage
      */
     public function set( int $skip )
     {
-        $this->pipe = $skip;
+        $this->pipe[ 'skip' ] = $skip;
     }
 }

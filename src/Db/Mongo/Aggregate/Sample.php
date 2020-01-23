@@ -18,6 +18,6 @@ Class Sample extends Stage
      */
     public function set( int $size )
     {
-        $this->pipe = $size;
+        $this->pipe[ 'sample' ] = $size;
     }
 }

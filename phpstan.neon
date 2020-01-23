@@ -1,19 +1,15 @@
 parameters:
-	checkGenericClassInNonGenericObjectType:
-		false
-	checkMissingIterableValueType:
-		false
+	level: 5
+	checkGenericClassInNonGenericObjectType: false
+	checkMissingIterableValueType: false
 	ignoreErrors:
 		- '#PHPDoc tag @#'
 		- '#Unsafe usage of new static()#'
 		- '#Cannot call method get() on array|League#'
 		- '#Call to an undefined method Chukdo\\Contracts\\Db\\Stage#'
-		- '#with no typehint specified#'
 		- '#Strict comparison using === between string and null will always evaluate to false#'
 		- '#Unreachable statement - code above always terminates#'
-		- '#has no return typehint specified#'
-		- '#expects callable\(\): mixed#'
-		- '#Call to an undefined method object::getResource\(\)#'
 		- '#expects resource, resource given#'
-		- '#has no typehint specified#'
-		- '#Offset .*? does not exist#'
+		- '#will always evaluate to#'
+		- '#readPreference of class MongoDB\\Driver\\ReadPreference constructor expects string, int given#'
+		- '#Chukdo\\Contracts\\Db\\Collection given#'

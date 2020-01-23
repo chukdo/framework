@@ -163,11 +163,11 @@ class Validator
             default :
                 $enum = $this->property->list();
 
-                if ( $enum ) {
+                if ( $enum->count() ) {
                     $validatedData = $this->validateList( $data );
                 }
                 else {
-                    throw new MongoException( sprintf( 'The field [%s] must be a valid type not [%s]', $this->property->name(), $this->property->type() ) );
+                    throw new MongoException( sprintf( 'The field [%s] must be a valid type not [%s]', $this->property->name(), $type ) );
                 }
         }
 
