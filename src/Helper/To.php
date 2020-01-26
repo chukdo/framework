@@ -20,33 +20,6 @@ use function is_string;
 final class To
 {
     /**
-     * @param string $type
-     * @param        $value
-     *
-     * @return array|bool|float|int|string
-     */
-    public static function type( string $type, $value )
-    {
-        switch ( $type ) {
-            case 'boolean':
-                return (bool) $value;
-                break;
-            case 'integer':
-                return (int) $value;
-                break;
-            case 'double':
-                return (float) $value;
-                break;
-            case 'array':
-                return (array) $value;
-                break;
-            case 'string':
-            default:
-                return (string) $value;
-        }
-    }
-
-    /**
      * @param string      $name
      * @param string|null $prefix
      *

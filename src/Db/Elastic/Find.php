@@ -249,7 +249,7 @@ Class Find extends Where implements FindInterface
      */
     public function sort( string $field, int $sort = SORT_ASC ): self
     {
-        $this->sort[] = $field . ':' . ( SORT_ASC
+        $this->sort[] = $field . ':' . ( $sort
                 ? 'asc'
                 : 'desc' );
 

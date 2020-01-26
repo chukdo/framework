@@ -183,7 +183,7 @@ class Property implements PropertyInterface
 
     /**
      * @param string $name
-     * @param null   $type
+     * @param mixed  $type
      * @param array  $options
      *
      * @return Property

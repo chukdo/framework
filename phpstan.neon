@@ -2,6 +2,7 @@ parameters:
 	level: 5
 	checkGenericClassInNonGenericObjectType: false
 	checkMissingIterableValueType: false
+	treatPhpDocTypesAsCertain: false
 	ignoreErrors:
 		- '#PHPDoc tag @#'
 		- '#Unsafe usage of new static()#'
@@ -13,3 +14,4 @@ parameters:
 		- '#will always evaluate to#'
 		- '#readPreference of class MongoDB\\Driver\\ReadPreference constructor expects string, int given#'
 		- '#Chukdo\\Contracts\\Db\\Collection given#'
+		- '#expects.*?callable#'

@@ -87,8 +87,8 @@ Abstract Class Where
     /**
      * @param string $field
      * @param string $operator
-     * @param null   $value
-     * @param null   $value2
+     * @param mixed  $value
+     * @param mixed  $value2
      *
      * @return array
      */
@@ -135,13 +135,14 @@ Abstract Class Where
                 break;
             case 'in':
             case '!in':
-                $in = [];
-                foreach ( $value as $k => $v ) {
-                    $in[ $k ] = Collection::filterIn( $field, $v );
-                }
+            $in = [];
 
-                return [ 'terms' => [ $field => $in, ], ];
-                break;
+            foreach ( (array) $value as $k => $v ) {
+                $in[ $k ] = Collection::filterIn( $field, $v );
+            }
+
+            return [ 'terms' => [ $field => $in, ], ];
+            break;
             case 'size':
                 return [
                     '

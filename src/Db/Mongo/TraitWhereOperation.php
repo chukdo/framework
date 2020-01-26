@@ -57,7 +57,8 @@ Trait TraitWhereOperation
                 break;
             case 'in':
                 $in = [];
-                foreach ( $value as $k => $v ) {
+
+                foreach ( (array) $value as $k => $v ) {
                     $in[ $k ] = Collection::filterIn( $field, $v );
                 }
 

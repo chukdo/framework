@@ -3,7 +3,9 @@
 namespace Chukdo\Db\Mongo\Aggregate;
 
 use Chukdo\Db\Mongo\Collection;
+use Chukdo\Db\Mongo\MongoException;
 use Chukdo\Json\Json;
+use MongoDB\Driver\Cursor as MongoDbCursor;
 
 /**
  * Aggregate.
@@ -70,8 +72,14 @@ Class Aggregate
      */
     public function cursor( array $options = [] ): Cursor
     {
-        return new Cursor( $this->collection->client()
-                                            ->aggregate( $this->projection(), $options ) );
+        $aggregate = $this->collection->client()
+                                      ->aggregate( $this->projection(), $options );
+
+        if ( !( $aggregate instanceof MongoDbCursor ) ) {
+            throw new MongoException( sprintf( 'Aggregate return [%s] instead of MongoDbCursor', get_class( $aggregate ) ) );
+        }
+
+        return new Cursor( $aggregate );
     }
 
     /**
@@ -95,11 +103,17 @@ Class Aggregate
      */
     public function explain(): Json
     {
-        return new Json( new Cursor( $this->collection->client()
-                                                      ->aggregate( $this->projection(), [
-                                                          'explain'   => true,
-                                                          'useCursor' => true,
-                                                      ] ) ) );
+        $aggregate = $this->collection->client()
+                                      ->aggregate( $this->projection(), [
+                                          'explain'   => true,
+                                          'useCursor' => true,
+                                      ] );
+
+        if ( !( $aggregate instanceof MongoDbCursor ) ) {
+            throw new MongoException( sprintf( 'Aggregate return [%s] instead of MongoDbCursor', get_class( $aggregate ) ) );
+        }
+
+        return new Json( new Cursor( $aggregate ) );
     }
 
 }

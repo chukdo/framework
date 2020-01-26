@@ -161,21 +161,21 @@ class Smtp implements TransportInterface
      */
     protected function write( string $c, bool $r = true )
     {
-        if ( $r ) {
-            $c           .= "\r\n";
-            $this->log[] = 'C: ' . $c;
-        }
-
         if ( !is_resource( $this->sock ) ) {
             throw new MailException( 'Error SMTP: Lost connection' );
         }
 
+        if ( $r ) {
+            $c           .= "\r\n";
+            $this->log[] = 'C: ' . $c;
+            @fwrite( $this->sock, $c );
+
+            return $this->read();
+        }
+
         @fwrite( $this->sock, $c );
 
-
-        return $r
-            ? $this->read()
-            : null;
+        return null;
     }
 
     /**
