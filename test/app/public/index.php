@@ -29,6 +29,18 @@ $app->registerServices( [
                             Providers\MongoServiceProvider::class,
                         ] );
 
+// app serveur oauth2
+// db
+// trade
+// network
+// group
+// company
+// kiosk
+// users
+// profiles
+// roles
+// acl
+
 Router::any( '/', static function( Input $inputs, Response $response )
 {
     $response->header( 'X-test', 'test header' );

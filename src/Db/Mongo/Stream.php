@@ -74,9 +74,8 @@ class Stream implements Iterator
     public function current()
     {
         $current    = $this->iterator->current();
-        $collection = $this->collection;
 
-        return Arr::filterRecursive( $current, fn( $v ) => Collection::filterOut( null, $v ) );
+        return Arr::filterRecursive( $current, fn( $v ) => $this->collection::filterOut( null, $v ) );
     }
 
     /**

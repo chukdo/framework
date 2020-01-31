@@ -1,6 +1,10 @@
 <?php
 
 namespace Chukdo\Bootstrap;
+
+use ReflectionClass;
+use ReflectionException;
+
 /**
  * Class loader PSR-4.
  *
@@ -94,18 +98,21 @@ class Loader
         /** normalize namespace */
         $ns = trim( $ns, '\\' );
         foreach ( (array) $paths as $path ) {
+
             /** normalize the base directory with a separator */
             $path = rtrim( $path, DIRECTORY_SEPARATOR ) . DIRECTORY_SEPARATOR;
-            /* initialize the namespace array */
+
+            /** initialize the namespace array */
             if ( isset( $this->namespaces[ $ns ] ) === false ) {
                 $this->namespaces[ $ns ] = [];
             }
-            /* retain the base directory for the namespace */
+
+            /** retain the base directory for the namespace */
             if ( $prepend ) {
                 array_unshift( $this->namespaces[ $ns ], $path );
             }
             else {
-                array_push( $this->namespaces[ $ns ], $path );
+                $this->namespaces[ $ns ][] = $path;
             }
         }
 
@@ -124,6 +131,7 @@ class Loader
         $ns      = explode( '\\', $nsclass );
         $class   = [];
         $class[] = array_pop( $ns );
+
         while ( !empty( $ns ) ) {
             if ( $this->loadFile( implode( '\\', $ns ), implode( '\\', $class ) ) ) {
                 return true;
@@ -132,6 +140,36 @@ class Loader
         }
 
         return false;
+    }
+
+    /**
+     * @param string      $nsString
+     * @param string|null $checkSubClass
+     * @param array       $params
+     *
+     * @return object|null
+     */
+    public static function instanceClass( string $nsString, string $checkSubClass = null, array $params = [] ): ?object
+    {
+        static $reflector = [];
+
+        if ( isset( $reflector[ $nsString ] ) && $reflector[ $nsString ] instanceof ReflectionClass ) {
+            return $reflector[ $nsString ]->newInstanceArgs( $params );
+        }
+
+        try {
+            $reflection = new ReflectionClass( $nsString );
+
+            if ( $checkSubClass === null || ( $checkSubClass && $reflection->isSubclassOf( $checkSubClass ) ) ) {
+                $reflector[ $nsString ] = $reflection;
+
+                return $reflection->newInstanceArgs( $params );
+            }
+        }
+        catch ( ReflectionException $e ) {
+        }
+
+        return null;
     }
 
     /**
@@ -147,8 +185,10 @@ class Loader
         if ( !isset( $this->namespaces[ $ns ] ) ) {
             return false;
         }
+
         foreach ( $this->namespaces[ $ns ] as $path ) {
             $file = $path . str_replace( '\\', DIRECTORY_SEPARATOR, $class ) . '.php';
+
             if ( $this->requireFile( $file ) ) {
                 $this->log[ $class ] = $file;
 

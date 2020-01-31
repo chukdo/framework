@@ -2,7 +2,6 @@
 
 namespace Chukdo\Db\Record;
 
-use Chukdo\Db\Mongo\Collection;
 use Exception;
 use DateTime;
 use Chukdo\Json\Json;
@@ -37,7 +36,7 @@ Class Record extends Json
     public function __construct( CollectionInterface $collection, $data = null )
     {
         $json             = new Json( $data );
-        $filtered         = $json->filterRecursive( fn( $k, $v ) => Collection::filterOut( $k, $v ) );
+        $filtered         = $json->filterRecursive( fn( $k, $v ) => $collection::filterOut( $k, $v ) );
         $this->collection = $collection;
         $this->id         = $filtered->offsetUnset( '_id' );
 

@@ -2,6 +2,7 @@
 
 Namespace Chukdo\Db\Mongo;
 
+use Chukdo\Bootstrap\Loader;
 use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\Db\Record\Record;
 use Chukdo\Db\Mongo\Aggregate\Aggregate;
@@ -14,8 +15,6 @@ use DateTime;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\BSON\Timestamp;
-use ReflectionClass;
-use ReflectionException;
 use Exception;
 
 /**
@@ -48,7 +47,7 @@ Class Collection implements CollectionInterface
     {
         $this->database = $database;
         $client         = $database->server()
-                                   ->client();
+            ->client();
         $this->client   = new MongoDbCollection( $client, $database->name(), $collection );
     }
 
@@ -114,19 +113,10 @@ Class Collection implements CollectionInterface
      */
     public function record( $data ): Record
     {
-        try {
-            $reflector = new ReflectionClass( '\App\Model\Mongo\Record\\' . $this->name() );
-            if ( $reflector->implementsInterface( Record::class ) ) {
-                return $reflector->newInstanceArgs( [
-                                                        $this,
-                                                        $data,
-                                                    ] );
-            }
-        }
-        catch ( ReflectionException $e ) {
-        }
-
-        return new Record( $this, $data );
+        return Loader::instanceClass( '\App\Model\Mongo\Record\\' . $this->name(), Record::class, [
+                $this,
+                $data,
+            ] ) ?? new Record( $this, $data );
     }
 
     /**
@@ -135,7 +125,7 @@ Class Collection implements CollectionInterface
     public function name(): string
     {
         return $this->client()
-                    ->getCollectionName();
+            ->getCollectionName();
     }
 
     /**
@@ -155,23 +145,23 @@ Class Collection implements CollectionInterface
     public function rename( string $collection, string $database = null ): Collection
     {
         $oldDatabase   = $this->database()
-                              ->name();
+            ->name();
         $oldCollection = $this->name();
         $old           = $oldDatabase . '.' . $oldCollection;
         $newDatabase   = $database ?? $oldDatabase;
         $newCollection = $collection;
         $new           = $newDatabase . '.' . $newCollection;
         $command       = $this->database()
-                              ->server()
-                              ->command( [
-                                             'renameCollection' => $old,
-                                             'to'               => $new,
-                                         ] );
+            ->server()
+            ->command( [
+                           'renameCollection' => $old,
+                           'to'               => $new,
+                       ] );
         if ( $command->offsetGet( 'ok' ) === 1 ) {
             return $this->database()
-                        ->server()
-                        ->database( $newDatabase )
-                        ->collection( $newCollection );
+                ->server()
+                ->database( $newDatabase )
+                ->collection( $newCollection );
         }
         throw new MongoException( sprintf( 'Can\'t rename collection [%s] to [%s]', $old, $new ) );
     }
@@ -190,7 +180,7 @@ Class Collection implements CollectionInterface
     public function drop(): bool
     {
         $drop = $this->client()
-                     ->drop();
+            ->drop();
 
         return $drop[ 'ok' ] === 1;
     }
@@ -210,47 +200,55 @@ Class Collection implements CollectionInterface
     {
         $name   = $this->name();
         $dbName = $this->database()
-                       ->name();
+            ->name();
 
         return $this->database()
-                    ->server()
-                    ->command( [ 'collStats' => $name ], $dbName )
-                    ->getIndexJson( 0 )
-                    ->filter( fn( $k, $v ) => is_scalar( $v )
-                        ? $v
-                        : false )
-                    ->clean();
+            ->server()
+            ->command( [ 'collStats' => $name ], $dbName )
+            ->getIndexJson( 0 )
+            ->filter( fn( $k, $v ) => is_scalar( $v )
+                ? $v
+                : false )
+            ->clean();
     }
 
     /**
-     * @return Schema
+     * @return Schema|object
      */
     public function schema(): Schema
     {
-        return new Schema( $this );
+        return Loader::instanceClass( '\App\Model\Mongo\Schema\\' . $this->name(), Schema::class, [
+                $this,
+            ] ) ?? new Schema( $this );
     }
 
     /**
-     * @return Write
+     * @return Write|object
      */
     public function write(): Write
     {
-        return new Write( $this );
+        return Loader::instanceClass( '\App\Model\Mongo\Write\\' . $this->name(), Write::class, [
+                $this,
+            ] ) ?? new Write( $this );
     }
 
     /**
-     * @return Index
+     * @return Index|object
      */
     public function index(): Index
     {
-        return new Index( $this );
+        return Loader::instanceClass( '\App\Model\Mongo\Index\\' . $this->name(), Index::class, [
+                $this,
+            ] ) ?? new Index( $this );
     }
 
     /**
-     * @return Aggregate
+     * @return Aggregate|object
      */
     public function aggregate(): Aggregate
     {
-        return new Aggregate( $this );
+        return Loader::instanceClass( '\App\Model\Mongo\Aggregate\\' . $this->name(), Aggregate::class, [
+                $this,
+            ] ) ?? new Aggregate( $this );
     }
 }
