@@ -4,7 +4,7 @@
 use \App\Providers;
 use \Chukdo\Facades\View;
 use \Chukdo\Facades\Router;
-use Chukdo\Helper\Str;
+use \Chukdo\Facades\Mongo;
 use Chukdo\Http\Input;
 use Chukdo\Http\Response;
 use Chukdo\View\Functions\Basic;
@@ -29,17 +29,11 @@ $app->registerServices( [
                             Providers\MongoServiceProvider::class,
                         ] );
 
-// app serveur oauth2
-// db
-// trade
-// network
-// group
-// company
-// kiosk
-// users
-// profiles
-// roles
-// acl
+$network = Mongo::collection( 'network', 'auth' );
+$schema  = $network->schema();
+
+App::dd( $schema->init() );
+//;
 
 Router::any( '/', static function( Input $inputs, Response $response )
 {

@@ -7,6 +7,7 @@ use Chukdo\Contracts\Db\Collection as CollectionInterface;
 use Chukdo\Db\Record\Record;
 use Chukdo\Db\Mongo\Aggregate\Aggregate;
 use Chukdo\Db\Mongo\Schema\Schema;
+use Chukdo\Facades\App;
 use Chukdo\Json\Json;
 use Chukdo\Helper\Str;
 use Chukdo\Helper\Is;
@@ -47,7 +48,7 @@ Class Collection implements CollectionInterface
     {
         $this->database = $database;
         $client         = $database->server()
-            ->client();
+                                   ->client();
         $this->client   = new MongoDbCollection( $client, $database->name(), $collection );
     }
 
@@ -113,20 +114,48 @@ Class Collection implements CollectionInterface
      */
     public function record( $data ): Record
     {
-        return Loader::instanceClass( '\App\Model\Mongo\Record\\' . $this->name(), Record::class, [
-                $this,
-                $data,
-            ] ) ?? new Record( $this, $data );
+        return Loader::instanceClass( App::conf()
+                                         ->get( 'path.model.mongo.record' ) . $this->path(), Record::class, [
+                                          $this,
+                                          $data,
+                                      ] ) ?? new Record( $this, $data );
     }
 
     /**
      * @return string
      */
-    public function name(): string
+    public function path(): string
     {
-        return $this->client()
-            ->getCollectionName();
+        $databaseName   = $this->database()
+                               ->name( true );
+        $collectionName = $this->name( true );
+
+        return '\\' . $databaseName . '\\' . $collectionName;
     }
+
+    /**
+     * @return Database
+     */
+    public function database(): Database
+    {
+        return $this->database;
+    }
+
+    /**
+     * @param bool $ucFirst
+     *
+     * @return string
+     */
+    public function name( bool $ucFirst = false ): string
+    {
+        $name = $this->client()
+                     ->getCollectionName();
+
+        return $ucFirst
+            ? ucfirst( $name )
+            : $name;
+    }
+
 
     /**
      * @return MongoDbCollection
@@ -145,33 +174,25 @@ Class Collection implements CollectionInterface
     public function rename( string $collection, string $database = null ): Collection
     {
         $oldDatabase   = $this->database()
-            ->name();
+                              ->name();
         $oldCollection = $this->name();
         $old           = $oldDatabase . '.' . $oldCollection;
         $newDatabase   = $database ?? $oldDatabase;
         $newCollection = $collection;
         $new           = $newDatabase . '.' . $newCollection;
         $command       = $this->database()
-            ->server()
-            ->command( [
-                           'renameCollection' => $old,
-                           'to'               => $new,
-                       ] );
+                              ->server()
+                              ->command( [
+                                             'renameCollection' => $old,
+                                             'to'               => $new,
+                                         ] );
         if ( $command->offsetGet( 'ok' ) === 1 ) {
             return $this->database()
-                ->server()
-                ->database( $newDatabase )
-                ->collection( $newCollection );
+                        ->server()
+                        ->database( $newDatabase )
+                        ->collection( $newCollection );
         }
         throw new MongoException( sprintf( 'Can\'t rename collection [%s] to [%s]', $old, $new ) );
-    }
-
-    /**
-     * @return Database
-     */
-    public function database(): Database
-    {
-        return $this->database;
     }
 
     /**
@@ -180,17 +201,20 @@ Class Collection implements CollectionInterface
     public function drop(): bool
     {
         $drop = $this->client()
-            ->drop();
+                     ->drop();
 
         return $drop[ 'ok' ] === 1;
     }
 
     /**
-     * @return Find
+     * @return Find|object
      */
     public function find(): Find
     {
-        return new Find( $this );
+        return Loader::instanceClass( App::conf()
+                                         ->offsetGet( 'path.model.mongo.find' ) . $this->path(), Find::class, [
+                                          $this,
+                                      ] ) ?? new Find( $this );
     }
 
     /**
@@ -200,16 +224,16 @@ Class Collection implements CollectionInterface
     {
         $name   = $this->name();
         $dbName = $this->database()
-            ->name();
+                       ->name();
 
         return $this->database()
-            ->server()
-            ->command( [ 'collStats' => $name ], $dbName )
-            ->getIndexJson( 0 )
-            ->filter( fn( $k, $v ) => is_scalar( $v )
-                ? $v
-                : false )
-            ->clean();
+                    ->server()
+                    ->command( [ 'collStats' => $name ], $dbName )
+                    ->getIndexJson( 0 )
+                    ->filter( fn( $k, $v ) => is_scalar( $v )
+                        ? $v
+                        : false )
+                    ->clean();
     }
 
     /**
@@ -217,9 +241,10 @@ Class Collection implements CollectionInterface
      */
     public function schema(): Schema
     {
-        return Loader::instanceClass( '\App\Model\Mongo\Schema\\' . $this->name(), Schema::class, [
-                $this,
-            ] ) ?? new Schema( $this );
+        return Loader::instanceClass( App::conf()
+                                         ->offsetGet( 'path.model.mongo.schema' ) . $this->path(), Schema::class, [
+                                          $this,
+                                      ] ) ?? new Schema( $this );
     }
 
     /**
@@ -227,9 +252,10 @@ Class Collection implements CollectionInterface
      */
     public function write(): Write
     {
-        return Loader::instanceClass( '\App\Model\Mongo\Write\\' . $this->name(), Write::class, [
-                $this,
-            ] ) ?? new Write( $this );
+        return Loader::instanceClass( App::conf()
+                                         ->offsetGet( 'path.model.mongo.write' ) . $this->path(), Write::class, [
+                                          $this,
+                                      ] ) ?? new Write( $this );
     }
 
     /**
@@ -237,9 +263,10 @@ Class Collection implements CollectionInterface
      */
     public function index(): Index
     {
-        return Loader::instanceClass( '\App\Model\Mongo\Index\\' . $this->name(), Index::class, [
-                $this,
-            ] ) ?? new Index( $this );
+        return Loader::instanceClass( App::conf()
+                                         ->offsetGet( 'path.model.mongo.index' ) . $this->path(), Index::class, [
+                                          $this,
+                                      ] ) ?? new Index( $this );
     }
 
     /**
@@ -247,8 +274,9 @@ Class Collection implements CollectionInterface
      */
     public function aggregate(): Aggregate
     {
-        return Loader::instanceClass( '\App\Model\Mongo\Aggregate\\' . $this->name(), Aggregate::class, [
-                $this,
-            ] ) ?? new Aggregate( $this );
+        return Loader::instanceClass( App::conf()
+                                         ->offsetGet( 'path.model.mongo.aggregate' ) . $this->path(), Aggregate::class, [
+                                          $this,
+                                      ] ) ?? new Aggregate( $this );
     }
 }

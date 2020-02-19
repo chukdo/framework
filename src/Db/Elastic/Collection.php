@@ -3,6 +3,8 @@
 Namespace Chukdo\Db\Elastic;
 
 use Chukdo\Bootstrap\Loader;
+use Chukdo\Conf\Conf;
+use Chukdo\Facades\App;
 use MongoDB\BSON\ObjectId;
 use Chukdo\Db\Elastic\Schema\Schema;
 use Chukdo\Helper\Is;
@@ -99,18 +101,43 @@ Class Collection implements CollectionInterface
      */
     public function record( $data ): Record
     {
-        return Loader::instanceClass( '\App\Model\Elastic\Record\\' . $this->name(), Record::class, [
-                $this,
-                $data,
-            ] ) ?? new Record( $this, $data );
+        return Loader::instanceClass( App::conf()
+                                         ->offsetGet( 'path.model.elastic.record' ) . $this->path(), Record::class, [
+                                          $this,
+                                          $data,
+                                      ] ) ?? new Record( $this, $data );
     }
 
     /**
      * @return string
      */
-    public function name(): string
+    public function path(): string
     {
-        return $this->collection;
+        $databaseName   = $this->database()
+                               ->name( true );
+        $collectionName = $this->name( true );
+
+        return '\\' . $databaseName . '\\' . $collectionName;
+    }
+
+    /**
+     * @return Database
+     */
+    public function database(): Database
+    {
+        return $this->database;
+    }
+
+    /**
+     * @param bool $ucFirst
+     *
+     * @return string
+     */
+    public function name( bool $ucFirst = false ): string
+    {
+        return $ucFirst
+            ? ucfirst( $this->collection )
+            : $this->collection;
     }
 
     /**
@@ -123,39 +150,31 @@ Class Collection implements CollectionInterface
     public function rename( string $collection, string $database = null, Schema $schema = null ): Collection
     {
         $database      ??= $this->database()
-            ->name();
+                                ->name();
         $newCollection = $this->database()
-            ->server()
-            ->database( $database )
-            ->dropCollection( $collection )
-            ->createCollection( $collection );
+                              ->server()
+                              ->database( $database )
+                              ->dropCollection( $collection )
+                              ->createCollection( $collection );
         $newCollection->client()
-            ->indices()
-            ->putMapping( [
-                              'index' => $newCollection->fullName(),
-                              'body'  => $schema
-                                  ? $schema->toArray()
-                                  : $this->schema()
-                                      ->toArray(),
-                          ] );
+                      ->indices()
+                      ->putMapping( [
+                                        'index' => $newCollection->fullName(),
+                                        'body'  => $schema
+                                            ? $schema->toArray()
+                                            : $this->schema()
+                                                   ->toArray(),
+                                    ] );
         $this->client()
-            ->reindex( [
-                           'body' => [
-                               'source' => [ 'index' => $this->fullName() ],
-                               'dest'   => [ 'index' => $newCollection->fullName() ],
-                           ],
-                       ] );
+             ->reindex( [
+                            'body' => [
+                                'source' => [ 'index' => $this->fullName() ],
+                                'dest'   => [ 'index' => $newCollection->fullName() ],
+                            ],
+                        ] );
         $this->drop();
 
         return $newCollection;
-    }
-
-    /**
-     * @return Database
-     */
-    public function database(): Database
-    {
-        return $this->database;
     }
 
     /**
@@ -164,7 +183,7 @@ Class Collection implements CollectionInterface
     public function client(): Client
     {
         return $this->database()
-            ->client();
+                    ->client();
     }
 
     /**
@@ -173,7 +192,7 @@ Class Collection implements CollectionInterface
     public function fullName(): string
     {
         return $this->database()
-                ->prefixName() . $this->name();
+                    ->prefixName() . $this->name();
     }
 
     /**
@@ -181,9 +200,10 @@ Class Collection implements CollectionInterface
      */
     public function schema(): Schema
     {
-        return Loader::instanceClass( '\App\Model\Elastic\Schema\\' . $this->name(), Schema::class, [
-                $this,
-            ] ) ?? new Schema( $this );
+        return Loader::instanceClass( App::conf()
+                                         ->offsetGet( 'path.model.elastic.schema' ) . $this->path(), Schema::class, [
+                                          $this,
+                                      ] ) ?? new Schema( $this );
     }
 
     /**
@@ -193,8 +213,8 @@ Class Collection implements CollectionInterface
     {
         try {
             $this->client()
-                ->indices()
-                ->delete( [ 'index' => $this->fullName() ] );
+                 ->indices()
+                 ->delete( [ 'index' => $this->fullName() ] );
 
             return true;
         }
@@ -207,11 +227,14 @@ Class Collection implements CollectionInterface
     }
 
     /**
-     * @return Find
+     * @return Find|object
      */
     public function find(): Find
     {
-        return new Find( $this );
+        return Loader::instanceClass( App::conf()
+                                         ->offsetGet( 'path.model.elastic.find' ) . $this->path(), Find::class, [
+                                          $this,
+                                      ] ) ?? new Find( $this );
     }
 
     /**
@@ -220,8 +243,8 @@ Class Collection implements CollectionInterface
     public function info(): Json
     {
         $stats = new Json( $this->client()
-                               ->indices()
-                               ->stats( [ 'index' => $this->name() ] ) );
+                                ->indices()
+                                ->stats( [ 'index' => $this->fullName() ] ) );
 
         return $stats->getJson( 'indices.' . $this->fullName() );
     }
@@ -231,8 +254,9 @@ Class Collection implements CollectionInterface
      */
     public function write(): Write
     {
-        return Loader::instanceClass( '\App\Model\Elastic\Write\\' . $this->name(), Write::class, [
-                $this,
-            ] ) ?? new Write( $this );
+        return Loader::instanceClass( App::conf()
+                                         ->offsetGet( 'path.model.elastic.write' ) . $this->path(), Write::class, [
+                                          $this,
+                                      ] ) ?? new Write( $this );
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model\Mongo\Record;
+namespace App\Model\Mongo\Record\Auth;
 
 use Chukdo\Db\Record\Record;
 

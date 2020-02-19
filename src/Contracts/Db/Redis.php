@@ -69,6 +69,13 @@ interface Redis extends Iterator, Countable
     public function exists( string $key );
 
     /**
+     * @param int $key
+     *
+     * @return mixed
+     */
+    public function expire( int $key );
+
+    /**
      * @param string $key
      * @param        $value
      *

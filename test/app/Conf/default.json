@@ -7,5 +7,23 @@
     "ws": "1",
     "api": "1",
     "webhook": "1"
+  },
+  "path": {
+    "model": {
+      "mongo": {
+        "record": "\\App\\Model\\Mongo\\Record",
+        "schema": "\\App\\Model\\Mongo\\Schema",
+        "write": "\\App\\Model\\Mongo\\Write",
+        "find": "\\App\\Model\\Mongo\\Find",
+        "index": "\\App\\Model\\Mongo\\Index",
+        "Aggregate": "\\App\\Model\\Mongo\\Aggregate"
+      },
+      "elastic": {
+        "record": "\\App\\Model\\Elastic\\Record",
+        "schema": "\\App\\Model\\Elastic\\Schema",
+        "write": "\\App\\Model\\Elastic\\Write",
+        "find": "\\App\\Model\\Elastic\\Find"
+      }
+    }
   }
 }

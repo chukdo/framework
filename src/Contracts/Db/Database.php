@@ -25,9 +25,11 @@ interface Database
     public function server(): Server;
 
     /**
+     * @param bool $ucFirst
+     *
      * @return string|null
      */
-    public function name(): ?string;
+    public function name( bool $ucFirst = false ): ?string;
 
     /**
      * @return JsonInterface

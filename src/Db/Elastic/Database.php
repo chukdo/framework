@@ -95,11 +95,15 @@ Class Database implements DatabaseInterface
     }
 
     /**
+     * @param bool $ucFirst
+     *
      * @return string|null
      */
-    public function name(): ?string
+    public function name( bool $ucFirst = false ): ?string
     {
-        return $this->database;
+        return $ucFirst
+            ? ucfirst( $this->database )
+            : $this->database;
     }
 
     /**

@@ -2,6 +2,8 @@
 
 namespace Chukdo\Db\Elastic\Schema;
 
+use Chukdo\Db\Elastic\ElasticException;
+use Chukdo\Helper\Arr;
 use Throwable;
 use Chukdo\Contracts\Db\Schema as SchemaInterface;
 use Chukdo\Db\Elastic\Collection;
@@ -45,6 +47,33 @@ class Schema implements SchemaInterface
     }
 
     /**
+     * @param array $schema
+     *
+     * @return $this
+     */
+    public function init( array $schema = [] ): self
+    {
+        $collection     = $this->collection();
+        $collectionName = $collection->fullName();
+        $database       = $collection->database();
+
+        /** Creation de la collection si elle n'existe pas */
+        if ( !$database->collectionExist( $collectionName ) ) {
+            $database->createCollection( $collectionName );
+        }
+
+        /** Suppression du schema */
+        if ( !Arr::empty( $schema ) && $this->drop() ) {
+            $this->property = new Property( $schema );
+            $this->save();
+
+            return $this;
+        }
+
+        throw new ElasticException( sprintf( 'Can\'t drop schema from [%s] collection', $collectionName ) );
+    }
+
+    /**
      * @param array $properties
      *
      * @return $this
@@ -75,7 +104,7 @@ class Schema implements SchemaInterface
     public function set( string $name, $type = null, array $options = [] ): self
     {
         $this->property()
-             ->set( $name, $type, $options );
+            ->set( $name, $type, $options );
 
         return $this;
     }
@@ -95,13 +124,13 @@ class Schema implements SchemaInterface
     {
         try {
             $this->collection()
-                 ->client()
-                 ->indices()
-                 ->putMapping( [
-                                   'index' => $this->collection()
-                                                   ->fullName(),
-                                   'body'  => [],
-                               ] );
+                ->client()
+                ->indices()
+                ->putMapping( [
+                                  'index' => $this->collection()
+                                      ->fullName(),
+                                  'body'  => [],
+                              ] );
 
             return true;
         }
@@ -126,7 +155,7 @@ class Schema implements SchemaInterface
     public function get( string $name ): ?Property
     {
         return $this->property()
-                    ->get( $name );
+            ->get( $name );
     }
 
     /**
@@ -137,7 +166,7 @@ class Schema implements SchemaInterface
     public function unset( string $name ): self
     {
         $this->property()
-             ->unset( $name );
+            ->unset( $name );
 
         return $this;
     }
@@ -148,13 +177,13 @@ class Schema implements SchemaInterface
     public function save(): bool
     {
         $save = new Json( $this->collection()
-                               ->client()
-                               ->indices()
-                               ->putMapping( [
-                                                 'index' => $this->collection()
-                                                                 ->name(),
-                                                 'body'  => $this->toArray(),
-                                             ] ) );
+                              ->client()
+                              ->indices()
+                              ->putMapping( [
+                                                'index' => $this->collection()
+                                                    ->name(),
+                                                'body'  => $this->toArray(),
+                                            ] ) );
 
         return $save->offsetGet( 'acknowledged' ) === 1;
     }
@@ -165,6 +194,6 @@ class Schema implements SchemaInterface
     public function toArray(): array
     {
         return $this->property()
-                    ->toArray();
+            ->toArray();
     }
 }

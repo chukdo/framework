@@ -67,6 +67,15 @@ class Redis implements RedisInterface
 
         $host = $urlParsed[ 'host' ];
         $port = $urlParsed[ 'port' ];
+
+        if ( $urlParsed[ 'scheme' ] === 'ssl' ) {
+            $host = 'ssl://' . $host;
+        }
+
+        if ( $urlParsed[ 'scheme' ] === 'tls' ) {
+            $host = 'tls://' . $host;
+        }
+
         $sock = fsockopen( $host, $port, $errno, $errstr, $timeout ?? 5 );
 
         if ( $sock === false ) {
@@ -440,6 +449,17 @@ class Redis implements RedisInterface
     public function exists( string $key )
     {
         return $this->__call( 'EXISTS', [ $key ] );
+    }
+
+    /**
+     * @param int $key second
+     *
+     * @return mixed
+     * @throws RedisException
+     */
+    public function expire( int $key )
+    {
+        return $this->__call( 'EXPIRE', [ $key ] );
     }
 
     /**

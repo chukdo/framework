@@ -39,40 +39,45 @@ class Property implements PropertyInterface
     {
         $this->name     = $name;
         $this->property = new Json();
+
         foreach ( $property as $key => $value ) {
             switch ( $key ) {
                 case 'properties' :
-                    $this->setProperties( (array)$value );
+                    $this->setProperties( $value );
                     break;
+                case 'type' :
                 case 'bsonType' :
-                    $this->setType( (array)$value );
+                    $this->setType( (array) $value );
                     break;
                 case 'description':
-                    $this->setDescription( (string)$value );
+                    $this->setDescription( (string) $value );
                     break;
                 case 'pattern':
-                    $this->setPattern( (string)$value );
+                    $this->setPattern( (string) $value );
                     break;
                 case 'minimum' :
-                    $this->setMin( (int)$value );
+                    $this->setMin( (int) $value );
                     break;
                 case 'maximum' :
-                    $this->setMax( (int)$value );
+                    $this->setMax( (int) $value );
                     break;
+                case 'list' :
                 case 'enum' :
-                    $this->setList( (array)$value );
+                    $this->setList( (array) $value );
                     break;
+                case 'min' :
                 case 'minItems':
-                    $this->setMinItems( (int)$value );
+                    $this->setMinItems( (int) $value );
                     break;
+                case 'max' :
                 case 'maxItems':
-                    $this->setMaxItems( (int)$value );
+                    $this->setMaxItems( (int) $value );
                     break;
                 case 'items':
-                    $this->setItems( (array)$value );
+                    $this->setItems( (array) $value );
                     break;
                 case 'required' :
-                    $this->setRequired( (array)$value );
+                    $this->setRequired( (array) $value );
                     break;
             }
         }
@@ -86,8 +91,9 @@ class Property implements PropertyInterface
     public function setProperties( array $value ): Property
     {
         $properties = $this->property->offsetGetOrSet( 'properties' );
+
         foreach ( $value as $k => $v ) {
-            $properties->offsetSet( $k, new Property( (array)$v, $k ) );
+            $properties->offsetSet( $k, new Property( $v, $k ) );
         }
 
         return $this;
@@ -104,6 +110,7 @@ class Property implements PropertyInterface
         if ( $value === 'keyword' || $value === 'text' ) {
             $value = 'string';
         }
+
         $this->property->offsetSet( 'bsonType', $value );
 
         return $this;
@@ -234,7 +241,7 @@ class Property implements PropertyInterface
     {
         $required = $this->required();
         foreach ( Arr::spreadArgs( $fields ) as $field ) {
-            foreach ( (array)$field as $f ) {
+            foreach ( (array) $field as $f ) {
                 $required->appendIfNoExist( $f );
             }
         }
@@ -413,7 +420,8 @@ class Property implements PropertyInterface
 
         if ( Is::string( $type ) ) {
             $property->setType( $type );
-        } elseif ( Is::arr( $type ) ) {
+        }
+        elseif ( Is::arr( $type ) ) {
             foreach ( $type as $k => $v ) {
                 $property->set( $k, $v );
             }

@@ -191,16 +191,16 @@ class Property implements PropertyInterface
     public function set( string $name, $type = null, array $options = [] ): Property
     {
         $property = new Property( $options, $name );
+
         if ( Is::string( $type ) ) {
             $property->setType( $type );
         }
-        else {
-            if ( Is::arr( $type ) ) {
-                foreach ( $type as $k => $v ) {
-                    $property->set( $k, $v );
-                }
+        elseif ( Is::arr( $type ) ) {
+            foreach ( $type as $k => $v ) {
+                $property->set( $k, $v );
             }
         }
+
         $this->properties()
              ->offsetSet( $name, $property );
 

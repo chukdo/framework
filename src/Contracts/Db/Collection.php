@@ -39,7 +39,14 @@ interface Collection
     /**
      * @return string
      */
-    public function name(): string;
+    public function path(): string;
+
+    /**
+     * @param bool $ucFirst
+     *
+     * @return string
+     */
+    public function name( bool $ucFirst = false ): string;
 
     /**
      * @return Json

@@ -390,7 +390,7 @@ class Validator
     /**
      * @param Json $data
      */
-    protected function checkMaxItems( Json $data )
+    protected function checkMaxItems( Json $data ): void
     {
         if ( ( $max = $this->property->maxItems() ) && $data->count() > $max ) {
             throw new MongoException( sprintf( 'The field [%s] must have less than [%s] items', $this->property->name(), $max ) );

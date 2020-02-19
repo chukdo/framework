@@ -4,6 +4,8 @@ namespace Chukdo\Db\Mongo\Schema;
 
 use Chukdo\Contracts\Db\Schema as SchemaInterface;
 use Chukdo\Db\Mongo\Collection;
+use Chukdo\Db\Mongo\MongoException;
+use Chukdo\Helper\Arr;
 use Chukdo\Json\Json;
 
 /**
@@ -45,6 +47,33 @@ class Schema implements SchemaInterface
     }
 
     /**
+     * @param array $schema
+     *
+     * @return $this
+     */
+    public function init( array $schema = [] ): self
+    {
+        $collection     = $this->collection();
+        $collectionName = $collection->name();
+        $database       = $collection->database();
+
+        /** Creation de la collection si elle n'existe pas */
+        if ( !$database->collectionExist( $collectionName ) ) {
+            $database->createCollection( $collectionName );
+        }
+
+        /** Suppression du schema */
+        if ( !Arr::empty( $schema ) && $this->drop() ) {
+            $this->property = new Property( $schema );
+            $this->save();
+
+            return $this;
+        }
+
+        throw new MongoException( sprintf( 'Can\'t drop schema from [%s] collection', $collectionName ) );
+    }
+
+    /**
      * @return bool
      */
     public function drop(): bool
@@ -59,7 +88,8 @@ class Schema implements SchemaInterface
                                  ->client()
                                  ->modifyCollection( $this->collection()
                                                           ->name(), $schema ) );
-        if ( $save->offsetGet( 'ok' ) === 1 ) {
+
+        if ( (int) $save->offsetGet( 'ok' ) === 1 ) {
             $this->property = new Property();
 
             return true;

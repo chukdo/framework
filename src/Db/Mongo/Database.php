@@ -57,12 +57,18 @@ Class Database implements DatabaseInterface
     }
 
     /**
+     * @param bool $ucFirst
+     *
      * @return string|null
      */
-    public function name(): ?string
+    public function name( bool $ucFirst = false ): ?string
     {
-        return $this->client()
-                    ->getDatabaseName();
+        $name = $this->client()
+                     ->getDatabaseName();
+
+        return $ucFirst
+            ? ucfirst( $name )
+            : $name;
     }
 
     /**
@@ -118,6 +124,7 @@ Class Database implements DatabaseInterface
     public function collections(): Json
     {
         $list = new Json();
+
         foreach ( $this->client()
                        ->listCollections() as $collection ) {
             $list->append( $collection->getName() );

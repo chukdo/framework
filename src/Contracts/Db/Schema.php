@@ -15,6 +15,13 @@ use Chukdo\Contracts\Json\Json as JsonInterface;
 interface Schema
 {
     /**
+     * @param array $schema
+     *
+     * @return Schema
+     */
+    public function init( array $schema = [] ): Schema;
+
+    /**
      * @return Collection
      */
     public function collection(): Collection;
